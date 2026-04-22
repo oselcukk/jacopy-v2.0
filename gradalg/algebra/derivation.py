@@ -133,6 +133,10 @@ def degree_of(
       the same ``Product`` node).
     * :class:`Neg` — same as its argument; negation is a scalar sign.
     * :class:`Act` — ``|D(x)| = |D| + |x|``.
+    * :class:`gradalg.brackets.base.BracketApply` —
+      ``|[a, b]| = |a| + |b| + bracket.degree``. Resolved via a late
+      import so the algebra layer does not depend on the brackets
+      layer at import time.
     * Registry :class:`Scalar` — degree 0.
     * Registry :class:`Graded` — its own degree.
     * Otherwise — :class:`ValueError`.
@@ -155,6 +159,15 @@ def degree_of(
     if isinstance(expr, Act):
         return degree_of(expr.op, registry) + degree_of(
             expr.arg, registry
+        )
+    # Brackets are a higher layer; resolve via late import to avoid
+    # an algebra → brackets cycle.
+    from gradalg.brackets.base import BracketApply  # noqa: WPS433
+    if isinstance(expr, BracketApply):
+        return (
+            degree_of(expr.a, registry)
+            + degree_of(expr.b, registry)
+            + expr.bracket.degree
         )
     if registry is not None:
         if registry.has(expr, Scalar):

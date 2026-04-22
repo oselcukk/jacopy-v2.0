@@ -102,6 +102,16 @@ def _canon_neg(arg: Expr) -> Expr:
         return Integer(-arg.value)
     if isinstance(arg, Rational):
         return Rational(-arg.p, arg.q)
+    if isinstance(arg, Sum):
+        # Push Neg through Sum: −(a + b + c) → (−a) + (−b) + (−c).
+        # This lets like-term collection cancel across signs (e.g.
+        # `X − (X − Y) → Y`). Each child is already canonical, so
+        # recurse through _canon_neg for proper Integer/Neg folding,
+        # then re-canonicalize the rebuilt Sum so sign-flipped terms
+        # merge with their opposites.
+        return _canon_sum(
+            tuple(_canon_neg(c) for c in arg.children)
+        )
     return Neg(arg)
 
 

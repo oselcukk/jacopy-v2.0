@@ -236,11 +236,21 @@ class TestIdempotent:
 
 
 class TestNested:
-    def test_neg_of_sum(self):
+    def test_neg_of_sum_distributes(self):
         x, y = Symbol("x"), Symbol("y")
-        # -(x + y) remains as Neg(Sum(x,y)); Sum stays internal.
+        # -(x + y) → -x + -y. Distributing Neg through Sum lets
+        # downstream collect_terms cancel across signs; the prior
+        # no-distribute behavior left cancellations trapped inside a
+        # Neg envelope. Output order is stable-sorted by repr.
         r = canonicalize(Neg(x + y))
-        assert r == Neg(Sum(x, y)) or r == Neg(Sum(y, x))
+        assert r == Sum(Neg(x), Neg(y)) or r == Sum(Neg(y), Neg(x))
+
+    def test_neg_of_sum_cancels_across_signs(self):
+        """X − (X − Y) → Y — the whole point of distributing Neg
+        through Sum."""
+        x, y = Symbol("x"), Symbol("y")
+        r = canonicalize(Sum(x, Neg(Sum(x, Neg(y)))))
+        assert r == y
 
     def test_nested_sum_in_product(self):
         x, y = Symbol("x"), Symbol("y")

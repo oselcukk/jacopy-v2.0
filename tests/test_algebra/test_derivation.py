@@ -194,6 +194,35 @@ class TestDegreeOf:
         e = Derivation("e", degree=2)
         assert degree_of(Act(d, Act(e, x)), reg) == Degree.const(4)
 
+    def test_bracketapply_adds_bracket_degree(self):
+        """|[a, b]| = |a| + |b| + bracket.degree."""
+        # Bracket of degree −1 (e.g. derived bracket from a deg-1
+        # generator: |Q| − 2 = −1) over two degree-1 operands.
+        from gradalg.brackets.custom import CustomBracket
+        reg = PropertyRegistry()
+        a = Symbol("a")
+        b = Symbol("b")
+        reg.declare(a, Graded(degree=1))
+        reg.declare(b, Graded(degree=1))
+        B = CustomBracket(
+            "B",
+            lambda x, y, r: x,  # expansion is irrelevant for degree
+            degree=-1,
+        )
+        assert degree_of(B(a, b), reg) == Degree.const(1)
+
+    def test_bracketapply_symbolic_degree(self):
+        """Bracket degree propagates symbolically."""
+        from gradalg.brackets.custom import CustomBracket
+        reg = PropertyRegistry()
+        a, b = Symbol("a"), Symbol("b")
+        reg.declare(a, Graded(degree=Degree.var("|a|")))
+        reg.declare(b, Graded(degree=Degree.var("|b|")))
+        B = CustomBracket("B", lambda x, y, r: x, degree=0)
+        assert degree_of(B(a, b), reg) == (
+            Degree.var("|a|") + Degree.var("|b|")
+        )
+
 
 # --------------------------------------------------------------------- #
 # compose                                                                #

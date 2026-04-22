@@ -3,7 +3,15 @@ Full simplification pipeline.
 
 Composes the Faz 2 passes into a single fix-point driver:
 
-    flatten → distribute → sort_product → collect_terms
+    flatten → distribute → canonicalize → sort_product → collect_terms
+
+The canonicalize step handles per-node normalizations that the other
+passes skip: Neg folding (``−(−x) → x``, ``−(a + b) → (−a) + (−b)``),
+Power trivialities, numeric-coefficient consolidation in Products.
+The Neg-over-Sum distribution in particular is what allows
+cancellations trapped inside a ``Neg(Sum(...))`` envelope to reach
+``collect_terms`` — without it, identities like Lie Jacobi fail to
+close even after full expansion.
 
 The Koszul sort step requires a :class:`PropertyRegistry` — pass one
 to enable it, or leave ``registry=None`` to skip sorting entirely (the
@@ -22,6 +30,7 @@ from __future__ import annotations
 
 from typing import Optional
 
+from gradalg.algorithms.canonicalize import canonicalize
 from gradalg.algorithms.collect_terms import collect_terms
 from gradalg.algorithms.distribute import distribute
 from gradalg.algorithms.flatten import flatten
@@ -46,8 +55,20 @@ def simplify(
     """
     current = expr
     for _ in range(max_iterations):
+        # 1. Flatten associative chains.
         step = flatten(current)
+        # 2. Normalize Neg / numeric folds. In particular, Neg-over-Sum
+        #    distribution here produces new Sums that the subsequent
+        #    ``distribute`` pass then pushes through any enclosing
+        #    Products. Running canonicalize *before* distribute is what
+        #    lets identities like Lie Jacobi close.
+        step = canonicalize(step)
+        # 3. Multiply out Products over Sums.
         step = distribute(step)
+        # 4. Re-flatten — distribute can leave freshly exposed
+        #    associative chains (a * (b*c) branches that were behind
+        #    a Sum) that would confuse sort_product.
+        step = flatten(step)
         if registry is not None:
             step = _sort_all_products(step, registry)
         step = collect_terms(step)
