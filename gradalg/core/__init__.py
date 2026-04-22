@@ -28,6 +28,9 @@ from gradalg.core.properties import (
     Symmetric,
     Antisymmetric,
     GradedAntisymmetric,
+    NonCommuting,
+    AntiCommuting,
+    GradedCommutative,
 )
 from gradalg.core.registry import (
     PropertyRegistry,
@@ -73,6 +76,9 @@ __all__ = [
     "Symmetric",
     "Antisymmetric",
     "GradedAntisymmetric",
+    "NonCommuting",
+    "AntiCommuting",
+    "GradedCommutative",
     # registry
     "PropertyRegistry",
     "default_registry",

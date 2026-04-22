@@ -3,9 +3,12 @@
 import pytest
 
 from gradalg.core.properties import (
+    AntiCommuting,
     Antisymmetric,
     Graded,
     GradedAntisymmetric,
+    GradedCommutative,
+    NonCommuting,
     ProofRef,
     Property,
     Provenance,
@@ -123,5 +126,46 @@ class TestSymmetryProperties:
 
 class TestPropertyHierarchy:
     def test_concrete_subclasses_are_property(self):
-        for cls in [Scalar, Graded, Symmetric, Antisymmetric, GradedAntisymmetric]:
+        for cls in [
+            Scalar,
+            Graded,
+            Symmetric,
+            Antisymmetric,
+            GradedAntisymmetric,
+            NonCommuting,
+            AntiCommuting,
+            GradedCommutative,
+        ]:
             assert issubclass(cls, Property)
+
+
+class TestCommutativityMarkers:
+    def test_three_distinct_types(self):
+        assert NonCommuting() != AntiCommuting()
+        assert AntiCommuting() != GradedCommutative()
+        assert NonCommuting() != GradedCommutative()
+
+    def test_same_type_equal(self):
+        assert NonCommuting() == NonCommuting()
+        assert AntiCommuting() == AntiCommuting()
+        assert GradedCommutative() == GradedCommutative()
+
+    def test_carry_provenance(self):
+        p = GradedCommutative(
+            provenance=Provenance.DERIVED, proof=ProofRef("r")
+        )
+        assert p.is_derived
+        assert p.proof.rule == "r"
+
+    def test_axiom_cannot_carry_proof(self):
+        with pytest.raises(ValueError):
+            NonCommuting(proof=ProofRef("r"))
+
+    def test_hashable(self):
+        s = {
+            NonCommuting(),
+            AntiCommuting(),
+            GradedCommutative(),
+            NonCommuting(),
+        }
+        assert len(s) == 3

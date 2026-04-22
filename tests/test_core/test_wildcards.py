@@ -41,14 +41,36 @@ class TestWildcardConstruction:
         with pytest.raises(TypeError):
             Wildcard("A", type_filter=int)  # type: ignore[arg-type]
 
+    def test_with_expr_type_single(self):
+        w = Wildcard("S", expr_type=Symbol)
+        assert w.expr_type == (Symbol,)
+
+    def test_with_expr_type_tuple(self):
+        w = Wildcard("N", expr_type=(Integer, Sum))
+        assert w.expr_type == (Integer, Sum)
+
+    def test_rejects_non_expr_type(self):
+        with pytest.raises(TypeError):
+            Wildcard("A", expr_type=int)  # type: ignore[arg-type]
+
+    def test_rejects_tuple_with_non_expr(self):
+        with pytest.raises(TypeError):
+            Wildcard("A", expr_type=(Symbol, int))  # type: ignore[arg-type]
+
     def test_repr(self):
         assert repr(Wildcard("A")) == "?A"
         assert repr(Wildcard("X", type_filter=Scalar)) == "?X:Scalar"
+        assert repr(Wildcard("S", expr_type=Symbol)) == "?S<Symbol>"
+        assert (
+            repr(Wildcard("N", expr_type=(Integer, Sum)))
+            == "?N<Integer|Sum>"
+        )
 
     def test_equality(self):
         assert Wildcard("A") == Wildcard("A")
         assert Wildcard("A") != Wildcard("B")
         assert Wildcard("A") != Wildcard("A", type_filter=Scalar)
+        assert Wildcard("A") != Wildcard("A", expr_type=Symbol)
 
     def test_usable_in_expression_builders(self):
         a, b = Wildcard("A"), Wildcard("B")
@@ -173,6 +195,40 @@ class TestTypeFilter:
 
 
 # --------------------------------------------------------------------- #
+# Expr-type filter                                                      #
+# --------------------------------------------------------------------- #
+
+
+class TestExprTypeFilter:
+    def test_matches_symbol_only(self):
+        w = Wildcard("S", expr_type=Symbol)
+        x = Symbol("x")
+        assert match(w, x) == {"S": x}
+        # Sum should not match.
+        assert match(w, Sum(x, Symbol("y"))) is None
+
+    def test_matches_integer_only(self):
+        w = Wildcard("N", expr_type=Integer)
+        assert match(w, Integer(3)) == {"N": Integer(3)}
+        assert match(w, Symbol("x")) is None
+
+    def test_tuple_accepts_any(self):
+        w = Wildcard("A", expr_type=(Symbol, Integer))
+        assert match(w, Symbol("x")) == {"A": Symbol("x")}
+        assert match(w, Integer(7)) == {"A": Integer(7)}
+        assert match(w, Sum(Symbol("x"), Symbol("y"))) is None
+
+    def test_combines_with_type_filter(self):
+        reg = PropertyRegistry()
+        reg.declare(Symbol("f"), Scalar())
+        # Must be a Symbol AND registered as Scalar.
+        w = Wildcard("F", type_filter=Scalar, expr_type=Symbol)
+        assert match(w, Symbol("f"), reg) == {"F": Symbol("f")}
+        # Integer(3) fails expr_type even though numerics are "scalar-ish".
+        assert match(w, Integer(3), reg) is None
+
+
+# --------------------------------------------------------------------- #
 # Sequence wildcards                                                    #
 # --------------------------------------------------------------------- #
 
@@ -214,14 +270,55 @@ class TestSeqWildcard:
         # It has one child here.
         assert match(pattern, target) is None
 
-    def test_two_seq_wildcards_rejected(self):
+    def test_two_seq_wildcards_split(self):
+        """Multiple SeqWildcards per level are allowed — backtracks over splits.
+
+        Leftmost-shortest-first: the first SeqWildcard consumes 0 elements,
+        the middle non-seq takes one, the second SeqWildcard takes the rest.
+        """
+        x, y, z = Symbol("x"), Symbol("y"), Symbol("z")
         pattern = Sum(
             SeqWildcard("a"),
             Wildcard("mid"),
             SeqWildcard("b"),
         )
-        with pytest.raises(ValueError):
-            match(pattern, Sum(Symbol("x"), Symbol("y")))
+        b = match(pattern, Sum(x, y, z))
+        assert b == {"a": (), "mid": x, "b": (y, z)}
+
+    def test_two_seq_wildcards_pinned_by_non_seq(self):
+        """The non-seq wildcard inside pins one element in place."""
+        x, y, z, w = (
+            Symbol("x"), Symbol("y"), Symbol("z"), Symbol("w"),
+        )
+        pattern = Product(
+            SeqWildcard("pre"),
+            Symbol("z"),
+            SeqWildcard("post"),
+        )
+        # z sits at index 2; pre takes (x, y), post takes (w,).
+        b = match(pattern, Product(x, y, z, w))
+        assert b == {"pre": (x, y), "post": (w,)}
+
+    def test_seq_backtracks_for_binding_consistency(self):
+        """Repeat wildcard forces backtracking over seq splits."""
+        y, z = Symbol("y"), Symbol("z")
+        pattern = Product(
+            SeqWildcard("pre"),
+            Wildcard("A"),
+            SeqWildcard("mid"),
+            Wildcard("A"),
+            SeqWildcard("post"),
+        )
+        # Target: y z y. Only consistent binding is A=y. The matcher
+        # first tries pre=(), A=y, mid=(), A=z which fails (y != z),
+        # then pre=(), A=y, mid=(z,), A=y which succeeds.
+        target = Product(y, z, y)
+        b = match(pattern, target)
+        assert b is not None
+        assert b["A"] == y
+        assert b["pre"] == ()
+        assert b["mid"] == (z,)
+        assert b["post"] == ()
 
 
 # --------------------------------------------------------------------- #

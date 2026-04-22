@@ -331,3 +331,68 @@ class TestEqualityHashing:
     def test_eq_with_non_expr_returns_notimplemented(self):
         # Python falls back to identity comparison -> False.
         assert (Symbol("x") == "x") is False
+
+
+# --------------------------------------------------------------------- #
+# replace_at                                                            #
+# --------------------------------------------------------------------- #
+
+
+class TestReplaceAt:
+    def test_empty_path_replaces_root(self):
+        x, y = Symbol("x"), Symbol("y")
+        assert x.replace_at((), y) is y
+
+    def test_atom_non_empty_path_raises(self):
+        x = Symbol("x")
+        with pytest.raises(IndexError):
+            x.replace_at((0,), Symbol("y"))
+
+    def test_replace_shallow_child(self):
+        x, y, z = Symbol("x"), Symbol("y"), Symbol("z")
+        tree = Sum(x, y)
+        out = tree.replace_at((1,), z)
+        assert out == Sum(x, z)
+
+    def test_replace_deep(self):
+        x, y, z, w = Symbol("x"), Symbol("y"), Symbol("z"), Symbol("w")
+        tree = Sum(x, Product(y, z))
+        out = tree.replace_at((1, 0), w)
+        assert out == Sum(x, Product(w, z))
+
+    def test_preserves_raw_structure_no_smart_ctor(self):
+        # replace_at must use the raw constructor: a Sum-of-Sum
+        # parent should NOT get flattened by Sum.make after splicing.
+        x, y, z = Symbol("x"), Symbol("y"), Symbol("z")
+        outer = Sum(Sum(x, y), z)
+        out = outer.replace_at((0, 1), z)
+        # First child should remain a Sum(x, z), not flattened with z.
+        assert isinstance(out.children[0], Sum)
+        assert out.children[0].children == (x, z)
+
+    def test_index_out_of_range_raises(self):
+        x, y = Symbol("x"), Symbol("y")
+        tree = Sum(x, y)
+        with pytest.raises(IndexError):
+            tree.replace_at((5,), Symbol("z"))
+
+    def test_non_expr_new_raises(self):
+        x = Symbol("x")
+        with pytest.raises(TypeError):
+            Sum(x, x).replace_at((0,), 5)
+
+
+# --------------------------------------------------------------------- #
+# clone                                                                 #
+# --------------------------------------------------------------------- #
+
+
+class TestClone:
+    def test_atom_returns_self(self):
+        x = Symbol("x")
+        assert x.clone() is x
+
+    def test_compound_returns_self(self):
+        x, y = Symbol("x"), Symbol("y")
+        tree = Sum(x, y)
+        assert tree.clone() is tree

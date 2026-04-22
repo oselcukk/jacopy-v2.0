@@ -9,15 +9,18 @@ for linearity, ``d(?A * ?B) -> d(?A)*?B + ?A*d(?B)`` for Leibniz,
 Two wildcard kinds:
 
 * :class:`Wildcard` — a single hole that matches one Expr. It may
-  carry a *type filter*: a :class:`Property` class that the candidate
-  must be registered with. Type-filtered matching requires a
-  :class:`PropertyRegistry` to be passed to :func:`match`.
+  carry constraints:
+
+  - ``type_filter``: a :class:`Property` class the candidate must be
+    registered with. Requires a :class:`PropertyRegistry` to be passed
+    to :func:`match`.
+  - ``expr_type``: an :class:`Expr` subclass (or tuple of them) the
+    candidate must be an instance of. Lets a rule say "match only a
+    Symbol here", "match any Sum here", and so on.
 
 * :class:`SeqWildcard` — a sequence hole that matches zero or more
-  consecutive children of a Sum or Product. Only one is permitted
-  per Sum/Product level; it binds to a tuple. Sequence wildcards are
-  what let Leibniz generalise to n factors without the rule author
-  having to enumerate arities.
+  consecutive children of a Sum or Product. Multiple per level are
+  allowed; matching backtracks over possible splits.
 
 Matching is structural and order-preserving — it does not reorder
 Sum or Product children. Commutative matching is the job of the
@@ -27,7 +30,7 @@ algorithms layer, which canonicalizes expressions before invoking
 
 from __future__ import annotations
 
-from typing import Any, Dict, Optional, Tuple, Type, Union
+from typing import Any, Dict, List, Optional, Tuple, Type, Union
 
 from gradalg.core.expr import Atom, Expr
 from gradalg.core.properties import Property
@@ -39,20 +42,53 @@ from gradalg.core.registry import PropertyRegistry
 # --------------------------------------------------------------------- #
 
 
+ExprTypeFilter = Union[Type[Expr], Tuple[Type[Expr], ...]]
+
+
+def _normalize_expr_type(
+    expr_type: Optional[ExprTypeFilter],
+) -> Optional[Tuple[Type[Expr], ...]]:
+    if expr_type is None:
+        return None
+    if isinstance(expr_type, type):
+        candidates: Tuple[Type[Expr], ...] = (expr_type,)
+    elif isinstance(expr_type, tuple):
+        candidates = expr_type
+    else:
+        raise TypeError(
+            "expr_type must be an Expr subclass or a tuple of them"
+        )
+    for cls in candidates:
+        if not (isinstance(cls, type) and issubclass(cls, Expr)):
+            raise TypeError(
+                "expr_type must be an Expr subclass or a tuple of them"
+            )
+    return candidates
+
+
 class Wildcard(Atom):
     """Single-hole pattern atom.
 
     A wildcard with ``name`` binds that name to whatever subtree it
     matches. If the same name appears twice in a pattern, both
     occurrences must match *structurally equal* targets.
+
+    Optional constraints:
+
+    * ``type_filter`` — a :class:`Property` class. The target must be
+      registered as that property in the :class:`PropertyRegistry`
+      passed to :func:`match`.
+    * ``expr_type`` — an :class:`Expr` subclass, or a tuple of them.
+      The target must be an instance. Evaluated without the registry.
     """
 
-    __slots__ = ("_name", "_type_filter")
+    __slots__ = ("_name", "_type_filter", "_expr_type")
 
     def __init__(
         self,
         name: str,
         type_filter: Optional[Type[Property]] = None,
+        expr_type: Optional[ExprTypeFilter] = None,
     ) -> None:
         if not isinstance(name, str):
             raise TypeError("Wildcard name must be a str")
@@ -63,6 +99,7 @@ class Wildcard(Atom):
                 raise TypeError("type_filter must be a Property subclass")
         self._name = name
         self._type_filter = type_filter
+        self._expr_type = _normalize_expr_type(expr_type)
 
     @property
     def name(self) -> str:
@@ -72,13 +109,21 @@ class Wildcard(Atom):
     def type_filter(self) -> Optional[Type[Property]]:
         return self._type_filter
 
+    @property
+    def expr_type(self) -> Optional[Tuple[Type[Expr], ...]]:
+        return self._expr_type
+
     def _key(self) -> Any:
-        return (self._name, self._type_filter)
+        return (self._name, self._type_filter, self._expr_type)
 
     def _repr_inner(self) -> str:
-        if self._type_filter is None:
-            return f"?{self._name}"
-        return f"?{self._name}:{self._type_filter.__name__}"
+        parts = [f"?{self._name}"]
+        if self._type_filter is not None:
+            parts.append(f":{self._type_filter.__name__}")
+        if self._expr_type is not None:
+            names = "|".join(c.__name__ for c in self._expr_type)
+            parts.append(f"<{names}>")
+        return "".join(parts)
 
 
 class SeqWildcard(Expr):
@@ -168,41 +213,58 @@ def _match_children(
     bindings: Bindings,
     registry: Optional[PropertyRegistry],
 ) -> bool:
-    seq_idx: Optional[int] = None
-    for i, p in enumerate(pchildren):
-        if isinstance(p, SeqWildcard):
-            if seq_idx is not None:
-                raise ValueError(
-                    "More than one SeqWildcard at the same level is not allowed"
-                )
-            seq_idx = i
+    """Backtracking match over a run of pattern children against targets.
 
-    if seq_idx is None:
-        if len(pchildren) != len(tchildren):
-            return False
-        for pc, tc in zip(pchildren, tchildren):
-            if not _match(pc, tc, bindings, registry):
-                return False
-        return True
+    Non-seq pattern children consume exactly one target each; SeqWildcards
+    can consume any number (0..remaining). With multiple SeqWildcards in
+    the same run we try all splits, left-to-right, restoring bindings on
+    failure so each candidate gets a clean slate.
+    """
+    return _match_children_rec(
+        list(pchildren), 0, list(tchildren), 0, bindings, registry
+    )
 
-    prefix = pchildren[:seq_idx]
-    seq_wild: SeqWildcard = pchildren[seq_idx]  # type: ignore[assignment]
-    suffix = pchildren[seq_idx + 1:]
 
-    if len(prefix) + len(suffix) > len(tchildren):
+def _match_children_rec(
+    ps: List[Expr],
+    pi: int,
+    ts: List[Expr],
+    ti: int,
+    bindings: Bindings,
+    registry: Optional[PropertyRegistry],
+) -> bool:
+    if pi == len(ps):
+        return ti == len(ts)
+
+    p = ps[pi]
+    if isinstance(p, SeqWildcard):
+        remaining = len(ts) - ti
+        # Try every length k in 0..remaining; leftmost-shortest first so
+        # the match order is predictable and stable.
+        for k in range(0, remaining + 1):
+            snapshot = dict(bindings)
+            seq = tuple(ts[ti:ti + k])
+            if _bind_sequence(p.name, seq, bindings):
+                if _match_children_rec(
+                    ps, pi + 1, ts, ti + k, bindings, registry
+                ):
+                    return True
+            bindings.clear()
+            bindings.update(snapshot)
         return False
 
-    for i, p in enumerate(prefix):
-        if not _match(p, tchildren[i], bindings, registry):
-            return False
+    if ti == len(ts):
+        return False
 
-    suffix_start = len(tchildren) - len(suffix)
-    for j, p in enumerate(suffix):
-        if not _match(p, tchildren[suffix_start + j], bindings, registry):
-            return False
-
-    middle = tuple(tchildren[len(prefix):suffix_start])
-    return _bind_sequence(seq_wild.name, middle, bindings)
+    snapshot = dict(bindings)
+    if _match(p, ts[ti], bindings, registry):
+        if _match_children_rec(
+            ps, pi + 1, ts, ti + 1, bindings, registry
+        ):
+            return True
+    bindings.clear()
+    bindings.update(snapshot)
+    return False
 
 
 def _bind_wildcard(
@@ -211,6 +273,9 @@ def _bind_wildcard(
     bindings: Bindings,
     registry: Optional[PropertyRegistry],
 ) -> bool:
+    if wild.expr_type is not None:
+        if not isinstance(target, wild.expr_type):
+            return False
     if wild.type_filter is not None:
         if registry is None:
             return False

@@ -151,3 +151,40 @@ class GradedAntisymmetric(Property):
     appropriate weakening for graded Lie brackets (Schouten-Nijenhuis,
     Koszul, etc.) where straight antisymmetry would be wrong.
     """
+
+
+# --------------------------------------------------------------------- #
+# Commutativity markers                                                 #
+# --------------------------------------------------------------------- #
+
+
+@dataclass(frozen=True)
+class NonCommuting(Property):
+    """Expression has no a-priori commutativity law.
+
+    The default for generic expressions — :class:`Product` is already
+    non-commutative at the core level; this property is the explicit,
+    registered counterpart for algorithms that want to assert the
+    absence of commutativity rather than infer it from silence.
+    """
+
+
+@dataclass(frozen=True)
+class AntiCommuting(Property):
+    """Expression anti-commutes past other ``AntiCommuting`` factors.
+
+    Satisfies ``a * b = - b * a`` at the element level. This is the
+    ungraded version — :class:`GradedCommutative` is the right choice
+    when signs depend on degrees.
+    """
+
+
+@dataclass(frozen=True)
+class GradedCommutative(Property):
+    """Expression obeys the Koszul sign rule: ``a*b = (-1)^{|a||b|} b*a``.
+
+    Orthogonal to :class:`Graded`, which supplies the degree itself.
+    An element that is both ``Graded(degree=d)`` and ``GradedCommutative``
+    is the typical case for symbols living in a graded-commutative
+    algebra (differential forms, polyvector fields, and so on).
+    """

@@ -79,6 +79,39 @@ class Expr(ABC):
             if predicate(node):
                 yield node
 
+    def replace_at(self, path: Tuple[int, ...], new: "Expr") -> "Expr":
+        """Return a new tree with ``new`` spliced at ``path``.
+
+        ``path`` is a tuple of child indices — ``(1, 0)`` means "the
+        first child of the second child". An empty path replaces the
+        root. Rebuilding uses the raw constructor (no smart-ctor
+        flattening), so the surrounding shape is preserved exactly.
+        """
+        if not isinstance(new, Expr):
+            raise TypeError("replace_at: `new` must be an Expr")
+        if not path:
+            return new
+        if self.is_atom:
+            raise IndexError("replace_at: cannot descend into an atom")
+        idx = path[0]
+        children_list = list(self.children)
+        if idx < 0 or idx >= len(children_list):
+            raise IndexError(
+                f"replace_at: index {idx} out of range for "
+                f"{type(self).__name__} with {len(children_list)} children"
+            )
+        children_list[idx] = children_list[idx].replace_at(path[1:], new)
+        return type(self)(*children_list)
+
+    def clone(self) -> "Expr":
+        """Return ``self``.
+
+        :class:`Expr` instances are immutable, so structural sharing is
+        always safe. ``clone()`` exists for API symmetry with mutable
+        tree libraries; it does not copy.
+        """
+        return self
+
     # ---- operator overloading --------------------------------------- #
 
     def __add__(self, other):
