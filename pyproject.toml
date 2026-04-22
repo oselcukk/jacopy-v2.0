@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gradalg"
+version = "0.0.1"
+description = "Symbolic computation for graded algebra, brackets, and Cartan calculus with step-by-step proofs."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "gradalg contributors" }]
+keywords = [
+    "graded algebra",
+    "lie algebra",
+    "poisson geometry",
+    "schouten-nijenhuis",
+    "koszul bracket",
+    "courant algebroid",
+    "cartan calculus",
+    "symbolic computation",
+]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+]
+dependencies = []
+
+[project.optional-dependencies]
+rich = ["rich>=13.0"]
+test = ["pytest>=7.0"]
+dev = [
+    "pytest>=7.0",
+    "rich>=13.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["gradalg*"]
+exclude = ["tests*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-ra"
