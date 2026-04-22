@@ -34,6 +34,17 @@ from gradalg.core.registry import (
     default_registry,
     reset_default_registry,
 )
+from gradalg.core.wildcards import (
+    Wildcard,
+    SeqWildcard,
+    match,
+    substitute,
+)
+from gradalg.core.equality import (
+    structural_equal,
+    alpha_equal,
+    sum_bag_equal,
+)
 
 __all__ = [
     # expr
@@ -66,4 +77,13 @@ __all__ = [
     "PropertyRegistry",
     "default_registry",
     "reset_default_registry",
+    # wildcards
+    "Wildcard",
+    "SeqWildcard",
+    "match",
+    "substitute",
+    # equality
+    "structural_equal",
+    "alpha_equal",
+    "sum_bag_equal",
 ]
