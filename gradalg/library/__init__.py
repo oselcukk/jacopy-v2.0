@@ -53,6 +53,12 @@ from gradalg.library.dirac import (
     presymplectic_dirac,
 )
 
+# Twisted Cartan bundle — d_H = d + H∧ variant (Faz 10 tutorial gap closure).
+from gradalg.library.twisted_cartan import (
+    TwistedCartanBundle,
+    twisted_cartan_bundle,
+)
+
 __all__ = [
     "Theorem",
     "TheoremBook",
@@ -71,6 +77,8 @@ __all__ = [
     "DiracStructure",
     "poisson_dirac",
     "presymplectic_dirac",
+    "TwistedCartanBundle",
+    "twisted_cartan_bundle",
     "THEOREM_POISSON_JACOBI",
     "THEOREM_POISSON_KOSZUL_EQUIVALENCE",
     "THEOREM_POISSON_KOSZUL_JACOBI",

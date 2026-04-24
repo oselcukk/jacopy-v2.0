@@ -164,6 +164,36 @@ lie_iota citation'ı). İstisna: default classification `d²=0`
 aksiyomunda `"axiom"` ama burada `"theorem"` — çünkü formül doğal
 olarak bu iki bağıntıdan çıkıyor, aksiyomatik bir giriş noktası değil.
 
+## Twisted Cartan bundle — `d_H = d + H∧`
+
+Kapalı bir 3-form `H` ile H-twisted exterior derivative `d_H` Cartan
+calculus'ünü aynı beş bağıntıyla taşıyor. `gradalg` bunu
+`TwistedCartanBundle(H)` wrapper'ı olarak verir: bundle, `d_H`'yi
+taze bir `ExteriorDerivative` olarak inşa eder ve Lie-türevi
+factory'sini `d_H`'yi bundle slot'una geçecek şekilde kurar —
+algebroid bundle'ının birebir twisted muadili.
+
+```python
+from gradalg.library import TwistedCartanBundle
+
+H = Symbol("H")
+reg.declare(H, Graded(degree=3))
+bundle = TwistedCartanBundle(H)
+bundle.d             # d_H — degree +1 fresh ExteriorDerivative
+bundle.cartan        # CartanCalculus(d=d_H, L_{H,·}, ι_·, [·,·])
+
+algebra_H = ExteriorAlgebra((f,), d=bundle.d)
+bundle.cartan.verify_all(algebra=algebra_H, X=X, Y=Y, registry=reg)
+# {'d_squared_zero': ProofChain, 'cartan_magic': ProofChain,
+#  'd_lie': ProofChain, 'lie_lie': ProofChain, 'lie_iota': ProofChain}
+```
+
+Paket `d_H`'yi formal derece-+1 türev olarak ele alır — `d + H∧`
+ayrışımı engine içinde açılmaz. `TwistedCartanBundle` inşa etmek
+`dH = 0` varsayımını yapmaktır: `d_H² = 0`'ın kapanması bu
+varsayıma dayanır. Twisted Courant bracket için
+(`background_H` kwargs'ı) bak [07_derived_bracket.md](07_derived_bracket.md).
+
 ## Sonraki adım
 
 Kendi bracket'inizi yazıp onun üzerinde Jacobi testini koşma —

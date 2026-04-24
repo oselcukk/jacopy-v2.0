@@ -589,6 +589,31 @@ TUTORIAL_05: list[tuple[str, str]] = [
     ),
     (
         "markdown",
+        "## Twisted Cartan bundle — `d_H = d + H∧`\n\n"
+        "Kapalı bir 3-form `H` ile H-twisted exterior derivative `d_H` "
+        "Cartan calculus'ünü aynı beş bağıntıyla taşır. "
+        "`TwistedCartanBundle(H)` wrapper'ı, `d_H`'yi taze bir "
+        "`ExteriorDerivative` olarak inşa edip Lie-türevi factory'sini "
+        "`d_H`'yi bundle slot'una geçecek şekilde kurar. Bundle inşa "
+        "etmek `dH = 0` varsayımını yapmaktır.",
+    ),
+    (
+        "code",
+        "from gradalg.library import TwistedCartanBundle\n\n"
+        "H = Symbol(\"H\")\n"
+        "reg.declare(H, Graded(degree=3))\n"
+        "bundle = TwistedCartanBundle(H)\n"
+        "print('bundle.d:', bundle.d)\n"
+        "print('bundle.cartan.d:', bundle.cartan.d)\n\n"
+        "algebra_H = ExteriorAlgebra((f,), d=bundle.d)\n"
+        "results = bundle.cartan.verify_all(\n"
+        "    algebra=algebra_H, X=X, Y=Y, registry=reg\n"
+        ")\n"
+        "for name, c in results.items():\n"
+        "    print(f'{name:16s}: len={len(c)}')",
+    ),
+    (
+        "markdown",
         "## Sonraki adım\n\n"
         "Kendi bracket'iniz + Jacobi testi — "
         "[06_custom_bracket.md](06_custom_bracket.md) (Stage C).",
