@@ -19,7 +19,7 @@ grading declaration is missing.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Optional, Protocol, Tuple, runtime_checkable
+from typing import Any, Optional, Protocol, Tuple, runtime_checkable
 
 from gradalg.algebra.derivation import Act, degree_of
 from gradalg.algorithms.product_rule import product_rule
@@ -40,7 +40,23 @@ class ProofFailure(Exception):
     usually enough to diagnose whether the mismatch is genuine or
     whether a missing grading declaration / definition prevented the
     strategy from closing.
+
+    When the raising strategy has a residual on hand, it may attach a
+    :class:`DiagnosticReport` as the ``report`` kwarg — callers can
+    read ``exc.report`` to get structural hints about which rewrite
+    stalled. A ``report`` is optional; legacy call sites still raise
+    with a bare message and ``report`` defaults to ``None``.
     """
+
+    def __init__(self, message: str, *, report: Optional[Any] = None) -> None:
+        super().__init__(message)
+        self.report = report
+
+    def __str__(self) -> str:
+        base = super().__str__()
+        if self.report is None or not self.report:
+            return base
+        return f"{base}\n\n{self.report.format()}"
 
 
 class Strategy(ABC):
@@ -157,9 +173,18 @@ class ExpandAndSimplify(Strategy):
             )
 
         if reduced != Integer(0):
+            # Attach a structural diagnostic report so callers (and the
+            # agent driving the proof) can see why the pipeline stalled
+            # without re-deriving the residual by eye. Imported locally
+            # to avoid a cycle with the diagnostics package import-time
+            # rule-registration side effects.
+            from gradalg.proof.diagnostics import diagnose
+
+            report = diagnose(reduced, registry=registry, engine=eng)
             raise ProofFailure(
                 f"ExpandAndSimplify left residual {reduced._repr_inner()} "
-                f"when proving {lhs._repr_inner()} == {rhs._repr_inner()}"
+                f"when proving {lhs._repr_inner()} == {rhs._repr_inner()}",
+                report=report,
             )
 
         # If no intermediate step recorded a change (everything cancelled

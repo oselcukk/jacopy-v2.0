@@ -1,6 +1,15 @@
 """Proof layer: step-by-step proof chains with pluggable strategies."""
 
 from gradalg.proof.chain import ProofChain
+from gradalg.proof.diagnostics import (
+    DiagnosticHint,
+    DiagnosticReport,
+    DiagnosticRule,
+    diagnose,
+    register_rule,
+)
+# Register built-in rules by importing for side effects.
+from gradalg.proof import diagnostic_rules  # noqa: F401
 from gradalg.proof.expansion import (
     MODES,
     ActOverSumOpDefinition,
@@ -42,6 +51,12 @@ __all__ = [
     # core data types
     "ProofStep",
     "ProofChain",
+    # diagnostics
+    "DiagnosticHint",
+    "DiagnosticReport",
+    "DiagnosticRule",
+    "diagnose",
+    "register_rule",
     # expansion
     "Definition",
     "ExpansionEngine",
