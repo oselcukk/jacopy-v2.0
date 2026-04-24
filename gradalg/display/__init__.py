@@ -9,16 +9,20 @@ Stage A — pure-stdlib renderers:
 """
 
 from gradalg.display.ascii import (
+    VERBOSITY_MODES,
     chain_to_ascii,
     step_to_ascii,
     to_ascii,
 )
 from gradalg.display.jupyter import (
+    HtmlProofDisplay,
     LatexDisplay,
     display_chain,
+    display_chain_collapsible,
     display_expr,
     display_proof,
     display_step,
+    display_step_collapsible,
 )
 from gradalg.display.latex import (
     chain_to_latex,
@@ -38,13 +42,17 @@ from gradalg.display.terminal import (
 
 __all__ = [
     "HAS_RICH",
+    "VERBOSITY_MODES",
+    "HtmlProofDisplay",
     "LatexDisplay",
     "chain_to_ascii",
     "chain_to_latex",
     "display_chain",
+    "display_chain_collapsible",
     "display_expr",
     "display_proof",
     "display_step",
+    "display_step_collapsible",
     "latex_name",
     "print_chain",
     "print_expr",

@@ -868,23 +868,51 @@ Artık genişletilmiş bir strateji katalogu:
 
 ---
 
-### Faz 8 — Display
+### Faz 8 — Display  *(KAPALI — Stage A + B + C + verbosity + collapsible)*
 
 **Amaç:** LaTeX, terminal, Jupyter çıktısı.
 
+#### Mimari sapma: dispatch vs. `_latex_()` metodu
+
+Plan başlangıçta "`_latex_()` metodu her Expr'da" öngörüyordu; gerçek
+uygulamada **MRO tabanlı dispatch fonksiyonları** tercih edildi
+(`to_ascii(expr)`, `to_latex(expr)`). Nedeni:
+
+- Core `Expr` hiyerarşisi render şekline bağımsız kalır — `display/`
+  paketi olmadan da derlenir/test edilir.
+- Yeni render hedefi (HTML collapsible, rich tree) eklerken Expr
+  sınıflarına tekrar metod eklemek gerekmez.
+- Subclass'lar (örn. `ExteriorDerivative : Derivation`) genel
+  `Derivation` handler'ına MRO ile düşer; her subclass'ın kendi
+  metodunu kaydetmesine gerek yok.
+- Jupyter'ın `_repr_latex_` / `_repr_html_` / `_repr_mimebundle_`
+  sözleşmesi `Expr` üzerinde değil, açık opt-in wrapper'larda
+  (`LatexDisplay`, `HtmlProofDisplay`) bulunur — test ederken bir
+  notebook boot etmek gerekmez.
+
+#### `display/ascii.py`
+- MRO dispatch renderer: `to_ascii`, `step_to_ascii`, `chain_to_ascii`.
+- Precedence rung'ları + sign normalisation (`Sum(a, Neg(b))` → `a - b`).
+- `VERBOSITY_MODES = ("full", "summary", "compact")` — tüm renderer
+  katmanlarının paylaştığı sabit.
+
 #### `display/latex.py`
-- `_latex_()` metodu her Expr'da
-- Greek letters
-- Sub/superscript
-- Bracket rendering
-- ProofChain → aligned LaTeX
+- `to_latex(expr)` dispatch fonksiyonu — Expr'a metod eklenmez.
+- `latex_name(...)`: Greek / musical / algebraic glyph translation +
+  multi-char subscript bracing (`X_ab` → `X_{ab}`).
+- `_escape_text(...)`: rule/justification metinlerinde hem ASCII
+  özel karakterleri (`\_#%&$`) hem de Unicode glyph'leri
+  `\ensuremath{...}` ile sarar — pdfLaTeX Unicode hatası engellenir.
+- `chain_to_latex` → `\begin{align*} … \end{align*}` bloğu
+  (paper-ready flat form).
 
 #### `display/terminal.py`
-- `rich` tabanlı
-- Renkli kutucuklar, başlıklar
-- Verbosity: full/summary/compact
-- Provenance göstergesi: theorem ispatlarında bağımlılık tree'si
-  açılabilir şekilde
+- `rich` opsiyonel; yüklü değilse sessizce `chain_to_ascii`'ye fallback.
+- `HAS_RICH` flag kullanıcıya görünür.
+- Renkli `Tree` hiyerarşisi; recording Console `file=io.StringIO()`
+  ile kurulur → stdout duplikasyonu yok.
+- Verbosity: `full` / `summary` / `compact` (compact hem justification
+  hem child'ları suppress eder → flat table-of-contents).
 
 Örnek terminal çıktısı (Cartan magic formula için):
 
@@ -916,14 +944,23 @@ Step 5: Both derivations agree on generators → equal on Ω*(M)
 ```
 
 #### `display/jupyter.py`
-- `_repr_latex_()`, `_repr_html_()`
-- Collapsible proof trees
-- MathJax
+- İki tamamlayıcı wrapper; Expr hiyerarşisi monkey-patch *edilmez*:
+  - `LatexDisplay` — inline `$…$` veya `\begin{align*}…\end{align*}`
+    payload; `_repr_latex_` / `_repr_html_` / `_repr_mimebundle_`
+    sözleşmesini yerine getirir.
+  - `HtmlProofDisplay` — collapsible proof tree (yalnız `text/html`).
+- Helpers:
+  - `display_expr`, `display_step`, `display_chain` (=
+    `display_proof`) — flat `align*` çıktı, paper-ready.
+  - `display_step_collapsible`, `display_chain_collapsible` —
+    `<details open>` HTML ağaç; her adım `[rule] (tag) \(before \to
+    after\) — just` biçiminde MathJax'e bırakılmış matematik içerir.
+    `max_depth`, `title`, `verbosity` opsiyonları terminal renderer'ı
+    ile aynı semantikte.
 
-#### `display/ascii.py`
-- Fallback plain text
-
-**Testler:** Golden file, snapshot tests.
+**Testler:** 173 display testi (`tests/test_display/`), golden-value
+assert'ler — tüm renderer'ların verbosity / tipe hata / Unicode
+sanitisation / stdout leak regresyon testleri dâhil.
 
 ---
 

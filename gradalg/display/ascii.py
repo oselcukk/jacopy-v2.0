@@ -209,35 +209,81 @@ def _pairing(expr: Pairing, _ctx: int) -> str:
 # --------------------------------------------------------------------- #
 
 
-def step_to_ascii(step: ProofStep, indent: int = 0, max_depth: int = 64) -> str:
+#: Recognised verbosity levels for proof-transcript rendering.
+#:
+#: * ``"full"``   — rule + tag + ``before → after`` + justification + children.
+#: * ``"summary"`` — rule + tag + ``before → after`` + children (no justification).
+#: * ``"compact"`` — rule + tag only (flat list; no before/after, no children).
+VERBOSITY_MODES = ("full", "summary", "compact")
+
+
+def _check_verbosity(verbosity: str) -> None:
+    if verbosity not in VERBOSITY_MODES:
+        raise ValueError(
+            f"verbosity must be one of {VERBOSITY_MODES}, got {verbosity!r}"
+        )
+
+
+def step_to_ascii(
+    step: ProofStep,
+    indent: int = 0,
+    max_depth: int = 64,
+    *,
+    verbosity: str = "full",
+) -> str:
     """Render a single :class:`ProofStep` including nested children.
 
     The format mirrors :meth:`ProofStep.format` but routes the ``before``
     / ``after`` expressions through :func:`to_ascii` so sign
     normalisation and precedence-aware parens kick in.
+
+    ``verbosity`` selects how much of each step is shown — see
+    :data:`VERBOSITY_MODES`.
     """
     if not isinstance(step, ProofStep):
         raise TypeError("step_to_ascii: expected a ProofStep")
+    _check_verbosity(verbosity)
     pad = "  " * indent
     tag = f" ({step.provenance_tag})" if step.provenance_tag else ""
+    if verbosity == "compact":
+        # Rule + tag only — a one-line table-of-contents entry.
+        return f"{pad}[{step.rule}]{tag}"
     before = to_ascii(step.before)
     after = to_ascii(step.after)
     head = f"{pad}[{step.rule}]{tag} {before} -> {after}"
-    if step.justification:
+    if verbosity == "full" and step.justification:
         head = f"{head}  -- {step.justification}"
     lines = [head]
     if max_depth > 0 and step.children:
         for ch in step.children:
-            lines.append(step_to_ascii(ch, indent + 1, max_depth - 1))
+            lines.append(
+                step_to_ascii(
+                    ch,
+                    indent + 1,
+                    max_depth - 1,
+                    verbosity=verbosity,
+                )
+            )
     return "\n".join(lines)
 
 
-def chain_to_ascii(chain: ProofChain, max_depth: int = 64) -> str:
-    """Render an entire :class:`ProofChain` as an ordered step list."""
+def chain_to_ascii(
+    chain: ProofChain,
+    max_depth: int = 64,
+    *,
+    verbosity: str = "full",
+) -> str:
+    """Render an entire :class:`ProofChain` as an ordered step list.
+
+    In ``"compact"`` mode children are suppressed, so the result reads
+    as a flat rule-sequence regardless of nesting.
+    """
     if not isinstance(chain, ProofChain):
         raise TypeError("chain_to_ascii: expected a ProofChain")
+    _check_verbosity(verbosity)
     if len(chain) == 0:
         return "(empty proof chain)"
     return "\n".join(
-        step_to_ascii(s, indent=0, max_depth=max_depth) for s in chain.steps
+        step_to_ascii(s, indent=0, max_depth=max_depth, verbosity=verbosity)
+        for s in chain.steps
     )

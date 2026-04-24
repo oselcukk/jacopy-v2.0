@@ -254,6 +254,82 @@ class TestProofTranscript:
 
 
 # --------------------------------------------------------------------- #
+# Verbosity modes                                                       #
+# --------------------------------------------------------------------- #
+
+
+class TestVerbosity:
+    def _demo_step(self):
+        return ProofStep(
+            Symbol("X"),
+            Symbol("Y"),
+            rule="demo",
+            justification="because of Cartan",
+            provenance_tag="axiom",
+        )
+
+    def _demo_chain_with_children(self):
+        child = ProofStep(Symbol("A"), Symbol("B"), rule="sub")
+        parent = ProofStep(
+            Symbol("X"),
+            Symbol("Y"),
+            rule="outer",
+            justification="outer-j",
+            children=[child],
+        )
+        return ProofChain([parent])
+
+    def test_full_is_default_and_includes_justification(self):
+        out = step_to_ascii(self._demo_step())
+        assert "X -> Y" in out
+        assert "because of Cartan" in out
+        # Default must equal explicit "full".
+        assert out == step_to_ascii(self._demo_step(), verbosity="full")
+
+    def test_summary_drops_justification_but_keeps_arrow(self):
+        out = step_to_ascii(self._demo_step(), verbosity="summary")
+        assert "X -> Y" in out
+        assert "because of Cartan" not in out
+
+    def test_compact_drops_arrow_and_justification(self):
+        out = step_to_ascii(self._demo_step(), verbosity="compact")
+        assert "X -> Y" not in out
+        assert "because of Cartan" not in out
+        # Rule + tag only.
+        assert out == "[demo] (axiom)"
+
+    def test_summary_keeps_children(self):
+        chain = self._demo_chain_with_children()
+        out = chain_to_ascii(chain, verbosity="summary")
+        assert "[outer]" in out
+        assert "[sub]" in out
+        assert "outer-j" not in out
+
+    def test_compact_suppresses_children(self):
+        chain = self._demo_chain_with_children()
+        out = chain_to_ascii(chain, verbosity="compact")
+        assert "[outer]" in out
+        assert "[sub]" not in out
+
+    def test_invalid_verbosity_on_step_raises(self):
+        with pytest.raises(ValueError, match="verbosity must be one of"):
+            step_to_ascii(self._demo_step(), verbosity="loud")
+
+    def test_invalid_verbosity_on_chain_raises(self):
+        with pytest.raises(ValueError, match="verbosity must be one of"):
+            chain_to_ascii(
+                self._demo_chain_with_children(), verbosity="loud"
+            )
+
+    def test_empty_chain_is_placeholder_in_every_mode(self):
+        for mode in ("full", "summary", "compact"):
+            assert (
+                chain_to_ascii(ProofChain(), verbosity=mode)
+                == "(empty proof chain)"
+            )
+
+
+# --------------------------------------------------------------------- #
 # Sign normalisation integration                                        #
 # --------------------------------------------------------------------- #
 

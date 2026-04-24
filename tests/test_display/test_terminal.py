@@ -208,3 +208,122 @@ class TestRichPath:
         step = ProofStep(Symbol("X"), Symbol("Y"), rule="demo")
         _ = render_step(step)
         assert capsys.readouterr().out == ""
+
+
+# --------------------------------------------------------------------- #
+# Verbosity — applies to both the rich and fallback paths               #
+# --------------------------------------------------------------------- #
+
+
+class TestVerbosityInputValidation:
+    def test_render_step_rejects_unknown_mode(self):
+        step = ProofStep(Symbol("X"), Symbol("Y"), rule="demo")
+        with pytest.raises(ValueError, match="verbosity must be one of"):
+            render_step(step, verbosity="loud")
+
+    def test_render_chain_rejects_unknown_mode(self):
+        chain = ProofChain([ProofStep(Symbol("X"), Symbol("Y"), rule="r")])
+        with pytest.raises(ValueError, match="verbosity must be one of"):
+            render_chain(chain, verbosity="loud")
+
+    def test_print_step_rejects_unknown_mode(self):
+        step = ProofStep(Symbol("X"), Symbol("Y"), rule="demo")
+        with pytest.raises(ValueError, match="verbosity must be one of"):
+            print_step(step, verbosity="loud")
+
+    def test_print_chain_rejects_unknown_mode(self):
+        chain = ProofChain([ProofStep(Symbol("X"), Symbol("Y"), rule="r")])
+        with pytest.raises(ValueError, match="verbosity must be one of"):
+            print_chain(chain, verbosity="loud")
+
+
+class TestVerbosityFallback:
+    """Fallback path delegates to ascii.step_to_ascii / chain_to_ascii."""
+
+    def _demo_step(self):
+        return ProofStep(
+            Symbol("X"),
+            Symbol("Y"),
+            rule="demo",
+            justification="because-j",
+            provenance_tag="axiom",
+        )
+
+    def _demo_chain_with_children(self):
+        child = ProofStep(Symbol("A"), Symbol("B"), rule="sub")
+        return ProofChain(
+            [
+                ProofStep(
+                    Symbol("X"),
+                    Symbol("Y"),
+                    rule="outer",
+                    justification="outer-j",
+                    children=[child],
+                )
+            ]
+        )
+
+    def test_summary_drops_justification_in_fallback(self, monkeypatch):
+        monkeypatch.setattr(term_mod, "HAS_RICH", False)
+        out = render_step(self._demo_step(), verbosity="summary")
+        assert "X -> Y" in out
+        assert "because-j" not in out
+
+    def test_compact_drops_arrow_in_fallback(self, monkeypatch):
+        monkeypatch.setattr(term_mod, "HAS_RICH", False)
+        out = render_step(self._demo_step(), verbosity="compact")
+        assert "X -> Y" not in out
+        assert out.strip() == "[demo] (axiom)"
+
+    def test_compact_suppresses_children_in_fallback(self, monkeypatch):
+        monkeypatch.setattr(term_mod, "HAS_RICH", False)
+        out = render_chain(
+            self._demo_chain_with_children(), verbosity="compact"
+        )
+        assert "[outer]" in out
+        assert "[sub]" not in out
+
+
+@_requires_rich
+class TestVerbosityRichPath:
+    def _demo_step(self):
+        return ProofStep(
+            Symbol("X"),
+            Symbol("Y"),
+            rule="demo",
+            justification="because-j",
+        )
+
+    def _demo_chain_with_children(self):
+        child = ProofStep(Symbol("A"), Symbol("B"), rule="sub")
+        return ProofChain(
+            [
+                ProofStep(
+                    Symbol("X"),
+                    Symbol("Y"),
+                    rule="outer",
+                    justification="outer-j",
+                    children=[child],
+                )
+            ]
+        )
+
+    def test_summary_omits_justification(self):
+        out = render_step(self._demo_step(), verbosity="summary")
+        assert "[demo]" in out
+        assert "X" in out and "Y" in out
+        assert "because-j" not in out
+
+    def test_compact_shows_only_rule_and_tag(self):
+        out = render_step(self._demo_step(), verbosity="compact")
+        assert "[demo]" in out
+        # No arrow and no before/after glyph.
+        assert "→" not in out
+        assert "because-j" not in out
+
+    def test_compact_suppresses_children_in_tree(self):
+        out = render_chain(
+            self._demo_chain_with_children(), verbosity="compact"
+        )
+        assert "[outer]" in out
+        assert "[sub]" not in out

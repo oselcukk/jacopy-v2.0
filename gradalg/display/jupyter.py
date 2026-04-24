@@ -27,10 +27,20 @@ and let tests assert the display output without booting a notebook.
 
 from __future__ import annotations
 
+import html as _html
+
 from gradalg.core.expr import Expr
+from gradalg.display.ascii import VERBOSITY_MODES
 from gradalg.display.latex import chain_to_latex, step_to_latex, to_latex
 from gradalg.proof.chain import ProofChain
 from gradalg.proof.step import ProofStep
+
+
+def _check_verbosity(verbosity: str) -> None:
+    if verbosity not in VERBOSITY_MODES:
+        raise ValueError(
+            f"verbosity must be one of {VERBOSITY_MODES}, got {verbosity!r}"
+        )
 
 
 class LatexDisplay:
@@ -145,3 +155,162 @@ def display_chain(chain: ProofChain) -> LatexDisplay:
 
 # Backwards-friendly alias matching the roadmap naming.
 display_proof = display_chain
+
+
+# --------------------------------------------------------------------- #
+# Collapsible HTML rendering                                            #
+# --------------------------------------------------------------------- #
+#
+# Jupyter's ``align*`` renders a transcript as a flat table of arrows
+# that is perfect on paper but loses the nesting of foundational proofs
+# (a single Cartan-identity derivation carries a sub-chain for every
+# axiom fire). This alternative renderer emits HTML with ``<details>``
+# elements so the nesting collapses and expands in-notebook, and each
+# step's ``before → after`` still renders through MathJax via ``\(...\)``
+# delimiters.
+
+
+class HtmlProofDisplay:
+    """Jupyter-friendly wrapper around a raw HTML proof-tree payload.
+
+    Unlike :class:`LatexDisplay`, this carries HTML rather than LaTeX
+    math, so the rich-display protocol only advertises ``text/html``.
+    ``str`` / ``repr`` return the raw HTML so the object behaves like a
+    plain string when printed outside a notebook.
+    """
+
+    __slots__ = ("_html",)
+
+    def __init__(self, html: str) -> None:
+        if not isinstance(html, str):
+            raise TypeError("HtmlProofDisplay expects a str")
+        self._html = html
+
+    @property
+    def html(self) -> str:
+        return self._html
+
+    def _repr_html_(self) -> str:
+        return self._html
+
+    def _repr_mimebundle_(self, include=None, exclude=None) -> dict:
+        bundle = {"text/html": self._html, "text/plain": self._html}
+        if include is not None:
+            bundle = {k: v for k, v in bundle.items() if k in include}
+        if exclude is not None:
+            bundle = {k: v for k, v in bundle.items() if k not in exclude}
+        return bundle
+
+    def __str__(self) -> str:
+        return self._html
+
+    def __repr__(self) -> str:
+        return self._html
+
+    def __eq__(self, other: object) -> bool:
+        if isinstance(other, HtmlProofDisplay):
+            return self._html == other._html
+        return NotImplemented
+
+    def __hash__(self) -> int:
+        return hash(self._html)
+
+
+def _step_summary_html(step: ProofStep, verbosity: str) -> str:
+    """Compose the ``<summary>`` (or leaf body) HTML for a single step.
+
+    Rule names / justifications are HTML-escaped because they can contain
+    characters like ``<``, ``&`` that must not appear raw in the DOM. The
+    ``before → after`` fragment is emitted as MathJax-delimited LaTeX so
+    the notebook typesets the expressions properly instead of printing
+    their source.
+    """
+    rule = _html.escape(step.rule)
+    pieces = [f'<span class="gradalg-rule">[{rule}]</span>']
+    if step.provenance_tag:
+        tag = _html.escape(step.provenance_tag)
+        pieces.append(f'<span class="gradalg-tag">({tag})</span>')
+    if verbosity != "compact":
+        before = to_latex(step.before)
+        after = to_latex(step.after)
+        pieces.append(f'<span class="gradalg-math">\\({before} \\to {after}\\)</span>')
+        if verbosity == "full" and step.justification:
+            just = _html.escape(step.justification)
+            pieces.append(f'<span class="gradalg-just">— {just}</span>')
+    return " ".join(pieces)
+
+
+def _step_to_html(step: ProofStep, verbosity: str, max_depth: int) -> str:
+    """Render a :class:`ProofStep` as a single HTML fragment.
+
+    Leaf steps (or compact-mode / depth-capped steps) become a plain
+    ``<div>``; steps with visible children become ``<details open>`` so
+    the reader sees the nesting expanded by default but can fold it
+    away. ``max_depth`` mirrors the terminal renderer's semantics —
+    ``0`` suppresses descent.
+    """
+    summary = _step_summary_html(step, verbosity)
+    show_children = (
+        verbosity != "compact" and max_depth > 0 and bool(step.children)
+    )
+    if not show_children:
+        return f'<div class="gradalg-step">{summary}</div>'
+    child_html = "".join(
+        _step_to_html(ch, verbosity, max_depth - 1) for ch in step.children
+    )
+    return (
+        '<details open class="gradalg-step">'
+        f"<summary>{summary}</summary>"
+        f'<div class="gradalg-children">{child_html}</div>'
+        "</details>"
+    )
+
+
+def display_step_collapsible(
+    step: ProofStep,
+    *,
+    max_depth: int = 64,
+    verbosity: str = "full",
+) -> HtmlProofDisplay:
+    """Wrap a :class:`ProofStep` as a collapsible HTML tree for Jupyter.
+
+    ``verbosity`` is one of :data:`VERBOSITY_MODES` — see
+    :mod:`gradalg.display.ascii` for the mode semantics.
+    """
+    if not isinstance(step, ProofStep):
+        raise TypeError("display_step_collapsible: expected a ProofStep")
+    _check_verbosity(verbosity)
+    return HtmlProofDisplay(_step_to_html(step, verbosity, max_depth))
+
+
+def display_chain_collapsible(
+    chain: ProofChain,
+    *,
+    max_depth: int = 64,
+    title: bool = True,
+    verbosity: str = "full",
+) -> HtmlProofDisplay:
+    """Wrap a :class:`ProofChain` as a collapsible HTML tree for Jupyter.
+
+    A ``Proof (N steps)`` heading precedes the tree when ``title`` is
+    true. Empty chains render as a placeholder div so downstream code
+    doesn't have to special-case the empty shape.
+    """
+    if not isinstance(chain, ProofChain):
+        raise TypeError("display_chain_collapsible: expected a ProofChain")
+    _check_verbosity(verbosity)
+    if len(chain) == 0:
+        return HtmlProofDisplay(
+            '<div class="gradalg-proof">(empty proof chain)</div>'
+        )
+    steps_html = "".join(
+        _step_to_html(s, verbosity, max_depth) for s in chain.steps
+    )
+    if title:
+        header = (
+            f'<div class="gradalg-proof-header">Proof ({len(chain)} steps)</div>'
+        )
+        body = header + steps_html
+    else:
+        body = steps_html
+    return HtmlProofDisplay(f'<div class="gradalg-proof">{body}</div>')
