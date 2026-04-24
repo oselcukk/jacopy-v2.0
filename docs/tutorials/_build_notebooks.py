@@ -600,6 +600,281 @@ TUTORIAL_05: list[tuple[str, str]] = [
 ]
 
 
+TUTORIAL_06: list[tuple[str, str]] = [
+    _BOOTSTRAP,
+    (
+        "markdown",
+        "# 06 — Custom Bracket\n\n"
+        "Bu notebook [06_custom_bracket.md](06_custom_bracket.md) "
+        "markdown'ının çalıştırılabilir sürümüdür. `CustomBracket` "
+        "ile kendi rule'unu tanımla, flag'lerle aksiyom profilini "
+        "beyan et, `prove_jacobi` ile generic yolda test et.",
+    ),
+    (
+        "markdown",
+        "## Minimum profil — commutator rule\n\n"
+        "`CustomBracket(name, expand_fn, *, degree=..., "
+        "is_graded_antisymmetric=..., satisfies_leibniz=..., "
+        "satisfies_graded_jacobi=...)`. expand_fn imzası "
+        "`(a, b, registry) → Expr`.",
+    ),
+    (
+        "code",
+        "from gradalg.brackets.custom import CustomBracket\n"
+        "from gradalg.core.expr import Neg, Product, Sum, Symbol\n\n"
+        "def commutator(a, b, registry):\n"
+        "    return Sum(Product(a, b), Neg(Product(b, a)))\n\n"
+        "B = CustomBracket(\"[·,·]\", commutator)\n"
+        "print('name:', B.name, 'degree:', B.degree)\n"
+        "print('antisym:', B.is_graded_antisymmetric)\n"
+        "print('expand X,Y:', B(Symbol('X'), Symbol('Y')).expand())",
+    ),
+    (
+        "markdown",
+        "## Aksiyom flag'leri\n\n"
+        "Default profili komşu bracket'lerden farklı bir şey kurmak "
+        "istersen flag'lerle beyan et. `satisfies_graded_jacobi=None` "
+        "— koşullu Jacobi (derived bracket'teki gibi).",
+    ),
+    (
+        "code",
+        "B_asym = CustomBracket(\n"
+        "    \"asym\",\n"
+        "    lambda a, b, reg: Product(a, b),\n"
+        "    is_graded_antisymmetric=False,\n"
+        "    satisfies_leibniz=False,\n"
+        "    satisfies_graded_jacobi=False,\n"
+        ")\n"
+        "print('antisym:', B_asym.is_graded_antisymmetric,\n"
+        "      'leibniz:', B_asym.satisfies_leibniz,\n"
+        "      'jacobi:', B_asym.satisfies_graded_jacobi)",
+    ),
+    (
+        "markdown",
+        "## `prove_jacobi` — generic dispatch\n\n"
+        "Commutator rule için zincir: bracket-expand → simplify → 0. "
+        "Asimetrik kötü rule ise residual bırakır ve `ProofFailure` "
+        "fırlatır.",
+    ),
+    (
+        "code",
+        "from gradalg.core.properties import Graded\n"
+        "from gradalg.core.registry import PropertyRegistry\n"
+        "from gradalg.proof.verifier import prove_jacobi\n"
+        "from gradalg.proof.strategies import ProofFailure\n\n"
+        "reg = PropertyRegistry()\n"
+        "for s in (Symbol('X'), Symbol('Y'), Symbol('Z')):\n"
+        "    reg.declare(s, Graded(degree=0))\n\n"
+        "chain = prove_jacobi(B, Symbol('X'), Symbol('Y'), Symbol('Z'), registry=reg)\n"
+        "print('commutator chain len:', len(chain))\n"
+        "for st in chain.steps:\n"
+        "    print(' ', st.rule)\n"
+        "print('final:', chain.steps[-1].after)\n\n"
+        "try:\n"
+        "    prove_jacobi(B_asym, Symbol('X'), Symbol('Y'), Symbol('Z'), registry=reg)\n"
+        "except ProofFailure as exc:\n"
+        "    print('\\nasym rule fails (as expected):')\n"
+        "    print(' ', str(exc)[:110])",
+    ),
+    (
+        "markdown",
+        "## Axiom obstruction helper'ları\n\n"
+        "`GradedBracket`'ten miras: her aksiyomun iddia ettiği ifadeyi "
+        "açıkça döner. İspata girmeden rule'u probe etmek için.",
+    ),
+    (
+        "code",
+        "a, b, c = Symbol('a'), Symbol('b'), Symbol('c')\n"
+        "for s in (a, b, c):\n"
+        "    reg.declare(s, Graded(degree=0))\n\n"
+        "print('antisym obs:', B.graded_antisymmetry_obstruction(a, b, reg))\n"
+        "print('jacobi obs :', B.graded_jacobi_obstruction(a, b, c, reg))\n"
+        "print('leibniz obs:', B.leibniz_obstruction(a, b, c, reg))",
+    ),
+    (
+        "markdown",
+        "## Eşitlik — callable kimliği\n\n"
+        "İki `CustomBracket` ancak aynı `expand_fn` callable'ını "
+        "paylaşırsa eşit.",
+    ),
+    (
+        "code",
+        "rule_a = lambda a, b, reg: Sum(Product(a, b), Neg(Product(b, a)))\n"
+        "rule_b = lambda a, b, reg: Sum(Product(a, b), Product(b, a))\n"
+        "print('same rule:', CustomBracket('B', rule_a) == CustomBracket('B', rule_a))\n"
+        "print('diff rule:', CustomBracket('B', rule_a) == CustomBracket('B', rule_b))",
+    ),
+    (
+        "markdown",
+        "## Sonraki adım\n\n"
+        "Generator tabanlı otomatik bracket inşası — "
+        "[07_derived_bracket.md](07_derived_bracket.md).",
+    ),
+]
+
+
+TUTORIAL_07: list[tuple[str, str]] = [
+    _BOOTSTRAP,
+    (
+        "markdown",
+        "# 07 — Derived Bracket\n\n"
+        "Bu notebook [07_derived_bracket.md](07_derived_bracket.md) "
+        "markdown'ının çalıştırılabilir sürümüdür. `{a, b}_Q := "
+        "[[a, Q]_base, b]_base` inşası, Jacobi'nin tek bir "
+        "denkleme (`[Q, Q]_base = 0`) indirilmesi, Koszul "
+        "eşdeğerliği, Poisson ve H-twisted Courant köşeleri.",
+    ),
+    (
+        "markdown",
+        "## İnşa\n\n"
+        "`DerivedBracket(base, Q, degree_Q=...)` — Lie base üstünde "
+        "degree-1 `Q` seçelim. `|{·,·}_Q| = |Q| − 2 = −1`. Leibniz "
+        "evrensel, antisymmetry/Jacobi koşullu (flag=None).",
+    ),
+    (
+        "code",
+        "from gradalg.brackets.derived import DerivedBracket\n"
+        "from gradalg.brackets.lie import LieBracket\n"
+        "from gradalg.core.expr import Symbol\n"
+        "from gradalg.core.properties import Graded\n"
+        "from gradalg.core.registry import PropertyRegistry\n\n"
+        "reg = PropertyRegistry()\n"
+        "Q = Symbol('Q')\n"
+        "reg.declare(Q, Graded(degree=1))\n"
+        "lie = LieBracket()\n\n"
+        "d = DerivedBracket(lie, Q, degree_Q=1)\n"
+        "print('name   :', d.name)\n"
+        "print('degree :', d.degree)\n"
+        "print('antisym:', d.is_graded_antisymmetric,\n"
+        "      'leibniz:', d.satisfies_leibniz,\n"
+        "      'jacobi :', d.satisfies_graded_jacobi)",
+    ),
+    (
+        "markdown",
+        "## İki yüzlü expansion\n\n"
+        "`expand` — iç/dış iki katman base açılmış; "
+        "`expand_definition` — iki katman base `BracketApply` inert.",
+    ),
+    (
+        "code",
+        "a, b = Symbol('a'), Symbol('b')\n"
+        "for s in (a, b):\n"
+        "    reg.declare(s, Graded(degree=0))\n\n"
+        "print('expand           :', d.expand(a, b, reg))\n"
+        "print('expand_definition:', d.expand_definition(a, b, reg))",
+    ),
+    (
+        "markdown",
+        "## Jacobi obstruction — üç yüz\n\n"
+        "Tek bir koşul: `[Q, Q]_base = 0`. Lie base için trivial "
+        "(`Q*Q − Q*Q`).",
+    ),
+    (
+        "code",
+        "print('expanded :', d.jacobi_obstruction(reg))\n"
+        "print('raw      :', d.jacobi_obstruction_raw())\n"
+        "cond = d.jacobi_condition(reg)\n"
+        "print('condition:', cond.name)\n"
+        "print('holds?   :', cond.holds(reg))",
+    ),
+    (
+        "markdown",
+        "## `prove_jacobi` — DerivedBracketStrategy\n\n"
+        "Bracket tipinden otomatik dispatch. Üç adım: "
+        "DerivedBracketTheorem → base-bracket-expand → simplify.",
+    ),
+    (
+        "code",
+        "from gradalg.proof.verifier import prove_jacobi\n\n"
+        "# a, b zaten yukarıda Graded(0) olarak kayıtlı — sadece c'yi ekle.\n"
+        "c = Symbol('c')\n"
+        "reg.declare(c, Graded(degree=0))\n\n"
+        "chain = prove_jacobi(d, a, b, c, registry=reg)\n"
+        "print('chain len:', len(chain))\n"
+        "for st in chain.steps:\n"
+        "    print(' ', st.rule)\n"
+        "print('final:', chain.steps[-1].after)",
+    ),
+    (
+        "markdown",
+        "## `acting_on` — Koszul eşdeğerliği\n\n"
+        "SN base + π generator + anchor ρ: `expand` otomatik olarak "
+        "Koszul 3-terim formunu emit eder. `KoszulBracket(ρ)` ile "
+        "structurally eşit.",
+    ),
+    (
+        "code",
+        "from gradalg.brackets.schouten import sn\n"
+        "from gradalg.brackets.koszul import KoszulBracket\n"
+        "from gradalg.calculus.anchor import Anchor\n\n"
+        "reg2 = PropertyRegistry()\n"
+        "pi = Symbol('π')\n"
+        "reg2.declare(pi, Graded(degree=1))\n"
+        "alpha, beta = Symbol('α'), Symbol('β')\n"
+        "for s in (alpha, beta):\n"
+        "    reg2.declare(s, Graded(degree=1))\n\n"
+        "rho = Anchor('ρ')\n"
+        "koszul_derived = DerivedBracket(sn, pi, degree_Q=1, acting_on=rho)\n"
+        "koszul_classical = KoszulBracket(rho)\n\n"
+        "lhs = koszul_derived.expand(alpha, beta)\n"
+        "rhs = koszul_classical.expand(alpha, beta)\n"
+        "print('derived :', lhs)\n"
+        "print('classic :', rhs)\n"
+        "print('equal?  :', lhs == rhs)",
+    ),
+    (
+        "markdown",
+        "## Poisson-as-derived — library wrapper\n\n"
+        "Matematiksel olarak `DerivedBracket(sn, π, degree_Q=1)` "
+        "Poisson bracket. `[π, π]_SN`'nin SN-atomik olması sebebiyle "
+        "`prove_jacobi` generic simplify yolu kapanmaz; "
+        "`PoissonBracket.prove_jacobi_reduction` seeded teorem "
+        "citation'ı ile bir adımda biter.",
+    ),
+    (
+        "code",
+        "from gradalg.library import theorem_book\n"
+        "from gradalg.library.declarations import Bivector, Functions\n"
+        "from gradalg.library.poisson import PoissonBracket\n\n"
+        "reg3 = PropertyRegistry()\n"
+        "pi3 = Bivector('π', registry=reg3)\n"
+        "f, g, h = Functions('f g h', degree=-1, registry=reg3)\n\n"
+        "poisson = PoissonBracket.from_bivector(pi3)\n"
+        "chain = poisson.prove_jacobi_reduction(f, g, h, registry=reg3)\n"
+        "print('reduction chain len:', len(chain))\n"
+        "print('  rule  :', chain.steps[0].rule)\n"
+        "print('  after :', chain.steps[0].after)\n\n"
+        "thm = theorem_book.get('poisson_jacobi')\n"
+        "print('theorem from_axioms:', thm.from_axioms)",
+    ),
+    (
+        "markdown",
+        "## H-twist — Courant koşullu Jacobi\n\n"
+        "`CourantBracket(background_H=H)`: Jacobi ⟺ dH = 0. "
+        "Default (H=None) vacuous.",
+    ),
+    (
+        "code",
+        "from gradalg.brackets.courant import CourantBracket\n\n"
+        "reg4 = PropertyRegistry()\n"
+        "H = Symbol('H')\n"
+        "reg4.declare(H, Graded(degree=3))\n\n"
+        "print('untwisted:', CourantBracket().jacobi_condition(reg4).name)\n\n"
+        "C = CourantBracket(background_H=H)\n"
+        "print('twisted  :', C.is_twisted)\n"
+        "cond = C.jacobi_condition(reg4)\n"
+        "print('  name       :', cond.name)\n"
+        "print('  obstruction:', cond.obstruction)",
+    ),
+    (
+        "markdown",
+        "## Sonraki adım\n\n"
+        "Stage D: birleşik tur + foundations — "
+        "[08_unified_picture.md](08_unified_picture.md).",
+    ),
+]
+
+
 # --------------------------------------------------------------------- #
 # Builder                                                                #
 # --------------------------------------------------------------------- #
@@ -635,6 +910,8 @@ def build_all() -> None:
         "03_poisson_geometry.ipynb": TUTORIAL_03,
         "04_lie_algebroid.ipynb": TUTORIAL_04,
         "05_cartan_calculus.ipynb": TUTORIAL_05,
+        "06_custom_bracket.ipynb": TUTORIAL_06,
+        "07_derived_bracket.ipynb": TUTORIAL_07,
     }
     for fname, cells in sources.items():
         nb = _build(cells)
