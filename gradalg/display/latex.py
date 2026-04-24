@@ -257,8 +257,21 @@ def _pairing(expr: Pairing, _ctx: int) -> str:
 
 
 def _escape_text(text: str) -> str:
-    """Minimal escaping for the text inside ``\\text{…}`` arguments."""
-    return (
+    """Escape special LaTeX chars and lift Unicode math glyphs into math mode.
+
+    ``\\text{…}`` arguments sit in textmode, but rule/justification
+    strings routinely carry Unicode math glyphs (``ι``, ``ω``, ``∘``)
+    copied from operator names. pdfLaTeX with the default input encoding
+    chokes on them. Wrapping each translated glyph in ``\\ensuremath{…}``
+    flips to math mode locally — the surrounding text stays in textmode,
+    and the output is UTF-8-free for the LaTeX kernel.
+
+    Order matters: escape the LaTeX-special ASCII chars first (so
+    underscores / ampersands from the rule name don't derail
+    ``align*``), then translate Unicode. The backslashes introduced by
+    the Unicode pass are post-escape, so they are emitted verbatim.
+    """
+    text = (
         text.replace("\\", r"\textbackslash{}")
         .replace("_", r"\_")
         .replace("#", r"\#")
@@ -266,6 +279,10 @@ def _escape_text(text: str) -> str:
         .replace("&", r"\&")
         .replace("$", r"\$")
     )
+    for glyph, cmd in _UNICODE_TO_LATEX.items():
+        if glyph in text:
+            text = text.replace(glyph, f"\\ensuremath{{{cmd}}}")
+    return text
 
 
 def step_to_latex(step: ProofStep) -> str:

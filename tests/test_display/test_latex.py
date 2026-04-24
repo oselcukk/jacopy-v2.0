@@ -227,6 +227,34 @@ class TestProofTranscript:
         out = step_to_latex(step)
         assert r"rule\_name" in out
 
+    def test_step_translates_unicode_in_rule_via_ensuremath(self):
+        """Regression: rule names carry math glyphs (ι, ∘, ω). Text-mode
+        \\text{…} can't host raw Unicode — pdfLaTeX errors with
+        'Unicode character not set up for use with LaTeX'. Each glyph
+        must land inside \\ensuremath{…} so math mode is entered
+        locally."""
+        step = ProofStep(Symbol("X"), Symbol("Y"), rule="L_X := d∘ι_X")
+        out = step_to_latex(step)
+        # Raw glyphs must NOT survive into the output.
+        assert "∘" not in out
+        assert "ι" not in out
+        # Each translated glyph must be wrapped in \ensuremath{…}.
+        assert r"\ensuremath{\circ}" in out
+        assert r"\ensuremath{\iota}" in out
+
+    def test_step_translates_unicode_in_justification(self):
+        step = ProofStep(
+            Symbol("X"),
+            Symbol("Y"),
+            rule="r",
+            justification="uses ω and ∂",
+        )
+        out = step_to_latex(step)
+        assert "ω" not in out
+        assert "∂" not in out
+        assert r"\ensuremath{\omega}" in out
+        assert r"\ensuremath{\partial}" in out
+
     def test_chain_empty_produces_placeholder(self):
         out = chain_to_latex(ProofChain())
         assert r"\begin{align*}" in out
