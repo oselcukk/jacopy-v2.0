@@ -120,28 +120,138 @@ değiştirebilirsiniz:
   yazarak enjekte etmek.
 
 `Definition` API minimal — `matches(expr)`, `rewrite(expr)`, ve opsiyonel
-`theorem_proof_builder()` (foundational mode'da sub-proof veren):
+`theorem_proof_builder()` (foundational mode'da sub-proof veren).
+
+### Axiom sınıfı — en kısa yol
+
+Aşağıda `c_zero` sembolünü sıfıra indiren bir kural. Kendi engine'ini
+`ExpansionEngine([...])` ile kuruyorsun; default kuralları devre dışı
+bırakıp sadece bu kuralı çalıştırıyorsun:
 
 ```python
-from gradalg.proof.expansion import Definition, DSquaredZeroDefinition
+from gradalg.proof.expansion import Definition, ExpansionEngine
+from gradalg.core.expr import Symbol, Integer, Sum
 
-class MyAxiom(Definition):
-    name = "my rule"
+class ZeroConstAxiom(Definition):
+    name = "c_zero := 0 (axiom)"
 
-    def matches(self, expr): ...
-    def rewrite(self, expr): ...
-    # theorem_proof_builder() bırakıyor → axiom olarak kalır
+    def matches(self, expr):
+        return isinstance(expr, Symbol) and expr.name == "c_zero"
+
+    def rewrite(self, expr):
+        return Integer(0)
+
+engine = ExpansionEngine([ZeroConstAxiom()])
+expanded, steps = engine.expand(Sum(Symbol("c_zero"), Symbol("x")))
+# expanded:  (0 + x)
+# steps:     [ProofStep(rule='c_zero := 0 (axiom)', provenance_tag='axiom')]
 ```
 
-`theorem_proof_builder` `None` döndürürse kural aksiyom — foundational
-mode'da bile çocuğu yok. `ProofChain` döndürürse kural theorem — mode
-foundational olduğunda bu chain step'in altına iliştirilir.
+`theorem_proof_builder` override etmediği için `is_theorem=False` —
+foundational mode'da bile çocuk adım yok.
+
+### Theorem sınıfı — sub-proof iliştir
+
+Aynı kuralı theorem olarak sunmak için `theorem_proof_builder` bir
+`ProofChain` builder'ı döndürür:
+
+```python
+from gradalg.proof.chain import ProofChain
+from gradalg.proof.step import ProofStep
+
+class ZeroConstTheorem(Definition):
+    name = "c_zero := 0 (theorem)"
+
+    def matches(self, expr):
+        return isinstance(expr, Symbol) and expr.name == "c_zero"
+
+    def rewrite(self, expr):
+        return Integer(0)
+
+    def theorem_proof_builder(self):
+        def build(matched):
+            step = ProofStep(
+                rule="c_zero = c_zero − c_zero (axiom)",
+                before=matched,
+                after=Integer(0),
+                justification="self-annihilation axiom on c_zero",
+                provenance_tag="axiom",
+            )
+            return ProofChain(steps=[step])
+        return build
+
+eff = ExpansionEngine([ZeroConstTheorem()], mode="efficient")
+fnd = ExpansionEngine([ZeroConstTheorem()], mode="foundational")
+
+c = Symbol("c_zero")
+eff_exp, eff_steps = eff.expand(c)
+fnd_exp, fnd_steps = fnd.expand(c)
+
+len(eff_steps[0].children)   # 0
+len(fnd_steps[0].children)   # 1
+fnd_steps[0].children[0].rule
+# 'c_zero = c_zero − c_zero (axiom)'
+```
+
+Aynı `Definition`; efficient mode'da atomik olarak atıyor, foundational
+mode'da altına tek adımlık sub-proof iliştiriyor. Paket'in kendi
+`DSquaredZeroDefinition`'ı da aynen böyle çalışıyor — sadece sub-proof
+builder'ı `d(df) = 0` generator axiom'una atıf yapıyor.
+
+## Theorem Book yapısı
+
+Expansion kuralları operatör-seviyesi provenance taşır; teorem-seviyesi
+provenance ise [`gradalg.library.theorem_book`](../../gradalg/library/theorem_book.py)
+altında. Veri yapısı:
+
+```python
+from gradalg.library.theorem_book import Theorem
+import dataclasses
+
+[f.name for f in dataclasses.fields(Theorem)]
+# ['name', 'statement', 'from_axioms', 'proof', 'notes']
+```
+
+Beş alan:
+
+- `name` — registry key (ör. `"poisson_jacobi"`).
+- `statement` — insan-okunur teorem iddiası.
+- `from_axioms` — atomic dayandığı aksiyomların `Tuple[str, ...]`'u.
+- `proof` — teoremin kanonik `ProofChain`'i.
+- `notes` — ek bağlam (opsiyonel).
+
+Singleton registry `theorem_book`'a sorgu atmak:
+
+```python
+from gradalg.library import theorem_book
+
+theorem_book.names()
+# ('poisson_jacobi', 'poisson_koszul_equivalence',
+#  'poisson_koszul_jacobi', 'lie_algebroid_anchor_compat',
+#  'courant_jacobi_twist', 'courant_dorfman_bridge',
+#  'dirac_isotropy', 'dirac_involutivity')
+
+thm = theorem_book.get("poisson_jacobi")
+thm.statement
+# '{f, g, h}_π cyclic sum = 0 when [π, π]_SN = 0'
+thm.from_axioms
+# ('Derived Bracket Theorem', '[π, π]_SN = 0 (Poisson hypothesis)')
+thm.proof.steps[0].rule
+# 'DerivedBracketTheorem'
+```
+
+Seeded teoremler paket initialization sırasında register edilir
+(`gradalg/library/__init__.py` submodule yüklemeleri). Downstream kod
+bir teoremi *yeniden ispatlamaz*; `theorem_book.get(name).proof`
+chain'ini alıp daha büyük bir `ProofChain`'in içine gömer. Bu paketin
+"tek citation, çok kullanım" stratejisinin omurgası — her yeni library
+modülü kendi teoremlerini register eder, Theorem Book büyür.
 
 ## Property provenance tekrar
 
 [02 — Property provenance](02_property_provenance.md) property'lerin
 `axiom` ve `theorem` olarak etiketlenmesini göstermişti. Aynı ayrım
-burada `Definition.classification` üstünden karşımıza çıkıyor — aslında
+burada `Definition.is_theorem` üstünden karşımıza çıkıyor — aslında
 paketin tek omurgası: "bir iddia primitive mi, yoksa başka
 primitive'lerden mi türüyor?" sorusu hem sembol seviyesinde
 (property'ler) hem operatör seviyesinde (expansion kuralları)

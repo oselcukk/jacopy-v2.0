@@ -1062,6 +1062,87 @@ TUTORIAL_09: list[tuple[str, str]] = [
     ),
     (
         "markdown",
+        "## Custom Definition — axiom sınıfı\n\n"
+        "`ExpansionEngine([YourDef()])` ile kendi aksiyom setinizi "
+        "kurup engine'i çalıştırabilirsiniz. Aşağıda `c_zero` "
+        "sembolünü sıfıra indiren tek kural:",
+    ),
+    (
+        "code",
+        "from gradalg.proof.expansion import Definition, ExpansionEngine\n"
+        "from gradalg.core.expr import Sum\n\n"
+        "class ZeroConstAxiom(Definition):\n"
+        "    name = 'c_zero := 0 (axiom)'\n\n"
+        "    def matches(self, expr):\n"
+        "        return isinstance(expr, Symbol) and expr.name == 'c_zero'\n\n"
+        "    def rewrite(self, expr):\n"
+        "        return Integer(0)\n\n"
+        "custom_engine = ExpansionEngine([ZeroConstAxiom()])\n"
+        "c, x = Symbol('c_zero'), Symbol('x')\n"
+        "expanded, steps = custom_engine.expand(Sum(c, x))\n"
+        "print('expanded:', expanded)\n"
+        "print('rule   :', steps[0].rule)\n"
+        "print('prov   :', steps[0].provenance_tag)",
+    ),
+    (
+        "markdown",
+        "## Custom Definition — theorem sınıfı\n\n"
+        "`theorem_proof_builder`'ı override ettiğinde aynı kural "
+        "theorem olur; foundational mode'da altına sub-proof "
+        "iliştirilir.",
+    ),
+    (
+        "code",
+        "from gradalg.proof.chain import ProofChain\n"
+        "from gradalg.proof.step import ProofStep\n\n"
+        "class ZeroConstTheorem(Definition):\n"
+        "    name = 'c_zero := 0 (theorem)'\n\n"
+        "    def matches(self, expr):\n"
+        "        return isinstance(expr, Symbol) and expr.name == 'c_zero'\n\n"
+        "    def rewrite(self, expr):\n"
+        "        return Integer(0)\n\n"
+        "    def theorem_proof_builder(self):\n"
+        "        def build(matched):\n"
+        "            return ProofChain(steps=[\n"
+        "                ProofStep(\n"
+        "                    rule='c_zero = c_zero − c_zero (axiom)',\n"
+        "                    before=matched, after=Integer(0),\n"
+        "                    justification='self-annihilation axiom',\n"
+        "                    provenance_tag='axiom',\n"
+        "                ),\n"
+        "            ])\n"
+        "        return build\n\n"
+        "eff = ExpansionEngine([ZeroConstTheorem()], mode='efficient')\n"
+        "fnd = ExpansionEngine([ZeroConstTheorem()], mode='foundational')\n\n"
+        "c = Symbol('c_zero')\n"
+        "_, eff_steps = eff.expand(c)\n"
+        "_, fnd_steps = fnd.expand(c)\n\n"
+        "print('efficient children :', len(eff_steps[0].children))\n"
+        "print('foundational child :', len(fnd_steps[0].children))\n"
+        "print('  ↳ sub-rule       :', fnd_steps[0].children[0].rule)",
+    ),
+    (
+        "markdown",
+        "## Theorem Book yapısı\n\n"
+        "`Theorem` dataclass beş alan taşır: `name`, `statement`, "
+        "`from_axioms`, `proof`, `notes`. Singleton `theorem_book` "
+        "registry seeded teoremleri tutar; downstream kod `proof` "
+        "chain'ini alıp daha büyük bir ispata gömebilir.",
+    ),
+    (
+        "code",
+        "from gradalg.library.theorem_book import Theorem\n"
+        "from gradalg.library import theorem_book\n"
+        "import dataclasses\n\n"
+        "print('fields:', [f.name for f in dataclasses.fields(Theorem)])\n"
+        "print('registry size:', len(theorem_book))\n"
+        "print()\n"
+        "for name in theorem_book.names():\n"
+        "    t = theorem_book.get(name)\n"
+        "    print(f'{name:32s} proof_len={len(t.proof)}')",
+    ),
+    (
+        "markdown",
         "## Üç provenance katmanı\n\n"
         "Property (sembol), Definition (expansion), Theorem — üçü de "
         "`axiom`/`theorem` ayrımı taşır. `Theorem.from_axioms` tek "
@@ -1069,7 +1150,6 @@ TUTORIAL_09: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.library import theorem_book\n\n"
         "for name in ('poisson_jacobi', 'courant_jacobi_twist'):\n"
         "    thm = theorem_book.get(name)\n"
         "    print(name, '->', thm.from_axioms)",
