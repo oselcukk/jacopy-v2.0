@@ -27,19 +27,25 @@ Cartan family.
 
 from __future__ import annotations
 
-from typing import Any, Callable, Optional
+from typing import TYPE_CHECKING, Any, Callable, Optional
 
 from gradalg.algebra.derivation import Act, Derivation
 from gradalg.brackets.base import GradedBracket
 from gradalg.brackets.derived import VanishingCondition
 from gradalg.brackets.schouten import sn as default_sn
-from gradalg.calculus.anchor import Anchor
 from gradalg.calculus.exterior_d import d as default_d
 from gradalg.calculus.lie_derivative import lie_derivative as default_lie_derivative
 from gradalg.calculus.pairing import pairing
 from gradalg.core.expr import Expr, Neg, Sum
 from gradalg.core.registry import PropertyRegistry
 from gradalg.core.symbolic_degree import DegreeLike
+
+if TYPE_CHECKING:
+    # Imported lazily to avoid a circular import: ``calculus.anchor``
+    # imports ``brackets.base``, which eagerly triggers this package's
+    # ``__init__`` and would then re-enter ``anchor`` mid-initialisation.
+    # The runtime ``isinstance`` check below imports ``Anchor`` locally.
+    from gradalg.calculus.anchor import Anchor
 
 
 LieDerivativeFactory = Callable[[Expr], Derivation]
@@ -85,7 +91,9 @@ class KoszulBracket(GradedBracket):
         lie_derivative: Optional[LieDerivativeFactory] = None,
         name: str = "[·,·]_K",
     ) -> None:
-        if not isinstance(anchor, Anchor):
+        from gradalg.calculus.anchor import Anchor as _Anchor
+
+        if not isinstance(anchor, _Anchor):
             raise TypeError(
                 f"KoszulBracket anchor must be an Anchor, got {type(anchor).__name__}"
             )

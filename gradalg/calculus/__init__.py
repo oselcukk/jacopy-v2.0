@@ -16,11 +16,6 @@ from gradalg.calculus.interior import (
     apply_iota_squared_zero,
     interior,
 )
-from gradalg.calculus.invariant_d import (
-    INVARIANT_D_CLASSIFICATIONS,
-    InvariantDOneFormDefinition,
-    invariant_d_one_form,
-)
 from gradalg.calculus.lie_derivative import (
     DEFINITIONS,
     LieDerivative,
@@ -96,3 +91,29 @@ __all__ = [
     "IotaFlatDefinition",
     "ArgNegLinearityDefinition",
 ]
+
+
+# Invariant-d re-exports are resolved lazily to break a circular import:
+# ``invariant_d`` subclasses ``proof.expansion.Definition``, and
+# ``proof.expansion`` itself depends on ``calculus.exterior_d``. Eagerly
+# pulling ``invariant_d`` here would force ``proof.expansion`` to finish
+# before it has had a chance to define ``Definition``. PEP 562's module
+# ``__getattr__`` defers the pull to first access, by which time the
+# import graph has settled.
+_LAZY_INVARIANT_D_NAMES = frozenset(
+    {
+        "INVARIANT_D_CLASSIFICATIONS",
+        "InvariantDOneFormDefinition",
+        "invariant_d_one_form",
+    }
+)
+
+
+def __getattr__(name: str):
+    if name in _LAZY_INVARIANT_D_NAMES:
+        from gradalg.calculus import invariant_d as _mod
+
+        value = getattr(_mod, name)
+        globals()[name] = value
+        return value
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

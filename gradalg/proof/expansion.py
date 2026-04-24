@@ -26,13 +26,21 @@ from abc import ABC, abstractmethod
 from typing import List, Optional, Tuple
 
 from gradalg.algebra.derivation import Act, Derivation, compose, degree_of
-from gradalg.calculus.exterior_d import ExteriorDerivative, d as default_d
-from gradalg.calculus.interior import InteriorProduct, interior
-from gradalg.calculus.lie_derivative import LieDerivative
 from gradalg.core.expr import Expr, Integer, Sum
 from gradalg.core.registry import PropertyRegistry
 from gradalg.core.symbolic_degree import Degree
 from gradalg.proof.step import ProofStep
+
+# Imported at module bottom to break a circular import: the three
+# ``gradalg.calculus.*`` submodules below eagerly trigger
+# ``gradalg.calculus.__init__``, which in turn pulls five calculus
+# modules that import names from *this* module (``Definition``,
+# ``ExpansionEngine``). Deferring these imports until after every
+# class/function in this file is defined lets that reverse edge find
+# the names it needs. ``from __future__ import annotations`` (above)
+# keeps type annotations lazy, so the forward references in the
+# function signatures below resolve at runtime without needing these
+# imports in scope at definition time.
 
 
 # --------------------------------------------------------------------- #
@@ -514,3 +522,11 @@ def default_engine(
         ],
         mode=mode,
     )
+
+
+# See the header comment above the top-of-module imports: these three
+# pulls happen after every class/function is defined so the circular
+# import from ``gradalg.calculus.*`` back into this module can resolve.
+from gradalg.calculus.exterior_d import ExteriorDerivative, d as default_d  # noqa: E402
+from gradalg.calculus.interior import InteriorProduct, interior  # noqa: E402
+from gradalg.calculus.lie_derivative import LieDerivative  # noqa: E402
