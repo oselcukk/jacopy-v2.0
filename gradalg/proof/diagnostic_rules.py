@@ -234,6 +234,87 @@ def unreduced_iota_on_df(
         )
 
 
+def _symbol_leaves_in_vector_field(expr: Expr) -> list:
+    """Return the list of non-Derivation leaves in a vector-field expression.
+
+    ``_is_derivation_combination`` only accepts :class:`Derivation` atoms
+    and Sum/Product/Neg composites of them. Anything else at a leaf
+    position — a bare :class:`Symbol`, most commonly — breaks pairing
+    rules like ``ι_V(df) = V(f)`` and ``L_V(f) = V(f)``. This helper
+    surfaces those offending leaves so the diagnostic can name them.
+    """
+    if isinstance(expr, Derivation):
+        return []
+    if isinstance(expr, (Sum, Product, Neg)):
+        out: list = []
+        for child in expr.children:
+            out.extend(_symbol_leaves_in_vector_field(child))
+        return out
+    return [expr]
+
+
+@register_rule
+def symbol_vector_field(
+    residual: Expr,
+    registry: Optional[PropertyRegistry],
+    engine: Optional[ExpansionEngine],
+) -> Iterable[DiagnosticHint]:
+    """Vector-field slot holds a plain :class:`Symbol` (or composite thereof).
+
+    The pairing rules ``ι_V(df) = V(f)`` and ``L_V(f) = V(f)`` only fire
+    when the vector field is a :class:`Derivation` (or Sum/Product/Neg
+    composite of Derivations) — bare Symbols don't carry the action
+    semantics that make ``V(f)`` meaningful. This is easy to trip on
+    when prototyping: ``Symbol("X")`` looks indistinguishable from
+    ``Derivation("X", degree=0)`` in a printed residual, but only the
+    latter triggers the pairing fire-path.
+
+    The rule walks every :class:`Act` whose operator has a
+    ``vector_field`` slot (ι_X, L_X, and any future operator keyed on a
+    vector field) and flags when that slot contains non-Derivation
+    leaves. It is strictly complementary to
+    :func:`unreduced_iota_on_df`: that rule fires on compound
+    *Derivation* combinations the matcher would accept; this one fires
+    on *Symbol* leaves the matcher never will.
+    """
+    for node in residual.walk():
+        if not isinstance(node, Act):
+            continue
+        vf = getattr(node.op, "vector_field", None)
+        if vf is None:
+            continue
+        offenders = _symbol_leaves_in_vector_field(vf)
+        if not offenders:
+            continue
+        # De-duplicate preserving first-seen order — the bracket
+        # ``X*Y − Y*X`` visits each Symbol twice, and the hint should
+        # name each offender once.
+        seen_offenders: set = set()
+        unique_offenders: list = []
+        for o in offenders:
+            key = o._repr_inner()
+            if key in seen_offenders:
+                continue
+            seen_offenders.add(key)
+            unique_offenders.append(o)
+        names = ", ".join(o._repr_inner() for o in unique_offenders)
+        yield DiagnosticHint(
+            category="symbol-vector-field",
+            message=(
+                f"{node.op._repr_inner()} carries a non-Derivation vector "
+                f"field ({vf._repr_inner()}); pairing rules like "
+                f"ι_V(df) = V(f) and L_V(f) = V(f) stay inert because "
+                f"{names} has no derivation semantics"
+            ),
+            location=node,
+            suggestion=(
+                f"rebuild {names} as Derivation(\"...\", degree=0) — "
+                "Symbol is a bare name; Derivation carries the action "
+                "semantics the pairing rules key on"
+            ),
+        )
+
+
 @register_rule
 def unclassified_factor(
     residual: Expr,

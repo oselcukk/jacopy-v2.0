@@ -13,6 +13,7 @@ import pytest
 from gradalg.algebra.derivation import Act, Derivation
 from gradalg.calculus.exterior_d import d
 from gradalg.calculus.interior import interior
+from gradalg.calculus.lie_derivative import lie_derivative
 from gradalg.core.expr import Integer, Neg, Product, Sum, Symbol
 from gradalg.core.properties import Graded
 from gradalg.core.registry import PropertyRegistry
@@ -113,6 +114,72 @@ class TestUnreducedIotaOnDf:
         residual = Act(interior(X), Act(d, f))
         report = diagnose(residual, registry=r)
         assert not report.by_category("unreduced-iota-on-df")
+
+
+# --------------------------------------------------------------------- #
+# symbol-vector-field                                                    #
+# --------------------------------------------------------------------- #
+
+
+class TestSymbolVectorField:
+    def test_fires_on_iota_of_symbol(self, reg):
+        """``ι_X(df)`` with ``X = Symbol("X")`` — pairing never fires."""
+        r, f = reg
+        X = Symbol("X")
+        residual = Act(interior(X), Act(d, f))
+        report = diagnose(residual, registry=r)
+        hints = report.by_category("symbol-vector-field")
+        assert hints
+        # Suggestion should name the offending symbol.
+        assert any("X" in (h.suggestion or "") for h in hints)
+
+    def test_fires_on_lie_derivative_of_symbol(self, reg):
+        """``L_X(f)`` with ``X = Symbol("X")`` — same gate."""
+        r, f = reg
+        X = Symbol("X")
+        residual = Act(lie_derivative(X), f)
+        report = diagnose(residual, registry=r)
+        assert report.by_category("symbol-vector-field")
+
+    def test_fires_on_bracket_of_symbols(self, reg):
+        """Bracket ``X*Y − Y*X`` of Symbols — still flags, names deduped."""
+        r, f = reg
+        X = Symbol("X")
+        Y = Symbol("Y")
+        vf = Sum(Product(X, Y), Neg(Product(Y, X)))
+        residual = Act(interior(vf), Act(d, f))
+        report = diagnose(residual, registry=r)
+        hints = report.by_category("symbol-vector-field")
+        assert hints
+        suggestion = hints[0].suggestion or ""
+        # Both Symbols named; each listed once (no "X, Y, Y, X").
+        assert "X" in suggestion and "Y" in suggestion
+        assert suggestion.count("X") == 1
+        assert suggestion.count("Y") == 1
+
+    def test_skips_plain_derivation(self, reg):
+        """``ι_X(df)`` with ``X = Derivation(...)`` — pairing fires, no hint."""
+        r, f = reg
+        X = Derivation("X", degree=0)
+        residual = Act(interior(X), Act(d, f))
+        report = diagnose(residual, registry=r)
+        assert not report.by_category("symbol-vector-field")
+
+    def test_skips_bracket_of_derivations(self, reg):
+        """Derivation bracket lands on :func:`unreduced_iota_on_df`, not here."""
+        r, f = reg
+        X = Derivation("X", degree=0)
+        Y = Derivation("Y", degree=0)
+        vf = Sum(Product(X, Y), Neg(Product(Y, X)))
+        residual = Act(interior(vf), Act(d, f))
+        report = diagnose(residual, registry=r)
+        assert not report.by_category("symbol-vector-field")
+
+    def test_skips_operators_without_vector_field(self, reg):
+        """``Act(d, f)`` — outer op has no vector_field slot, no hint."""
+        r, f = reg
+        report = diagnose(Act(d, f), registry=r)
+        assert not report.by_category("symbol-vector-field")
 
 
 # --------------------------------------------------------------------- #
