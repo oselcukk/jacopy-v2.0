@@ -13,6 +13,12 @@ from gradalg.core.expr import (
     One,
     NegOne,
 )
+from gradalg.library.declarations import (
+    Bivector,
+    Forms,
+    Functions,
+    VectorFields,
+)
 
 __version__ = "0.0.1"
 
@@ -28,4 +34,8 @@ __all__ = [
     "Zero",
     "One",
     "NegOne",
+    "Functions",
+    "VectorFields",
+    "Forms",
+    "Bivector",
 ]

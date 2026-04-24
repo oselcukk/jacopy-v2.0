@@ -32,7 +32,33 @@ THIS_DIR = Path(__file__).resolve().parent
 # --------------------------------------------------------------------- #
 
 
+# Every notebook opens with a bootstrap cell that ensures ``gradalg``
+# is importable even when the notebook is opened directly in the IDE
+# (not via pytest, which has its own PYTHONPATH fixture). We try a
+# plain import first and only touch ``sys.path`` on failure, so a
+# user who ``pip install -e .``'d the repo sees no side-effects.
+_BOOTSTRAP = (
+    "code",
+    "# Ensure gradalg is importable when this notebook is opened\n"
+    "# directly (not via pytest). Walks up from the notebook's\n"
+    "# directory to the repo root and prepends it to sys.path if\n"
+    "# gradalg isn't already installed into this kernel.\n"
+    "try:\n"
+    "    import gradalg  # noqa: F401\n"
+    "except ModuleNotFoundError:\n"
+    "    import sys\n"
+    "    from pathlib import Path\n"
+    "    here = Path.cwd().resolve()\n"
+    "    for candidate in (here, *here.parents):\n"
+    "        if (candidate / \"gradalg\" / \"__init__.py\").is_file():\n"
+    "            sys.path.insert(0, str(candidate))\n"
+    "            break\n"
+    "    import gradalg  # noqa: F401",
+)
+
+
 TUTORIAL_01: list[tuple[str, str]] = [
+    _BOOTSTRAP,
     (
         "markdown",
         "# 01 — İlk Adımlar\n\n"
@@ -79,6 +105,25 @@ TUTORIAL_01: list[tuple[str, str]] = [
     ),
     (
         "markdown",
+        "### Role-driven kısayollar\n\n"
+        "Sık tekrarlanan desenler — fonksiyon, vektör alanı, form, "
+        "bivector — için `gradalg.library.declarations` altında "
+        "`Functions`, `VectorFields`, `Forms`, `Bivector` yardımcıları "
+        "var. Her biri `Symbol(...)` + uygun `reg.declare(...)` "
+        "çağrısını tek satıra indirir.",
+    ),
+    (
+        "code",
+        "from gradalg import Functions, VectorFields, Forms, Bivector\n\n"
+        "reg2 = PropertyRegistry()\n"
+        "f, g = Functions(\"f g\", registry=reg2)\n"
+        "X, Y = VectorFields(\"X Y\", registry=reg2)\n"
+        "alpha, beta = Forms(\"α β\", degree=1, registry=reg2)\n"
+        "pi = Bivector(\"π\", registry=reg2)\n"
+        "print(f, g, X, Y, alpha, beta, pi)",
+    ),
+    (
+        "markdown",
         "## `simplify`: canonical forma indirme\n\n"
         "`simplify(expr, registry)` pipeline'ı: flatten → canonicalize → "
         "distribute → flatten → sort_product → collect_terms. "
@@ -118,6 +163,7 @@ TUTORIAL_01: list[tuple[str, str]] = [
 
 
 TUTORIAL_02: list[tuple[str, str]] = [
+    _BOOTSTRAP,
     (
         "markdown",
         "# 02 — Jacobi Özdeşliği\n\n"
@@ -130,19 +176,18 @@ TUTORIAL_02: list[tuple[str, str]] = [
         "markdown",
         "## Lie bracket ve üç vector field\n\n"
         "`gradalg.brackets.lie.lie` standart manifold Lie bracket'inin "
-        "modül-seviyesi singleton'ıdır. Üç derece-0 sembolü `X, Y, Z` "
-        "declare ediyoruz — vector field olarak davranacaklar.",
+        "modül-seviyesi singleton'ıdır. Üç vector field'ı `VectorFields` "
+        "yardımcısıyla tek satırda deklare ediyoruz — her birine "
+        "`Graded(degree=0)` iliştirilir, Jacobi expansion'ın işaret "
+        "kuralları için gereken budur.",
     ),
     (
         "code",
+        "from gradalg import VectorFields\n"
         "from gradalg.brackets.lie import lie\n"
-        "from gradalg.core.expr import Symbol\n"
-        "from gradalg.core.properties import Graded\n"
         "from gradalg.core.registry import PropertyRegistry\n\n"
-        "X, Y, Z = Symbol(\"X\"), Symbol(\"Y\"), Symbol(\"Z\")\n"
         "reg = PropertyRegistry()\n"
-        "for s in (X, Y, Z):\n"
-        "    reg.declare(s, Graded(degree=0))",
+        "X, Y, Z = VectorFields(\"X Y Z\", registry=reg)",
     ),
     (
         "markdown",
@@ -201,6 +246,360 @@ TUTORIAL_02: list[tuple[str, str]] = [
 ]
 
 
+TUTORIAL_03: list[tuple[str, str]] = [
+    _BOOTSTRAP,
+    (
+        "markdown",
+        "# 03 — Poisson Geometri\n\n"
+        "Bu notebook [03_poisson_geometry.md](03_poisson_geometry.md) "
+        "markdown'ının çalıştırılabilir sürümüdür. Symplectic manifold "
+        "üstünde Poisson bracket'inin üç eşdeğer görüşü (derived, "
+        "Hamiltonian, Koszul) ve `[π, π]_SN = 0` tek koşuluna indirgenmiş "
+        "Jacobi ispatı.",
+    ),
+    (
+        "markdown",
+        "## Symplectic manifold — (ω, π, ♭, ♯) demet\n\n"
+        "`SymplecticManifold(ω, bivector=π)` formu, ters-bivector'ı, "
+        "musical map'leri ve `MusicalCompatibility` aksiyomunu tek "
+        "objede tutar. Registry'de `ω` 2-form, `π` SN-derecesi 1'lik "
+        "2-vektör olarak deklare edilir — `Bivector` yardımcısı bunu "
+        "otomatik yapar.",
+    ),
+    (
+        "code",
+        "from gradalg import Bivector, Forms, Functions\n"
+        "from gradalg.core.registry import PropertyRegistry\n"
+        "from gradalg.library.symplectic import SymplecticManifold\n\n"
+        "reg = PropertyRegistry()\n"
+        "(omega,) = Forms(\"ω\", degree=2, registry=reg)\n"
+        "pi = Bivector(\"π\", registry=reg)\n\n"
+        "M = SymplecticManifold(omega, bivector=pi, name=\"(M, ω, π)\")\n"
+        "print(M)\n"
+        "print('flat:', M.flat)\n"
+        "print('sharp:', M.sharp)\n"
+        "print('compat:', M.compatibility.name)",
+    ),
+    (
+        "markdown",
+        "## `PoissonBracket` — üç eşdeğer görüş\n\n"
+        "Fonksiyonlar SN-shifted grading'de degree `−1` taşır; "
+        "`Functions` yardımcısına `degree=-1` kwarg'ı verilir.",
+    ),
+    (
+        "code",
+        "from gradalg.library.poisson import PoissonBracket\n\n"
+        "f, g, h = Functions(\"f g h\", degree=-1, registry=reg)\n"
+        "poisson = PoissonBracket.from_bivector(pi)\n"
+        "print('bracket:', poisson)",
+    ),
+    (
+        "markdown",
+        "### Görüş 1 — derived bracket\n\n"
+        "`{f, g}_π = [[f, π]_SN, g]_SN`.",
+    ),
+    (
+        "code",
+        "poisson.expand(f, g, reg)",
+    ),
+    (
+        "markdown",
+        "### Görüş 2 — Hamiltonian vector field\n\n"
+        "`{f, g}_π = X_f(g)`. Symplectic manifold üstünde bu eşitlik "
+        "`ι_{X_f} ω + df = 0`'ya denktir; `prove_hamiltonian_equivalence` "
+        "musical kompatibiliteyi kullanarak beş adımda kapatır.",
+    ),
+    (
+        "code",
+        "from gradalg.display import chain_to_ascii\n\n"
+        "print('X_f =', poisson.hamiltonian_vf(f))\n"
+        "print('X_f(g) =', poisson.via_hamiltonian(f, g))\n"
+        "\n"
+        "chain = M.prove_hamiltonian_equivalence(f, registry=reg)\n"
+        "print('chain length:', len(chain))\n"
+        "print(chain_to_ascii(chain))",
+    ),
+    (
+        "markdown",
+        "### Görüş 3 — Koszul üç-terim formülü\n\n"
+        "1-formlar üstünde `{α, β}_π = L_{π♯(α)} β − L_{π♯(β)} α − "
+        "d⟨π♯(α), β⟩`. Klasik Koszul bracket ile derived bracket'in "
+        "bu operand tipinde *yapısal eşitliği* `prove_koszul_equivalence` "
+        "ile tek reflexive adımda kayda geçer.",
+    ),
+    (
+        "code",
+        "alpha, beta = Forms(\"α β\", degree=1, registry=reg)\n"
+        "print('koszul expand:', poisson.koszul_expand(alpha, beta, reg))\n\n"
+        "chain_k = poisson.prove_koszul_equivalence(alpha, beta, registry=reg)\n"
+        "print('koszul chain length:', len(chain_k))\n"
+        "print('rule:', chain_k.steps[0].rule)",
+    ),
+    (
+        "markdown",
+        "## `[π, π]_SN = 0` — tek koşul\n\n"
+        "Derived Bracket Teoremi, `{·, ·}_π` üstündeki Jacobi'yi tek "
+        "koşula indirger: `[π, π]_SN = 0`. Üç-giriş reduction zinciri "
+        "`DerivedBracketTheorem` rule'u ile tek adımda obstruction'a "
+        "varır; atomik `π` için obstruction opak kalır — Poisson "
+        "hipotezi devreye girince Jacobi kapanır.",
+    ),
+    (
+        "code",
+        "print('obstruction:', poisson.jacobi_obstruction(reg))\n"
+        "print('condition:', poisson.jacobi_condition(reg))\n\n"
+        "chain_j = poisson.prove_jacobi_reduction(f, g, h, registry=reg)\n"
+        "print('chain length:', len(chain_j))\n"
+        "print('rule:', chain_j.steps[0].rule)\n"
+        "print('reduces to:', chain_j.steps[0].after)",
+    ),
+    (
+        "markdown",
+        "## Theorem Book — seeded teorem\n\n"
+        "Kütüphane bu indirgemeyi `poisson_jacobi` altında hazır bir "
+        "`Theorem` kaydı olarak tutar — downstream kod tek citation ile "
+        "sonuca bağlanır.",
+    ),
+    (
+        "code",
+        "from gradalg.library import theorem_book\n\n"
+        "thm = theorem_book.get(\"poisson_jacobi\")\n"
+        "print('statement:', thm.statement)\n"
+        "print('from_axioms:', thm.from_axioms)",
+    ),
+    (
+        "markdown",
+        "## Sonraki adım\n\n"
+        "Lie algebroid çerçevesi aynı derivation stratejisini bir vector "
+        "bundle'ın üstünde yaşayan bir bracket'e uygular — "
+        "[04_lie_algebroid.md](04_lie_algebroid.md).",
+    ),
+]
+
+
+TUTORIAL_04: list[tuple[str, str]] = [
+    _BOOTSTRAP,
+    (
+        "markdown",
+        "# 04 — Lie Algebroid\n\n"
+        "Bu notebook [04_lie_algebroid.md](04_lie_algebroid.md) "
+        "markdown'ının çalıştırılabilir sürümüdür. `(E, [·,·]_E, ρ)` "
+        "üçlüsünün `gradalg` içindeki nesneleşmesi, anchor "
+        "compatibility'nin ayrı aksiyom olarak ele alınışı, ve "
+        "algebroid Cartan bundle'ına giriş.",
+    ),
+    (
+        "markdown",
+        "## Üçlü: (E, [·,·]_E, ρ)\n\n"
+        "`LieAlgebroid` bundle adı, section bracket'i, anchor'u ve "
+        "uyum hedefi olan TM bracket'ini tek objede tutar.",
+    ),
+    (
+        "code",
+        "from gradalg import VectorFields\n"
+        "from gradalg.brackets.lie import LieBracket\n"
+        "from gradalg.calculus.anchor import Anchor\n"
+        "from gradalg.core.expr import Symbol\n"
+        "from gradalg.core.registry import PropertyRegistry\n"
+        "from gradalg.library.lie_algebroid import LieAlgebroid\n\n"
+        "reg = PropertyRegistry()\n"
+        "E = Symbol(\"E\")\n"
+        "bracket_E = LieBracket(name=\"[·,·]_E\")\n"
+        "rho = Anchor(name=\"ρ\")\n\n"
+        "A = LieAlgebroid(E, bracket=bracket_E, anchor=rho, name=\"E-algebroid\")\n"
+        "print(A)",
+    ),
+    (
+        "markdown",
+        "## Anchor compatibility — ayrı aksiyom\n\n"
+        "`ρ([X, Y]_E) = [ρ(X), ρ(Y)]_{TM}` Lie algebroid *tanımı*nın "
+        "bir parçasıdır; bracket'in kendi aksiyomları içermez. Üç "
+        "sunumu vardır: obstruction (Expr), koşul "
+        "(VanishingCondition), ve aksiyom etiketli tek adımlık "
+        "ProofChain.",
+    ),
+    (
+        "code",
+        "X, Y = VectorFields(\"X Y\", registry=reg)\n\n"
+        "print('obstruction:')\n"
+        "print(' ', A.anchor_compatibility_obstruction(X, Y, reg))\n"
+        "print()\n"
+        "print('condition:', A.anchor_compatibility_condition(X, Y, reg))\n"
+        "print()\n"
+        "chain = A.prove_anchor_compatibility(X, Y, registry=reg)\n"
+        "print('chain rule:', chain.steps[0].rule)\n"
+        "print('provenance:', chain.steps[0].provenance_tag)\n"
+        "print('justification:', chain.steps[0].justification)",
+    ),
+    (
+        "markdown",
+        "## Algebroid Cartan bundle\n\n"
+        "Aynı `CartanCalculus` API'si ama `E`-etiketli operatörler ile: "
+        "`d_E`, `L_{E,X}`, `ι_{E,X}`. Operator-seviyesi `relation()` "
+        "çağrısı `OperatorEquation` döner. Not: algebroid Cartan "
+        "magic'i otomatik `verify` ile kapanmıyor (engine cartan-def "
+        "rewrite'ı TM'ye bağlı); bu beklenen ve kayıtlı. Beş Cartan "
+        "bağıntısının canlı ispatı için [05_cartan_calculus.md](05_cartan_calculus.md) "
+        "TM üstünde çalışır.",
+    ),
+    (
+        "code",
+        "cart = A.cartan\n"
+        "print('d:', A.d)\n"
+        "print('L_E,X:', cart.lie_derivative(X))\n"
+        "print('ι_E,X:', cart.interior(X))\n\n"
+        "eq = cart.relation(\"cartan_magic\", X=X)\n"
+        "print('magic:', eq.lhs, '=', eq.rhs)",
+    ),
+    (
+        "markdown",
+        "## Seeded teorem\n\n"
+        "Compatibility aksiyomu `theorem_book`'ta kayıtlı — downstream "
+        "teoremler (algebroid Cartan, Courant–Dorfman köprüsü) tek "
+        "citation ile bu aksiyomu kullanır.",
+    ),
+    (
+        "code",
+        "from gradalg.library import theorem_book\n\n"
+        "thm = theorem_book.get(\"lie_algebroid_anchor_compat\")\n"
+        "print('statement:', thm.statement)\n"
+        "print('from_axioms:', thm.from_axioms)",
+    ),
+    (
+        "markdown",
+        "## Sonraki adım\n\n"
+        "Beş Cartan bağıntısının TM üstünde iki modda canlı ispatı: "
+        "[05_cartan_calculus.md](05_cartan_calculus.md).",
+    ),
+]
+
+
+TUTORIAL_05: list[tuple[str, str]] = [
+    _BOOTSTRAP,
+    (
+        "markdown",
+        "# 05 — Cartan Calculus\n\n"
+        "Bu notebook [05_cartan_calculus.md](05_cartan_calculus.md) "
+        "markdown'ının çalıştırılabilir sürümüdür. Beş Cartan "
+        "bağıntısının `OperatorEquation` olarak inşası, `d² = 0` için "
+        "axiom/theorem mod farkı, magic formülünün iki modda canlı "
+        "ispatı, ve invariant-d helper'ı.",
+    ),
+    (
+        "markdown",
+        "## Bundle\n\n"
+        "`CartanCalculus(d, L, ι, [·,·])` — dört ingredient tek objede.",
+    ),
+    (
+        "code",
+        "from gradalg.algebra.derivation import Derivation\n"
+        "from gradalg.brackets.lie import LieBracket\n"
+        "from gradalg.calculus.cartan import CartanCalculus, RELATIONS\n"
+        "from gradalg.calculus.exterior_algebra import ExteriorAlgebra\n"
+        "from gradalg.calculus.exterior_d import d\n"
+        "from gradalg.calculus.interior import interior\n"
+        "from gradalg.calculus.lie_derivative import lie_derivative\n"
+        "from gradalg.core.expr import Symbol\n"
+        "from gradalg.core.properties import Graded\n"
+        "from gradalg.core.registry import PropertyRegistry\n\n"
+        "cart = CartanCalculus(\n"
+        "    d=d, lie_derivative=lie_derivative,\n"
+        "    interior=interior, vector_bracket=LieBracket(),\n"
+        ")\n"
+        "print('RELATIONS:', RELATIONS)",
+    ),
+    (
+        "markdown",
+        "## Beş bağıntı, beş `OperatorEquation`",
+    ),
+    (
+        "code",
+        "reg = PropertyRegistry()\n"
+        "f = Symbol(\"f\")\n"
+        "reg.declare(f, Graded(degree=0))\n"
+        "algebra = ExteriorAlgebra((f,))\n"
+        "X = Derivation(\"X\", degree=0)\n"
+        "Y = Derivation(\"Y\", degree=0)\n\n"
+        "for name, kw in [\n"
+        "    (\"d_squared_zero\", {}),\n"
+        "    (\"cartan_magic\", {\"X\": X}),\n"
+        "    (\"d_lie\", {\"X\": X}),\n"
+        "    (\"lie_lie\", {\"X\": X, \"Y\": Y}),\n"
+        "    (\"lie_iota\", {\"X\": X, \"Y\": Y}),\n"
+        "]:\n"
+        "    eq = cart.relation(name, algebra=algebra, **kw)\n"
+        "    print(f\"{name:16s}: {eq.lhs} = {eq.rhs}\")",
+    ),
+    (
+        "markdown",
+        "## `d² = 0` — axiom mode vs theorem mode\n\n"
+        "Sade helper `apply_d_squared_zero` her zaman 0'a çevirir. "
+        "Default engine `d_squared_mode=\"theorem\"` + foundational "
+        "modda d(d(x)) → 0 rewrite'ını ProofStep olarak kaydeder.",
+    ),
+    (
+        "code",
+        "from gradalg.calculus.exterior_d import apply_d_squared_zero\n"
+        "from gradalg.proof.expansion import default_engine\n\n"
+        "x = Symbol(\"x\")\n"
+        "reg.declare(x, Graded(degree=0))\n"
+        "print('axiom rewrite:', apply_d_squared_zero(d(d(x))))\n\n"
+        "engine = default_engine(\n"
+        "    registry=reg, mode=\"foundational\", d_squared_mode=\"theorem\"\n"
+        ")\n"
+        "expanded, steps = engine.expand(d(d(x)))\n"
+        "print('theorem-mode expanded:', expanded)\n"
+        "print('theorem-mode step rule:', steps[0].rule)",
+    ),
+    (
+        "markdown",
+        "## Cartan magic — `verify` üzerinden canlı ispat\n\n"
+        "`cartan_magic` iki modda da `ExteriorAlgebra((f,))` üstünde "
+        "tek adımda kapanıyor.",
+    ),
+    (
+        "code",
+        "chain = cart.verify(\"cartan_magic\", algebra=algebra, X=X, registry=reg)\n"
+        "print('efficient len:', len(chain), 'rule:', chain.steps[0].rule)\n\n"
+        "chain_f = cart.verify(\n"
+        "    \"cartan_magic\", algebra=algebra, X=X, registry=reg,\n"
+        "    mode=\"foundational\",\n"
+        ")\n"
+        "print('foundational len:', len(chain_f), 'rule:', chain_f.steps[0].rule)",
+    ),
+    (
+        "markdown",
+        "## `d_lie`, `lie_lie`, `lie_iota` — henüz verify kapsamı dışında\n\n"
+        "Bu üçünün `relation()`'ı `OperatorEquation` üretiyor; `verify()` "
+        "mevcut baseline'da kapanmıyor (derece/grading sebepleri). "
+        "Üzerinde deney yapacak kullanıcı bağıntıyı elle parçalar. "
+        "Kapanış sonraki pass'te.",
+    ),
+    (
+        "markdown",
+        "## `invariant_d` — magic + lie_iota türevi teorem\n\n"
+        "`dω(X, Y) = X(ω(Y)) − Y(ω(X)) − ω([X, Y])` — 1-formlar için "
+        "Koszul-Cartan invariant formülü. `InvariantDOneFormDefinition`'ın "
+        "default classification'ı `\"theorem\"` (d²=0'ın tersine) — "
+        "çünkü formül doğal olarak magic + lie_iota'dan türüyor.",
+    ),
+    (
+        "code",
+        "from gradalg.calculus.invariant_d import invariant_d_one_form\n"
+        "from gradalg.brackets.lie import lie\n\n"
+        "omega = Symbol(\"ω\")\n"
+        "reg.declare(omega, Graded(degree=1))\n"
+        "print(invariant_d_one_form(omega, X, Y, bracket=lie))",
+    ),
+    (
+        "markdown",
+        "## Sonraki adım\n\n"
+        "Kendi bracket'iniz + Jacobi testi — "
+        "[06_custom_bracket.md](06_custom_bracket.md) (Stage C).",
+    ),
+]
+
+
 # --------------------------------------------------------------------- #
 # Builder                                                                #
 # --------------------------------------------------------------------- #
@@ -233,6 +632,9 @@ def build_all() -> None:
     sources = {
         "01_first_steps.ipynb": TUTORIAL_01,
         "02_jacobi_identity.ipynb": TUTORIAL_02,
+        "03_poisson_geometry.ipynb": TUTORIAL_03,
+        "04_lie_algebroid.ipynb": TUTORIAL_04,
+        "05_cartan_calculus.ipynb": TUTORIAL_05,
     }
     for fname, cells in sources.items():
         nb = _build(cells)

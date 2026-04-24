@@ -21,20 +21,22 @@ from gradalg.brackets.lie import lie
 
 ## Üç vector field
 
-Jacobi için üç sembol gerekli. Vector field'ları `Graded(degree=0)` ile
-ilan ediyoruz — `PropertyRegistry` Jacobi expansion sırasında işaret
-kurallarını bu dereceden türetiyor.
+Jacobi için üç sembol gerekli. `VectorFields` yardımcısı her sembole
+`Graded(degree=0)` declare eder — `PropertyRegistry` Jacobi expansion
+sırasında işaret kurallarını bu dereceden türetiyor.
 
 ```python
-from gradalg.core.expr import Symbol
-from gradalg.core.properties import Graded
+from gradalg import VectorFields
 from gradalg.core.registry import PropertyRegistry
 
-X, Y, Z = Symbol("X"), Symbol("Y"), Symbol("Z")
 reg = PropertyRegistry()
-for s in (X, Y, Z):
-    reg.declare(s, Graded(degree=0))
+X, Y, Z = VectorFields("X Y Z", registry=reg)
 ```
+
+Alternatif (primitive) yol için [01_first_steps.md](01_first_steps.md)
+altındaki "Özellik atama" bölümüne bakın — yardımcı yalnızca
+`Symbol(...) + reg.declare(sym, Graded(degree=0))` deseninin bir
+sargısı.
 
 ## `prove_jacobi`
 

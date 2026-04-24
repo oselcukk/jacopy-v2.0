@@ -11,6 +11,12 @@ with the algebroid Cartan bundle and the seeded
 """
 
 from gradalg.library.theorem_book import Theorem, TheoremBook, theorem_book
+from gradalg.library.declarations import (
+    Bivector,
+    Forms,
+    Functions,
+    VectorFields,
+)
 
 # Stage B — seeding happens on import of these modules.
 from gradalg.library.symplectic import SymplecticManifold
@@ -51,6 +57,10 @@ __all__ = [
     "Theorem",
     "TheoremBook",
     "theorem_book",
+    "Functions",
+    "VectorFields",
+    "Forms",
+    "Bivector",
     "SymplecticManifold",
     "PoissonBracket",
     "poisson_bracket",

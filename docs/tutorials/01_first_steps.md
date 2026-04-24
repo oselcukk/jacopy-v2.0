@@ -52,6 +52,26 @@ reg.declare(z, Graded(degree=1))  # z bir 1-form gibi davranır
 Scalar olarak ilan edilmiş iki sembol çarpımda takas edilebilir;
 graded semboller arasındaki değişim `(−1)^{|a||b|}` işaretini taşır.
 
+### Role-driven kısayollar
+
+Sık tekrarlanan desenler (fonksiyon, vektör alanı, form, bivector)
+için `gradalg.library.declarations` altında role-driven yardımcılar
+var. Her biri `Symbol(...)` + uygun `reg.declare(...)` çağrısını tek
+satıra indirir:
+
+```python
+from gradalg import Functions, VectorFields, Forms, Bivector
+
+reg2 = PropertyRegistry()
+f, g = Functions("f g", registry=reg2)         # Graded(degree=0)
+X, Y = VectorFields("X Y", registry=reg2)      # Graded(degree=0)
+alpha, beta = Forms("α β", degree=1, registry=reg2)  # Graded(degree=1)
+pi = Bivector("π", registry=reg2)              # Graded(degree=1), SN-derecesi
+```
+
+Tek isim verildiğinde bile dönen değer bir demet (`(f,) = Functions("f", ...)`);
+`Bivector` tek istisna — doğrudan sembolü döner.
+
 ## simplify: canonical forma indirme
 
 `simplify(expr, registry)` pipeline'ı:
