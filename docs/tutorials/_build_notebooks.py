@@ -875,6 +875,215 @@ TUTORIAL_07: list[tuple[str, str]] = [
 ]
 
 
+TUTORIAL_08: list[tuple[str, str]] = [
+    _BOOTSTRAP,
+    (
+        "markdown",
+        "# 08 — Birleşik Tablo\n\n"
+        "Bu notebook [08_unified_picture.md](08_unified_picture.md) "
+        "markdown'ının çalıştırılabilir sürümüdür. Tek hipotez "
+        "`[π, π]_SN = 0` — fonksiyon ve form seviyelerinde aynı "
+        "obstruction. Theorem Book citation zinciri. Paralel örnek: "
+        "`dH = 0`.",
+    ),
+    (
+        "markdown",
+        "## Tek hipotez, iki yüz\n\n"
+        "`jacobi_condition` ve `koszul_jacobi_condition` aynı `Expr`'e "
+        "işaret ediyor — sadece display ismi farklı.",
+    ),
+    (
+        "code",
+        "from gradalg.library.declarations import Bivector, Forms, Functions\n"
+        "from gradalg.library.poisson import PoissonBracket\n"
+        "from gradalg.core.registry import PropertyRegistry\n\n"
+        "reg = PropertyRegistry()\n"
+        "pi = Bivector('π', registry=reg)\n"
+        "poisson = PoissonBracket.from_bivector(pi)\n\n"
+        "c1 = poisson.jacobi_condition(reg)\n"
+        "c2 = poisson.koszul_jacobi_condition(reg)\n"
+        "print('func obs:', c1.obstruction)\n"
+        "print('form obs:', c2.obstruction)\n"
+        "print('same expr?:', c1.obstruction == c2.obstruction)",
+    ),
+    (
+        "markdown",
+        "## Fonksiyon vs form — aynı obstruction'da kesişim",
+    ),
+    (
+        "code",
+        "f, g, h = Functions('f g h', degree=-1, registry=reg)\n"
+        "alpha, beta, gamma = Forms('α β γ', degree=1, registry=reg)\n\n"
+        "func_chain = poisson.prove_jacobi_reduction(f, g, h, registry=reg)\n"
+        "form_chain = poisson.prove_koszul_jacobi_reduction(\n"
+        "    alpha, beta, gamma, registry=reg\n"
+        ")\n\n"
+        "print('func rule:', func_chain.steps[0].rule)\n"
+        "print('form rule:', form_chain.steps[0].rule)\n"
+        "print('func after:', func_chain.steps[0].after)\n"
+        "print('form after:', form_chain.steps[0].after)\n"
+        "print('same after?:', func_chain.steps[0].after == form_chain.steps[0].after)",
+    ),
+    (
+        "markdown",
+        "## Klasik-derived köprü — `reflexive` step\n\n"
+        "Paketin expand kuralları her iki tarafı aynı `Expr` ağacına "
+        "getirir; Koszul eşdeğerliği yapısal olarak kapanır.",
+    ),
+    (
+        "code",
+        "chain_eq = poisson.prove_koszul_equivalence(alpha, beta, registry=reg)\n"
+        "print('len:', len(chain_eq), 'rule:', chain_eq.steps[0].rule)",
+    ),
+    (
+        "markdown",
+        "## Seeded teoremler — citation zinciri",
+    ),
+    (
+        "code",
+        "from gradalg.library import theorem_book\n\n"
+        "for name in (\n"
+        "    'poisson_jacobi',\n"
+        "    'poisson_koszul_equivalence',\n"
+        "    'poisson_koszul_jacobi',\n"
+        "):\n"
+        "    thm = theorem_book.get(name)\n"
+        "    print(name)\n"
+        "    for ax in thm.from_axioms:\n"
+        "        print('   -', ax)",
+    ),
+    (
+        "markdown",
+        "## `dH = 0` — Courant tarafı aynı desen",
+    ),
+    (
+        "code",
+        "from gradalg.brackets.courant import CourantBracket\n"
+        "from gradalg.core.expr import Symbol\n"
+        "from gradalg.core.properties import Graded\n\n"
+        "reg_h = PropertyRegistry()\n"
+        "H = Symbol('H')\n"
+        "reg_h.declare(H, Graded(degree=3))\n\n"
+        "C = CourantBracket(background_H=H)\n"
+        "cond = C.jacobi_condition(reg_h)\n"
+        "print('name       :', cond.name)\n"
+        "print('obstruction:', cond.obstruction)\n\n"
+        "twist = theorem_book.get('courant_jacobi_twist')\n"
+        "print('twist from_axioms:', twist.from_axioms)",
+    ),
+    (
+        "markdown",
+        "## Sonraki adım\n\n"
+        "Aksiyomun *kendisi* nereden geliyor? "
+        "[09_foundations.md](09_foundations.md).",
+    ),
+]
+
+
+TUTORIAL_09: list[tuple[str, str]] = [
+    _BOOTSTRAP,
+    (
+        "markdown",
+        "# 09 — Temeller\n\n"
+        "Bu notebook [09_foundations.md](09_foundations.md) markdown'ının "
+        "çalıştırılabilir sürümüdür. Axiom vs theorem sınıflandırması, "
+        "efficient vs foundational mode, `d² = 0`'ın generator-level "
+        "axiom'dan türetilişi.",
+    ),
+    (
+        "markdown",
+        "## Default engine — her şey axiom",
+    ),
+    (
+        "code",
+        "from gradalg.proof.expansion import default_engine\n\n"
+        "eng = default_engine()\n"
+        "for d in eng.definitions:\n"
+        "    label = 'theorem' if d.is_theorem else 'axiom'\n"
+        "    print(f'{label:<8} | {d.name}')",
+    ),
+    (
+        "markdown",
+        "## `d_squared_mode=\"theorem\"` — yeniden sınıflandır",
+    ),
+    (
+        "code",
+        "eng_th = default_engine(d_squared_mode='theorem')\n"
+        "for d in eng_th.definitions:\n"
+        "    if d.name == 'd² = 0':\n"
+        "        print('is_theorem    :', d.is_theorem)\n"
+        "        print('has builder?  :', d.theorem_proof_builder() is not None)",
+    ),
+    (
+        "markdown",
+        "## Efficient vs foundational — aynı adım, farklı sub-proof\n\n"
+        "Efficient mode child taşımaz; foundational mode theorem-sınıfı "
+        "bir kural tetiklendiğinde generator-level axiom'a atıf "
+        "iliştirir.",
+    ),
+    (
+        "code",
+        "from gradalg.calculus.invariant_d import default_d\n"
+        "from gradalg.core.registry import PropertyRegistry\n"
+        "from gradalg.core.expr import Symbol, Integer\n"
+        "from gradalg.core.properties import Graded\n"
+        "from gradalg.proof.verifier import prove_equivalence\n\n"
+        "reg = PropertyRegistry()\n"
+        "omega = Symbol('ω')\n"
+        "reg.declare(omega, Graded(degree=2))\n"
+        "expr = default_d(default_d(omega))\n\n"
+        "eng_eff = default_engine(registry=reg, mode='efficient',\n"
+        "                         d_squared_mode='theorem')\n"
+        "eng_fnd = default_engine(registry=reg, mode='foundational',\n"
+        "                         d_squared_mode='theorem')\n\n"
+        "eff = prove_equivalence(expr, Integer(0), registry=reg, engine=eng_eff)\n"
+        "fnd = prove_equivalence(expr, Integer(0), registry=reg, engine=eng_fnd)\n\n"
+        "print('efficient steps:')\n"
+        "for s in eff.steps:\n"
+        "    print(f'  {s.rule:<15} children={len(s.children)}')\n"
+        "print('foundational steps:')\n"
+        "for s in fnd.steps:\n"
+        "    print(f'  {s.rule:<15} children={len(s.children)}')\n"
+        "    for c in s.children:\n"
+        "        print(f'     ↳ {c.rule}')",
+    ),
+    (
+        "markdown",
+        "## Sub-proof ne söylüyor?\n\n"
+        "Foundational sub-proof'un tek girdisi `d(df) = 0` — bu "
+        "paketin primitive kabul ettiği jenerik aksiyom. `d² = 0` "
+        "tüm form derecelerinde ondan extend ediyor.",
+    ),
+    (
+        "code",
+        "child = fnd.steps[0].children[0]\n"
+        "print('child rule         :', child.rule)\n"
+        "print('child justification:\\n  ', child.justification)",
+    ),
+    (
+        "markdown",
+        "## Üç provenance katmanı\n\n"
+        "Property (sembol), Definition (expansion), Theorem — üçü de "
+        "`axiom`/`theorem` ayrımı taşır. `Theorem.from_axioms` tek "
+        "citation olarak makale ispatına iner.",
+    ),
+    (
+        "code",
+        "from gradalg.library import theorem_book\n\n"
+        "for name in ('poisson_jacobi', 'courant_jacobi_twist'):\n"
+        "    thm = theorem_book.get(name)\n"
+        "    print(name, '->', thm.from_axioms)",
+    ),
+    (
+        "markdown",
+        "## Tutorial serisinin sonu\n\n"
+        "Dokuz bölüm tamamlandı. Paket artık kendi bracket'iniz, kendi "
+        "teoreminiz, kendi aksiyom setinizle genişletilebilir bir araç "
+        "olarak kullanıma hazır.",
+    ),
+]
+
+
 # --------------------------------------------------------------------- #
 # Builder                                                                #
 # --------------------------------------------------------------------- #
@@ -912,6 +1121,8 @@ def build_all() -> None:
         "05_cartan_calculus.ipynb": TUTORIAL_05,
         "06_custom_bracket.ipynb": TUTORIAL_06,
         "07_derived_bracket.ipynb": TUTORIAL_07,
+        "08_unified_picture.ipynb": TUTORIAL_08,
+        "09_foundations.ipynb": TUTORIAL_09,
     }
     for fname, cells in sources.items():
         nb = _build(cells)
