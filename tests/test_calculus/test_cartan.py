@@ -8,7 +8,7 @@ from gradalg.calculus.cartan import MODES, RELATIONS, CartanCalculus
 from gradalg.calculus.exterior_algebra import ExteriorAlgebra
 from gradalg.calculus.exterior_d import d
 from gradalg.calculus.interior import interior
-from gradalg.calculus.lie_derivative import lie_derivative
+from gradalg.calculus.lie_derivative import LieDerivative, lie_derivative
 from gradalg.calculus.operator_equation import OperatorEquation
 from gradalg.core.expr import Integer, Symbol
 from gradalg.core.properties import Graded
@@ -264,6 +264,90 @@ class TestVerifyOtherRelations:
             "d_squared_zero", algebra=algebra, registry=reg
         )
         assert isinstance(chain, ProofChain)
+
+
+# --------------------------------------------------------------------- #
+# verify() — flow-mode L_X on all five relations                         #
+# --------------------------------------------------------------------- #
+
+
+class TestVerifyFlowMode:
+    """Regression for flow-mode Cartan relations — Faz 11 erteleme 1.
+
+    ``LieDerivative(X, definition="flow")`` keeps ``L_X`` opaque rather
+    than unfolding it via the Cartan magic formula. The two flow-mode
+    rewrite rules ``L_X(f) = X(f)`` on 0-forms and ``L_X ∘ d = d ∘ L_X``
+    let the same five Cartan relations close as rewrite cascades rather
+    than as definitional tautologies — the magic formula now holds as a
+    theorem in flow mode, not by construction.
+    """
+
+    @pytest.fixture
+    def flow_calc(self):
+        def flow_lie(X):
+            return LieDerivative(X, definition="flow")
+
+        return CartanCalculus(
+            d=d,
+            lie_derivative=flow_lie,
+            interior=interior,
+            vector_bracket=LieBracket(),
+        )
+
+    def test_d_squared_zero_closes_in_flow_mode(
+        self, flow_calc, context
+    ):
+        reg, algebra, _ = context
+        chain = flow_calc.verify(
+            "d_squared_zero", algebra=algebra, registry=reg
+        )
+        assert isinstance(chain, ProofChain)
+
+    def test_cartan_magic_closes_in_flow_mode(
+        self, flow_calc, context, XY
+    ):
+        reg, algebra, _ = context
+        X, _ = XY
+        chain = flow_calc.verify(
+            "cartan_magic", algebra=algebra, X=X, registry=reg
+        )
+        assert isinstance(chain, ProofChain)
+
+    def test_d_lie_closes_in_flow_mode(self, flow_calc, context, XY):
+        reg, algebra, _ = context
+        X, _ = XY
+        chain = flow_calc.verify(
+            "d_lie", algebra=algebra, X=X, registry=reg
+        )
+        assert isinstance(chain, ProofChain)
+
+    def test_lie_lie_closes_in_flow_mode(self, flow_calc, context, XY):
+        reg, algebra, _ = context
+        X, Y = XY
+        chain = flow_calc.verify(
+            "lie_lie", algebra=algebra, X=X, Y=Y, registry=reg
+        )
+        assert isinstance(chain, ProofChain)
+
+    def test_lie_iota_closes_in_flow_mode(self, flow_calc, context, XY):
+        reg, algebra, _ = context
+        X, Y = XY
+        chain = flow_calc.verify(
+            "lie_iota", algebra=algebra, X=X, Y=Y, registry=reg
+        )
+        assert isinstance(chain, ProofChain)
+
+    def test_verify_all_closes_every_relation_in_flow_mode(
+        self, flow_calc, context, XY
+    ):
+        reg, algebra, _ = context
+        X, Y = XY
+        results = flow_calc.verify_all(
+            algebra=algebra, X=X, Y=Y, registry=reg
+        )
+        assert set(results) == set(RELATIONS)
+        for chain in results.values():
+            assert isinstance(chain, ProofChain)
 
 
 # --------------------------------------------------------------------- #

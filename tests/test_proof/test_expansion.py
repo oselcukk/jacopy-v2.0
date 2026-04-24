@@ -20,6 +20,8 @@ from gradalg.proof.expansion import (
     IotaOnZeroFormDefinition,
     IotaSquaredZeroDefinition,
     LieDerivativeCartanDefinition,
+    LieDerivativeCommutesWithDDefinition,
+    LieDerivativeOnZeroFormDefinition,
     default_engine,
 )
 from gradalg.proof.step import ProofStep
@@ -117,6 +119,105 @@ class TestLieDerivativeCartanDefinition:
             Act(compose(iota_EX, d_E), omega),
         )
         assert result == expected
+
+
+# --------------------------------------------------------------------- #
+# LieDerivativeOnZeroFormDefinition                                      #
+# --------------------------------------------------------------------- #
+
+
+class TestLieDerivativeOnZeroFormDefinition:
+    def test_matches_flow_on_zero_form(self):
+        reg = PropertyRegistry()
+        f = Symbol("f")
+        reg.declare(f, Graded(degree=0))
+        X = Derivation("X", degree=0)
+        L = lie_derivative(X, definition="flow")
+        defn = LieDerivativeOnZeroFormDefinition(registry=reg)
+        assert defn.matches(Act(L, f))
+
+    def test_does_not_match_cartan_mode(self):
+        reg = PropertyRegistry()
+        f = Symbol("f")
+        reg.declare(f, Graded(degree=0))
+        X = Derivation("X", degree=0)
+        L = lie_derivative(X, definition="cartan")
+        defn = LieDerivativeOnZeroFormDefinition(registry=reg)
+        assert not defn.matches(Act(L, f))
+
+    def test_does_not_match_one_form(self):
+        reg = PropertyRegistry()
+        alpha = Symbol("alpha")
+        reg.declare(alpha, Graded(degree=1))
+        X = Derivation("X", degree=0)
+        L = lie_derivative(X, definition="flow")
+        defn = LieDerivativeOnZeroFormDefinition(registry=reg)
+        assert not defn.matches(Act(L, alpha))
+
+    def test_does_not_match_non_derivation_field(self):
+        """X must be a Derivation or composite — bare Symbol shouldn't fire."""
+        reg = PropertyRegistry()
+        f = Symbol("f")
+        reg.declare(f, Graded(degree=0))
+        X = Symbol("X")
+        L = lie_derivative(X, definition="flow")
+        defn = LieDerivativeOnZeroFormDefinition(registry=reg)
+        assert not defn.matches(Act(L, f))
+
+    def test_rewrite_produces_X_of_f(self):
+        reg = PropertyRegistry()
+        f = Symbol("f")
+        reg.declare(f, Graded(degree=0))
+        X = Derivation("X", degree=0)
+        L = lie_derivative(X, definition="flow")
+        defn = LieDerivativeOnZeroFormDefinition(registry=reg)
+        assert defn.rewrite(Act(L, f)) == Act(X, f)
+
+
+# --------------------------------------------------------------------- #
+# LieDerivativeCommutesWithDDefinition                                   #
+# --------------------------------------------------------------------- #
+
+
+class TestLieDerivativeCommutesWithDDefinition:
+    def test_matches_flow_on_exact_form(self):
+        X = Derivation("X", degree=0)
+        L = lie_derivative(X, definition="flow")
+        omega = Symbol("omega")
+        defn = LieDerivativeCommutesWithDDefinition()
+        assert defn.matches(Act(L, Act(d, omega)))
+
+    def test_does_not_match_cartan_mode(self):
+        X = Derivation("X", degree=0)
+        L = lie_derivative(X, definition="cartan")
+        omega = Symbol("omega")
+        defn = LieDerivativeCommutesWithDDefinition()
+        assert not defn.matches(Act(L, Act(d, omega)))
+
+    def test_does_not_match_non_d_inner(self):
+        X = Derivation("X", degree=0)
+        L = lie_derivative(X, definition="flow")
+        omega = Symbol("omega")
+        defn = LieDerivativeCommutesWithDDefinition()
+        assert not defn.matches(Act(L, omega))
+
+    def test_pins_to_bundle_specific_d(self):
+        """If L carries d_E, default d doesn't match."""
+        X = Derivation("X", degree=0)
+        d_E = ExteriorDerivative("d_E")
+        L = lie_derivative(X, definition="flow", d=d_E)
+        omega = Symbol("omega")
+        defn = LieDerivativeCommutesWithDDefinition()
+        assert not defn.matches(Act(L, Act(d, omega)))
+        assert defn.matches(Act(L, Act(d_E, omega)))
+
+    def test_rewrite_moves_d_outside(self):
+        X = Derivation("X", degree=0)
+        L = lie_derivative(X, definition="flow")
+        omega = Symbol("omega")
+        defn = LieDerivativeCommutesWithDDefinition()
+        result = defn.rewrite(Act(L, Act(d, omega)))
+        assert result == Act(d, Act(L, omega))
 
 
 # --------------------------------------------------------------------- #

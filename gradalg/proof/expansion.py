@@ -381,6 +381,72 @@ class LieDerivativeCartanDefinition(Definition):
         )
 
 
+class LieDerivativeOnZeroFormDefinition(Definition):
+    """``L_X(f) → X(f)`` on 0-forms for flow-mode ``L_X``.
+
+    Fires only on :class:`LieDerivative` instances whose
+    :attr:`definition` is ``"flow"`` — cartan-mode ``L_X`` unfolds via
+    :class:`LieDerivativeCartanDefinition` and reaches the same result
+    through the magic formula. The vector field must be a Derivation or
+    a Sum/Product/Neg composite of Derivations (the pairing gate used
+    by :class:`IotaOnExactOneFormDefinition`); otherwise ``X(f)``
+    wouldn't be meaningful.
+    """
+
+    name = "L_X(f) = X(f) on 0-forms (flow)"
+
+    def __init__(self, *, registry: Optional[PropertyRegistry] = None) -> None:
+        self._registry = registry
+
+    def matches(self, expr: Expr) -> bool:
+        if not (isinstance(expr, Act) and isinstance(expr.op, LieDerivative)):
+            return False
+        L: LieDerivative = expr.op  # type: ignore[assignment]
+        if L.definition != "flow":
+            return False
+        if not _is_derivation_combination(L.vector_field):
+            return False
+        return _is_degree_zero(expr.arg, self._registry)
+
+    def rewrite(self, expr: Expr) -> Expr:
+        X = expr.op.vector_field  # type: ignore[union-attr]
+        return Act(X, expr.arg)
+
+
+class LieDerivativeCommutesWithDDefinition(Definition):
+    """``L_X(d(ω)) → d(L_X(ω))`` for flow-mode ``L_X``.
+
+    The Cartan-mode ``L_X`` picks up the same identity through the
+    magic-formula expansion; the flow-mode presentation keeps ``L_X``
+    opaque, so this rule is what lets ``[d, L_X] = 0`` close as a
+    rewrite cascade. If ``L_X`` carries a bundle-specific ``d`` slot
+    the rewrite only fires on that exterior derivative, avoiding
+    accidental pairing with a TM ``d`` that happens to coexist in the
+    same expression tree.
+    """
+
+    name = "L_X ∘ d = d ∘ L_X (flow)"
+
+    def matches(self, expr: Expr) -> bool:
+        if not (isinstance(expr, Act) and isinstance(expr.op, LieDerivative)):
+            return False
+        L: LieDerivative = expr.op  # type: ignore[assignment]
+        if L.definition != "flow":
+            return False
+        inner = expr.arg
+        if not (isinstance(inner, Act) and isinstance(inner.op, ExteriorDerivative)):
+            return False
+        if L.d is not None and inner.op != L.d:
+            return False
+        return True
+
+    def rewrite(self, expr: Expr) -> Expr:
+        L = expr.op
+        d_inner = expr.arg.op  # type: ignore[union-attr]
+        omega = expr.arg.arg  # type: ignore[union-attr]
+        return Act(d_inner, Act(L, omega))
+
+
 # --------------------------------------------------------------------- #
 # Engine                                                                 #
 # --------------------------------------------------------------------- #
@@ -547,6 +613,8 @@ def default_engine(
     return ExpansionEngine(
         [
             LieDerivativeCartanDefinition(),
+            LieDerivativeOnZeroFormDefinition(registry=registry),
+            LieDerivativeCommutesWithDDefinition(),
             ActOverSumOpDefinition(),
             DSquaredZeroDefinition(target=dop, classification=d_squared_mode),
             IotaSquaredZeroDefinition(),
