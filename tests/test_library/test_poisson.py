@@ -7,15 +7,18 @@ import pytest
 from gradalg.algebra.derivation import Act
 from gradalg.brackets.base import BracketApply
 from gradalg.brackets.derived import DerivedBracket, VanishingCondition
+from gradalg.brackets.koszul import KoszulBracket
 from gradalg.brackets.schouten import sn
 from gradalg.calculus.hamiltonian_vf import HamiltonianVectorField
-from gradalg.core.expr import Symbol
+from gradalg.calculus.musical import Sharp
+from gradalg.core.expr import Sum, Symbol
 from gradalg.core.properties import Graded
 from gradalg.core.registry import PropertyRegistry
 from gradalg.core.symbolic_degree import Degree
 from gradalg.library import theorem_book
 from gradalg.library.poisson import (
     THEOREM_POISSON_JACOBI,
+    THEOREM_POISSON_KOSZUL_EQUIVALENCE,
     PoissonBracket,
     poisson_bracket,
 )
@@ -198,3 +201,107 @@ class TestSeededTheorem:
         assert isinstance(thm.proof, ProofChain)
         assert len(thm.proof) >= 1
         assert thm.proof.steps[0].rule == "DerivedBracketTheorem"
+
+
+# --------------------------------------------------------------------- #
+# Stage B.2 — form-level (Koszul) view                                  #
+# --------------------------------------------------------------------- #
+
+
+class TestKoszulViews:
+    def test_sharp_built_from_bivector(self):
+        pi = Symbol("π")
+        P = PoissonBracket(pi)
+        assert isinstance(P.sharp, Sharp)
+        assert P.sharp.bivector is pi
+
+    def test_koszul_derived_uses_sharp_as_anchor(self):
+        pi = Symbol("π")
+        P = PoissonBracket(pi)
+        D = P.koszul_derived
+        assert isinstance(D, DerivedBracket)
+        assert D.acting_on is P.sharp
+        assert D.base is sn
+        assert D.Q is pi
+
+    def test_koszul_classical_uses_sharp_as_anchor(self):
+        """Classical :class:`KoszulBracket` built with the manifold's
+        ``Sharp(π)`` — the relaxed anchor type (``Derivation`` rather
+        than strictly ``Anchor``) is what unlocks this path."""
+        pi = Symbol("π")
+        P = PoissonBracket(pi)
+        K = P.koszul_classical
+        assert isinstance(K, KoszulBracket)
+        assert K.anchor is P.sharp
+
+    def test_koszul_expand_shape_is_three_term_sum(self, registry):
+        """Expansion should be a :class:`Sum` of three Koszul pieces —
+        ``L_{π^♯(α)} β``, ``−L_{π^♯(β)} α``, ``−d⟨π^♯(α), β⟩``. We
+        don't probe the exact operator identities beyond counting the
+        top-level summands; the structural agreement with
+        :attr:`koszul_classical` is covered below."""
+        pi = Symbol("π")
+        alpha, beta = Symbol("α"), Symbol("β")
+        registry.declare(alpha, Graded(degree=1))
+        registry.declare(beta, Graded(degree=1))
+        P = PoissonBracket(pi)
+        out = P.koszul_expand(alpha, beta, registry)
+        assert isinstance(out, Sum)
+        assert len(out.children) == 3
+
+    def test_koszul_expand_matches_classical_structurally(self, registry):
+        """The two views share the same ``Sharp(π)`` anchor by
+        construction, so their Exprs are *structurally* equal — this
+        is what makes :meth:`prove_koszul_equivalence` close in one
+        reflexive step."""
+        pi = Symbol("π")
+        alpha, beta = Symbol("α"), Symbol("β")
+        registry.declare(alpha, Graded(degree=1))
+        registry.declare(beta, Graded(degree=1))
+        P = PoissonBracket(pi)
+        derived_out = P.koszul_expand(alpha, beta, registry)
+        classical_out = P.koszul_classical.expand(alpha, beta, registry)
+        assert derived_out == classical_out
+
+
+class TestProveKoszulEquivalence:
+    def test_returns_proof_chain(self, registry):
+        pi = Symbol("π")
+        alpha, beta = Symbol("α"), Symbol("β")
+        registry.declare(alpha, Graded(degree=1))
+        registry.declare(beta, Graded(degree=1))
+        P = PoissonBracket(pi)
+        chain = P.prove_koszul_equivalence(alpha, beta, registry=registry)
+        assert isinstance(chain, ProofChain)
+        assert len(chain) >= 1
+
+    def test_closes_in_one_reflexive_step(self, registry):
+        """Both Koszul views emit the same Expr — no rewrites needed,
+        :func:`prove_equivalence` reports a single ``reflexive`` step."""
+        pi = Symbol("π")
+        alpha, beta = Symbol("α"), Symbol("β")
+        registry.declare(alpha, Graded(degree=1))
+        registry.declare(beta, Graded(degree=1))
+        P = PoissonBracket(pi)
+        chain = P.prove_koszul_equivalence(alpha, beta, registry=registry)
+        assert len(chain) == 1
+        assert chain.steps[0].rule == "reflexive"
+
+
+class TestSeededKoszulTheorem:
+    def test_theorem_registered(self):
+        assert "poisson_koszul_equivalence" in theorem_book
+        assert (
+            theorem_book.get("poisson_koszul_equivalence")
+            is THEOREM_POISSON_KOSZUL_EQUIVALENCE
+        )
+
+    def test_theorem_proof_closes_reflexively(self):
+        thm = THEOREM_POISSON_KOSZUL_EQUIVALENCE
+        assert isinstance(thm.proof, ProofChain)
+        assert len(thm.proof) == 1
+        assert thm.proof.steps[0].rule == "reflexive"
+
+    def test_theorem_from_axioms_names_sharp_as_anchor(self):
+        thm = THEOREM_POISSON_KOSZUL_EQUIVALENCE
+        assert any("Sharp" in ax or "π^♯" in ax for ax in thm.from_axioms)

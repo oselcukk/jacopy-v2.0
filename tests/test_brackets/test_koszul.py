@@ -18,9 +18,21 @@ from gradalg.proof.verifier import prove_equivalence
 
 
 class TestConstruction:
-    def test_requires_anchor(self):
+    def test_requires_derivation(self):
+        """Non-``Derivation`` anchors rejected at construction."""
         with pytest.raises(TypeError):
             KoszulBracket("ρ")  # type: ignore[arg-type]
+
+    def test_accepts_sharp_as_anchor(self):
+        """Any :class:`Derivation` is a valid anchor — the relaxed check
+        lets the musical map ``π^♯`` stand in as the anchor on a
+        Poisson manifold, which is what
+        :class:`gradalg.library.poisson.PoissonBracket` relies on."""
+        from gradalg.calculus.musical import Sharp
+        pi = Symbol("π")
+        sh = Sharp(pi)
+        K = KoszulBracket(sh)
+        assert K.anchor is sh
 
     def test_default_name(self):
         K = KoszulBracket(Anchor("ρ"))

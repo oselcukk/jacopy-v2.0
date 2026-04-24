@@ -27,7 +27,7 @@ Cartan family.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable, Optional
+from typing import Any, Callable, Optional
 
 from gradalg.algebra.derivation import Act, Derivation
 from gradalg.brackets.base import GradedBracket
@@ -40,13 +40,6 @@ from gradalg.core.expr import Expr, Neg, Sum
 from gradalg.core.registry import PropertyRegistry
 from gradalg.core.symbolic_degree import DegreeLike
 
-if TYPE_CHECKING:
-    # Imported lazily to avoid a circular import: ``calculus.anchor``
-    # imports ``brackets.base``, which eagerly triggers this package's
-    # ``__init__`` and would then re-enter ``anchor`` mid-initialisation.
-    # The runtime ``isinstance`` check below imports ``Anchor`` locally.
-    from gradalg.calculus.anchor import Anchor
-
 
 LieDerivativeFactory = Callable[[Expr], Derivation]
 
@@ -57,11 +50,13 @@ class KoszulBracket(GradedBracket):
     Parameters
     ----------
     anchor
-        The anchor ``ρ: T*M → TM``. In the Poisson case this is the
-        musical map ``π^♯`` (supplied as an :class:`Anchor` instance
-        named ``"π♯"`` by the caller), but the bracket itself is
-        anchor-agnostic — any :class:`Anchor` that lands in ``TM`` will
-        do.
+        The anchor ``ρ: T*M → TM`` — any degree-0
+        :class:`~gradalg.algebra.derivation.Derivation`. The canonical
+        choices are a dedicated :class:`~gradalg.calculus.anchor.Anchor`
+        on a Lie algebroid and the musical map
+        :class:`~gradalg.calculus.musical.Sharp` (``π^♯``) on a Poisson
+        manifold; both share the same ``Derivation`` base class and the
+        bracket is agnostic between them.
     d
         Exterior derivative operator. Defaults to the
         :data:`gradalg.calculus.exterior_d.d` singleton.
@@ -85,17 +80,15 @@ class KoszulBracket(GradedBracket):
 
     def __init__(
         self,
-        anchor: Anchor,
+        anchor: Derivation,
         *,
         d: Optional[Derivation] = None,
         lie_derivative: Optional[LieDerivativeFactory] = None,
         name: str = "[·,·]_K",
     ) -> None:
-        from gradalg.calculus.anchor import Anchor as _Anchor
-
-        if not isinstance(anchor, _Anchor):
+        if not isinstance(anchor, Derivation):
             raise TypeError(
-                f"KoszulBracket anchor must be an Anchor, got {type(anchor).__name__}"
+                f"KoszulBracket anchor must be a Derivation, got {type(anchor).__name__}"
             )
         super().__init__(
             name,
@@ -111,7 +104,7 @@ class KoszulBracket(GradedBracket):
         )
 
     @property
-    def anchor(self) -> Anchor:
+    def anchor(self) -> Derivation:
         return self._anchor
 
     def expand(

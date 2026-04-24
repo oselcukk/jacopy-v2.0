@@ -27,11 +27,13 @@ from typing import Optional
 
 from gradalg.algebra.derivation import Act
 from gradalg.brackets.derived import DerivedBracket, VanishingCondition
+from gradalg.brackets.koszul import KoszulBracket
 from gradalg.brackets.schouten import sn
 from gradalg.calculus.hamiltonian_vf import (
     HamiltonianVectorField,
     hamiltonian_vf as _hamiltonian_vf,
 )
+from gradalg.calculus.musical import Sharp
 from gradalg.core.expr import Expr, Symbol
 from gradalg.core.properties import Graded
 from gradalg.core.registry import PropertyRegistry
@@ -39,6 +41,7 @@ from gradalg.core.symbolic_degree import DegreeLike
 from gradalg.library.theorem_book import Theorem, theorem_book
 from gradalg.proof.chain import ProofChain
 from gradalg.proof.step import ProofStep
+from gradalg.proof.verifier import prove_equivalence
 
 
 # --------------------------------------------------------------------- #
@@ -76,7 +79,14 @@ class PoissonBracket:
     (which it doesn't, for atomic ``π``).
     """
 
-    __slots__ = ("_pi", "_derived", "_name")
+    __slots__ = (
+        "_pi",
+        "_derived",
+        "_sharp",
+        "_koszul_derived",
+        "_koszul_classical",
+        "_name",
+    )
 
     def __init__(
         self,
@@ -91,6 +101,23 @@ class PoissonBracket:
         self._pi = pi
         self._derived = DerivedBracket(
             sn, pi, degree_Q=degree_bivector, name=display,
+        )
+        # Sharp (``π^♯``) plus the two form-level views it unlocks. The
+        # sharp is the canonical T*M → TM lift on a Poisson manifold and
+        # lets both the derived bracket and the classical Koszul
+        # formula run directly on 1-form operands without the caller
+        # supplying a separate anchor.
+        self._sharp = Sharp(pi)
+        self._koszul_derived = DerivedBracket(
+            sn,
+            pi,
+            degree_Q=degree_bivector,
+            acting_on=self._sharp,
+            name=f"{{·,·}}_{pi._repr_inner()},♯",
+        )
+        self._koszul_classical = KoszulBracket(
+            self._sharp,
+            name=f"[·,·]_K,{pi._repr_inner()}",
         )
         self._name = display
 
@@ -115,6 +142,33 @@ class PoissonBracket:
     def derived(self) -> DerivedBracket:
         """The underlying :class:`DerivedBracket` ``(sn, π)``."""
         return self._derived
+
+    @property
+    def sharp(self) -> Sharp:
+        """``π^♯`` — the musical map ``T*M → TM`` induced by the bivector."""
+        return self._sharp
+
+    @property
+    def koszul_derived(self) -> DerivedBracket:
+        """Form-level derived bracket ``DerivedBracket(sn, π, acting_on=π^♯)``.
+
+        This is the shape the library uses when evaluating ``{·, ·}_π``
+        on 1-forms — the anchor lifts the forms to vector fields via
+        ``π^♯`` and the expansion emits the classical Koszul three-term
+        formula.
+        """
+        return self._koszul_derived
+
+    @property
+    def koszul_classical(self) -> KoszulBracket:
+        """Classical :class:`KoszulBracket` with anchor ``π^♯``.
+
+        Structurally the ``KoszulBracket(Sharp(π))`` built at
+        construction, kept as a handle so
+        :meth:`prove_koszul_equivalence` can reference a fixed anchor
+        instance and the proof close in a single reflexive step.
+        """
+        return self._koszul_classical
 
     @property
     def name(self) -> str:
@@ -152,6 +206,55 @@ class PoissonBracket:
     def hamiltonian_vf(self, f: Expr) -> HamiltonianVectorField:
         """Build the Hamiltonian vector field ``X_f`` over ``π``."""
         return _hamiltonian_vf(f, bivector=self._pi)
+
+    # ---- form-level (Koszul) view ---------------------------------- #
+
+    def koszul_expand(
+        self,
+        alpha: Expr,
+        beta: Expr,
+        registry: Optional[PropertyRegistry] = None,
+    ) -> Expr:
+        """``{α, β}_π = L_{π^♯(α)} β − L_{π^♯(β)} α − d⟨π^♯(α), β⟩``.
+
+        The form-level view of the Poisson bracket — the classical
+        Koszul three-term formula on 1-forms, produced through the
+        :attr:`koszul_derived` bracket so the anchor ``π^♯`` is fixed to
+        this bivector.
+
+        Structurally equal to
+        ``poisson.koszul_classical.expand(α, β, registry)``: both paths
+        go through the same ``Sharp(π)`` instance and emit the same
+        :class:`Sum`. Use this method when expanding by value; use
+        :meth:`prove_koszul_equivalence` to obtain the equality as a
+        transcripted :class:`ProofChain`.
+        """
+        return self._koszul_derived.expand(alpha, beta, registry)
+
+    def prove_koszul_equivalence(
+        self,
+        alpha: Expr,
+        beta: Expr,
+        *,
+        registry: Optional[PropertyRegistry] = None,
+    ) -> ProofChain:
+        """Close ``koszul_classical.expand(α, β) = koszul_derived.expand(α, β)``.
+
+        Both sides are computed with the same ``π^♯`` anchor, so their
+        :class:`Expr` outputs are structurally equal and
+        :func:`~gradalg.proof.verifier.prove_equivalence` closes the
+        chain in a single reflexive step. The value isn't the depth of
+        the proof — it is having the classical/derived agreement
+        recorded as a citable :class:`ProofChain` on this specific
+        ``(α, β)`` triple.
+        """
+        return prove_equivalence(
+            self._koszul_classical,
+            self._koszul_derived,
+            alpha,
+            beta,
+            registry=registry,
+        )
 
     # ---- Jacobi -------------------------------------------------- #
 
@@ -296,3 +399,59 @@ THEOREM_POISSON_JACOBI = _build_poisson_jacobi_theorem()
 
 if "poisson_jacobi" not in theorem_book:
     theorem_book.add(THEOREM_POISSON_JACOBI)
+
+
+def _build_poisson_koszul_equivalence_theorem() -> Theorem:
+    """Construct the canonical ``poisson_koszul_equivalence`` theorem.
+
+    On 1-forms the Poisson bracket agrees with the classical Koszul
+    bracket whose anchor is ``π^♯``:
+
+        {α, β}_π = L_{π^♯(α)} β − L_{π^♯(β)} α − d⟨π^♯(α), β⟩.
+
+    Both :attr:`PoissonBracket.koszul_derived` and
+    :attr:`PoissonBracket.koszul_classical` emit the same
+    :class:`Expr` — they share the ``Sharp(π)`` anchor by construction
+    — so the proof closes in a single reflexive step. The seeded
+    record fixes generic symbols ``(π, α, β)`` as a concrete witness;
+    downstream callers produce their own chain on the concrete operands
+    they care about via :meth:`PoissonBracket.prove_koszul_equivalence`.
+    """
+    pi = Symbol("π")
+    alpha = Symbol("α")
+    beta = Symbol("β")
+    reg = PropertyRegistry()
+    reg.declare(pi, Graded(degree=1))
+    reg.declare(alpha, Graded(degree=1))
+    reg.declare(beta, Graded(degree=1))
+    poisson = PoissonBracket.from_bivector(pi)
+    chain = poisson.prove_koszul_equivalence(alpha, beta, registry=reg)
+    return Theorem(
+        name="poisson_koszul_equivalence",
+        statement=(
+            "{α, β}_π = L_{π^♯(α)} β − L_{π^♯(β)} α − d⟨π^♯(α), β⟩ "
+            "(derived = classical Koszul via π^♯)"
+        ),
+        from_axioms=(
+            "derived bracket definition",
+            "classical Koszul bracket definition",
+            "π^♯ = Sharp(π) as common anchor",
+        ),
+        proof=chain,
+        notes=(
+            "Both views are built with the same Sharp(π) instance, so "
+            "their Exprs are structurally equal and prove_equivalence "
+            "closes in one reflexive step. The theorem records that "
+            "structural identity as a transcribable ProofChain."
+        ),
+    )
+
+
+#: The Poisson–Koszul equivalence theorem — the form-level counterpart
+#: of :data:`THEOREM_POISSON_JACOBI`. Seeded into
+#: :data:`~gradalg.library.theorem_book.theorem_book` at import time.
+THEOREM_POISSON_KOSZUL_EQUIVALENCE = _build_poisson_koszul_equivalence_theorem()
+
+
+if "poisson_koszul_equivalence" not in theorem_book:
+    theorem_book.add(THEOREM_POISSON_KOSZUL_EQUIVALENCE)
