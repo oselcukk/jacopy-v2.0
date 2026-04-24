@@ -30,13 +30,21 @@ caller can splice in or compare against.
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import Callable, Optional
 
 from gradalg.algebra.derivation import Act, Derivation, compose
 from gradalg.calculus.exterior_d import ExteriorDerivative, d as default_d
 from gradalg.calculus.interior import InteriorProduct, interior
 from gradalg.core.expr import Expr, Sum
 from gradalg.core.registry import PropertyRegistry
+
+
+#: Type alias — a callable ``X -> ι_X`` that builds an
+#: :class:`InteriorProduct` for a given vector field. Used by
+#: :class:`LieDerivative` to remember which interior-product factory its
+#: Cartan expansion should use (so algebroid bundles get ``ι_{E,X}``
+#: rather than the default ``ι_X``).
+IotaFactory = Callable[[Expr], InteriorProduct]
 
 
 # Supported axiomatic definitions. Kept as a tuple of literals rather
@@ -56,7 +64,7 @@ class LieDerivative(Derivation):
     of the vector field.
     """
 
-    __slots__ = ("_vector_field", "_definition")
+    __slots__ = ("_vector_field", "_definition", "_d", "_iota_factory")
 
     def __init__(
         self,
@@ -64,6 +72,8 @@ class LieDerivative(Derivation):
         *,
         definition: str = "cartan",
         name: Optional[str] = None,
+        d: Optional[ExteriorDerivative] = None,
+        iota_factory: Optional[IotaFactory] = None,
     ) -> None:
         if not isinstance(X, Expr):
             raise TypeError("Lie derivative requires an Expr vector field")
@@ -71,10 +81,18 @@ class LieDerivative(Derivation):
             raise ValueError(
                 f"definition must be one of {DEFINITIONS}, got {definition!r}"
             )
+        if d is not None and not isinstance(d, ExteriorDerivative):
+            raise TypeError(
+                "LieDerivative d override must be an ExteriorDerivative"
+            )
+        if iota_factory is not None and not callable(iota_factory):
+            raise TypeError("LieDerivative iota_factory must be callable")
         display_name = name if name is not None else f"L_{X._repr_inner()}"
         super().__init__(display_name, degree=0)
         self._vector_field = X
         self._definition = definition
+        self._d = d
+        self._iota_factory = iota_factory
 
     @property
     def vector_field(self) -> Expr:
@@ -84,15 +102,46 @@ class LieDerivative(Derivation):
     def definition(self) -> str:
         return self._definition
 
+    @property
+    def d(self) -> Optional[ExteriorDerivative]:
+        """Bundle-specific exterior derivative, or ``None`` for the TM default.
+
+        When non-``None`` the Cartan expansion driven by the expansion
+        engine uses this ``d`` in place of the default :mod:`exterior_d`
+        singleton — this is how a Lie-algebroid ``L_{E,X}`` keeps its
+        ``d_E`` glued to its own bundle instead of falling back to the
+        ambient manifold ``d``.
+        """
+        return self._d
+
+    @property
+    def iota_factory(self) -> Optional[IotaFactory]:
+        """Bundle-specific ``ι_X`` factory, or ``None`` for the default.
+
+        Parallels :attr:`d`: when non-``None`` the engine's Cartan
+        expansion builds the interior product through this factory
+        (yielding e.g. ``ι_{E,X}`` rather than the default ``ι_X``) so
+        that composed forms match the algebroid's own operator names.
+        """
+        return self._iota_factory
+
 
 def lie_derivative(
     X: Expr,
     *,
     definition: str = "cartan",
     name: Optional[str] = None,
+    d: Optional[ExteriorDerivative] = None,
+    iota_factory: Optional[IotaFactory] = None,
 ) -> LieDerivative:
     """Build the Lie-derivative operator ``L_X``."""
-    return LieDerivative(X, definition=definition, name=name)
+    return LieDerivative(
+        X,
+        definition=definition,
+        name=name,
+        d=d,
+        iota_factory=iota_factory,
+    )
 
 
 # --------------------------------------------------------------------- #

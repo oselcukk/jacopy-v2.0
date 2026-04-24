@@ -1160,6 +1160,153 @@ Her tutorial için çalıştırılabilir Jupyter notebook.
 - Export: ProofChain → .tex, TikZ diagram
 - CLI: `gradalg verify calculus.yaml`
 
+#### Faz 11 ertelemeleri (küçük paketler, talep gelince açılır)
+
+Stage A (Diagnostic) + Stage B (Export) + Stage C (L_X bundle slots)
+kapandıktan sonra hâlâ duran üç ince iş — engine genişletmesi gerekmiyor,
+kapsam dar. Kullanıcı talebi gelince sırayla alınır.
+
+1. **Flow-mode `L_X` rewrite kuralları.** Şu an engine'de `L_X` sadece
+   `definition="cartan"` instance'ı için `d∘ι_X + ι_X∘d` olarak açılıyor.
+   `"flow"` mode'da `L_X` primitive gibi davranıyor — Cartan's magic
+   formula "teorem olarak çıkar" vaadi engine tarafında doldurulmuş
+   değil. İki definition eklenmesi yeter:
+   - `LieDerivativeOnZeroFormDefinition` — `L_X(f) → X(f)` when `f` is
+     a declared 0-form.
+   - `LieDerivativeCommutesWithDDefinition` — `L_X(d ω) → d(L_X ω)`
+     (flow axiom: Lie derivative commutes with `d`).
+   Bu ikisiyle `AgreementOnGenerators` flow-mode magic formula'yı
+   generator'lar üzerinde kapatır. +3-4 definition, +~10 test.
+
+2. **Algebroid `d_E² = 0` / `ι_E² = 0` axiom wiring.** Stage C
+   `cartan_magic`'i kapattı; kalan dört relation (`d_squared_zero`,
+   `d_lie`, `lie_lie`, `lie_iota`) algebroid tarafında `d_E`/`ι_E`
+   axiom'larının engine'e kaydedilmemesinden kapanmıyor.
+   `DSquaredZeroDefinition(target=d_E)` ve
+   `IotaSquaredZeroDefinition(target=iota_E_factory)` gibi algebroid
+   aware kayıtları `LieAlgebroid` içinden default engine'e eklemek
+   yeter. Bu da Courant-Dorfman bridge'in foundational unroll'u için
+   ön şart.
+
+---
+
+### Faz 12 — Intrinsik (koordinatsız) tanımları tanıma *(opsiyonel, kaçıcı)*
+
+**Amaç:** Kullanıcının klasik diferansiyel geometri metinlerinde
+gördüğü multilinear / rank-p formül tanımlarını framework düzeyinde
+ifade edilebilir ve açılabilir kılmak.
+
+**Motivasyon:** Şu an engine sadece **operatör-seviyesi** tanımları
+tanıyor (`L_X := d∘ι_X + ι_X∘d`, `ι_X(df) = X(f)`, `[L_X, L_Y] =
+L_{[X,Y]}`, vb.). Kullanıcı ders kitabı standardı olan intrinsik
+formülleri — örneğin
+
+$$
+(L_X \omega)(Y_1,\dots,Y_p) = X(\omega(Y_1,\dots,Y_p))
+  - \sum_{i} \omega(Y_1,\dots,[X,Y_i],\dots,Y_p)
+$$
+
+ya da Koszul formülü
+
+$$
+(d\omega)(X_0,\dots,X_p) = \sum_i (-1)^i X_i\bigl(\omega(\dots,\hat{X}_i,\dots)\bigr)
+  + \sum_{i<j} (-1)^{i+j}\,\omega\bigl([X_i,X_j],\dots,\hat{X}_i,\dots,\hat{X}_j,\dots\bigr)
+$$
+
+ya da `(ι_X \omega)(X_1,\dots,X_{p-1}) = \omega(X, X_1,\dots,X_{p-1})`
+yazdığında sistemin bunu bir **tanım** olarak alıp operatör-seviyesine
+redüksiyonu (veya tersini) ispat zinciri olarak üretmesini istiyor.
+
+Bugünkü çerçeve bunu **yapamıyor** — çünkü `ω(Y_1,…,Y_p)` biçimindeki
+rank-p multilinear evaluation için Expr node tipi yok, ve bunu
+eklemeden intrinsik formüller sentaks düzeyinde ifade edilemez.
+
+#### Gereken altyapı parçaları
+
+1. **Multilinear evaluation node** — `MultiEval(form, *vector_fields)`.
+   Derecesi: `|form| − len(vector_fields)`; argüman sayısı uyuşmazsa
+   hata. Cadabra benzeri head + variadic children. Leibniz'in genellemesi
+   için graded-antisymmetry bayrağı (p-formlar için argümanlarda
+   antisymmetrik).
+
+2. **Skip-index ("hat") semantiği** — `MultiEval` üzerinde
+   `omit(index)` operasyonu veya `HatMultiEval(form, args, omit=i)`
+   sabit-*i* varyantı. Somut p için döngü açılımı + sembolik p için
+   yerleşik "hat iterator" — generator olarak tanımlı.
+
+3. **Parametrik (indeksli) sembolik toplam** — `SymbolicSum(index,
+   range, body)`. Şu an `Sum` variadic ama "∑ᵢ (-1)ⁱ … " tipinde
+   parametrik ifadelere uygun değil. Somut p için `SymbolicSum` →
+   `Sum` expansion'ı bir rewrite kuralı. Sembolik p için alternating
+   sum cebri (Koszul sign compatibility) ayrı bir mini-calculus.
+
+4. **Intrinsik definition sınıfları** (engine için):
+   - `InteriorProductIntrinsicDefinition` —
+     `MultiEval(ι_X ω, Y_1,…,Y_{p-1}) → MultiEval(ω, X, Y_1,…,Y_{p-1})`.
+     En kolay; ι'nın rank-1 pairing sözleşmesinin rank-p genellemesi.
+   - `LieDerivativeIntrinsicDefinition` — yukarıdaki Leibniz formülü.
+     Rank-1 halini `lie_iota` relation'ının Leibniz'li versiyonu
+     olarak türetmek mümkün; p sembolikse parametrik sum motoru
+     gerekir.
+   - `ExteriorDIntrinsicDefinition` (Koszul formülü) — üç altyapı
+     parçasının hepsini aynı anda kullanır: hat notation, parametrik
+     sum, `(-1)^i` işaret cebri. En ağır parça.
+
+5. **`IntrinsicFormulaRecognizer`** (`proof/recognizers.py`'ye) —
+   kullanıcının yazdığı multilinear ifade bir klasik intrinsik tanımın
+   şablonunu tutuyorsa tanısın; `prove_equivalence` ile operatör-seviyesi
+   tanıma bağlansın. Örneğin kullanıcı Koszul formülünü LHS olarak
+   girerse sistem `d` operatör tanımıyla eşdeğerliğini
+   `AgreementOnGenerators` + `MultiEval` açılımıyla kapatabilir.
+
+#### Somut vs. sembolik p
+
+- **Somut p (örn. p=2, p=3)** — yukarıdaki üç altyapıdan sadece
+  `MultiEval` ve `ExteriorDIntrinsicDefinition` açılımı gerekir,
+  sembolik toplam mekanizması olmadan döngü açılımıyla biter. Bu
+  alt-kümenin tek başına faydası var: kullanıcı 2-formlar, 3-formlar
+  üzerinde intrinsik formülleri test edebilir. Faz 12.A olarak
+  ayrılabilir, ~orta iş.
+
+- **Sembolik p** — parametrik sum + hat generator + alternating sign
+  cebri birlikte. Faz 12.B. Ağır — symbolic_degree.py'nin paralel
+  genişlemesi lazım (sembolik indeksli toplam'ın derece hesabı).
+
+#### Kapsam dışı
+
+- Koordinat bazlı açılım (local chart, Christoffel sembolleri, vb.)
+  — paketin "koordinatsız" felsefesine aykırı.
+- Butler-Portugal tarzı index canonicalisation — multilinear
+  değerlendirme antisymmetry'si `MultiEval`'ın bayrağıyla sorunsuz
+  halledilir, genel index cebrine gerek yok.
+
+#### Neden opsiyonel / kaçıcı
+
+- Mevcut hedef kitlenin (derived bracket / Cartan calculus / Poisson-
+  Lie-Courant geometri üzerinde **operatör-seviyesi** ispat) ihtiyacı
+  bu genişleme olmadan karşılanıyor. Faz 10'daki 9 tutorial ve Faz 9'un
+  8 seeded theorem'i intrinsik formüllere bağlı değil.
+- Altyapı genişlemesi core katmanına dokunuyor (yeni Expr node, yeni
+  symbolic_degree modu) — blast radius büyük, ciddi regression
+  yüzeyi. Talep gelmeden başlatılmamalı.
+- "Ders kitabı okuyucusuna intrinsik formülü doğrulama aracı" özel
+  bir kullanıcı profili; standart araştırma akışında karşılığı zaten
+  operatör-seviyesi Cartan relations üzerinden veriliyor.
+
+#### Ne zaman açılır
+
+Aşağıdakilerden biri olduğunda:
+1. Kullanıcı intrinsik formül doğrulaması için somut bir pedagoji
+   ihtiyacı dile getirdiğinde (ör. "Tutorial 10'da Koszul formülünün
+   operatör tanımıyla eşdeğerliği gösterilsin").
+2. Bir research workflow'u `MultiEval` olmadan ifade edilemeyecek bir
+   yapı gerektirirse (ör. derecesi parametrik algebroid üzerinde
+   Cartan formülünü çıkarma).
+
+O zamana kadar deferral notu bu başlık altında kayıtlı — `memory/`
+tarafında ayrı bir "faz12_intrinsic.md" açıldığında cross-ref buraya
+atılır.
+
 ## Geliştirme Sırası (Bağımlılık Grafiği)
 
 ```

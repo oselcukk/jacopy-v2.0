@@ -148,6 +148,20 @@ class TestAlgebroidCartanBundle:
         assert isinstance(L, LieDerivative)
         assert L.name == "L_E,X"
 
+    def test_lie_factory_plumbs_bundle_d_and_iota(self, algebroid):
+        """The algebroid ``L_{E,X}`` carries its bundle's ``d_E`` and
+        ``ι_E`` factory on its slots so the Cartan expansion engine can
+        keep the operator names aligned."""
+        X = Symbol("X")
+        L = algebroid.cartan.lie_derivative(X)
+        assert L.d is algebroid.d
+        # The factory is the one stored on the algebroid's Cartan bundle —
+        # call it on a fresh field and check the resulting ι carries the
+        # bundle tag.
+        assert L.iota_factory is not None
+        iota_X = L.iota_factory(X)
+        assert iota_X.name == "ι_E,X"
+
     def test_interior_factory_names_carry_bundle_tag(self, algebroid):
         X = Symbol("X")
         iota = algebroid.cartan.interior(X)
@@ -175,17 +189,28 @@ class TestAlgebroidCartanBundle:
 
     def test_cartan_magic_relation_builds(self, algebroid):
         """Magic-formula :class:`OperatorEquation` is buildable on the
-        algebroid Cartan bundle — same API as the TM Cartan calculus.
-        We don't run :meth:`verify` here because the ambient expansion
-        engine's cartan-definition rewrite is hardcoded to the TM
-        ``d`` / default ``ι_X`` singletons; closing a custom-named
-        ``d_E`` / ``ι_{E,X}`` magic formula would require the engine
-        to look up the bundle's own factories. That's an engine
-        enhancement, not an algebroid-wrapper concern."""
+        algebroid Cartan bundle — same API as the TM Cartan calculus."""
         X = Derivation("X", degree=0)
         eq = algebroid.cartan.relation("cartan_magic", X=X)
         # LHS is the commutator of d_E with ι_{E,X}; RHS is L_{E,X}.
         assert eq.rhs.name == "L_E,X"
+
+    def test_cartan_magic_verify_closes_on_algebroid(self, algebroid):
+        """The magic formula verifies as a :class:`ProofChain` on the
+        algebroid bundle — ``L_{E,X}`` carries its own ``d_E`` and
+        ``ι_E`` factory, so the expansion engine's Cartan rewrite lines
+        up operator names on both sides and the residual collapses."""
+        X = Symbol("X")
+        f = Symbol("f")
+        reg = PropertyRegistry()
+        reg.declare(X, Graded(degree=0))
+        reg.declare(f, Graded(degree=0))
+        algebra = ExteriorAlgebra((f,), d=algebroid.d)
+        chain = algebroid.cartan.verify(
+            "cartan_magic", algebra=algebra, X=X, registry=reg
+        )
+        assert isinstance(chain, ProofChain)
+        assert len(chain.steps) >= 1
 
 
 # --------------------------------------------------------------------- #

@@ -140,12 +140,23 @@ class LieAlgebroid:
 
     def _make_lie_derivative_factory(self):
         bundle_tag = self._bundle._repr_inner()
+        iota_factory = self._make_interior_factory()
+        d_E = self._d_E
 
         def factory(X: Expr) -> LieDerivative:
             if not isinstance(X, Expr):
                 raise TypeError("algebroid L factory requires an Expr section")
+            # Plumbing: the algebroid ``L_{E,X}`` has to carry its bundle's
+            # ``d_E`` and ``ι_{E,·}`` factory so that the expansion engine's
+            # Cartan rewrite produces ``d_E ∘ ι_{E,X} + ι_{E,X} ∘ d_E``
+            # instead of the TM default ``d ∘ ι_X + ι_X ∘ d``. Without this
+            # the algebroid magic formula residual can't close — the two
+            # sides use mismatched operator names.
             return lie_derivative(
-                X, name=f"L_{bundle_tag},{X._repr_inner()}"
+                X,
+                name=f"L_{bundle_tag},{X._repr_inner()}",
+                d=d_E,
+                iota_factory=iota_factory,
             )
 
         return factory

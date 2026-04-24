@@ -64,6 +64,60 @@ class TestLieDerivativeCartanDefinition:
         )
         assert result == expected
 
+    def test_rewrite_uses_bundle_specific_d(self):
+        """L.d overrides the default exterior derivative in the rewrite."""
+        X = Symbol("X")
+        d_E = ExteriorDerivative("d_E")
+        L = lie_derivative(X, definition="cartan", d=d_E)
+        omega = Symbol("omega")
+        defn = LieDerivativeCartanDefinition()
+        result = defn.rewrite(Act(L, omega))
+        iota_X = interior(X)
+        expected = Sum(
+            Act(compose(d_E, iota_X), omega),
+            Act(compose(iota_X, d_E), omega),
+        )
+        assert result == expected
+
+    def test_rewrite_uses_bundle_specific_iota_factory(self):
+        """L.iota_factory decides which ι_X instance is produced."""
+        X = Symbol("X")
+
+        def factory(Y: Expr):
+            return interior(Y, name=f"ι_E,{Y._repr_inner()}")
+
+        L = lie_derivative(X, definition="cartan", iota_factory=factory)
+        omega = Symbol("omega")
+        defn = LieDerivativeCartanDefinition()
+        result = defn.rewrite(Act(L, omega))
+        iota_EX = factory(X)
+        expected = Sum(
+            Act(compose(d, iota_EX), omega),
+            Act(compose(iota_EX, d), omega),
+        )
+        assert result == expected
+
+    def test_rewrite_uses_both_bundle_slots(self):
+        """Algebroid case — L carries both d_E and the ι_E factory."""
+        X = Symbol("X")
+        d_E = ExteriorDerivative("d_E")
+
+        def factory(Y: Expr):
+            return interior(Y, name=f"ι_E,{Y._repr_inner()}")
+
+        L = lie_derivative(
+            X, definition="cartan", d=d_E, iota_factory=factory
+        )
+        omega = Symbol("omega")
+        defn = LieDerivativeCartanDefinition()
+        result = defn.rewrite(Act(L, omega))
+        iota_EX = factory(X)
+        expected = Sum(
+            Act(compose(d_E, iota_EX), omega),
+            Act(compose(iota_EX, d_E), omega),
+        )
+        assert result == expected
+
 
 # --------------------------------------------------------------------- #
 # ExpansionEngine                                                        #

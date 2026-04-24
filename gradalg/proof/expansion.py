@@ -365,10 +365,19 @@ class LieDerivativeCartanDefinition(Definition):
     def rewrite(self, expr: Expr) -> Expr:
         L: LieDerivative = expr.op  # type: ignore[assignment]
         arg = expr.arg
-        iota_X = interior(L.vector_field)
+        # Honour the bundle-specific ``d``/``iota_factory`` slots on
+        # ``LieDerivative``: algebroid-constructed ``L_{E,X}`` carries
+        # its own ``d_E`` and ``ι_{E,·}`` factory, and without this
+        # routing the expansion would reintroduce the TM default ``d``
+        # and ``ι_X`` — leaving the magic-formula residual wedged in
+        # mismatched operator names. Fallback is still the TM default,
+        # so existing callers and the ``TM`` Cartan bundle behave as
+        # before.
+        dop = L.d if L.d is not None else default_d
+        iota_X = L.iota_factory(L.vector_field) if L.iota_factory is not None else interior(L.vector_field)
         return Sum(
-            Act(compose(default_d, iota_X), arg),
-            Act(compose(iota_X, default_d), arg),
+            Act(compose(dop, iota_X), arg),
+            Act(compose(iota_X, dop), arg),
         )
 
 
