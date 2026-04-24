@@ -553,9 +553,10 @@ TUTORIAL_05: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Cartan magic — `verify` üzerinden canlı ispat\n\n"
+        "## Tüm beş bağıntı — `verify` üzerinden canlı ispat\n\n"
         "`cartan_magic` iki modda da `ExteriorAlgebra((f,))` üstünde "
-        "tek adımda kapanıyor.",
+        "tek adımda kapanıyor; diğer dördü `AgreementOnGenerators` + "
+        "`ExpandAndSimplify` zinciriyle generator seviyesinde kapanıyor.",
     ),
     (
         "code",
@@ -565,15 +566,10 @@ TUTORIAL_05: list[tuple[str, str]] = [
         "    \"cartan_magic\", algebra=algebra, X=X, registry=reg,\n"
         "    mode=\"foundational\",\n"
         ")\n"
-        "print('foundational len:', len(chain_f), 'rule:', chain_f.steps[0].rule)",
-    ),
-    (
-        "markdown",
-        "## `d_lie`, `lie_lie`, `lie_iota` — henüz verify kapsamı dışında\n\n"
-        "Bu üçünün `relation()`'ı `OperatorEquation` üretiyor; `verify()` "
-        "mevcut baseline'da kapanmıyor (derece/grading sebepleri). "
-        "Üzerinde deney yapacak kullanıcı bağıntıyı elle parçalar. "
-        "Kapanış sonraki pass'te.",
+        "print('foundational len:', len(chain_f), 'rule:', chain_f.steps[0].rule)\n\n"
+        "results = cart.verify_all(algebra=algebra, X=X, Y=Y, registry=reg)\n"
+        "for name, c in results.items():\n"
+        "    print(f'{name:16s}: len={len(c)}')",
     ),
     (
         "markdown",

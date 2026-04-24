@@ -110,28 +110,46 @@ class ExpandAndSimplify(Strategy):
 
         obstruction: Expr = Sum(lhs, Neg(rhs))
 
-        # Phase 1: definition expansion.
-        expanded, exp_steps = eng.expand(obstruction)
-        chain.extend(exp_steps)
-
-        # Phase 2: graded Leibniz + linearity.
-        after_pr = product_rule(expanded, registry)
-        if after_pr != expanded:
-            chain.append(
-                ProofStep(
-                    expanded,
-                    after_pr,
-                    rule="product-rule",
-                    justification="graded Leibniz + linearity",
+        # Phases 1-2 interleave until a fix-point. Definition expansion
+        # often lands shapes (``Act(d∘ι_X, arg)``, ``Act(Sum(...), arg)``)
+        # that only unfold once :mod:`product_rule` distributes the
+        # Leibniz / linearity through — and that distribution itself
+        # exposes fresh element-level shapes (``Act(d, Act(d, x))``,
+        # ``Act(ι_X, Act(d, f))``) that axioms like ``d² = 0`` and
+        # ``ι_X(df) = X(f)`` only match in post-composition form. Looping
+        # both passes under a single fix-point is the minimum cost to
+        # make Cartan relations like ``[d, L_X] = 0`` and
+        # ``[L_X, L_Y] = L_{[X,Y]}`` close via cancellation.
+        current: Expr = obstruction
+        for _ in range(64):
+            expanded, exp_steps = eng.expand(current)
+            if exp_steps:
+                chain.extend(exp_steps)
+            after_pr = product_rule(expanded, registry)
+            if after_pr != expanded:
+                chain.append(
+                    ProofStep(
+                        expanded,
+                        after_pr,
+                        rule="product-rule",
+                        justification="graded Leibniz + linearity",
+                    )
                 )
+            if after_pr == current:
+                break
+            current = after_pr
+        else:
+            raise ProofFailure(
+                "ExpandAndSimplify expand/product-rule loop did not "
+                f"converge on {lhs._repr_inner()} == {rhs._repr_inner()}"
             )
 
         # Phase 3: canonical simplification.
-        reduced = simplify(after_pr, registry)
-        if reduced != after_pr:
+        reduced = simplify(current, registry)
+        if reduced != current:
             chain.append(
                 ProofStep(
-                    after_pr,
+                    current,
                     reduced,
                     rule="simplify",
                     justification="canonical-form pipeline",
@@ -243,19 +261,30 @@ class AgreementOnGenerators(Strategy):
         registry: Optional[PropertyRegistry] = None,
         engine: Optional[ExpansionEngine] = None,
     ) -> ProofChain:
-        # Degree well-formedness.
+        # Degree well-formedness. The zero operator Integer(0) is
+        # polymorphic in degree — it sits in every graded slot as the
+        # unique element that vanishes — so an equality against it only
+        # requires the non-zero side to have a well-defined homogeneous
+        # degree.
+        lhs_is_zero = lhs == Integer(0)
+        rhs_is_zero = rhs == Integer(0)
         try:
-            deg_lhs = _operator_degree(lhs, registry)
-            deg_rhs = _operator_degree(rhs, registry)
+            deg_lhs = (
+                _operator_degree(lhs, registry) if not lhs_is_zero else None
+            )
+            deg_rhs = (
+                _operator_degree(rhs, registry) if not rhs_is_zero else None
+            )
         except ValueError as exc:
             raise ProofFailure(
                 f"AgreementOnGenerators needs determinable degrees: {exc}"
             )
-        if deg_lhs != deg_rhs:
+        if deg_lhs is not None and deg_rhs is not None and deg_lhs != deg_rhs:
             raise ProofFailure(
                 f"Operators have distinct degrees: "
                 f"|lhs| = {deg_lhs}, |rhs| = {deg_rhs}"
             )
+        deg_for_step = deg_lhs if deg_lhs is not None else deg_rhs
 
         generators = self._algebra.generators
         if not generators:
@@ -268,7 +297,7 @@ class AgreementOnGenerators(Strategy):
             rhs,
             rule=self.name,
             justification=(
-                f"both of degree {deg_lhs}; agree on "
+                f"both of degree {deg_for_step}; agree on "
                 f"{len(generators)} generator(s)"
             ),
         )

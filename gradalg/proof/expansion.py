@@ -26,7 +26,7 @@ from abc import ABC, abstractmethod
 from typing import List, Optional, Tuple
 
 from gradalg.algebra.derivation import Act, Derivation, compose, degree_of
-from gradalg.core.expr import Expr, Integer, Sum
+from gradalg.core.expr import Expr, Integer, Neg, Product, Sum
 from gradalg.core.registry import PropertyRegistry
 from gradalg.core.symbolic_degree import Degree
 from gradalg.proof.step import ProofStep
@@ -271,16 +271,40 @@ class IotaOnZeroFormDefinition(Definition):
         return Integer(0)
 
 
+def _is_derivation_combination(expr: Expr) -> bool:
+    """True when ``expr`` is a :class:`Derivation` or a Sum/Product/Neg
+    whose leaves are all Derivations.
+
+    The pairing axiom ``ι_V(df) = V(f)`` is meaningful whenever ``V``
+    represents a vector field built from Derivations — including
+    composites like the Lie bracket ``X*Y − Y*X`` produced by
+    ``vector_bracket.expand(X, Y)``. Restricting to strict
+    ``Derivation`` instances would miss those composites and leave
+    Cartan relations like ``[L_X, L_Y] = L_{[X,Y]}`` half-reduced.
+    """
+    if isinstance(expr, Derivation):
+        return True
+    if isinstance(expr, (Sum, Product, Neg)):
+        return all(
+            _is_derivation_combination(c) for c in expr.children
+        )
+    return False
+
+
 class IotaOnExactOneFormDefinition(Definition):
-    """``ι_X(df) → X(f)`` when the vector field ``X`` is a :class:`Derivation`.
+    """``ι_X(df) → X(f)`` when the vector field ``X`` is a :class:`Derivation`
+    or a composition of such.
 
     The rewrite fires on the shape ``Act(ι_X, Act(d, f))`` with ``f``
     resolving to degree 0 in the registry. ``d`` pins the rewrite to
     a specific :class:`ExteriorDerivative`, so a Lie-algebroid ``d_E``
     paired against the standard ``d`` doesn't accidentally pair. The
-    rewrite uses ``ι_X.vector_field`` directly — if that field isn't a
-    :class:`Derivation`, the rule stays inert (the user hasn't given X
-    an action on functions yet).
+    vector field is accepted as a :class:`Derivation` or any
+    ``Sum``/``Product``/``Neg`` composite whose leaves are all
+    Derivations — this covers linear combinations produced by bracket
+    expansion on vector fields. If the field contains a non-Derivation
+    leaf the rule stays inert (the user hasn't given that field an
+    action on functions yet).
     """
 
     name = "ι_X(df) = X(f)"
@@ -298,7 +322,7 @@ class IotaOnExactOneFormDefinition(Definition):
         if not (isinstance(expr, Act) and isinstance(expr.op, InteriorProduct)):
             return False
         iota: InteriorProduct = expr.op  # type: ignore[assignment]
-        if not isinstance(iota.vector_field, Derivation):
+        if not _is_derivation_combination(iota.vector_field):
             return False
         inner = expr.arg
         if not (isinstance(inner, Act) and isinstance(inner.op, ExteriorDerivative)):

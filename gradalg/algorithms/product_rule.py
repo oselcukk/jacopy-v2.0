@@ -76,7 +76,24 @@ def _expand_act(
     expanded in turn. That is the only place in the algorithm where
     derivation composition actually acts on an operand; at
     :class:`Act` construction it stays inert.
+
+    Scalar-level linearity on the operator side — ``Neg(op)`` and the
+    zero operator ``Integer(0)`` — is peeled here too. Commutator
+    expansion routinely generates ``Act(Neg(compose(D1, D2)), x)``
+    shapes; pulling the sign out and recursing lets the composition
+    unfold through the negation instead of stalling.
     """
+    if isinstance(op, Neg):
+        return Neg(_expand_act(op.arg, arg, registry))
+    if isinstance(op, Integer) and op == Integer(0):
+        return Integer(0)
+    if isinstance(arg, Integer) and arg == Integer(0):
+        # Every graded derivation is linear, so D(0) = 0 regardless of
+        # the specific operator. Dropping this eagerly keeps axiom
+        # residues like Act(d, Act(d², x))=Act(d, 0) from surviving into
+        # later passes that would otherwise stall waiting for an engine
+        # rewrite that never fires on this surviving shape.
+        return Integer(0)
     if isinstance(op, Product) and op.children:
         result = arg
         for d in reversed(op.children):

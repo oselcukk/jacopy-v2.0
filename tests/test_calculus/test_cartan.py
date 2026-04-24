@@ -174,6 +174,66 @@ class TestVerifyCartanMagic:
 
 
 # --------------------------------------------------------------------- #
+# verify() — the other four relations on a function algebra              #
+# --------------------------------------------------------------------- #
+
+
+class TestVerifyOtherRelations:
+    """Regression tests for d_squared_zero, d_lie, lie_lie, lie_iota.
+
+    Closing these required five engine/strategy fixes (Derivation-degree
+    fallback in sort_product, zero-polymorphic degree in
+    AgreementOnGenerators, Neg/Zero handling in product_rule, looped
+    expand+product-rule fix-point in ExpandAndSimplify, and iota on
+    Derivation-combinations). Guarding all four here so regressions
+    surface immediately.
+    """
+
+    def test_d_squared_zero_closes_on_function_algebra(
+        self, calc, context
+    ):
+        reg, algebra, _ = context
+        chain = calc.verify(
+            "d_squared_zero", algebra=algebra, registry=reg
+        )
+        assert isinstance(chain, ProofChain)
+
+    def test_d_lie_closes_on_function_algebra(self, calc, context, XY):
+        reg, algebra, _ = context
+        X, _ = XY
+        chain = calc.verify(
+            "d_lie", algebra=algebra, X=X, registry=reg
+        )
+        assert isinstance(chain, ProofChain)
+
+    def test_lie_lie_closes_on_function_algebra(self, calc, context, XY):
+        reg, algebra, _ = context
+        X, Y = XY
+        chain = calc.verify(
+            "lie_lie", algebra=algebra, X=X, Y=Y, registry=reg
+        )
+        assert isinstance(chain, ProofChain)
+
+    def test_lie_iota_closes_on_function_algebra(self, calc, context, XY):
+        reg, algebra, _ = context
+        X, Y = XY
+        chain = calc.verify(
+            "lie_iota", algebra=algebra, X=X, Y=Y, registry=reg
+        )
+        assert isinstance(chain, ProofChain)
+
+    def test_verify_all_closes_every_relation(self, calc, context, XY):
+        reg, algebra, _ = context
+        X, Y = XY
+        results = calc.verify_all(
+            algebra=algebra, X=X, Y=Y, registry=reg
+        )
+        assert set(results) == set(RELATIONS)
+        for chain in results.values():
+            assert isinstance(chain, ProofChain)
+
+
+# --------------------------------------------------------------------- #
 # Identity                                                               #
 # --------------------------------------------------------------------- #
 

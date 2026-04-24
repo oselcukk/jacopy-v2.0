@@ -96,10 +96,10 @@ steps                               # [ProofStep(rule='d² = 0', d(d(x)) → 0)]
 `d ∘ d = 0`'ın generator'ler üstünde anlaşmayla genelleştiği
 `AgreementOnGenerators` stratejisinin tam yoludur.
 
-## Cartan magic — `verify` üzerinden canlı ispat
+## Tüm beş bağıntı — `verify` üzerinden canlı ispat
 
-`cartan_magic` şu an `CartanCalculus.verify(...)` üstünden `ExteriorAlgebra`
-bir fonksiyon generator'ı ile iki modda da net kapanıyor:
+Default `CartanCalculus` üstünde `ExteriorAlgebra` bir fonksiyon
+generator'ı ile beş bağıntı da `verify()` ile kapanıyor:
 
 ```python
 chain = cart.verify("cartan_magic", algebra=algebra, X=X, registry=reg)
@@ -114,31 +114,29 @@ chain_f = cart.verify(
     mode="foundational",
 )
 len(chain_f)              # 1 — UnrollToFoundations sarmalıyor
+
+# Üçü X,Y gerektiriyor; d_squared_zero saf operatör:
+cart.verify("d_squared_zero", algebra=algebra, registry=reg)
+cart.verify("d_lie", algebra=algebra, X=X, registry=reg)
+cart.verify("lie_lie", algebra=algebra, X=X, Y=Y, registry=reg)
+cart.verify("lie_iota", algebra=algebra, X=X, Y=Y, registry=reg)
+
+# Ya da topluca:
+results = cart.verify_all(algebra=algebra, X=X, Y=Y, registry=reg)
+set(results) == {"d_squared_zero", "cartan_magic", "d_lie",
+                 "lie_lie", "lie_iota"}
 ```
 
-Magic formülü `LieDerivativeCartanDefinition`'ın default classification'ı
-gereği tek adımlık teorem olarak tetikleniyor; foundational mod aynı
-sub-proof'u citation halinde tutuyor. Algebroid variant için
-bak: [04_lie_algebroid.md](04_lie_algebroid.md) — o tarafta
-`verify`'ın bundle-etiketli operatörlerle tetiklenememesi bilinen bir
-deferral.
-
-## `d_lie`, `lie_lie`, `lie_iota` — inşa hazır, verify henüz kapsanmıyor
-
-Üç parametrik bağıntının `OperatorEquation`'ı `relation()` ile sağlam
-kuruluyor ama `verify()` bugünün baseline'ında iki nedenle kapanmıyor:
-
-- `d_lie` için `lhs`/`rhs` derecelerinin otomatik anlaşılması gereken
-  sembolik `Derivation` operatör vakaları;
-- `lie_lie` / `lie_iota` için `L_Y`, `ι_Y` faktörlerinin kaydedilmiş
-  bir grading beklemesi — default `AgreementOnGenerators`
-  normalizasyonu şu an açık-ifadeli bu objeler için yapılmıyor.
-
-Bu üçünün "sağlamca build" + "henüz verify değil" durumu bilerek
-korunuyor: tutorial seviyesinde üzerlerinde gerçek operatör-hesabı
-deneyen kullanıcılar bağıntıları elle parçalayıp sub-relation'a
-düşürebilir. Sonra detaylı verify yolları eklenince bu paragraf
-güncellenecek.
+Magic formülü `LieDerivativeCartanDefinition`'ın default
+classification'ı gereği tek adımlık teorem olarak tetikleniyor;
+foundational mod aynı sub-proof'u citation halinde tutuyor. `d_lie`,
+`lie_lie`, `lie_iota` bağıntıları `AgreementOnGenerators` +
+`ExpandAndSimplify` zinciriyle generator seviyesinde kapanıyor: Lie
+bracket `[X, Y] = X*Y − Y*X` açılıyor, graded Leibniz dağıtılıyor,
+d²=0 axiom'u ve `ι_V(df) = V(f)` tanımı üstünden sıfıra indirgeniyor.
+Algebroid variant için bak: [04_lie_algebroid.md](04_lie_algebroid.md)
+— o tarafta `verify`'ın bundle-etiketli operatörlerle tetiklenememesi
+bilinen bir deferral.
 
 ## `invariant_d` — magic + lie_iota → d formülü
 

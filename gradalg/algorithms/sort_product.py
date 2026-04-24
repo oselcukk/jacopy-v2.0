@@ -28,6 +28,7 @@ from __future__ import annotations
 
 from typing import List, Tuple
 
+from gradalg.algebra.derivation import Derivation
 from gradalg.core.expr import Expr, Integer, Neg, Product, Rational
 from gradalg.core.properties import (
     AntiCommuting,
@@ -100,10 +101,16 @@ def _degree_of(factor: Expr, registry: PropertyRegistry) -> Degree:
     """Return the grading of ``factor``, or raise if unclassified.
 
     Scalars have degree ``0``; :class:`Graded` factors carry their own
-    Degree. Anything else is an error at this layer.
+    Degree. A :class:`Derivation` used as an operator factor carries
+    its grading intrinsically and is read off directly — requiring the
+    caller to also register every ``L_X`` / ``ι_X`` they construct would
+    double-bookkeep information the operator already guarantees.
+    Anything else is an error at this layer.
     """
     if _is_scalar(factor, registry):
         return Degree.const(0)
+    if isinstance(factor, Derivation):
+        return factor.degree
     prop = registry.get(factor, Graded)
     if prop is None:
         raise ValueError(
