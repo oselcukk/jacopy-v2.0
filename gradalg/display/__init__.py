@@ -13,6 +13,13 @@ from gradalg.display.ascii import (
     step_to_ascii,
     to_ascii,
 )
+from gradalg.display.jupyter import (
+    LatexDisplay,
+    display_chain,
+    display_expr,
+    display_proof,
+    display_step,
+)
 from gradalg.display.latex import (
     chain_to_latex,
     latex_name,
@@ -21,8 +28,13 @@ from gradalg.display.latex import (
 )
 
 __all__ = [
+    "LatexDisplay",
     "chain_to_ascii",
     "chain_to_latex",
+    "display_chain",
+    "display_expr",
+    "display_proof",
+    "display_step",
     "latex_name",
     "step_to_ascii",
     "step_to_latex",
