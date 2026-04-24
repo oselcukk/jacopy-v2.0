@@ -30,6 +30,7 @@ but uses rich's box characters so the hierarchy reads at a glance.
 
 from __future__ import annotations
 
+import io
 from typing import Optional
 
 from gradalg.core.expr import Expr
@@ -108,8 +109,15 @@ def _build_chain_tree(chain: ProofChain, max_depth: int, title: bool):
 
 def _render_to_text(renderable, *, styles: bool = True) -> str:
     # pragma: no cover - rich-only path
-    """Render a rich object through a recording Console and return the text."""
+    """Render a rich object through a recording Console and return the text.
+
+    The recording Console needs a sink to write to even though only the
+    captured buffer matters; pointing ``file`` at an in-memory
+    ``StringIO`` keeps the render from duplicating on stdout when the
+    caller later ``print()``s the returned string.
+    """
     console = Console(
+        file=io.StringIO(),
         record=True,
         force_terminal=True,
         color_system="truecolor" if styles else None,

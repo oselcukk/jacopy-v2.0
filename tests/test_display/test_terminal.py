@@ -192,3 +192,19 @@ class TestRichPath:
         out = render_step(parent, max_depth=0)
         assert "[outer]" in out
         assert "[sub]" not in out
+
+    def test_render_chain_does_not_leak_to_stdout(self, capsys):
+        """Regression: render_chain must be pure — no stray stdout write.
+
+        Earlier the recording Console had no explicit ``file`` arg and
+        rich writes to stdout by default even when recording, so
+        callers who printed the returned string saw the tree twice.
+        """
+        s1 = ProofStep(Symbol("X"), Symbol("Y"), rule="r1")
+        _ = render_chain(ProofChain([s1]))
+        assert capsys.readouterr().out == ""
+
+    def test_render_step_does_not_leak_to_stdout(self, capsys):
+        step = ProofStep(Symbol("X"), Symbol("Y"), rule="demo")
+        _ = render_step(step)
+        assert capsys.readouterr().out == ""
