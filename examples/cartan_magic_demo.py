@@ -1,21 +1,38 @@
 """End-to-end proof demo: Cartan's magic formula + d² = 0.
 
-Two canonical Cartan-calculus identities, each proved via
-:func:`gradalg.proof.show_equal` and rendered through the display
-layer (terminal tree + ASCII + LaTeX).
+Three canonical Cartan-calculus closures, each rendered through the
+display layer (terminal tree + ASCII + LaTeX). The three demos form a
+progression from trivial element-level rewriting to a genuine
+operator-level proof on an exterior algebra.
 
-Demo 1 — *Cartan's magic formula*, efficient mode::
+Demo 1 — *Cartan's magic formula, element-level*, efficient mode::
 
     L_X(ω) == (d ∘ ι_X + ι_X ∘ d)(ω)
+
+Closed by :func:`gradalg.proof.show_equal`: definition-level unfold of
+``L_X`` (classified as an axiom by default), graded-Leibniz product
+rule, canonicalize. Three steps. Fast, but circular: the rule that
+fires *is* the formula being proved.
 
 Demo 2 — *d² = 0*, foundational mode::
 
     d(d(f)) == 0
 
-In foundational mode the ``d² = 0`` rule is classified as a theorem
-and its :class:`ProofStep` carries a sub-proof citing the generator
-axiom ``d(df) = 0``. The tree renderer nests the sub-proof under the
-parent step, which is the whole point of the mode switch.
+Default engine with ``d_squared_mode="theorem"`` classifies ``d² = 0``
+as a theorem; foundational mode attaches its generator-axiom sub-proof
+as a child step. Shows the axiom/theorem distinction in the tree.
+
+Demo 3 — *Cartan's magic formula, operator-level*::
+
+    [d, ι_X] = L_X    (as an equation of operators on Ω*(M))
+
+Closed by :class:`CartanCalculus.verify`, which routes through
+:class:`AgreementOnGenerators`: both sides must have the same degree
+and agree on each generator of the supplied exterior algebra. The
+proof is fundamentally reshaped — degree check + per-generator
+sub-proofs — instead of element-level simplify. Run twice, once in
+efficient mode and once in foundational mode, to expose the
+:class:`UnrollToFoundations` wrapper.
 
 Run::
 
@@ -119,9 +136,96 @@ def demo_d_squared_zero() -> None:
             print(f"  child[{i}]     = [{child.provenance_tag}] {child.rule}")
 
 
+def demo_cartan_magic_operator_level() -> None:
+    """``[d, ι_X] = L_X`` as an operator equation — AgreementOnGenerators.
+
+    This is the *non-trivial* closure of Cartan's magic formula: the
+    identity is stated between operators (not between their evaluations
+    on a chosen form), and the proof discharges it on every generator
+    of a finite exterior algebra ``Ω*(M)``. Two modes of the same
+    verification are shown, so the effect of the foundational unroll
+    is visible.
+    """
+    _section("Demo 3 — Cartan's magic formula, operator-level")
+
+    # Build a concrete Cartan-calculus bundle and a minimal
+    # exterior algebra with one 0-form generator f (and its
+    # differential df, which ExteriorAlgebra derives automatically).
+    from gradalg.brackets.lie import LieBracket
+    from gradalg.calculus.cartan import CartanCalculus
+    from gradalg.calculus.exterior_algebra import ExteriorAlgebra
+    from gradalg.core.properties import Graded
+    from gradalg.core.registry import PropertyRegistry
+
+    reg = PropertyRegistry()
+    f = Symbol("f")
+    reg.declare(f, Graded(degree=0))
+    algebra = ExteriorAlgebra((f,))
+    print(f"  algebra generators = {algebra.generators}\n")
+
+    X = Derivation("X", degree=0)
+    calc = CartanCalculus(
+        d=d,
+        lie_derivative=lie_derivative,
+        interior=interior,
+        vector_bracket=LieBracket(),
+    )
+
+    # -- efficient mode -------------------------------------------- #
+    print("--- efficient mode")
+    chain_eff = calc.verify(
+        "cartan_magic",
+        algebra=algebra,
+        X=X,
+        registry=reg,
+        mode="efficient",
+    )
+    print(render_chain(chain_eff))
+
+    # -- foundational mode ----------------------------------------- #
+    # Wire d² = 0 as a theorem so the foundational unroll has
+    # something to expand under the per-generator sub-proof — on
+    # generator ``df`` the proof hits ι_X(d(df)) which fires d² = 0.
+    foundational_engine = default_engine(
+        registry=reg, mode="foundational", d_squared_mode="theorem"
+    )
+    print("\n--- foundational mode (d² = 0 classified as theorem)")
+    chain_fnd = calc.verify(
+        "cartan_magic",
+        algebra=algebra,
+        X=X,
+        registry=reg,
+        mode="foundational",
+        engine=foundational_engine,
+    )
+    print(render_chain(chain_fnd))
+
+    # Per-generator sub-proof inspection — makes the shape explicit
+    # even when the tree renderer wraps lines.
+    print("\n--- shape of the efficient-mode proof")
+    root = chain_eff.steps[0]
+    print(f"  root rule       = {root.rule}")
+    print(f"  root children   = {len(root.children)} (one per generator)")
+    for i, gen_step in enumerate(root.children):
+        print(
+            f"    child[{i}] rule = {gen_step.rule}  "
+            f"({len(gen_step.children)} sub-step(s))"
+        )
+
+    print(
+        "\n  Note: efficient and foundational trees are identical here\n"
+        "  because the (A + B) - (A + B) cancellation in ExpandAndSimplify\n"
+        "  reaches 0 without any theorem-classified rule firing — d² = 0\n"
+        "  is never invoked, so there's nothing for UnrollToFoundations\n"
+        "  to unroll. The mode only shows a visible difference when a\n"
+        "  theorem step is actually reached (cf. Demo 2)."
+    )
+
+
 def main() -> None:
     demo_cartan_magic()
     demo_d_squared_zero()
+    demo_cartan_magic_operator_level()
     print()
 
 
