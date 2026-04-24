@@ -20,6 +20,9 @@ from gradalg.core.expr import (
 )
 from gradalg.display.latex import (
     chain_to_latex,
+    chain_to_latex_document,
+    chain_to_tikz,
+    chain_to_tikz_document,
     latex_name,
     step_to_latex,
     to_latex,
@@ -295,3 +298,149 @@ class TestSignNormalisation:
         expr = Act(d, Sum(Symbol("X"), Neg(Symbol("Y"))))
         out = to_latex(expr)
         assert out == r"d\!\left(X - Y\right)"
+
+
+# --------------------------------------------------------------------- #
+# Standalone document export                                             #
+# --------------------------------------------------------------------- #
+
+
+class TestChainToLatexDocument:
+    @pytest.fixture
+    def chain(self):
+        s1 = ProofStep(Symbol("X"), Symbol("Y"), rule="r1")
+        s2 = ProofStep(Symbol("Y"), Symbol("Z"), rule="r2")
+        return ProofChain([s1, s2])
+
+    def test_wraps_align_in_documentclass(self, chain):
+        out = chain_to_latex_document(chain)
+        assert out.startswith(r"\documentclass{article}")
+        assert r"\usepackage{amsmath}" in out
+        assert r"\usepackage{amssymb}" in out
+        assert r"\begin{document}" in out
+        assert r"\end{document}" in out
+        # Body: the align* block from chain_to_latex should be present.
+        assert r"\begin{align*}" in out
+        assert r"\end{align*}" in out
+
+    def test_no_maketitle_without_title_or_author(self, chain):
+        out = chain_to_latex_document(chain)
+        assert r"\maketitle" not in out
+
+    def test_title_and_author_trigger_maketitle(self, chain):
+        out = chain_to_latex_document(
+            chain, title="Jacobi for Poisson", author="Test"
+        )
+        assert r"\title{Jacobi for Poisson}" in out
+        assert r"\author{Test}" in out
+        assert r"\maketitle" in out
+
+    def test_title_alone_triggers_maketitle(self, chain):
+        out = chain_to_latex_document(chain, title="X")
+        assert r"\title{X}" in out
+        assert r"\maketitle" in out
+
+    def test_preamble_extras_inserted(self, chain):
+        extras = r"\newcommand{\foo}{bar}"
+        out = chain_to_latex_document(chain, preamble_extras=extras)
+        # Extras must appear after default packages, before \begin{document}.
+        extras_pos = out.find(extras)
+        doc_pos = out.find(r"\begin{document}")
+        assert extras_pos > 0
+        assert extras_pos < doc_pos
+
+    def test_title_escapes_special_chars(self, chain):
+        out = chain_to_latex_document(chain, title="X_1 & Y")
+        assert r"X\_1 \& Y" in out
+
+    def test_trailing_newline(self, chain):
+        out = chain_to_latex_document(chain)
+        assert out.endswith("\n")
+
+    def test_type_error_on_non_chain(self):
+        with pytest.raises(TypeError):
+            chain_to_latex_document("not a chain")  # type: ignore[arg-type]
+
+    def test_empty_chain_still_renders_document(self):
+        out = chain_to_latex_document(ProofChain())
+        assert r"\documentclass" in out
+        assert "empty proof chain" in out
+
+
+# --------------------------------------------------------------------- #
+# TikZ export                                                            #
+# --------------------------------------------------------------------- #
+
+
+class TestChainToTikz:
+    @pytest.fixture
+    def chain(self):
+        s1 = ProofStep(Symbol("X"), Symbol("Y"), rule="r1")
+        s2 = ProofStep(Symbol("Y"), Symbol("Z"), rule="r2")
+        return ProofChain([s1, s2])
+
+    def test_emits_tikzpicture(self, chain):
+        out = chain_to_tikz(chain)
+        assert out.startswith(r"\begin{tikzpicture}")
+        assert out.endswith(r"\end{tikzpicture}")
+
+    def test_n_plus_one_nodes_for_n_steps(self, chain):
+        out = chain_to_tikz(chain)
+        # 2 steps → 3 nodes (e0, e1, e2).
+        for i in range(3):
+            assert f"(e{i})" in out
+        assert "(e3)" not in out
+
+    def test_arrows_carry_rule_labels(self, chain):
+        out = chain_to_tikz(chain)
+        assert r"\draw[->] (e0)" in out
+        assert r"\draw[->] (e1)" in out
+        assert "r1" in out
+        assert "r2" in out
+
+    def test_provenance_tag_in_label(self):
+        step = ProofStep(
+            Symbol("X"), Symbol("Y"), rule="rule", provenance_tag="axiom"
+        )
+        out = chain_to_tikz(ProofChain([step]))
+        assert "(axiom)" in out
+
+    def test_custom_node_distance(self, chain):
+        out = chain_to_tikz(chain, node_distance="2.5cm")
+        assert "node distance=2.5cm" in out
+
+    def test_empty_chain_placeholder(self):
+        out = chain_to_tikz(ProofChain())
+        assert r"\begin{tikzpicture}" in out
+        assert "empty proof chain" in out
+
+    def test_type_error_on_non_chain(self):
+        with pytest.raises(TypeError):
+            chain_to_tikz("not a chain")  # type: ignore[arg-type]
+
+
+class TestChainToTikzDocument:
+    @pytest.fixture
+    def chain(self):
+        s1 = ProofStep(Symbol("X"), Symbol("Y"), rule="r1")
+        return ProofChain([s1])
+
+    def test_loads_tikz_and_positioning(self, chain):
+        out = chain_to_tikz_document(chain)
+        assert r"\usepackage{tikz}" in out
+        assert r"\usetikzlibrary{positioning}" in out
+
+    def test_body_wraps_tikzpicture(self, chain):
+        out = chain_to_tikz_document(chain)
+        assert r"\begin{tikzpicture}" in out
+        assert r"\end{tikzpicture}" in out
+        assert r"\begin{center}" in out
+
+    def test_title_triggers_maketitle(self, chain):
+        out = chain_to_tikz_document(chain, title="Demo")
+        assert r"\title{Demo}" in out
+        assert r"\maketitle" in out
+
+    def test_type_error_on_non_chain(self):
+        with pytest.raises(TypeError):
+            chain_to_tikz_document("not a chain")  # type: ignore[arg-type]

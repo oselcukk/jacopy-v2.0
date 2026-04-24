@@ -321,3 +321,158 @@ def chain_to_latex(chain: ProofChain) -> str:
         return "\\begin{align*}\n\\text{(empty proof chain)}\n\\end{align*}"
     body = " \\\\\n".join(step_to_latex(s) for s in chain.steps)
     return f"\\begin{{align*}}\n{body}\n\\end{{align*}}"
+
+
+# --------------------------------------------------------------------- #
+# Standalone document export                                             #
+# --------------------------------------------------------------------- #
+
+
+_DEFAULT_PREAMBLE = (
+    r"\usepackage{amsmath}" "\n"
+    r"\usepackage{amssymb}" "\n"
+    r"\usepackage[utf8]{inputenc}" "\n"
+)
+
+
+def chain_to_latex_document(
+    chain: ProofChain,
+    *,
+    title: str = "",
+    author: str = "",
+    preamble_extras: str = "",
+) -> str:
+    r"""Wrap :func:`chain_to_latex` in a full ``\documentclass`` document.
+
+    The result is a pdfLaTeX-ready ``article`` document — the caller can
+    write it to disk and run ``pdflatex file.tex`` without further
+    massaging. ``preamble_extras`` is spliced between the default
+    ``amsmath``/``amssymb`` block and ``\begin{document}`` so
+    projects with their own macros can inject them verbatim.
+
+    ``title`` / ``author``, when non-empty, trigger a ``\title``/
+    ``\author`` / ``\maketitle`` block. Empty strings are treated as
+    "no title" — the chain just renders on a blank page.
+    """
+    if not isinstance(chain, ProofChain):
+        raise TypeError("chain_to_latex_document: expected a ProofChain")
+    body = chain_to_latex(chain)
+    lines = [
+        r"\documentclass{article}",
+        _DEFAULT_PREAMBLE.rstrip(),
+    ]
+    if preamble_extras:
+        lines.append(preamble_extras.rstrip())
+    if title:
+        lines.append(f"\\title{{{_escape_text(title)}}}")
+    if author:
+        lines.append(f"\\author{{{_escape_text(author)}}}")
+    lines.append(r"\begin{document}")
+    if title or author:
+        lines.append(r"\maketitle")
+    lines.append(body)
+    lines.append(r"\end{document}")
+    return "\n".join(lines) + "\n"
+
+
+# --------------------------------------------------------------------- #
+# TikZ chain diagram                                                     #
+# --------------------------------------------------------------------- #
+
+
+def _tikz_escape(text: str) -> str:
+    """Escape a math-mode label for embedding in a TikZ ``node`` body.
+
+    TikZ nodes inside ``$…$`` inherit math mode, which is what we want
+    for expressions. The label text comes straight from
+    :func:`to_latex` — math-mode safe already. Rule labels are text,
+    run through :func:`_escape_text`.
+    """
+    return _escape_text(text)
+
+
+def chain_to_tikz(
+    chain: ProofChain,
+    *,
+    node_distance: str = "1.2cm",
+) -> str:
+    r"""Render a :class:`ProofChain` as a vertical TikZ diagram.
+
+    Each step's ``before`` / ``after`` become boxed nodes; consecutive
+    ``after`` and next ``before`` coincide, so the chain produces
+    ``n + 1`` nodes for ``n`` steps. Arrows are labelled with the
+    rule name (provenance tag in parentheses when present).
+
+    The output is a ``tikzpicture`` environment — paste it into any
+    LaTeX document that loads the ``tikz`` package. For a standalone
+    file wrapping this, see :func:`chain_to_tikz_document`.
+
+    Nested sub-proofs flatten: this renderer only walks ``chain.steps``.
+    Callers that want a tree diagram should compose multiple calls.
+    """
+    if not isinstance(chain, ProofChain):
+        raise TypeError("chain_to_tikz: expected a ProofChain")
+    if len(chain) == 0:
+        return (
+            f"\\begin{{tikzpicture}}[node distance={node_distance}]\n"
+            "\\node {(empty proof chain)};\n"
+            "\\end{tikzpicture}"
+        )
+    lines = [f"\\begin{{tikzpicture}}[node distance={node_distance}]"]
+    # Emit n+1 nodes: e0, e1, ..., en. Each step's ``before`` is the
+    # prior node's expression, which we already emitted — so only emit
+    # the first ``before`` plus every ``after``.
+    first = chain.steps[0].before
+    lines.append(f"\\node[draw, rectangle] (e0) {{${to_latex(first)}$}};")
+    for i, step in enumerate(chain.steps):
+        label = to_latex(step.after)
+        lines.append(
+            f"\\node[draw, rectangle, below=of e{i}] "
+            f"(e{i + 1}) {{${label}$}};"
+        )
+    for i, step in enumerate(chain.steps):
+        tag = f" ({step.provenance_tag})" if step.provenance_tag else ""
+        rule = _tikz_escape(f"{step.rule}{tag}")
+        lines.append(
+            f"\\draw[->] (e{i}) -- node[right] {{\\small {rule}}} "
+            f"(e{i + 1});"
+        )
+    lines.append(r"\end{tikzpicture}")
+    return "\n".join(lines)
+
+
+def chain_to_tikz_document(
+    chain: ProofChain,
+    *,
+    title: str = "",
+    author: str = "",
+    node_distance: str = "1.2cm",
+) -> str:
+    r"""Standalone ``\documentclass`` wrapper around :func:`chain_to_tikz`.
+
+    Loads ``tikz`` and ``positioning`` (for ``below=of`` placement) in
+    the preamble so the output is directly ``pdflatex``-able.
+    """
+    if not isinstance(chain, ProofChain):
+        raise TypeError("chain_to_tikz_document: expected a ProofChain")
+    body = chain_to_tikz(chain, node_distance=node_distance)
+    lines = [
+        r"\documentclass{article}",
+        r"\usepackage{amsmath}",
+        r"\usepackage{amssymb}",
+        r"\usepackage[utf8]{inputenc}",
+        r"\usepackage{tikz}",
+        r"\usetikzlibrary{positioning}",
+    ]
+    if title:
+        lines.append(f"\\title{{{_escape_text(title)}}}")
+    if author:
+        lines.append(f"\\author{{{_escape_text(author)}}}")
+    lines.append(r"\begin{document}")
+    if title or author:
+        lines.append(r"\maketitle")
+    lines.append(r"\begin{center}")
+    lines.append(body)
+    lines.append(r"\end{center}")
+    lines.append(r"\end{document}")
+    return "\n".join(lines) + "\n"

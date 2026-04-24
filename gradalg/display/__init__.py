@@ -26,6 +26,9 @@ from gradalg.display.jupyter import (
 )
 from gradalg.display.latex import (
     chain_to_latex,
+    chain_to_latex_document,
+    chain_to_tikz,
+    chain_to_tikz_document,
     latex_name,
     step_to_latex,
     to_latex,
@@ -47,6 +50,9 @@ __all__ = [
     "LatexDisplay",
     "chain_to_ascii",
     "chain_to_latex",
+    "chain_to_latex_document",
+    "chain_to_tikz",
+    "chain_to_tikz_document",
     "display_chain",
     "display_chain_collapsible",
     "display_expr",
