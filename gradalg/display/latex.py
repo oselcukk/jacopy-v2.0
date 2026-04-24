@@ -1,0 +1,306 @@
+r"""
+LaTeX renderer for :class:`~gradalg.core.expr.Expr` trees and
+:class:`~gradalg.proof.step.ProofStep` / :class:`~gradalg.proof.chain.ProofChain`.
+
+The output is raw LaTeX math — no ``$…$`` delimiters — so the caller
+chooses the surrounding environment. :func:`chain_to_latex` wraps a
+:class:`ProofChain` in an ``align*`` body; individual expressions come
+out as atomic math snippets ready to splice into equations, tables, or
+``\text{…}`` arguments.
+
+Name sanitising handles the Unicode glyphs that appear naturally in
+the package (``ι_X``, ``ω``, ``α``, ``♭``, ``Θ``) by translating them
+to standard LaTeX commands (``\iota_X``, ``\omega``, ``\alpha``,
+``\flat``, ``\Theta``). Multi-character subscripts are automatically
+braced — ``X_ab`` becomes ``X_{ab}`` — so the sanitiser's output is
+pdfLaTeX-safe without the caller having to pre-format names.
+
+Dispatch is MRO-based: the most specific registered class for
+``type(expr)`` wins, which lets :class:`Derivation` subclasses fall
+through to the generic handler without each subclass registering
+independently.
+"""
+
+from __future__ import annotations
+
+import re
+from typing import Callable, Dict, Type
+
+from gradalg.algebra.commutator import Commutator
+from gradalg.algebra.derivation import Act, Derivation
+from gradalg.brackets.base import BracketApply
+from gradalg.brackets.dorfman import SectionPair
+from gradalg.calculus.pairing import Pairing
+from gradalg.core.expr import (
+    Expr,
+    Integer,
+    Neg,
+    Power,
+    Product,
+    Rational,
+    Sum,
+    Symbol,
+)
+from gradalg.proof.chain import ProofChain
+from gradalg.proof.step import ProofStep
+
+
+# --------------------------------------------------------------------- #
+# Name sanitising                                                        #
+# --------------------------------------------------------------------- #
+
+
+_UNICODE_TO_LATEX: Dict[str, str] = {
+    # lowercase Greek
+    "α": r"\alpha", "β": r"\beta", "γ": r"\gamma", "δ": r"\delta",
+    "ε": r"\epsilon", "ζ": r"\zeta", "η": r"\eta", "θ": r"\theta",
+    "ι": r"\iota", "κ": r"\kappa", "λ": r"\lambda", "μ": r"\mu",
+    "ν": r"\nu", "ξ": r"\xi", "π": r"\pi", "ρ": r"\rho",
+    "σ": r"\sigma", "τ": r"\tau", "υ": r"\upsilon", "φ": r"\phi",
+    "χ": r"\chi", "ψ": r"\psi", "ω": r"\omega",
+    # uppercase Greek
+    "Γ": r"\Gamma", "Δ": r"\Delta", "Θ": r"\Theta", "Λ": r"\Lambda",
+    "Ξ": r"\Xi", "Π": r"\Pi", "Σ": r"\Sigma", "Υ": r"\Upsilon",
+    "Φ": r"\Phi", "Ψ": r"\Psi", "Ω": r"\Omega",
+    # musical / algebraic
+    "♭": r"\flat", "♯": r"\sharp",
+    "∧": r"\wedge", "∨": r"\vee",
+    "∘": r"\circ", "⊕": r"\oplus", "⊗": r"\otimes",
+    "·": r"\cdot",
+    "⟨": r"\langle", "⟩": r"\rangle",
+    "∞": r"\infty",
+    # hat / bars / primes occasionally show up in names
+    "∂": r"\partial",
+}
+
+
+_MULTICHAR_SUB = re.compile(r"_(\w{2,})")
+
+
+def latex_name(name: str) -> str:
+    """Translate a Derivation/Symbol name into a LaTeX math snippet.
+
+    Replaces Unicode mathematical glyphs with their standard LaTeX
+    commands, then braces multi-character subscripts so ``X_ab``
+    renders as ``X_{ab}``. Single-character subscripts (``X_f``) are
+    left alone — LaTeX handles them without braces.
+    """
+    if not isinstance(name, str):
+        raise TypeError("latex_name: expected a str")
+    for glyph, replacement in _UNICODE_TO_LATEX.items():
+        name = name.replace(glyph, replacement)
+    name = _MULTICHAR_SUB.sub(lambda m: "_{" + m.group(1) + "}", name)
+    return name
+
+
+# --------------------------------------------------------------------- #
+# Dispatch                                                              #
+# --------------------------------------------------------------------- #
+
+
+# Same precedence rungs as the ASCII renderer; a child renders with
+# parens when its own precedence is below the surrounding context's.
+_P_ATOM = 100
+_P_CALL = 90
+_P_POWER = 80
+_P_PRODUCT = 60
+_P_NEG = 50
+_P_SUM = 40
+
+
+Handler = Callable[[Expr, int], str]
+_HANDLERS: Dict[Type[Expr], Handler] = {}
+
+
+def _register(cls: Type[Expr]):
+    def decorator(fn: Handler) -> Handler:
+        _HANDLERS[cls] = fn
+        return fn
+
+    return decorator
+
+
+def to_latex(expr: Expr, ctx_precedence: int = 0) -> str:
+    """Render ``expr`` as a LaTeX math snippet (no ``$`` delimiters)."""
+    if not isinstance(expr, Expr):
+        raise TypeError("to_latex: expected an Expr")
+    for cls in type(expr).__mro__:
+        h = _HANDLERS.get(cls)
+        if h is not None:
+            return h(expr, ctx_precedence)
+    # Last-resort fallback: sanitise the ``__repr__`` output so at least
+    # Greek glyphs still come through as LaTeX commands.
+    return latex_name(repr(expr))
+
+
+def _wrap(text: str, own_prec: int, ctx_prec: int) -> str:
+    if own_prec < ctx_prec:
+        return f"\\left({text}\\right)"
+    return text
+
+
+# --------------------------------------------------------------------- #
+# Core expression types                                                 #
+# --------------------------------------------------------------------- #
+
+
+@_register(Symbol)
+def _sym(expr: Symbol, _ctx: int) -> str:
+    return latex_name(expr.name)
+
+
+@_register(Integer)
+def _int(expr: Integer, ctx: int) -> str:
+    v = expr.value
+    if v < 0:
+        return _wrap(str(v), _P_NEG, ctx)
+    return str(v)
+
+
+@_register(Rational)
+def _rat(expr: Rational, ctx: int) -> str:
+    p, q = expr.p, expr.q
+    if p < 0:
+        text = f"-\\frac{{{-p}}}{{{q}}}"
+        return _wrap(text, _P_NEG, ctx)
+    return f"\\frac{{{p}}}{{{q}}}"
+
+
+@_register(Neg)
+def _neg(expr: Neg, ctx: int) -> str:
+    inner = to_latex(expr.arg, _P_NEG + 1)
+    return _wrap(f"-{inner}", _P_NEG, ctx)
+
+
+@_register(Sum)
+def _sum(expr: Sum, ctx: int) -> str:
+    parts: list[str] = []
+    for i, child in enumerate(expr.children):
+        if isinstance(child, Neg):
+            inner = to_latex(child.arg, _P_NEG + 1)
+            parts.append(("- " if i > 0 else "-") + inner)
+        else:
+            rendered = to_latex(child, _P_SUM + 1)
+            parts.append(("+ " if i > 0 else "") + rendered)
+    text = " ".join(parts) if len(parts) > 1 else parts[0] if parts else "0"
+    return _wrap(text, _P_SUM, ctx)
+
+
+@_register(Product)
+def _prod(expr: Product, ctx: int) -> str:
+    parts = [to_latex(c, _P_PRODUCT + 1) for c in expr.children]
+    text = " \\, ".join(parts) if parts else "1"
+    return _wrap(text, _P_PRODUCT, ctx)
+
+
+@_register(Power)
+def _pow(expr: Power, ctx: int) -> str:
+    base = to_latex(expr.base, _P_POWER + 1)
+    exp = to_latex(expr.exp, 0)
+    return _wrap(f"{{{base}}}^{{{exp}}}", _P_POWER, ctx)
+
+
+# --------------------------------------------------------------------- #
+# Algebra                                                               #
+# --------------------------------------------------------------------- #
+
+
+@_register(Derivation)
+def _deriv(expr: Derivation, _ctx: int) -> str:
+    return latex_name(expr.name)
+
+
+@_register(Act)
+def _act(expr: Act, ctx: int) -> str:
+    op = to_latex(expr.op, _P_CALL + 1)
+    arg = to_latex(expr.arg, 0)
+    return _wrap(f"{op}\\!\\left({arg}\\right)", _P_CALL, ctx)
+
+
+@_register(Commutator)
+def _comm(expr: Commutator, _ctx: int) -> str:
+    a = to_latex(expr.a, 0)
+    b = to_latex(expr.b, 0)
+    return f"\\left[{a},\\, {b}\\right]"
+
+
+# --------------------------------------------------------------------- #
+# Bracket / section / pairing nodes                                     #
+# --------------------------------------------------------------------- #
+
+
+@_register(BracketApply)
+def _bracket_apply(expr: BracketApply, _ctx: int) -> str:
+    a = to_latex(expr.a, 0)
+    b = to_latex(expr.b, 0)
+    tag = latex_name(expr.bracket.name)
+    return f"\\left[{a},\\, {b}\\right]_{{{tag}}}"
+
+
+@_register(SectionPair)
+def _section(expr: SectionPair, _ctx: int) -> str:
+    v = to_latex(expr.vector, 0)
+    f = to_latex(expr.form, 0)
+    return f"\\left({v},\\, {f}\\right)"
+
+
+@_register(Pairing)
+def _pairing(expr: Pairing, _ctx: int) -> str:
+    a = to_latex(expr.alpha, 0)
+    X = to_latex(expr.X, 0)
+    return f"\\langle {a},\\, {X} \\rangle"
+
+
+# --------------------------------------------------------------------- #
+# Proof transcript                                                      #
+# --------------------------------------------------------------------- #
+
+
+def _escape_text(text: str) -> str:
+    """Minimal escaping for the text inside ``\\text{…}`` arguments."""
+    return (
+        text.replace("\\", r"\textbackslash{}")
+        .replace("_", r"\_")
+        .replace("#", r"\#")
+        .replace("%", r"\%")
+        .replace("&", r"\&")
+        .replace("$", r"\$")
+    )
+
+
+def step_to_latex(step: ProofStep) -> str:
+    r"""Render a single :class:`ProofStep` as an ``align*``-ready line.
+
+    Produces ``before &\to after &&\text{[rule]}``. The rule and
+    justification are passed through :func:`_escape_text` so stray
+    underscores or ampersands don't derail the surrounding
+    ``align*`` body.
+    """
+    if not isinstance(step, ProofStep):
+        raise TypeError("step_to_latex: expected a ProofStep")
+    before = to_latex(step.before)
+    after = to_latex(step.after)
+    rule = _escape_text(step.rule)
+    tag = f"\\,({step.provenance_tag})" if step.provenance_tag else ""
+    annotation = f"\\text{{[{rule}]{tag}}}"
+    if step.justification:
+        annotation = (
+            annotation + f"\\;\\text{{--- {_escape_text(step.justification)}}}"
+        )
+    return f"{before} &\\to {after} && {annotation}"
+
+
+def chain_to_latex(chain: ProofChain) -> str:
+    r"""Render a :class:`ProofChain` as an ``\begin{align*}…\end{align*}`` block.
+
+    Nested sub-proofs are not expanded inline — strategies that want a
+    rich tree rendering should iterate the steps themselves and compose
+    the output. This keeps the ``align*`` body flat and copy-pasteable
+    into a paper or notes document.
+    """
+    if not isinstance(chain, ProofChain):
+        raise TypeError("chain_to_latex: expected a ProofChain")
+    if len(chain) == 0:
+        return "\\begin{align*}\n\\text{(empty proof chain)}\n\\end{align*}"
+    body = " \\\\\n".join(step_to_latex(s) for s in chain.steps)
+    return f"\\begin{{align*}}\n{body}\n\\end{{align*}}"
