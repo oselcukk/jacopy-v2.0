@@ -5,8 +5,9 @@ the process-wide singleton :data:`theorem_book`. Stage B adds
 :class:`SymplecticManifold` and :class:`PoissonBracket` together with
 the seeded Poisson/Koszul theorems. Stage C adds :class:`LieAlgebroid`
 with the algebroid Cartan bundle and the seeded
-``lie_algebroid_anchor_compat`` axiom theorem. Stage D (Courant,
-Dirac) will populate further entries.
+``lie_algebroid_anchor_compat`` axiom theorem. Stage D adds
+:class:`CourantAlgebroid` (with H-twist + Courant–Dorfman bridge) and
+:class:`DiracStructure` plus four further seeded theorems.
 """
 
 from gradalg.library.theorem_book import Theorem, TheoremBook, theorem_book
@@ -29,6 +30,23 @@ from gradalg.library.lie_algebroid import (
     lie_algebroid,
 )
 
+# Stage D — Courant algebroid + Dirac structures; seeds
+# ``courant_jacobi_twist``, ``courant_dorfman_bridge``,
+# ``dirac_isotropy``, ``dirac_involutivity`` on import.
+from gradalg.library.courant_algebroid import (
+    THEOREM_COURANT_DORFMAN_BRIDGE,
+    THEOREM_COURANT_JACOBI_TWIST,
+    CourantAlgebroid,
+    courant_algebroid,
+)
+from gradalg.library.dirac import (
+    THEOREM_DIRAC_INVOLUTIVITY,
+    THEOREM_DIRAC_ISOTROPY,
+    DiracStructure,
+    poisson_dirac,
+    presymplectic_dirac,
+)
+
 __all__ = [
     "Theorem",
     "TheoremBook",
@@ -38,8 +56,17 @@ __all__ = [
     "poisson_bracket",
     "LieAlgebroid",
     "lie_algebroid",
+    "CourantAlgebroid",
+    "courant_algebroid",
+    "DiracStructure",
+    "poisson_dirac",
+    "presymplectic_dirac",
     "THEOREM_POISSON_JACOBI",
     "THEOREM_POISSON_KOSZUL_EQUIVALENCE",
     "THEOREM_POISSON_KOSZUL_JACOBI",
     "THEOREM_LIE_ALGEBROID_ANCHOR_COMPAT",
+    "THEOREM_COURANT_JACOBI_TWIST",
+    "THEOREM_COURANT_DORFMAN_BRIDGE",
+    "THEOREM_DIRAC_ISOTROPY",
+    "THEOREM_DIRAC_INVOLUTIVITY",
 ]
