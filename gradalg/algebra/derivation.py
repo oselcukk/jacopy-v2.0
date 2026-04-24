@@ -169,6 +169,11 @@ def degree_of(
             + degree_of(expr.b, registry)
             + expr.bracket.degree
         )
+    # The canonical pairing ⟨α, X⟩ produces a scalar regardless of its
+    # inputs. Late import keeps the algebra → calculus direction clean.
+    from gradalg.calculus.pairing import Pairing  # noqa: WPS433
+    if isinstance(expr, Pairing):
+        return Degree.const(0)
     if registry is not None:
         if registry.has(expr, Scalar):
             return Degree.const(0)

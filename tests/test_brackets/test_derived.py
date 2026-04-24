@@ -2,10 +2,17 @@
 
 import pytest
 
+from gradalg.algebra.derivation import Act
 from gradalg.algorithms.simplify import simplify
 from gradalg.brackets.base import BracketApply
 from gradalg.brackets.derived import DerivedBracket, derived_bracket
+from gradalg.brackets.koszul import KoszulBracket
 from gradalg.brackets.lie import LieBracket
+from gradalg.brackets.schouten import sn
+from gradalg.calculus.anchor import Anchor
+from gradalg.calculus.exterior_d import d as d_op
+from gradalg.calculus.lie_derivative import lie_derivative
+from gradalg.calculus.pairing import Pairing, pairing
 from gradalg.core.expr import Neg, Product, Sum, Symbol
 from gradalg.core.properties import Graded
 from gradalg.core.registry import PropertyRegistry
@@ -211,3 +218,145 @@ class TestDerivedBracketTheorem:
             # Outer: d(x, inner); inner is also a derived-bracket app.
             assert isinstance(term.b, BracketApply)
             assert term.b.bracket is d
+
+
+# --------------------------------------------------------------------- #
+# VanishingCondition / jacobi_condition                                  #
+# --------------------------------------------------------------------- #
+
+
+class TestJacobiCondition:
+    def test_returns_vanishing_condition(self, reg):
+        from gradalg.brackets.derived import VanishingCondition
+        lie = LieBracket()
+        d = DerivedBracket(lie, Symbol("Q"), degree_Q=1)
+        cond = d.jacobi_condition(reg)
+        assert isinstance(cond, VanishingCondition)
+
+    def test_condition_obstruction_matches_expanded_form(self, reg):
+        lie = LieBracket()
+        d = DerivedBracket(lie, Symbol("Q"), degree_Q=1)
+        cond = d.jacobi_condition(reg)
+        assert cond.obstruction == d.jacobi_obstruction(reg)
+
+    def test_name_references_bracket(self, reg):
+        lie = LieBracket()
+        d = DerivedBracket(lie, Symbol("Q"), degree_Q=1, name="koszul")
+        cond = d.jacobi_condition(reg)
+        assert "koszul" in cond.name
+
+    def test_holds_true_for_lie_base(self, reg):
+        """LieBracket gives [Q, Q] = Q*Q - Q*Q = 0 → Jacobi holds."""
+        reg.declare(Symbol("Q"), Graded(degree=1))
+        lie = LieBracket()
+        d = DerivedBracket(lie, Symbol("Q"), degree_Q=1)
+        assert d.jacobi_condition(reg).holds(reg) is True
+
+    def test_is_hashable_and_equatable(self, reg):
+        """Frozen dataclass → usable as dict key."""
+        lie = LieBracket()
+        d = DerivedBracket(lie, Symbol("Q"), degree_Q=1)
+        c1 = d.jacobi_condition(reg)
+        c2 = d.jacobi_condition(reg)
+        assert c1 == c2
+        assert hash(c1) == hash(c2)
+
+
+# --------------------------------------------------------------------- #
+# acting_on: anchor-lifted derived bracket (Koszul case)                 #
+# --------------------------------------------------------------------- #
+
+
+class TestActingOn:
+    def test_default_is_none(self):
+        d = DerivedBracket(LieBracket(), Symbol("Q"), degree_Q=1)
+        assert d.acting_on is None
+
+    def test_stores_anchor(self):
+        rho = Anchor("ρ")
+        d = DerivedBracket(sn, Symbol("π"), degree_Q=1, acting_on=rho)
+        assert d.acting_on is rho
+
+    def test_rejects_non_derivation_acting_on(self):
+        with pytest.raises(TypeError):
+            DerivedBracket(
+                sn, Symbol("π"), degree_Q=1, acting_on="ρ"  # type: ignore[arg-type]
+            )
+
+    def test_accepts_musical_sharp_as_anchor(self):
+        """``Sharp`` is a ``Derivation`` too — any ``Derivation`` works."""
+        from gradalg.calculus.musical import sharp
+        pi = Symbol("π")
+        sh = sharp(pi)
+        d = DerivedBracket(sn, pi, degree_Q=1, acting_on=sh)
+        assert d.acting_on is sh
+
+    def test_expand_emits_koszul_three_term_sum(self):
+        rho = Anchor("ρ")
+        pi = Symbol("π")
+        alpha, beta = Symbol("α"), Symbol("β")
+        d = DerivedBracket(sn, pi, degree_Q=1, acting_on=rho)
+        out = d.expand(alpha, beta)
+        assert isinstance(out, Sum)
+        assert len(out.children) == 3
+
+    def test_expand_structurally_equals_classical_koszul(self):
+        """The reason for the ``acting_on`` kwarg: derived-bracket form
+        on 1-forms reproduces the classical Koszul bracket exactly."""
+        rho = Anchor("ρ")
+        pi = Symbol("π")
+        alpha, beta = Symbol("α"), Symbol("β")
+        k_out = KoszulBracket(rho).expand(alpha, beta)
+        d_out = DerivedBracket(sn, pi, degree_Q=1, acting_on=rho).expand(alpha, beta)
+        assert k_out == d_out
+
+    def test_expand_first_term_is_L_rho_alpha_beta(self):
+        rho = Anchor("ρ")
+        alpha, beta = Symbol("α"), Symbol("β")
+        d = DerivedBracket(sn, Symbol("π"), degree_Q=1, acting_on=rho)
+        out = d.expand(alpha, beta)
+        assert out.children[0] == Act(lie_derivative(Act(rho, alpha)), beta)
+
+    def test_expand_third_term_wraps_pairing_in_d(self):
+        rho = Anchor("ρ")
+        alpha, beta = Symbol("α"), Symbol("β")
+        d = DerivedBracket(sn, Symbol("π"), degree_Q=1, acting_on=rho)
+        out = d.expand(alpha, beta)
+        assert out.children[2] == Neg(Act(d_op, pairing(Act(rho, alpha), beta)))
+
+    def test_acting_on_none_preserves_default_path(self, reg):
+        """Classic {a,b}_Q = [[a,Q],b] path is not disturbed."""
+        lie = LieBracket()
+        Q = Symbol("Q")
+        reg.declare(Q, Graded(degree=1))
+        d = DerivedBracket(lie, Q, degree_Q=1)
+        a, b = Symbol("a"), Symbol("b")
+        default_expanded = d.expand(a, b, reg)
+        manual = lie.expand(lie.expand(a, Q, reg), b, reg)
+        assert default_expanded == manual
+
+    def test_different_acting_on_distinguishes_brackets(self):
+        """Anchor participates in identity — two derived brackets with
+        different anchors are distinct."""
+        pi = Symbol("π")
+        d1 = DerivedBracket(sn, pi, degree_Q=1, acting_on=Anchor("ρ1"))
+        d2 = DerivedBracket(sn, pi, degree_Q=1, acting_on=Anchor("ρ2"))
+        assert d1 != d2
+
+    def test_jacobi_obstruction_unchanged_by_acting_on(self, reg):
+        """``acting_on`` only rewires ``expand``. The Jacobi obstruction
+        is still ``[Q, Q]_base``."""
+        rho = Anchor("ρ")
+        Q = Symbol("Q")
+        reg.declare(Q, Graded(degree=1))
+        lie = LieBracket()
+        d_plain = DerivedBracket(lie, Q, degree_Q=1)
+        d_lift = DerivedBracket(lie, Q, degree_Q=1, acting_on=rho)
+        assert d_lift.jacobi_obstruction(reg) == d_plain.jacobi_obstruction(reg)
+
+    def test_degree_formula_unchanged_by_acting_on(self):
+        """``|{·,·}_Q| = |Q| − 2`` regardless of ``acting_on``; the
+        interpretation on forms is the caller's responsibility."""
+        rho = Anchor("ρ")
+        d = DerivedBracket(sn, Symbol("π"), degree_Q=1, acting_on=rho)
+        assert d.degree == Degree.const(-1)

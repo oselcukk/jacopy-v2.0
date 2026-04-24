@@ -38,12 +38,52 @@ than re-proving it.
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from dataclasses import dataclass
+from typing import Any, Callable, Optional
 
+from gradalg.algebra.derivation import Act, Derivation
+from gradalg.algorithms.simplify import simplify
 from gradalg.brackets.base import BracketApply, GradedBracket
-from gradalg.core.expr import Expr
+from gradalg.core.expr import Expr, Integer, Neg, Sum
 from gradalg.core.registry import PropertyRegistry
 from gradalg.core.symbolic_degree import Degree, DegreeLike, as_degree
+
+
+LieDerivativeFactory = Callable[[Expr], Derivation]
+
+
+@dataclass(frozen=True)
+class VanishingCondition:
+    """A proof-level claim of the form ``obstruction = 0``.
+
+    A :class:`VanishingCondition` is the typed handle the proof layer
+    consumes when a construction's correctness rests on a single
+    equation. :meth:`DerivedBracket.jacobi_condition` returns one whose
+    :attr:`obstruction` is ``[Q, Q]_base``: the Derived Bracket Theorem
+    says Jacobi on ``{·, ·}_Q`` holds iff this vanishes, so passing the
+    condition around is the same as passing around the theorem's
+    hypothesis.
+
+    The class is intentionally minimal — it is data, not a proof
+    tactic. :meth:`holds` runs :func:`simplify` against the
+    ``obstruction`` and reports whether the canonical form is the
+    literal :class:`Integer` ``0``. Symbolic residues that the
+    canonical pipeline can't settle return ``False`` even if the
+    underlying math would eventually close them; the expectation is
+    that the proof layer (e.g.
+    :class:`gradalg.proof.strategies.DerivedBracketStrategy`) is the
+    right tool for non-trivial discharges.
+    """
+
+    obstruction: Expr
+    name: str = "vanishing condition"
+
+    def holds(self, registry: Optional[PropertyRegistry] = None) -> bool:
+        """True iff the obstruction simplifies to :class:`Integer` ``0``."""
+        return simplify(self.obstruction, registry) == Integer(0)
+
+    def __str__(self) -> str:  # pragma: no cover
+        return f"{self.name}: {self.obstruction._repr_inner()} = 0"
 
 
 class DerivedBracket(GradedBracket):
@@ -62,6 +102,21 @@ class DerivedBracket(GradedBracket):
     name
         Optional display name. Defaults to a structured tag derived
         from the base bracket and generator.
+    acting_on
+        Optional :class:`~gradalg.algebra.derivation.Derivation` that
+        lifts operands into the domain of the base bracket. The
+        canonical use is the Koszul bracket on 1-forms: with
+        ``base=sn``, ``Q=π``, and ``acting_on=π^♯`` (an
+        :class:`~gradalg.calculus.anchor.Anchor` or musical
+        :class:`~gradalg.calculus.musical.Sharp`), :meth:`expand`
+        emits the classical Koszul formula
+        ``L_{ρa} b − L_{ρb} a − d⟨ρa, b⟩`` rather than the literal
+        ``[[a, Q]_base, b]_base``. The literal form is unreachable
+        when operands are 1-forms and the base bracket (SN) takes
+        multivectors — the anchor bridges the two bundles.
+    d, lie_derivative
+        Cartan operators used *only* when ``acting_on`` is set. Default
+        to the smooth-manifold singletons.
     """
 
     def __init__(
@@ -71,14 +126,27 @@ class DerivedBracket(GradedBracket):
         *,
         degree_Q: DegreeLike = 0,
         name: Optional[str] = None,
+        acting_on: Optional[Derivation] = None,
+        d: Optional[Derivation] = None,
+        lie_derivative: Optional[LieDerivativeFactory] = None,
     ) -> None:
         if not isinstance(base, GradedBracket):
             raise TypeError("DerivedBracket 'base' must be a GradedBracket")
         if not isinstance(Q, Expr):
             raise TypeError("DerivedBracket generator 'Q' must be an Expr")
+        if acting_on is not None and not isinstance(acting_on, Derivation):
+            raise TypeError(
+                f"DerivedBracket acting_on must be a Derivation, "
+                f"got {type(acting_on).__name__}"
+            )
         self._base = base
         self._Q = Q
         self._degree_Q = as_degree(degree_Q)
+        self._acting_on = acting_on
+        # Cartan ops resolved lazily to avoid import-time cycles — only
+        # used when acting_on is set.
+        self._d_override = d
+        self._lie_derivative_override = lie_derivative
         display = name or f"{{·,·}}_{Q._repr_inner()}"
         # Derived-bracket degree formula: |{·,·}_Q| = |Q| - 2. Graded
         # Leibniz always holds; antisymmetry and Jacobi are conditional
@@ -105,6 +173,10 @@ class DerivedBracket(GradedBracket):
     def degree_Q(self) -> Degree:
         return self._degree_Q
 
+    @property
+    def acting_on(self) -> Optional[Derivation]:
+        return self._acting_on
+
     # ---- core expansion -------------------------------------------- #
 
     def expand(
@@ -113,15 +185,53 @@ class DerivedBracket(GradedBracket):
         b: Expr,
         registry: Optional[PropertyRegistry] = None,
     ) -> Expr:
-        """``{a, b}_Q = [[a, Q]_base, b]_base``.
+        """``{a, b}_Q = [[a, Q]_base, b]_base`` (generic) or the
+        anchor-lifted Koszul formula when ``acting_on`` is set.
 
-        Two base-bracket applications are produced and each is
-        immediately expanded by the base bracket. The result is the
-        fully-unfolded Expr — the caller is free to pipe it through
-        ``simplify`` / ``canonicalize`` for a readable form.
+        With ``acting_on=ρ``:
+        ``{a, b}_{Q, ρ} = L_{ρa} b − L_{ρb} a − d⟨ρa, b⟩``,
+        matching :class:`~gradalg.brackets.koszul.KoszulBracket(ρ)` —
+        the structural equality is the content of the
+        classical/derived equivalence theorem on Poisson manifolds.
         """
+        if self._acting_on is not None:
+            return self._koszul_expand(a, b, registry)
         inner = self._base.expand(a, self._Q, registry)
         return self._base.expand(inner, b, registry)
+
+    def _koszul_expand(
+        self,
+        a: Expr,
+        b: Expr,
+        registry: Optional[PropertyRegistry] = None,
+    ) -> Expr:
+        """Emit the Koszul 3-term formula via the anchor lift.
+
+        Delegated out of :meth:`expand` to keep the default derived
+        path clean. Cartan operators are resolved from the
+        constructor overrides or from the smooth-manifold singletons;
+        imports are deferred to avoid a top-level cycle between
+        ``brackets`` and ``calculus``.
+        """
+        from gradalg.calculus.exterior_d import d as default_d
+        from gradalg.calculus.lie_derivative import (
+            lie_derivative as default_lie_derivative,
+        )
+        from gradalg.calculus.pairing import pairing
+
+        d_op = self._d_override if self._d_override is not None else default_d
+        lie_factory = (
+            self._lie_derivative_override
+            if self._lie_derivative_override is not None
+            else default_lie_derivative
+        )
+        rho_a = Act(self._acting_on, a)
+        rho_b = Act(self._acting_on, b)
+        return Sum(
+            Act(lie_factory(rho_a), b),
+            Neg(Act(lie_factory(rho_b), a)),
+            Neg(Act(d_op, pairing(rho_a, b))),
+        )
 
     def expand_definition(
         self,
@@ -159,14 +269,40 @@ class DerivedBracket(GradedBracket):
         further pattern matching."""
         return BracketApply(self._base, self._Q, self._Q)
 
+    def jacobi_condition(
+        self, registry: Optional[PropertyRegistry] = None
+    ) -> VanishingCondition:
+        """Return the :class:`VanishingCondition` controlling Jacobi.
+
+        The returned condition wraps ``[Q, Q]_base`` (expanded by the
+        base bracket via :meth:`jacobi_obstruction`) together with a
+        display name tied to this derived bracket. The proof layer's
+        :class:`~gradalg.proof.strategies.DerivedBracketStrategy`
+        consumes exactly this shape when it discharges Jacobi: one
+        theorem step reduces triple-cyclic Jacobi to the
+        condition's vanishing, then simplifies.
+        """
+        return VanishingCondition(
+            obstruction=self.jacobi_obstruction(registry),
+            name=f"Jacobi condition on {self.name}",
+        )
+
     # ---- identity -------------------------------------------------- #
 
     def _identity_key(self) -> Any:
         # Extend the base key with the base-bracket reference, the
         # generator, and the generator's degree so that two derived
         # brackets with identical parameters compare equal and hash
-        # alike.
-        return super()._identity_key() + (self._base, self._Q, self._degree_Q)
+        # alike. ``acting_on`` + Cartan overrides also participate —
+        # two derived brackets with different anchors are distinct.
+        return super()._identity_key() + (
+            self._base,
+            self._Q,
+            self._degree_Q,
+            self._acting_on,
+            self._d_override,
+            self._lie_derivative_override,
+        )
 
 
 # --------------------------------------------------------------------- #

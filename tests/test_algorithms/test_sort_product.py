@@ -275,3 +275,66 @@ class TestGradedCommutativeExplicit:
         assert out == Product(t, u)
         # Both odd → parity 1.
         assert sign.parity() == 1
+
+
+# --------------------------------------------------------------------- #
+# Neg-wrapped factors and nested Products                                #
+# --------------------------------------------------------------------- #
+
+
+class TestNegWrappedFactors:
+    def test_single_neg_factor_contributes_parity_one(self):
+        reg = PropertyRegistry()
+        a = Symbol("a")
+        reg.declare(a, Graded(degree=0))
+        # Product(Neg(a)) — a single peeled factor; parity bumps to 1.
+        out, sign = sort_product(Product(Neg(a)), reg)
+        assert sign.parity() == 1
+        # Single-factor product collapses to the lone factor.
+        assert out == a
+
+    def test_double_neg_cancels(self):
+        reg = PropertyRegistry()
+        a, b = Symbol("a"), Symbol("b")
+        for s in (a, b):
+            reg.declare(s, Graded(degree=0))
+        out, sign = sort_product(Product(Neg(a), Neg(b)), reg)
+        # Two Negs → parity 0 from peel; both degree 0 → no Koszul sign.
+        assert sign.parity() == 0
+        assert out == Product(a, b)
+
+    def test_neg_over_inner_product_splices_factors(self):
+        """Previously raised: ``Neg(Product(a,c))`` as factor.
+
+        The enhancement flattens through the Neg barrier, pulling the
+        inner product's factors up and contributing a single sign.
+        """
+        reg = PropertyRegistry()
+        a, b, c = Symbol("a"), Symbol("b"), Symbol("c")
+        for s in (a, b, c):
+            reg.declare(s, Graded(degree=0))
+        expr = Product(a, Neg(Product(b, c)))
+        out, sign = sort_product(expr, reg)
+        assert sign.parity() == 1
+        assert out == Product(a, b, c)
+
+    def test_inner_product_without_neg_also_splices(self):
+        reg = PropertyRegistry()
+        a, b, c = Symbol("a"), Symbol("b"), Symbol("c")
+        for s in (a, b, c):
+            reg.declare(s, Graded(degree=0))
+        expr = Product(a, Product(b, c))
+        out, sign = sort_product(expr, reg)
+        assert sign.parity() == 0
+        assert out == Product(a, b, c)
+
+    def test_deeply_nested_neg_product_resolves(self):
+        reg = PropertyRegistry()
+        a, b = Symbol("a"), Symbol("b")
+        for s in (a, b):
+            reg.declare(s, Graded(degree=0))
+        # Neg(Product(a, Neg(b))): two Negs → parity 0, splice → Product(a, b).
+        expr = Product(Neg(Product(a, Neg(b))))
+        out, sign = sort_product(expr, reg)
+        assert sign.parity() == 0
+        assert out == Product(a, b)

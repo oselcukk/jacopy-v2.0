@@ -45,6 +45,48 @@ from gradalg.core.symbolic_degree import Degree
 # --------------------------------------------------------------------- #
 
 
+def _peel_neg(factor: Expr) -> Tuple[Expr, int]:
+    """Strip leading :class:`Neg` wrappers, returning ``(inner, parity)``.
+
+    A :class:`Neg` node has the same degree as its argument and the same
+    commutativity behaviour — it is a pure scalar sign in front of the
+    factor. Pulling it out lets the rest of :func:`sort_product` run on
+    the bare factor (which the registry knows how to grade) and fold the
+    accumulated sign back into the Koszul exponent at the end. Double
+    negations simply cancel their parity contribution.
+    """
+    parity = 0
+    while isinstance(factor, Neg):
+        parity ^= 1
+        factor = factor.arg
+    return factor, parity
+
+
+def _explode_factor(factor: Expr) -> Tuple[List[Expr], int]:
+    """Return ``(flat_factors, parity)`` for a factor appearing under a Product.
+
+    Peels any :class:`Neg` layers and splices an inner :class:`Product`
+    into the surrounding factor list. The ordinary :mod:`flatten` pass
+    merges nested :class:`Product` nodes only when they appear
+    directly; a :class:`Neg` between the outer and inner product acts
+    as a barrier that flatten leaves alone. :func:`sort_product` needs
+    to see bare factors for registry lookup, so we handle the
+    flatten-through-Neg case here inline — recursing through both
+    sides until every emitted factor is a non-Product, non-Neg atom
+    (or at worst a composite node that the registry has explicitly
+    graded).
+    """
+    inner, parity = _peel_neg(factor)
+    if not isinstance(inner, Product):
+        return ([inner], parity)
+    result: List[Expr] = []
+    for child in inner.children:
+        sub_factors, sub_parity = _explode_factor(child)
+        result.extend(sub_factors)
+        parity ^= sub_parity
+    return (result, parity)
+
+
 def _is_scalar(factor: Expr, registry: PropertyRegistry) -> bool:
     # Numeric literals are always scalars — they commute with
     # everything and carry no grading. Declaring Scalar on every
@@ -133,13 +175,27 @@ def sort_product(
     if not isinstance(expr, Product):
         return (expr, Degree.const(0))
 
-    factors: List[Expr] = list(expr.children)
+    raw_factors: List[Expr] = list(expr.children)
+    # Peel off any :class:`Neg` wrappers and splice nested
+    # :class:`Product` children up into the parent factor list. Negs
+    # only contribute a sign, so their parity is tallied and folded
+    # back into the Koszul exponent at the end. Flattening through the
+    # Neg barrier is what lets bracket-expanded shapes (which routinely
+    # produce ``Product(a, Neg(Product(b, c)))``) reach the sort layer
+    # as ``Product(a, b, c)`` with a ``−1`` sign attached.
+    factors: List[Expr] = []
+    neg_parity = 0
+    for f in raw_factors:
+        sub_factors, parity = _explode_factor(f)
+        factors.extend(sub_factors)
+        neg_parity ^= parity
+
     # Up-front classification check so an unclassified factor is
     # reported even when it happens to already be in canonical
     # position — missing a grading is a modelling error, not a perf issue.
     for f in factors:
         _degree_of(f, registry)
-    sign_exp = Degree.const(0)
+    sign_exp = Degree.const(neg_parity)
     n = len(factors)
     # Bubble sort: stable enough for our size, and each swap's sign
     # contribution is easy to track. A NonCommuting pair blocks the
