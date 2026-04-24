@@ -1,0 +1,194 @@
+"""Tests for ``gradalg.display.terminal``."""
+
+from __future__ import annotations
+
+import pytest
+
+from gradalg.core.expr import Symbol
+from gradalg.display import terminal as term_mod
+from gradalg.display.ascii import chain_to_ascii, step_to_ascii, to_ascii
+from gradalg.display.terminal import (
+    HAS_RICH,
+    print_chain,
+    print_expr,
+    print_step,
+    render_chain,
+    render_expr,
+    render_step,
+)
+from gradalg.proof.chain import ProofChain
+from gradalg.proof.step import ProofStep
+
+
+# --------------------------------------------------------------------- #
+# Module-level flag                                                     #
+# --------------------------------------------------------------------- #
+
+
+class TestHasRichFlag:
+    def test_is_bool(self):
+        assert isinstance(HAS_RICH, bool)
+
+
+# --------------------------------------------------------------------- #
+# Input validation                                                      #
+# --------------------------------------------------------------------- #
+
+
+class TestTypeErrors:
+    def test_render_expr_rejects_non_expr(self):
+        with pytest.raises(TypeError):
+            render_expr("X")  # type: ignore[arg-type]
+
+    def test_render_step_rejects_non_step(self):
+        with pytest.raises(TypeError):
+            render_step("not a step")  # type: ignore[arg-type]
+
+    def test_render_chain_rejects_non_chain(self):
+        with pytest.raises(TypeError):
+            render_chain("not a chain")  # type: ignore[arg-type]
+
+    def test_print_expr_rejects_non_expr(self):
+        with pytest.raises(TypeError):
+            print_expr("X")  # type: ignore[arg-type]
+
+    def test_print_step_rejects_non_step(self):
+        with pytest.raises(TypeError):
+            print_step("not a step")  # type: ignore[arg-type]
+
+    def test_print_chain_rejects_non_chain(self):
+        with pytest.raises(TypeError):
+            print_chain("not a chain")  # type: ignore[arg-type]
+
+
+# --------------------------------------------------------------------- #
+# render_expr                                                           #
+# --------------------------------------------------------------------- #
+
+
+class TestRenderExpr:
+    def test_symbol(self):
+        # render_expr is symmetric — always returns the ASCII form.
+        assert render_expr(Symbol("X")) == to_ascii(Symbol("X"))
+
+    def test_greek_passthrough(self):
+        # ASCII renderer leaves Unicode glyphs alone.
+        assert render_expr(Symbol("ω")) == "ω"
+
+
+# --------------------------------------------------------------------- #
+# Fallback path (HAS_RICH == False)                                     #
+#                                                                       #
+# These tests force the fallback branch via monkeypatch so they pass    #
+# regardless of whether rich is installed in the test environment.     #
+# --------------------------------------------------------------------- #
+
+
+class TestFallbackRender:
+    def test_render_step_falls_back_to_ascii(self, monkeypatch):
+        monkeypatch.setattr(term_mod, "HAS_RICH", False)
+        step = ProofStep(Symbol("X"), Symbol("Y"), rule="demo")
+        assert render_step(step) == step_to_ascii(step)
+
+    def test_render_step_respects_max_depth_in_fallback(self, monkeypatch):
+        monkeypatch.setattr(term_mod, "HAS_RICH", False)
+        child = ProofStep(Symbol("A"), Symbol("B"), rule="sub")
+        parent = ProofStep(
+            Symbol("X"), Symbol("Y"), rule="outer", children=[child]
+        )
+        assert render_step(parent, max_depth=0) == step_to_ascii(
+            parent, max_depth=0
+        )
+
+    def test_render_chain_falls_back_to_ascii(self, monkeypatch):
+        monkeypatch.setattr(term_mod, "HAS_RICH", False)
+        s1 = ProofStep(Symbol("X"), Symbol("Y"), rule="r1")
+        s2 = ProofStep(Symbol("Y"), Symbol("Z"), rule="r2")
+        chain = ProofChain([s1, s2])
+        assert render_chain(chain) == chain_to_ascii(chain)
+
+    def test_render_chain_empty_in_fallback(self, monkeypatch):
+        monkeypatch.setattr(term_mod, "HAS_RICH", False)
+        assert render_chain(ProofChain()) == "(empty proof chain)"
+
+    def test_print_expr_fallback_writes_to_stdout(self, monkeypatch, capsys):
+        monkeypatch.setattr(term_mod, "HAS_RICH", False)
+        print_expr(Symbol("X"))
+        captured = capsys.readouterr()
+        assert captured.out.strip() == "X"
+
+    def test_print_step_fallback_writes_to_stdout(self, monkeypatch, capsys):
+        monkeypatch.setattr(term_mod, "HAS_RICH", False)
+        step = ProofStep(Symbol("X"), Symbol("Y"), rule="demo")
+        print_step(step)
+        captured = capsys.readouterr()
+        assert "[demo]" in captured.out
+        assert "X -> Y" in captured.out
+
+    def test_print_chain_fallback_writes_to_stdout(self, monkeypatch, capsys):
+        monkeypatch.setattr(term_mod, "HAS_RICH", False)
+        s1 = ProofStep(Symbol("X"), Symbol("Y"), rule="r1")
+        print_chain(ProofChain([s1]))
+        captured = capsys.readouterr()
+        assert "[r1]" in captured.out
+
+    def test_print_chain_fallback_empty(self, monkeypatch, capsys):
+        monkeypatch.setattr(term_mod, "HAS_RICH", False)
+        print_chain(ProofChain())
+        captured = capsys.readouterr()
+        assert "(empty proof chain)" in captured.out
+
+
+# --------------------------------------------------------------------- #
+# Rich path (skipped when rich is absent)                               #
+# --------------------------------------------------------------------- #
+
+
+_requires_rich = pytest.mark.skipif(
+    not HAS_RICH, reason="rich not installed"
+)
+
+
+@_requires_rich
+class TestRichPath:
+    def test_render_step_contains_rule_and_expressions(self):
+        step = ProofStep(Symbol("X"), Symbol("Y"), rule="demo")
+        out = render_step(step)
+        assert "[demo]" in out
+        assert "X" in out
+        assert "Y" in out
+
+    def test_render_chain_has_title(self):
+        s1 = ProofStep(Symbol("X"), Symbol("Y"), rule="r1")
+        s2 = ProofStep(Symbol("Y"), Symbol("Z"), rule="r2")
+        out = render_chain(ProofChain([s1, s2]))
+        assert "Proof" in out
+        assert "2 steps" in out
+        assert "[r1]" in out
+        assert "[r2]" in out
+
+    def test_render_chain_title_false_suppresses_header(self):
+        s1 = ProofStep(Symbol("X"), Symbol("Y"), rule="r1")
+        out = render_chain(ProofChain([s1]), title=False)
+        assert "Proof (" not in out
+
+    def test_render_chain_empty(self):
+        assert render_chain(ProofChain()) == "(empty proof chain)"
+
+    def test_render_step_nests_children(self):
+        child = ProofStep(Symbol("A"), Symbol("B"), rule="sub")
+        parent = ProofStep(
+            Symbol("X"), Symbol("Y"), rule="outer", children=[child]
+        )
+        out = render_step(parent)
+        assert "[outer]" in out
+        assert "[sub]" in out
+
+    def test_render_step_respects_max_depth(self):
+        child = ProofStep(Symbol("A"), Symbol("B"), rule="sub")
+        parent = ProofStep(
+            Symbol("X"), Symbol("Y"), rule="outer", children=[child]
+        )
+        out = render_step(parent, max_depth=0)
+        assert "[outer]" in out
+        assert "[sub]" not in out

@@ -26,8 +26,18 @@ from gradalg.display.latex import (
     step_to_latex,
     to_latex,
 )
+from gradalg.display.terminal import (
+    HAS_RICH,
+    print_chain,
+    print_expr,
+    print_step,
+    render_chain,
+    render_expr,
+    render_step,
+)
 
 __all__ = [
+    "HAS_RICH",
     "LatexDisplay",
     "chain_to_ascii",
     "chain_to_latex",
@@ -36,6 +46,12 @@ __all__ = [
     "display_proof",
     "display_step",
     "latex_name",
+    "print_chain",
+    "print_expr",
+    "print_step",
+    "render_chain",
+    "render_expr",
+    "render_step",
     "step_to_ascii",
     "step_to_latex",
     "to_ascii",
