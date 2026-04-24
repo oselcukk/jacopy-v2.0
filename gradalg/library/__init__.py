@@ -14,6 +14,7 @@ from gradalg.library.symplectic import SymplecticManifold
 from gradalg.library.poisson import (
     THEOREM_POISSON_JACOBI,
     THEOREM_POISSON_KOSZUL_EQUIVALENCE,
+    THEOREM_POISSON_KOSZUL_JACOBI,
     PoissonBracket,
     poisson_bracket,
 )
@@ -27,4 +28,5 @@ __all__ = [
     "poisson_bracket",
     "THEOREM_POISSON_JACOBI",
     "THEOREM_POISSON_KOSZUL_EQUIVALENCE",
+    "THEOREM_POISSON_KOSZUL_JACOBI",
 ]

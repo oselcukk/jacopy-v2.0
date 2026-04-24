@@ -19,6 +19,7 @@ from gradalg.library import theorem_book
 from gradalg.library.poisson import (
     THEOREM_POISSON_JACOBI,
     THEOREM_POISSON_KOSZUL_EQUIVALENCE,
+    THEOREM_POISSON_KOSZUL_JACOBI,
     PoissonBracket,
     poisson_bracket,
 )
@@ -305,3 +306,125 @@ class TestSeededKoszulTheorem:
     def test_theorem_from_axioms_names_sharp_as_anchor(self):
         thm = THEOREM_POISSON_KOSZUL_EQUIVALENCE
         assert any("Sharp" in ax or "π^♯" in ax for ax in thm.from_axioms)
+
+
+# --------------------------------------------------------------------- #
+# Stage B.3 — form-level (Koszul) Jacobi reduction ProofChain            #
+# --------------------------------------------------------------------- #
+
+
+@pytest.fixture
+def koszul_registry():
+    r = PropertyRegistry()
+    pi = Symbol("π")
+    alpha = Symbol("α")
+    beta = Symbol("β")
+    gamma = Symbol("γ")
+    r.declare(pi, Graded(degree=1))
+    r.declare(alpha, Graded(degree=1))
+    r.declare(beta, Graded(degree=1))
+    r.declare(gamma, Graded(degree=1))
+    return r
+
+
+class TestKoszulJacobiCondition:
+    def test_returns_vanishing_condition(self, koszul_registry):
+        pi = Symbol("π")
+        P = PoissonBracket(pi)
+        cond = P.koszul_jacobi_condition(koszul_registry)
+        assert isinstance(cond, VanishingCondition)
+
+    def test_obstruction_matches_function_level(self, koszul_registry):
+        """Form-level and function-level Jacobi share the same
+        ``[π, π]_SN`` universal obstruction — ``acting_on`` doesn't
+        alter ``[Q, Q]_base`` on a DerivedBracket."""
+        pi = Symbol("π")
+        P = PoissonBracket(pi)
+        assert (
+            P.koszul_jacobi_condition(koszul_registry).obstruction
+            == P.jacobi_condition(koszul_registry).obstruction
+        )
+
+    def test_name_mentions_koszul(self, koszul_registry):
+        pi = Symbol("π")
+        P = PoissonBracket(pi)
+        cond = P.koszul_jacobi_condition(koszul_registry)
+        assert "Koszul" in cond.name
+
+
+class TestProveKoszulJacobiReduction:
+    def test_returns_proof_chain(self, koszul_registry):
+        pi = Symbol("π")
+        alpha, beta, gamma = Symbol("α"), Symbol("β"), Symbol("γ")
+        P = PoissonBracket(pi)
+        chain = P.prove_koszul_jacobi_reduction(
+            alpha, beta, gamma, registry=koszul_registry
+        )
+        assert isinstance(chain, ProofChain)
+        assert len(chain) >= 1
+
+    def test_first_step_cites_derived_bracket_theorem(self, koszul_registry):
+        pi = Symbol("π")
+        alpha, beta, gamma = Symbol("α"), Symbol("β"), Symbol("γ")
+        P = PoissonBracket(pi)
+        chain = P.prove_koszul_jacobi_reduction(
+            alpha, beta, gamma, registry=koszul_registry
+        )
+        first = chain.steps[0]
+        assert first.rule == "DerivedBracketTheorem"
+        assert first.provenance_tag == "theorem"
+        assert isinstance(first.after, BracketApply)
+        assert first.after.bracket is sn
+
+    def test_final_is_shared_obstruction(self, koszul_registry):
+        """The chain terminates at the same ``[π, π]_SN`` the
+        function-level reduction lands on — one hypothesis discharges
+        both views."""
+        pi = Symbol("π")
+        alpha, beta, gamma = Symbol("α"), Symbol("β"), Symbol("γ")
+        f, g, h = Symbol("f"), Symbol("g"), Symbol("h")
+        reg = koszul_registry
+        reg.declare(f, Graded(degree=-1))
+        reg.declare(g, Graded(degree=-1))
+        reg.declare(h, Graded(degree=-1))
+        P = PoissonBracket(pi)
+        koszul_chain = P.prove_koszul_jacobi_reduction(
+            alpha, beta, gamma, registry=reg
+        )
+        fn_chain = P.prove_jacobi_reduction(f, g, h, registry=reg)
+        assert koszul_chain.final == fn_chain.final
+
+    def test_first_step_starts_on_cyclic_sum(self, koszul_registry):
+        """The reduction begins on the cyclic Jacobi Sum built from the
+        form-level derived bracket — not the function-level one, so the
+        inner BracketApply nodes carry ``koszul_derived``'s name."""
+        pi = Symbol("π")
+        alpha, beta, gamma = Symbol("α"), Symbol("β"), Symbol("γ")
+        P = PoissonBracket(pi)
+        chain = P.prove_koszul_jacobi_reduction(
+            alpha, beta, gamma, registry=koszul_registry
+        )
+        expected_start = P.koszul_derived.graded_jacobi_obstruction(
+            alpha, beta, gamma, koszul_registry
+        )
+        assert chain.steps[0].before == expected_start
+
+
+class TestSeededKoszulJacobiTheorem:
+    def test_theorem_registered(self):
+        assert "poisson_koszul_jacobi" in theorem_book
+        assert (
+            theorem_book.get("poisson_koszul_jacobi")
+            is THEOREM_POISSON_KOSZUL_JACOBI
+        )
+
+    def test_theorem_from_axioms_includes_poisson_hypothesis(self):
+        thm = THEOREM_POISSON_KOSZUL_JACOBI
+        assert any("[π, π]_SN" in ax for ax in thm.from_axioms)
+        assert "Derived Bracket Theorem" in thm.from_axioms
+
+    def test_theorem_proof_has_derived_bracket_step(self):
+        thm = THEOREM_POISSON_KOSZUL_JACOBI
+        assert isinstance(thm.proof, ProofChain)
+        assert thm.proof.steps[0].rule == "DerivedBracketTheorem"
+        assert thm.proof.steps[0].provenance_tag == "theorem"

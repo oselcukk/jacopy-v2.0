@@ -296,9 +296,70 @@ class PoissonBracket:
         :func:`gradalg.proof.verifier.prove_jacobi` instead — that path
         closes the ProofChain all the way to :class:`Integer` ``0``.
         """
-        jacobi_sum = self._derived.graded_jacobi_obstruction(f, g, h, registry)
-        obstruction_raw = self._derived.jacobi_obstruction_raw()
-        obstruction = self._derived.jacobi_obstruction(registry)
+        return self._prove_jacobi_reduction_chain(
+            self._derived, f, g, h, registry
+        )
+
+    def koszul_jacobi_condition(
+        self,
+        registry: Optional[PropertyRegistry] = None,
+    ) -> VanishingCondition:
+        """Form-level Jacobi condition — same ``[π, π]_SN`` obstruction.
+
+        The universal obstruction only depends on ``(base, Q)``, so this
+        condition wraps the same :class:`Expr` as :meth:`jacobi_condition`
+        — the ``π^♯`` anchor in :attr:`koszul_derived` doesn't shift it.
+        What differs from the function-level condition is the *name*,
+        which is keyed to the Koszul view for display / theorem-book
+        citations.
+        """
+        return VanishingCondition(
+            obstruction=self._koszul_derived.jacobi_obstruction(registry),
+            name=f"Koszul Jacobi condition on {self._name}",
+        )
+
+    def prove_koszul_jacobi_reduction(
+        self,
+        alpha: Expr,
+        beta: Expr,
+        gamma: Expr,
+        *,
+        registry: Optional[PropertyRegistry] = None,
+    ) -> ProofChain:
+        """Reduce triple Koszul Jacobi ``(α, β, γ)`` to ``[π, π]_SN``.
+
+        Form-level counterpart of :meth:`prove_jacobi_reduction` — same
+        Derived Bracket Theorem citation, same ``[π, π]_SN`` obstruction,
+        just driven by the :attr:`koszul_derived` bracket so the Jacobi
+        sum is written on 1-form operands lifted through ``π^♯``. The
+        structural identity witnessed in B.2 (Koszul Jacobi obstruction
+        equals Poisson Jacobi obstruction) is what lets a single helper
+        serve both views.
+        """
+        return self._prove_jacobi_reduction_chain(
+            self._koszul_derived, alpha, beta, gamma, registry
+        )
+
+    def _prove_jacobi_reduction_chain(
+        self,
+        bracket: DerivedBracket,
+        a: Expr,
+        b: Expr,
+        c: Expr,
+        registry: Optional[PropertyRegistry],
+    ) -> ProofChain:
+        """Shared Jacobi-reduction chain for a DerivedBracket(sn, π, …).
+
+        Produces the Derived Bracket Theorem step that rewrites the
+        cyclic Jacobi sum on ``(a, b, c)`` to the raw
+        :class:`BracketApply` ``[π, π]_SN``, then appends an ``sn-expand``
+        step when the base bracket's own expansion narrows the
+        obstruction further. Callers (function-level vs form-level) only
+        differ in which DerivedBracket they hand in.
+        """
+        jacobi_sum = bracket.graded_jacobi_obstruction(a, b, c, registry)
+        obstruction_raw = bracket.jacobi_obstruction_raw()
+        obstruction = bracket.jacobi_obstruction(registry)
         chain = ProofChain()
         chain.append(
             ProofStep(
@@ -306,7 +367,7 @@ class PoissonBracket:
                 obstruction_raw,
                 rule="DerivedBracketTheorem",
                 justification=(
-                    f"Jacobi on {self._name} ⟺ [π, π]_SN = 0 "
+                    f"Jacobi on {bracket.name} ⟺ [π, π]_SN = 0 "
                     f"(Derived Bracket Theorem)"
                 ),
                 provenance_tag="theorem",
@@ -455,3 +516,58 @@ THEOREM_POISSON_KOSZUL_EQUIVALENCE = _build_poisson_koszul_equivalence_theorem()
 
 if "poisson_koszul_equivalence" not in theorem_book:
     theorem_book.add(THEOREM_POISSON_KOSZUL_EQUIVALENCE)
+
+
+def _build_poisson_koszul_jacobi_theorem() -> Theorem:
+    """Construct the canonical ``poisson_koszul_jacobi`` theorem.
+
+    Form-level counterpart of :data:`THEOREM_POISSON_JACOBI`: the cyclic
+    Koszul Jacobi sum on ``(α, β, γ)`` (1-forms, lifted through ``π^♯``)
+    reduces to the *same* universal obstruction ``[π, π]_SN``. The
+    structural identity ``koszul_derived.jacobi_obstruction ==
+    derived.jacobi_obstruction`` — the ``acting_on`` anchor doesn't
+    shift the ``[Q, Q]_base`` on a DerivedBracket — is what lets this
+    record share its Poisson hypothesis with the function-level
+    theorem.
+    """
+    pi = Symbol("π")
+    alpha = Symbol("α")
+    beta = Symbol("β")
+    gamma = Symbol("γ")
+    reg = PropertyRegistry()
+    reg.declare(pi, Graded(degree=1))
+    reg.declare(alpha, Graded(degree=1))
+    reg.declare(beta, Graded(degree=1))
+    reg.declare(gamma, Graded(degree=1))
+    poisson = PoissonBracket.from_bivector(pi)
+    chain = poisson.prove_koszul_jacobi_reduction(
+        alpha, beta, gamma, registry=reg,
+    )
+    return Theorem(
+        name="poisson_koszul_jacobi",
+        statement=(
+            "Koszul Jacobi on {·,·}_π cyclic sum = 0 when [π, π]_SN = 0"
+        ),
+        from_axioms=(
+            "Derived Bracket Theorem",
+            "π^♯ = Sharp(π) as form-lift anchor",
+            "[π, π]_SN = 0 (Poisson hypothesis)",
+        ),
+        proof=chain,
+        notes=(
+            "Form-level analogue of poisson_jacobi. The Koszul view's "
+            "Jacobi obstruction coincides with the SN self-bracket "
+            "[π, π]_SN — anchor ``acting_on=Sharp(π)`` reshapes the "
+            "expansion but leaves [Q, Q]_base untouched — so one "
+            "Poisson hypothesis discharges both views at once."
+        ),
+    )
+
+
+#: The form-level Poisson–Koszul Jacobi reduction theorem. Seeded into
+#: :data:`~gradalg.library.theorem_book.theorem_book` at import time.
+THEOREM_POISSON_KOSZUL_JACOBI = _build_poisson_koszul_jacobi_theorem()
+
+
+if "poisson_koszul_jacobi" not in theorem_book:
+    theorem_book.add(THEOREM_POISSON_KOSZUL_JACOBI)
