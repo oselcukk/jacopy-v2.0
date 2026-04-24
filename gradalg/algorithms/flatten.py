@@ -39,7 +39,7 @@ def flatten(expr: Expr) -> Expr:
         return _flatten_sum(new_children)
     if isinstance(expr, Product):
         return _flatten_product(new_children)
-    return type(expr)(*new_children)
+    return expr._rebuild(new_children)
 
 
 def _flatten_sum(children) -> Expr:

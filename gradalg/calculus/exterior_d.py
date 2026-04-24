@@ -129,7 +129,7 @@ def apply_d_squared_zero(
         apply_d_squared_zero(c, tgt) for c in expr.children
     )
     if any(a is not b for a, b in zip(new_children, expr.children)):
-        rebuilt: Expr = type(expr)(*new_children)
+        rebuilt: Expr = expr._rebuild(new_children)
     else:
         rebuilt = expr
     if isinstance(rebuilt, Act):

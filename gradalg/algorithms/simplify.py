@@ -92,7 +92,7 @@ def _sort_all_products(expr: Expr, registry: PropertyRegistry) -> Expr:
     new_children = tuple(
         _sort_all_products(c, registry) for c in expr.children
     )
-    rebuilt = type(expr)(*new_children) if new_children else expr
+    rebuilt = expr._rebuild(new_children) if new_children else expr
     if isinstance(rebuilt, Product):
         sorted_expr, sign_exp = sort_product(rebuilt, registry)
         parity = sign_exp.parity()

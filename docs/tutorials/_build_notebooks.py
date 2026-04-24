@@ -826,10 +826,11 @@ TUTORIAL_07: list[tuple[str, str]] = [
         "markdown",
         "## Poisson-as-derived — library wrapper\n\n"
         "Matematiksel olarak `DerivedBracket(sn, π, degree_Q=1)` "
-        "Poisson bracket. `[π, π]_SN`'nin SN-atomik olması sebebiyle "
-        "`prove_jacobi` generic simplify yolu kapanmaz; "
-        "`PoissonBracket.prove_jacobi_reduction` seeded teorem "
-        "citation'ı ile bir adımda biter.",
+        "Poisson bracket. Generic `prove_jacobi` obstruction'ı "
+        "`[·,·]_SN(π, π)` formuna indirir ve dürüst bir `ProofFailure` "
+        "olarak yüzeyleşir — Poisson hipotezi `[π, π]_SN = 0` "
+        "explicit varsayımdır. `PoissonBracket.prove_jacobi_reduction` "
+        "seeded teorem citation'ı ile bir adımda kapatır.",
     ),
     (
         "code",

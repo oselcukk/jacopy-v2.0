@@ -40,7 +40,7 @@ def collect_terms(expr: Expr) -> Expr:
 
     if isinstance(expr, Sum):
         return _collect_sum(new_children)
-    return type(expr)(*new_children)
+    return expr._rebuild(new_children)
 
 
 def _collect_sum(children) -> Expr:

@@ -45,6 +45,16 @@ class Expr(ABC):
     def is_atom(self) -> bool:
         return len(self.children) == 0
 
+    def _rebuild(self, new_children: Tuple["Expr", ...]) -> "Expr":
+        """Return a new node of the same type with ``new_children``.
+
+        Default: ``type(self)(*new_children)``. Subclasses whose
+        constructor signature doesn't match the children tuple (e.g.
+        :class:`BracketApply`, which carries a non-Expr bracket
+        reference outside its children) override this hook.
+        """
+        return type(self)(*new_children)
+
     @abstractmethod
     def _key(self) -> Any:
         """Canonical payload for equality / hashing.
@@ -101,7 +111,7 @@ class Expr(ABC):
                 f"{type(self).__name__} with {len(children_list)} children"
             )
         children_list[idx] = children_list[idx].replace_at(path[1:], new)
-        return type(self)(*children_list)
+        return self._rebuild(tuple(children_list))
 
     def clone(self) -> "Expr":
         """Return ``self``.

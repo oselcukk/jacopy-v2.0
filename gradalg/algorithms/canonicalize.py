@@ -65,7 +65,7 @@ def canonicalize(expr: Expr) -> Expr:
         return _canon_power(new_children[0], new_children[1])
 
     # Unknown compound — rebuild preserving structure.
-    return type(expr)(*new_children)
+    return expr._rebuild(new_children)
 
 
 # --------------------------------------------------------------------- #

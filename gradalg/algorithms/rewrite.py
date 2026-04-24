@@ -47,7 +47,7 @@ def _rebuild(old: Expr, new_children: Tuple[Expr, ...]) -> Expr:
     make = getattr(type(old), "make", None)
     if make is not None:
         return make(*new_children)
-    return type(old)(*new_children)
+    return old._rebuild(new_children)
 
 
 # --------------------------------------------------------------------- #

@@ -344,5 +344,7 @@ def substitute(pattern: Expr, bindings: Bindings) -> Expr:
 
     # Rebuild via the same constructor. Smart constructors live on
     # Sum/Product via `.make()` — but we want structural preservation
-    # here, not simplification. Direct constructor call.
-    return type(pattern)(*new_children)
+    # here, not simplification. Direct constructor call via _rebuild
+    # so types whose __init__ diverges from children (BracketApply
+    # carries its bracket outside children) reconstruct correctly.
+    return pattern._rebuild(tuple(new_children))

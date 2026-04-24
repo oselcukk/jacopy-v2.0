@@ -57,7 +57,7 @@ def product_rule(
         op, arg = new_children
         return _expand_act(op, arg, registry)
 
-    return type(expr)(*new_children)
+    return expr._rebuild(new_children)
 
 
 # --------------------------------------------------------------------- #

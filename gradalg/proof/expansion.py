@@ -449,7 +449,7 @@ class ExpansionEngine:
                 new_c, step = self.expand_once(c)
                 if step is not None:
                     children[i] = new_c
-                    return type(expr)(*children), step
+                    return expr._rebuild(tuple(children)), step
         d = self._match(expr)
         if d is not None:
             after = d.rewrite(expr)

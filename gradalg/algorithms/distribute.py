@@ -39,7 +39,7 @@ def distribute(expr: Expr) -> Expr:
 
     if isinstance(expr, Product):
         return _distribute_product(new_children)
-    return type(expr)(*new_children)
+    return expr._rebuild(new_children)
 
 
 def _distribute_product(factors: Tuple[Expr, ...]) -> Expr:

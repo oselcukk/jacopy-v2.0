@@ -228,3 +228,69 @@ class TestABC:
         """GradedBracket without expand() is abstract."""
         with pytest.raises(TypeError):
             GradedBracket("B")  # type: ignore[abstract]
+
+
+# --------------------------------------------------------------------- #
+# _rebuild hook                                                           #
+# --------------------------------------------------------------------- #
+
+
+class TestRebuildHook:
+    """BracketApply overrides Expr._rebuild so generic rewriters that
+    reconstruct nodes from (new_children) preserve the bracket reference
+    which lives outside the children tuple."""
+
+    def test_rebuild_preserves_bracket(self):
+        lie = LieBracket()
+        X, Y, Z = Symbol("X"), Symbol("Y"), Symbol("Z")
+        node = lie(X, Y)
+        rebuilt = node._rebuild((X, Z))
+        assert isinstance(rebuilt, BracketApply)
+        assert rebuilt.bracket is lie
+        assert rebuilt.a == X
+        assert rebuilt.b == Z
+
+    def test_rebuild_rejects_wrong_arity(self):
+        lie = LieBracket()
+        node = lie(Symbol("X"), Symbol("Y"))
+        with pytest.raises(ValueError):
+            node._rebuild((Symbol("X"),))
+
+    def test_flatten_through_bracket_apply(self):
+        """Regression: flatten was crashing with ``BracketApply.__init__
+        missing 'b'`` when a BracketApply sat below a nested Sum/Product
+        because its constructor signature diverges from children."""
+        from gradalg.algorithms.flatten import flatten
+
+        lie = LieBracket()
+        X, Y = Symbol("X"), Symbol("Y")
+        # Nested Sum inside a BracketApply operand forces flatten to
+        # descend into the bracket node and reconstruct it.
+        nested = Sum(Sum(X, Y), X)
+        expr = lie(nested, Y)
+        out = flatten(expr)
+        assert isinstance(out, BracketApply)
+        assert out.bracket is lie
+        # Inner Sum flattened to a single 3-child Sum.
+        assert isinstance(out.a, Sum) and len(out.a.children) == 3
+
+    def test_prove_jacobi_sn_derived_surfaces_diagnostic(self, reg):
+        """Regression: ``prove_jacobi`` on ``DerivedBracket(sn, π, …)``
+        used to crash inside flatten. It now surfaces the honest
+        mathematical diagnostic — the obstruction needs the Poisson
+        hypothesis ``[π, π]_SN = 0`` which the generic dispatcher cannot
+        assume."""
+        from gradalg.brackets.derived import DerivedBracket
+        from gradalg.brackets.schouten import sn
+        from gradalg.proof.strategies import ProofFailure
+        from gradalg.proof.verifier import prove_jacobi
+
+        pi = Symbol("π")
+        reg.declare(pi, Graded(degree=1))
+        f, g, h = Symbol("f"), Symbol("g"), Symbol("h")
+        for s in (f, g, h):
+            reg.declare(s, Graded(degree=-1))
+
+        d = DerivedBracket(sn, pi, degree_Q=1)
+        with pytest.raises(ProofFailure, match=r"\[·,·\]_SN\(π, π\)"):
+            prove_jacobi(d, f, g, h, registry=reg)

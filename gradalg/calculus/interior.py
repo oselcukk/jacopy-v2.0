@@ -113,7 +113,7 @@ def apply_iota_squared_zero(
         apply_iota_squared_zero(c, target) for c in expr.children
     )
     if any(a is not b for a, b in zip(new_children, expr.children)):
-        rebuilt: Expr = type(expr)(*new_children)
+        rebuilt: Expr = expr._rebuild(new_children)
     else:
         rebuilt = expr
     if isinstance(rebuilt, Act):
@@ -192,7 +192,7 @@ def apply_iota_axioms(
         for c in expr.children
     )
     if any(a is not b for a, b in zip(new_children, expr.children)):
-        rebuilt: Expr = type(expr)(*new_children)
+        rebuilt: Expr = expr._rebuild(new_children)
     else:
         rebuilt = expr
     if isinstance(rebuilt, Act) and _is_iota_on(rebuilt.op, target):

@@ -173,10 +173,11 @@ bracket'tir.
 ## Poisson-as-derived
 
 `DerivedBracket(sn, π, degree_Q=1)` matematiksel olarak Poisson
-bracket'in derived inşasıdır. Ancak base atomik `π` üstünde
-`[π, π]_SN`'yi serbest *Expr*'e çözemez (düğüm opak kalır), bu yüzden
-`prove_jacobi` strateji'sinin son simplify adımı mevcut baseline'da
-özel bir simplify yolu bekler. Üretim kullanımı için
+bracket'in derived inşasıdır. Generic dispatcher üstünden
+`prove_jacobi` çağrılınca obstruction `[·,·]_SN(π, π)` şekline iner ve
+`ProofFailure` olarak yüzeyleşir — bu dürüst matematiksel teşhistir:
+Poisson hipotezi `[π, π]_SN = 0` generic bir simplify kuralı değildir,
+explicit varsayım olarak taşınmalıdır. Üretim kullanımı için
 `gradalg.library.poisson.PoissonBracket` wrapper'ı tercih edilir —
 seeded theorem `poisson_jacobi`'yi tek adımlık citation olarak
 verir:

@@ -86,6 +86,17 @@ class BracketApply(Expr):
         # binary node.
         return (self._a, self._b)
 
+    def _rebuild(self, new_children: Tuple[Expr, ...]) -> Expr:
+        # Default ``type(self)(*children)`` would drop the bracket
+        # reference, since it lives outside the children tuple.
+        if len(new_children) != 2:
+            raise ValueError(
+                "BracketApply._rebuild expects exactly 2 children "
+                f"(a, b), got {len(new_children)}"
+            )
+        a, b = new_children
+        return BracketApply(self._bracket, a, b)
+
     def _key(self) -> Any:
         return (self._bracket, self._a, self._b)
 

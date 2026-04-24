@@ -208,10 +208,7 @@ def _expand_all_brackets(
     bracket's own :meth:`~gradalg.brackets.base.GradedBracket.expand`
     produces the defining formula, which is then re-walked so nested
     bracket nodes inside the expansion get unfolded too. Non-bracket
-    nodes rebuild structurally via ``type(expr)(*children)``, which is
-    safe because the constructor signatures for :class:`Sum`,
-    :class:`Neg`, :class:`Product`, and atoms accept exactly their
-    children.
+    nodes rebuild structurally via :meth:`Expr._rebuild`.
     """
     if isinstance(expr, BracketApply):
         expanded = expr.expand(registry)
@@ -221,7 +218,7 @@ def _expand_all_brackets(
     new_children = tuple(_expand_all_brackets(c, registry) for c in expr.children)
     if new_children == tuple(expr.children):
         return expr
-    return type(expr)(*new_children)
+    return expr._rebuild(new_children)
 
 
 def prove_operator_equation(
