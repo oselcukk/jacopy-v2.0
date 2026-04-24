@@ -212,6 +212,61 @@ class TestAlgebroidCartanBundle:
         assert isinstance(chain, ProofChain)
         assert len(chain.steps) >= 1
 
+    def test_d_squared_zero_verify_closes_on_algebroid(self, algebroid):
+        """``d_E² = 0`` closes on the algebroid because
+        :meth:`CartanCalculus.verify` now threads its own ``d`` into the
+        default engine — ``DSquaredZeroDefinition`` gets pinned to
+        ``d_E`` rather than silently to the TM default."""
+        f = Symbol("f")
+        reg = PropertyRegistry()
+        reg.declare(f, Graded(degree=0))
+        algebra = ExteriorAlgebra((f,), d=algebroid.d)
+        chain = algebroid.cartan.verify(
+            "d_squared_zero", algebra=algebra, registry=reg
+        )
+        assert isinstance(chain, ProofChain)
+
+    def test_d_lie_verify_closes_on_algebroid(self, algebroid):
+        """``[d_E, L_{E,X}] = 0`` on the algebroid."""
+        X = Symbol("X")
+        f = Symbol("f")
+        reg = PropertyRegistry()
+        reg.declare(X, Graded(degree=0))
+        reg.declare(f, Graded(degree=0))
+        algebra = ExteriorAlgebra((f,), d=algebroid.d)
+        chain = algebroid.cartan.verify(
+            "d_lie", algebra=algebra, X=X, registry=reg
+        )
+        assert isinstance(chain, ProofChain)
+
+    def test_verify_all_closes_on_algebroid(self, algebroid):
+        """Every Cartan relation closes on the algebroid bundle in one
+        ``verify_all`` sweep — parity with the TM ``CartanCalculus``.
+        Vector fields are declared as :class:`Derivation` instances so
+        the generator-level Leibniz reductions (``ι_X(df) = X(f)``)
+        fire; with plain :class:`Symbol` sections ``lie_lie`` and
+        ``lie_iota`` leave a residual on *both* TM and algebroid sides,
+        which is a universal limitation of the pairing rule rather
+        than an algebroid-specific gap."""
+        X = Derivation("X", degree=0)
+        Y = Derivation("Y", degree=0)
+        f = Symbol("f")
+        reg = PropertyRegistry()
+        reg.declare(f, Graded(degree=0))
+        algebra = ExteriorAlgebra((f,), d=algebroid.d)
+        results = algebroid.cartan.verify_all(
+            algebra=algebra, X=X, Y=Y, registry=reg
+        )
+        assert set(results.keys()) == {
+            "d_squared_zero",
+            "cartan_magic",
+            "d_lie",
+            "lie_lie",
+            "lie_iota",
+        }
+        for name, chain in results.items():
+            assert isinstance(chain, ProofChain), name
+
 
 # --------------------------------------------------------------------- #
 # Anchor compatibility                                                   #

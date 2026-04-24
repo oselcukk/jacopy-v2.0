@@ -232,6 +232,39 @@ class TestVerifyOtherRelations:
         for chain in results.values():
             assert isinstance(chain, ProofChain)
 
+    def test_verify_threads_custom_d_into_default_engine(self, context):
+        """A CartanCalculus built with a non-default ``d`` propagates
+        that ``d`` into the auto-constructed expansion engine — the
+        ``d² = 0`` and ``ι_X(df) = X(f)`` rules are pinned to the
+        bundle's own exterior derivative, not the TM default.
+
+        Before this threading, a custom ``d_E`` calculus silently drove
+        the engine's default_d-bound rules, so ``d_E²`` never reduced —
+        the residual surfaced as a :class:`ProofFailure` on
+        ``d_squared_zero``. The ``L_X``-bearing relations
+        (``cartan_magic``, ``d_lie``, etc.) also need the calculus'
+        ``lie_derivative`` factory to plumb ``d_E`` / ``ι_E`` into
+        every ``L_{E,X}`` it produces — that's what the algebroid
+        ``LieAlgebroid`` wrapper does, and the full five-relation
+        parity test lives on the algebroid side."""
+        from gradalg.calculus.exterior_d import ExteriorDerivative
+
+        d_E = ExteriorDerivative("d_E")
+        custom_calc = CartanCalculus(
+            d=d_E,
+            lie_derivative=lie_derivative,
+            interior=interior,
+            vector_bracket=LieBracket(),
+        )
+        f = Symbol("f")
+        reg = PropertyRegistry()
+        reg.declare(f, Graded(degree=0))
+        algebra = ExteriorAlgebra((f,), d=d_E)
+        chain = custom_calc.verify(
+            "d_squared_zero", algebra=algebra, registry=reg
+        )
+        assert isinstance(chain, ProofChain)
+
 
 # --------------------------------------------------------------------- #
 # Identity                                                               #

@@ -230,7 +230,13 @@ class CartanCalculus:
 
         eff_engine = engine
         if eff_engine is None and registry is not None:
-            eff_engine = default_engine(registry=registry, mode=mode)
+            # Pass this calculus' own ``d`` so definitions pinned to an
+            # :class:`ExteriorDerivative` target (``DSquaredZero`` and
+            # ``IotaOnExactOneForm``) fire on bundle-specific operators
+            # like a Lie-algebroid ``d_E`` — not just the TM default.
+            eff_engine = default_engine(
+                registry=registry, d=self._d, mode=mode
+            )
 
         return eq.prove(
             registry=registry,
