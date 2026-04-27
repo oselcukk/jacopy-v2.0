@@ -1,21 +1,21 @@
-"""Tests for gradalg.calculus.interior."""
+"""Tests for jacopy.calculus.interior."""
 
 import pytest
 
-from gradalg.algebra.derivation import Act, Derivation, compose, degree_of
-from gradalg.algorithms.product_rule import product_rule
-from gradalg.algorithms.simplify import simplify
-from gradalg.calculus.exterior_d import ExteriorDerivative, d
-from gradalg.calculus.interior import (
+from jacopy.algebra.derivation import Act, Derivation, compose, degree_of
+from jacopy.algorithms.product_rule import product_rule
+from jacopy.algorithms.simplify import simplify
+from jacopy.calculus.exterior_d import ExteriorDerivative, d
+from jacopy.calculus.interior import (
     InteriorProduct,
     apply_iota_axioms,
     apply_iota_squared_zero,
     interior,
 )
-from gradalg.core.expr import Integer, Neg, Product, Sum, Symbol
-from gradalg.core.properties import Graded
-from gradalg.core.registry import PropertyRegistry
-from gradalg.core.symbolic_degree import Degree
+from jacopy.core.expr import Integer, Neg, Product, Sum, Symbol
+from jacopy.core.properties import Graded
+from jacopy.core.registry import PropertyRegistry
+from jacopy.core.symbolic_degree import Degree
 
 
 class TestConstruction:

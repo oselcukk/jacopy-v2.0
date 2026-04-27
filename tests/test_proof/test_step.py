@@ -1,9 +1,9 @@
-"""Tests for gradalg.proof.step."""
+"""Tests for jacopy.proof.step."""
 
 import pytest
 
-from gradalg.core.expr import Integer, Symbol
-from gradalg.proof.step import ProofStep
+from jacopy.core.expr import Integer, Symbol
+from jacopy.proof.step import ProofStep
 
 
 class TestConstruction:

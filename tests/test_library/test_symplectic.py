@@ -1,16 +1,16 @@
-"""Tests for ``gradalg.library.symplectic.SymplecticManifold``."""
+"""Tests for ``jacopy.library.symplectic.SymplecticManifold``."""
 
 from __future__ import annotations
 
 import pytest
 
-from gradalg.calculus.hamiltonian_vf import HamiltonianVectorField
-from gradalg.calculus.musical import Flat, MusicalCompatibility, Sharp
-from gradalg.core.expr import Integer, Symbol
-from gradalg.core.properties import Graded
-from gradalg.core.registry import PropertyRegistry
-from gradalg.library.symplectic import SymplecticManifold
-from gradalg.proof.chain import ProofChain
+from jacopy.calculus.hamiltonian_vf import HamiltonianVectorField
+from jacopy.calculus.musical import Flat, MusicalCompatibility, Sharp
+from jacopy.core.expr import Integer, Symbol
+from jacopy.core.properties import Graded
+from jacopy.core.registry import PropertyRegistry
+from jacopy.library.symplectic import SymplecticManifold
+from jacopy.proof.chain import ProofChain
 
 
 # --------------------------------------------------------------------- #
@@ -139,6 +139,42 @@ class TestProveEquivalence:
         assert isinstance(chain, ProofChain)
         assert len(chain) > 0
         assert chain.final == Integer(0)
+
+
+# --------------------------------------------------------------------- #
+# Bivector bridge — ω(π♯df, π♯dg) = π(df, dg)                            #
+# --------------------------------------------------------------------- #
+
+
+class TestBivectorBridge:
+    def test_closes_one_step(self, omega, pi):
+        from jacopy.algebra.derivation import Act
+        from jacopy.calculus.exterior_d import d as default_d
+        from jacopy.core.multi_eval import multi_eval
+
+        M = SymplecticManifold(omega, bivector=pi)
+        f, g = Symbol("f"), Symbol("g")
+        chain = M.bivector_bridge(f, g)
+        assert isinstance(chain, ProofChain)
+        assert len(chain) == 1
+        step = chain.steps[0]
+        df, dg = Act(default_d, f), Act(default_d, g)
+        assert step.before == multi_eval(
+            omega, Act(M.sharp, df), Act(M.sharp, dg)
+        )
+        assert step.after == multi_eval(
+            pi, df, dg, slot_kind="covector"
+        )
+
+    def test_requires_bivector(self, omega):
+        M = SymplecticManifold(omega)
+        with pytest.raises(ValueError, match="compatible bivector"):
+            M.bivector_bridge(Symbol("f"), Symbol("g"))
+
+    def test_rejects_non_expr(self, omega, pi):
+        M = SymplecticManifold(omega, bivector=pi)
+        with pytest.raises(TypeError, match="Expr"):
+            M.bivector_bridge("f", Symbol("g"))  # type: ignore[arg-type]
 
 
 # --------------------------------------------------------------------- #

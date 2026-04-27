@@ -1,9 +1,9 @@
-"""Tests for gradalg.core.registry."""
+"""Tests for jacopy.core.registry."""
 
 import pytest
 
-from gradalg.core.expr import Expr, Integer, Symbol
-from gradalg.core.properties import (
+from jacopy.core.expr import Expr, Integer, Symbol
+from jacopy.core.properties import (
     Antisymmetric,
     Graded,
     NonCommuting,
@@ -12,7 +12,7 @@ from gradalg.core.properties import (
     Scalar,
     Symmetric,
 )
-from gradalg.core.registry import (
+from jacopy.core.registry import (
     PropertyRegistry,
     default_registry,
     reset_default_registry,

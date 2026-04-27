@@ -2,7 +2,7 @@
 
 Bir Lie algebroid, bir `M` manifoldu üstündeki vector bundle `E`
 üzerinde yaşayan bir bracket ve anchor morfizmi `ρ: E → TM`'den ibaret
-üç parçalı yapıdır: `(E, [·,·]_E, ρ)`. Bu tutorial, `gradalg`'in
+üç parçalı yapıdır: `(E, [·,·]_E, ρ)`. Bu tutorial, `jacopy`'in
 bu üçlüyü tek bir `LieAlgebroid` objesi etrafında nasıl topladığını,
 *anchor compatibility* aksiyomunun neden ayrıca ele alındığını, ve
 algebroid üstünde yaşayan Cartan calculus'un (d_E, L_{E,X}, ι_{E,X})
@@ -23,15 +23,15 @@ dörtlüyü tek objede tutar:
 - `anchor` — `Anchor(name="ρ")`: `E → TM` linear bir morphism
   (Derivation sınıfının 0-derecesi altında oturur; Leibniz'i trivial).
 - `vector_bracket` — uyum hedefi olan `TM` bracket'i. Varsayılan
-  `gradalg.brackets.lie.lie` singleton'ı.
+  `jacopy.brackets.lie.lie` singleton'ı.
 
 ```python
-from gradalg import VectorFields
-from gradalg.brackets.lie import LieBracket
-from gradalg.calculus.anchor import Anchor
-from gradalg.core.expr import Symbol
-from gradalg.core.registry import PropertyRegistry
-from gradalg.library.lie_algebroid import LieAlgebroid
+from jacopy import VectorFields
+from jacopy.brackets.lie import LieBracket
+from jacopy.calculus.anchor import Anchor
+from jacopy.core.expr import Symbol
+from jacopy.core.registry import PropertyRegistry
+from jacopy.library.lie_algebroid import LieAlgebroid
 
 reg = PropertyRegistry()
 E = Symbol("E")
@@ -46,7 +46,7 @@ A = LieAlgebroid(E, bracket=bracket_E, anchor=rho, name="E-algebroid")
 Bracket'in kendi üç aksiyomu (antisymmetry, Jacobi, Leibniz) anchor
 compatibility'yi *içermez*. Yani `ρ([X, Y]_E) = [ρ(X), ρ(Y)]_{TM}`
 klasik Lie bracket aksiyomlarından türetilmez; Lie algebroid
-*tanımının* bir parçasıdır. `gradalg` bunu üç farklı şekilde sunar:
+*tanımının* bir parçasıdır. `jacopy` bunu üç farklı şekilde sunar:
 
 1. **Ham obstruction (Expr):** farkı eşit olması gereken sıfır olarak
    verir — simplify ile indirgemek kullanıcının seçimi.
@@ -116,7 +116,7 @@ TM üstünde yürütür; algebroid'de yapısal simetri aynıdır.
 Compatibility aksiyomu `theorem_book` içine kaydedildi:
 
 ```python
-from gradalg.library import theorem_book
+from jacopy.library import theorem_book
 
 thm = theorem_book.get("lie_algebroid_anchor_compat")
 thm.statement    # "ρ([X, Y]_E) = [ρ(X), ρ(Y)]_{TM}"

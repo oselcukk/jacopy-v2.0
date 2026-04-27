@@ -1,18 +1,18 @@
-"""Tests for gradalg.algebra.commutator."""
+"""Tests for jacopy.algebra.commutator."""
 
 import pytest
 
-from gradalg.algebra.commutator import (
+from jacopy.algebra.commutator import (
     Commutator,
     commutator,
     expand_commutator,
 )
-from gradalg.algebra.derivation import Derivation
-from gradalg.algorithms.collect_terms import collect_terms
-from gradalg.core.expr import Integer, Neg, Product, Sum, Symbol
-from gradalg.core.properties import Graded
-from gradalg.core.registry import PropertyRegistry
-from gradalg.core.symbolic_degree import Degree
+from jacopy.algebra.derivation import Derivation
+from jacopy.algorithms.collect_terms import collect_terms
+from jacopy.core.expr import Integer, Neg, Product, Sum, Symbol
+from jacopy.core.properties import Graded
+from jacopy.core.registry import PropertyRegistry
+from jacopy.core.symbolic_degree import Degree
 
 
 # --------------------------------------------------------------------- #

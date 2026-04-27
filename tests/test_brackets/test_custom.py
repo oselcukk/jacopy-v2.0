@@ -1,11 +1,11 @@
-"""Tests for gradalg.brackets.custom."""
+"""Tests for jacopy.brackets.custom."""
 
 import pytest
 
-from gradalg.brackets.base import BracketApply
-from gradalg.brackets.custom import CustomBracket
-from gradalg.core.expr import Neg, Product, Sum, Symbol
-from gradalg.core.symbolic_degree import Degree
+from jacopy.brackets.base import BracketApply
+from jacopy.brackets.custom import CustomBracket
+from jacopy.core.expr import Neg, Product, Sum, Symbol
+from jacopy.core.symbolic_degree import Degree
 
 
 def _anticommutator(a, b, registry):

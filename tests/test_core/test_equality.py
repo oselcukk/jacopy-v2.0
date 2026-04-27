@@ -1,11 +1,11 @@
-"""Tests for gradalg.core.equality."""
+"""Tests for jacopy.core.equality."""
 
 import pytest
 
-from gradalg.core.expr import Integer, Product, Sum, Symbol
-from gradalg.core.equality import alpha_equal, structural_equal, sum_bag_equal
-from gradalg.core.properties import Graded, Scalar
-from gradalg.core.wildcards import SeqWildcard, Wildcard
+from jacopy.core.expr import Integer, Product, Sum, Symbol
+from jacopy.core.equality import alpha_equal, structural_equal, sum_bag_equal
+from jacopy.core.properties import Graded, Scalar
+from jacopy.core.wildcards import SeqWildcard, Wildcard
 
 
 # --------------------------------------------------------------------- #

@@ -1,8 +1,8 @@
-"""Tests for gradalg.core.symbolic_degree."""
+"""Tests for jacopy.core.symbolic_degree."""
 
 import pytest
 
-from gradalg.core.symbolic_degree import Degree, as_degree
+from jacopy.core.symbolic_degree import Degree, as_degree
 
 
 # --------------------------------------------------------------------- #

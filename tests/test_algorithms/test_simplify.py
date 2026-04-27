@@ -1,9 +1,9 @@
-"""Tests for gradalg.algorithms.simplify — the Faz 2 pipeline."""
+"""Tests for jacopy.algorithms.simplify — the Faz 2 pipeline."""
 
 import pytest
 
-from gradalg.algorithms.simplify import simplify
-from gradalg.core.expr import (
+from jacopy.algorithms.simplify import simplify
+from jacopy.core.expr import (
     Integer,
     Neg,
     Product,
@@ -11,8 +11,8 @@ from gradalg.core.expr import (
     Symbol,
     Zero,
 )
-from gradalg.core.properties import Graded, Scalar
-from gradalg.core.registry import PropertyRegistry
+from jacopy.core.properties import Graded, Scalar
+from jacopy.core.registry import PropertyRegistry
 
 
 class TestWithoutRegistry:
@@ -71,7 +71,7 @@ class TestWithRegistry:
 
     def test_symbolic_sign_preserves_order(self, reg):
         """If sign parity is symbolic, the Product stays in pre-sort order."""
-        from gradalg.core.symbolic_degree import Degree
+        from jacopy.core.symbolic_degree import Degree
         a, b = Symbol("a"), Symbol("b")
         reg.declare(a, Graded(degree=Degree.var("|α|")))
         reg.declare(b, Graded(degree=Degree.var("|β|")))

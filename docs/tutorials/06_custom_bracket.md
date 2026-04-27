@@ -4,7 +4,7 @@ Daha önceki tutorial'lar paketin içinde hazır gelen bracket'lerle
 çalıştı: `LieBracket`, `sn`, `KoszulBracket`, `CourantBracket`…
 Kullanıcı kendi tanım-kuralını (expansion function) bir bracket
 olarak sokmak istediğinde — sınıf yazıp `GradedBracket`'ten türemeden —
-`gradalg.brackets.custom.CustomBracket` devreye girer. Bu tutorial
+`jacopy.brackets.custom.CustomBracket` devreye girer. Bu tutorial
 (a) `CustomBracket`'in minimum veri profilini, (b) flag'ler aracılığıyla
 aksiyom profilini nasıl deklare ettiğini, (c) `prove_jacobi`'nin bu
 bracket üstünde hangi yolu takip ettiğini, ve (d) ne zaman
@@ -27,8 +27,8 @@ işine yaramasa bile her çağrıda geçilir — diğer bracket'lerle
 çağrı-uyumluluğu için.
 
 ```python
-from gradalg.brackets.custom import CustomBracket
-from gradalg.core.expr import Neg, Product, Sum, Symbol
+from jacopy.brackets.custom import CustomBracket
+from jacopy.core.expr import Neg, Product, Sum, Symbol
 
 
 def commutator(a, b, registry):
@@ -88,9 +88,9 @@ tablosunda `GradedBracket` generic yoluna düşer. Bu yol:
 Commutator rule'u için tüm bu zincir sıfıra kapanır:
 
 ```python
-from gradalg.core.properties import Graded
-from gradalg.core.registry import PropertyRegistry
-from gradalg.proof.verifier import prove_jacobi
+from jacopy.core.properties import Graded
+from jacopy.core.registry import PropertyRegistry
+from jacopy.proof.verifier import prove_jacobi
 
 reg = PropertyRegistry()
 for s in (Symbol("X"), Symbol("Y"), Symbol("Z")):
@@ -107,7 +107,7 @@ Yanlış bir kural seçerseniz aynı pipeline residual bırakır ve
 `ProofFailure` fırlatır:
 
 ```python
-from gradalg.proof.strategies import ProofFailure
+from jacopy.proof.strategies import ProofFailure
 
 try:
     prove_jacobi(B_asym, Symbol("X"), Symbol("Y"), Symbol("Z"), registry=reg)

@@ -2,16 +2,16 @@
 
 import pytest
 
-from gradalg.algebra.derivation import Act
-from gradalg.algorithms.simplify import simplify
-from gradalg.brackets.base import BracketApply
-from gradalg.brackets.derived import DerivedBracket, VanishingCondition
-from gradalg.brackets.lie import LieBracket
-from gradalg.brackets.schouten import SchoutenBracket, _sn_degree, sn
-from gradalg.core.expr import Integer, Neg, Product, Sum, Symbol, Zero
-from gradalg.core.properties import Graded
-from gradalg.core.registry import PropertyRegistry
-from gradalg.core.symbolic_degree import Degree
+from jacopy.algebra.derivation import Act
+from jacopy.algorithms.simplify import simplify
+from jacopy.brackets.base import BracketApply
+from jacopy.brackets.derived import DerivedBracket, VanishingCondition
+from jacopy.brackets.lie import LieBracket
+from jacopy.brackets.schouten import SchoutenBracket, _sn_degree, sn
+from jacopy.core.expr import Integer, Neg, Product, Sum, Symbol, Zero
+from jacopy.core.properties import Graded
+from jacopy.core.registry import PropertyRegistry
+from jacopy.core.symbolic_degree import Degree
 
 
 # --------------------------------------------------------------------- #

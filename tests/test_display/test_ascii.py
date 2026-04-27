@@ -1,15 +1,15 @@
-"""Tests for ``gradalg.display.ascii``."""
+"""Tests for ``jacopy.display.ascii``."""
 
 from __future__ import annotations
 
 import pytest
 
-from gradalg.algebra.commutator import Commutator
-from gradalg.algebra.derivation import Act, Derivation
-from gradalg.brackets.dorfman import SectionPair
-from gradalg.brackets.lie import LieBracket
-from gradalg.calculus.pairing import Pairing
-from gradalg.core.expr import (
+from jacopy.algebra.commutator import Commutator
+from jacopy.algebra.derivation import Act, Derivation
+from jacopy.brackets.dorfman import SectionPair
+from jacopy.brackets.lie import LieBracket
+from jacopy.calculus.pairing import Pairing
+from jacopy.core.expr import (
     Integer,
     Neg,
     Power,
@@ -18,13 +18,13 @@ from gradalg.core.expr import (
     Sum,
     Symbol,
 )
-from gradalg.display.ascii import (
+from jacopy.display.ascii import (
     chain_to_ascii,
     step_to_ascii,
     to_ascii,
 )
-from gradalg.proof.chain import ProofChain
-from gradalg.proof.step import ProofStep
+from jacopy.proof.chain import ProofChain
+from jacopy.proof.step import ProofStep
 
 
 # --------------------------------------------------------------------- #

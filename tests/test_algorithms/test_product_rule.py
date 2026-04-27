@@ -1,12 +1,12 @@
-"""Tests for gradalg.algorithms.product_rule."""
+"""Tests for jacopy.algorithms.product_rule."""
 
 import pytest
 
-from gradalg.algebra.derivation import Act, Derivation, compose
-from gradalg.algorithms.product_rule import ProductRule, product_rule
-from gradalg.core.expr import Integer, Neg, Product, Sum, Symbol
-from gradalg.core.properties import Graded, Scalar
-from gradalg.core.registry import PropertyRegistry
+from jacopy.algebra.derivation import Act, Derivation, compose
+from jacopy.algorithms.product_rule import ProductRule, product_rule
+from jacopy.core.expr import Integer, Neg, Product, Sum, Symbol
+from jacopy.core.properties import Graded, Scalar
+from jacopy.core.registry import PropertyRegistry
 
 
 # --------------------------------------------------------------------- #
@@ -174,7 +174,7 @@ class TestDegreeErrors:
 
     def test_symbolic_parity_mid_product_raises(self, reg):
         """A symbolic-degree factor blocking a split should raise."""
-        from gradalg.core.symbolic_degree import Degree
+        from jacopy.core.symbolic_degree import Degree
 
         d = Derivation("d", degree=1)
         alpha = Symbol("α")

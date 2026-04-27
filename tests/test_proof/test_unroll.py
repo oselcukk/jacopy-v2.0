@@ -1,16 +1,16 @@
-"""Tests for gradalg.proof.strategies.UnrollToFoundations."""
+"""Tests for jacopy.proof.strategies.UnrollToFoundations."""
 
 import pytest
 
-from gradalg.core.expr import Integer, Symbol
-from gradalg.proof.chain import ProofChain
-from gradalg.proof.expansion import (
+from jacopy.core.expr import Integer, Symbol
+from jacopy.proof.chain import ProofChain
+from jacopy.proof.expansion import (
     Definition,
     ExpansionEngine,
     default_engine,
 )
-from gradalg.proof.step import ProofStep
-from gradalg.proof.strategies import (
+from jacopy.proof.step import ProofStep
+from jacopy.proof.strategies import (
     ExpandAndSimplify,
     ProofFailure,
     Strategy,

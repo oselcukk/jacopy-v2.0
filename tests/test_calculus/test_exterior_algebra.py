@@ -1,11 +1,11 @@
-"""Tests for gradalg.calculus.exterior_algebra."""
+"""Tests for jacopy.calculus.exterior_algebra."""
 
 import pytest
 
-from gradalg.algebra.derivation import Act
-from gradalg.calculus.exterior_algebra import ExteriorAlgebra
-from gradalg.calculus.exterior_d import ExteriorDerivative, d
-from gradalg.core.expr import Symbol
+from jacopy.algebra.derivation import Act
+from jacopy.calculus.exterior_algebra import ExteriorAlgebra
+from jacopy.calculus.exterior_d import ExteriorDerivative, d
+from jacopy.core.expr import Symbol
 
 
 class TestConstruction:

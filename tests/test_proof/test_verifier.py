@@ -1,13 +1,13 @@
-"""Tests for gradalg.proof.verifier."""
+"""Tests for jacopy.proof.verifier."""
 
 import pytest
 
-from gradalg.algebra.derivation import Act, compose
-from gradalg.calculus.exterior_d import d
-from gradalg.calculus.interior import interior
-from gradalg.calculus.lie_derivative import lie_derivative
-from gradalg.core.expr import Integer, Sum, Symbol
-from gradalg.proof import (
+from jacopy.algebra.derivation import Act, compose
+from jacopy.calculus.exterior_d import d
+from jacopy.calculus.interior import interior
+from jacopy.calculus.lie_derivative import lie_derivative
+from jacopy.core.expr import Integer, Sum, Symbol
+from jacopy.proof import (
     ExpandAndSimplify,
     ProofChain,
     ProofFailure,
@@ -22,7 +22,7 @@ class _EchoStrategy(Strategy):
     name = "echo"
 
     def prove(self, lhs, rhs, *, registry=None, engine=None):
-        from gradalg.proof.step import ProofStep
+        from jacopy.proof.step import ProofStep
 
         chain = ProofChain()
         chain.append(ProofStep(lhs, rhs, rule="echo", justification="unconditional"))

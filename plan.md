@@ -1,8 +1,8 @@
-# gradalg — Graded Algebra ve Bracket Hesabı için Sembolik Paket
+# jacopy — Graded Algebra ve Bracket Hesabı için Sembolik Paket
 
 ## Proje Özeti
 
-`gradalg`, graded cebir, bracket yapıları ve Cartan calculus alanında
+`jacopy`, graded cebir, bracket yapıları ve Cartan calculus alanında
 sembolik hesap ve **adım adım ispat** üretmek için tasarlanmış bir Python
 paketidir. Hedef kitlesi: diferansiyel geometri, Poisson geometrisi,
 Lie/Courant algebroidleri ve ilgili konularda çalışan matematikçiler ve
@@ -277,7 +277,7 @@ ve unroll modunu desteklen kendi paketimizi yazıyoruz.
 ## Paket Dizin Yapısı
 
 ```
-gradalg/
+jacopy/
 ├── pyproject.toml
 ├── README.md
 ├── LICENSE
@@ -296,7 +296,7 @@ gradalg/
 │   ├── examples/                 (Jupyter notebooks)
 │   └── api/                      (otomatik API reference)
 │
-├── gradalg/
+├── jacopy/
 │   ├── __init__.py
 │   │
 │   ├── core/                     [Faz 1]
@@ -1158,7 +1158,7 @@ Her tutorial için çalıştırılabilir Jupyter notebook.
 - Konfigürasyon: sign convention seçimi, L_X tanımı seçimi
 - Diagnostic: doğrulama başarısızsa hangi aksiyom eksik
 - Export: ProofChain → .tex, TikZ diagram
-- CLI: `gradalg verify calculus.yaml`
+- CLI: `jacopy verify calculus.yaml`
 
 #### Faz 11 ertelemeleri (küçük paketler, talep gelince açılır)
 
@@ -1259,6 +1259,100 @@ eklemeden intrinsik formüller sentaks düzeyinde ifade edilemez.
    girerse sistem `d` operatör tanımıyla eşdeğerliğini
    `AgreementOnGenerators` + `MultiEval` açılımıyla kapatabilir.
 
+6. **Bivector / multivector evaluation** — `MultiEval` form-on-vectors
+   için; **covector-on-bivector** eşi için de aynı makine lazım
+   (`π(α, β)`, `[·,·]_SN(α, β)` gibi bilinear contract'lar). Tek
+   `MultiEval` node'u symmetry flag'i ile her iki yönü karşılayabilir
+   (form = antisymmetric-on-vectors, bivector = antisymmetric-on-covectors).
+   Bu, Poisson bracket'i `{f,g} := π(df, dg)` olarak **Expr seviyesinde**
+   ifade edip intrinsik olarak açmanın yolu.
+
+7. **`Closed` registry property** (`core/properties.py`'ye) —
+   `Graded(degree=p)` gibi declarative bir bayrak. Engine'de yeni bir
+   `ClosedFormDefinition(registry)` kuralı: `Act(d, ω)` gördüğünde
+   `ω`'nın registry'de `Closed` olup olmadığına bakar; öyleyse
+   `Integer(0)`'a yazar. Böylece kullanıcı "`dω = 0`" için inline
+   `Definition` yazmak zorunda kalmaz — `registry.declare(ω, Closed())`
+   yeter. Symplectic form, volume form, H-twist 3-form'u gibi tipik
+   sabit closed form'lar için natural API.
+
+8. **Musical compatibility bilinear genişlemesi** — mevcut
+   `MusicalCompatibility` axiom'u sadece 1-form seviyesinde
+   (`ω^♭ ∘ π^♯ = id`) iş görüyor. Bilinear seviye (`MultiEval` üstünden):
+   $\omega(\pi^\sharp\alpha, \pi^\sharp\beta) = \pi(\alpha, \beta)$.
+   Bu identity'yi bir ``MusicalCompatibilityBilinearDefinition`` olarak
+   eklemek, Poisson bracket'in symplectic formüllü hali
+   (`{f,g} = ω(X_f, X_g)`) ile bivector tanımlı hali
+   (`{f,g} = π(df, dg)`) arasındaki eşitliği aksiyomsuz kapatır.
+   Altyapı olarak `MultiEval` + Sharp/Flat operatörleri birlikte
+   olmalı; Musical layer'ın rank-p desteği yeni alt-pass.
+
+9. **`NonDegenerate` property + injectivity dispatch** *(deferred,
+   12.C(e) birikene kadar bekletilir)* — `core/properties.py` zaten
+   `NonDegenerate`'i bir class adı olarak listeliyor (plan §460-467),
+   ama Faz 12 altyapısında karşılığı yok. İki ayrı iş:
+   - **Registry property**: `registry.declare(ω, NonDegenerate())` ile
+     ω'nın non-degenerate olduğunu declarative biçimde söyleyebilmek.
+     `Closed` property'sine (#7) paralel — bir bayrak, bir engine
+     kuralı değil.
+   - **Injectivity dispatch (yeni engine primitivi)**: "$\iota_Y \omega
+     = \iota_{Y'} \omega$ zinciri kapandıysa $Y = Y'$" meta-kuralı.
+     Bugünkü engine term-rewriting ($A \to B$) temelli; bu ise
+     **equation-closure-under-injectivity** — farklı bir ispat
+     primitivi. Blast radius büyük.
+   - **Tetikleyici**: `examples/2c.ipynb` pass'i (2026-04-25) bunu
+     açıkça ortaya çıkardı — $[X_f, X_g] = X_{\{f,g\}}$ operator-level
+     sonucu engine'e indirilemedi, son adım markdown'a yazıldı. Tek
+     başına bir notebook için 12.C(e) `prove_hamiltonian_equality`
+     wrapper'ı yeterli (aşağıda); #9'un kendisi, non-degeneracy
+     paterni başka use-case'lerde (volume form + divergence-free vektör
+     alanı, Riemann metric + musical izomorfizma) birikirse açılır.
+   - **Kapsam dışı (şimdilik)**: injectivity dispatch'in engine-level
+     tasarımı — ayrı pass, kendi planı.
+
+10. **$L_{fX}$ rescaling rule** *(yeni altyapı, `examples/2d.ipynb`
+    pass'inden — 2026-04-25)* — engine-level rewrite:
+    $\mathcal{L}_{fX}\omega \to f\,\mathcal{L}_X\omega + df\wedge
+    \iota_X\omega$ (1-form için $df\wedge\iota_X\omega$, genel rank için
+    $df\wedge\iota_X\omega$). Cartan magic'in skalar-ölçeklendirilmiş
+    vektör alanı versiyonu; bugünkü `LieDerivative` slot mimarisinin
+    (Faz 11 Stage C) doğal genişlemesi. Tetikleyici: 2d'nin A-K1
+    aksiyomu **üç farklı geometrik olguyu** ($[α,β]_K$ tanımı + sharp
+    $C^\infty$-linearity + $L_{fX}$ açılımı) tek "fold edilmiş" satıra
+    sıkıştırıyor; bu kural landing ettiğinde A-K1 saf Koszul tanımına
+    iner, sharp linearity #6'ya, $L_{fX}$ ise bu kurala düşer. Blast
+    radius dar — yalnızca `LieDerivative` rewrite slot'u, registry
+    yüzeyi yok. Sadece 2d için değil, **her skalar-ölçeklendirilmiş
+    vektör alanı problemi için** lazım (Hamiltonian transport, Lie
+    algebroid morphism testleri, vb.).
+
+11. **`AntiSymmetric` registry property + bivector evaluation rewrite**
+    *(yeni altyapı, `examples/2d.ipynb` pass'inden — 2026-04-25)* —
+    `core/properties.py`'a yeni bayrak: `registry.declare(π,
+    AntiSymmetric())`. Engine-level rewrite: anti-simetrik bir
+    `MultiEval`/bivector evaluation gördüğünde
+    $\pi(\alpha,\beta) \to -\pi(\beta,\alpha)$ kanonikleştirir (veya
+    sıfıra düşürür slot'lar eşitse). #8 (musical compat bilinear) ile
+    birleştiğinde 2d'nin **A-π-antisym** aksiyomu
+    ($\iota_{X_\eta}(\omega) = -\langle X_\omega,\eta\rangle$) tamamen
+    engine'e iner: $\iota_{\pi^\sharp\eta}\omega \xrightarrow{\#8}
+    \pi(\eta,\omega) \xrightarrow{\#11} -\pi(\omega,\eta)
+    \xrightarrow{\#8} -\langle\pi^\sharp\omega,\eta\rangle$. #8 tek
+    başına yetmez — anti-symmetry ayrı bir geometrik olgudur. `Closed`
+    property'sine paralel declarative bayrak.
+
+12. **Pairing $C^\infty$-linearity built-in** *(yeni altyapı,
+    `examples/2d.ipynb` pass'inden — 2026-04-25)* — `Pairing` node'unun
+    intrinsik özelliği: covector slot $C^\infty(M)$-modül lineer.
+    Engine'e otomatik kural: `Pairing(α, Product(f, X))` formundaki
+    bir node $f \cdot \mathrm{Pairing}(\alpha, X)$ olarak rewrite
+    edilir, $f$ 0-form olduğu sürece. 2d'deki **A-pairing** aksiyomu
+    ($\langle X_\omega, f\eta\rangle = f\langle X_\omega,\eta\rangle$)
+    bu kuralla aksiyomsuz kapanır. Şu anki `Pairing` Expr'ı sadece
+    syntactic; bu özellik ona bilinearity semantiği ekler. Blast
+    radius dar — sadece `Pairing` evaluation, `Act` veya `Product`'a
+    dokunmaz.
+
 #### Somut vs. sembolik p
 
 - **Somut p (örn. p=2, p=3)** — yukarıdaki üç altyapıdan sadece
@@ -1271,6 +1365,80 @@ eklemeden intrinsik formüller sentaks düzeyinde ifade edilemez.
 - **Sembolik p** — parametrik sum + hat generator + alternating sign
   cebri birlikte. Faz 12.B. Ağır — symbolic_degree.py'nin paralel
   genişlemesi lazım (sembolik indeksli toplam'ın derece hesabı).
+
+#### Ergonomi wrapper'ları — `examples/2a`, `examples/2b` pass'inden
+
+2026-04-25'te symplectic manifold problem-kitabı şıklarını (`examples/2a.ipynb`
+$\mathcal{L}_{X_f}\omega = 0$ ve `examples/2b.ipynb` $\{f,g\} = X_f(g)$)
+notebook'a döken pass, intrinsik altyapı olmadan da çalışıyor ama
+**her problemde aynı iskelet inline `Definition` olarak tekrar
+yazılıyor**. Bu yüzden Faz 12 kapsamına aşağıdaki library-layer
+ergonomi wrapper'ları da girer — core altyapı değişmeden çalışır,
+ama intrinsik altyapı landing ettiğinde doğal olarak onunla
+birleşirler:
+
+a. **`SymplecticProblem(omega, functions=(f,g,...), registry=...)`** —
+   `SymplecticManifold`'un problem-odaklı kardeşi. Inşa edildiğinde
+   engine'e otomatik register eder:
+   - `d ω = 0` (ω closed — yukarıdaki #7 property'si sayesinde),
+   - her `f_i` için Hamiltonian defining relation (sign convention
+     kwarg'ıyla),
+   - `X_{f_i}` derivation'larını factory olarak.
+   Notebook şablonu: `SymplecticProblem(ω, (f, g))` → `engine` →
+   `prove(...)`. Aksiyom sayısı sıfıra iner, problem-özel olmayan
+   her şey wrapper'dan gelir.
+
+b. **Sign convention flag** — library'nin default'u
+   `ι_{X_f}ω = -df`, ders kitaplarının bir kısmı `+df`. Hem
+   `HamiltonianVectorField` hem yeni `SymplecticProblem`
+   `sign="+"` / `sign="-"` kwarg'ı taşısın; aksiyom rewrite'ı
+   flag'e göre şekil alsın. `examples/2a.ipynb`'de şu an inline
+   aksiyom yazılıyor çünkü library'nin eksisi sabit.
+
+c. **`register_hamiltonian_defining_relation(X, f, omega, engine)`**
+   helper'ı — `SymplecticProblem` kullanmayan ama tek-atım
+   problem çözen kullanıcılar için mini API. Şu an 2a/2b'de her
+   fonksiyon için el-yazımı `Definition` sınıfı yazıyoruz; bu
+   tek satıra iner.
+
+d. **Poisson bracket Expr-level entegrasyonu** — `library/poisson.py`'deki
+   `PoissonBracket` wrapper'ı yüksek seviyede kalıyor; Expr'ın kendi
+   içinde `{f,g}` ifadesi yok (2b'de `Symbol("{f,g}")` aliasıyla
+   çözdük). #6 (bivector evaluation) + musical genişlemesi landing
+   ettiğinde `PoissonBracket.eval(f, g)` bir `MultiEval(π, df, dg)`
+   döndürsün; `{f,g} = X_f(g)` zinciri aksiyomsuz kapansın.
+
+e. **`SymplecticProblem.prove_hamiltonian_equality(Y, h)` helper'ı** —
+   `examples/2c.ipynb` pass'inden (2026-04-25). Paternin özeti:
+   "$Y$ vektör alanı ve $h$ fonksiyonu verildiğinde, $\iota_Y \omega
+   = dh$ zincirini engine'de kapat, sonra non-degeneracy ile $Y =
+   X_h$ sonucunu transcript'e **cited axiom step** olarak ekle."
+   Bu wrapper bugünkü engine'e dokunmadan çalışır — son adımı
+   markdown prose yerine kayıtlı bir ProofChain step'i yapar.
+   `examples/2c.ipynb`'in §7 markdown bölümü (non-degeneracy +
+   (b) cite) bu helper'a iner, callsite bir satıra düşer:
+   `sp.prove_hamiltonian_equality(lie_bracket(X_f, X_g), poisson_fg)`.
+   Altyapı #9 (gerçek engine-level injectivity dispatch) açılmadan
+   da değerli; açılınca helper'ın iç implementation'ı aksiyom
+   cite'ını engine-derived reduction'a refactor eder, callsite
+   değişmez.
+
+f. **`KoszulProblem(pi, forms, engine=...)` library wrapper'ı** —
+   `examples/2d.ipynb` pass'inden (2026-04-25). `SymplecticProblem`'in
+   Koszul-bracket kardeşi. İnşa edildiğinde otomatik kaydeder:
+   - Koszul defining axiom'u her form çifti için: $[\alpha,\beta]_K =
+     \mathcal{L}_{\pi^\sharp\alpha}\beta - \mathcal{L}_{\pi^\sharp
+     \beta}\alpha - d\langle\pi^\sharp\alpha,\beta\rangle$,
+   - $\pi^\sharp$ $C^\infty$-linearity (altyapı #6 landing ettiyse
+     theorem'e iner; o zamana kadar Definition olarak),
+   - $\pi$ anti-symmetry (altyapı #11 landing ettiyse declarative
+     `AntiSymmetric` flag, yoksa Definition).
+   2d'deki 4-aksiyom paterni (A-K1, A-K2, A-pairing, A-π-antisym)
+   tek satıra iner: `kp = KoszulProblem(π, (ω, η, f, f*η),
+   engine=engine)`. Altyapı #6/#10/#11/#12 hepsi landing ettiğinde
+   `kp` yalnızca Koszul defining'i taşır — sharp linearity, $L_{fX}$,
+   anti-sym, pairing linearity hepsi engine-derived olur. Callsite
+   her iki dünyada aynı.
 
 #### Kapsam dışı
 
@@ -1302,10 +1470,649 @@ Aşağıdakilerden biri olduğunda:
 2. Bir research workflow'u `MultiEval` olmadan ifade edilemeyecek bir
    yapı gerektirirse (ör. derecesi parametrik algebroid üzerinde
    Cartan formülünü çıkarma).
+3. **Problem-kitabı akışı birikmeye başladığında** —
+   `examples/2a.ipynb`, `examples/2b.ipynb` bir dizi halinde
+   çoğalırsa (2c, 2d, …). Her yeni problem aynı boilerplate'i
+   tekrar etmeye başladığında, yukarıdaki **ergonomi wrapper'ları**
+   (`SymplecticProblem` + sign flag + auto-register helper) kritik
+   eşiği geçer. Wrapper'lar intrinsik altyapı beklemeden **ayrı bir
+   mini-pass** olarak da landing edebilir — Faz 12.C. Intrinsik
+   altyapı sonra geldiğinde aynı wrapper'ların axiomlarını theorem'e
+   indirmek **in-place** refactor olur, callsite'lar değişmez.
 
 O zamana kadar deferral notu bu başlık altında kayıtlı — `memory/`
 tarafında ayrı bir "faz12_intrinsic.md" açıldığında cross-ref buraya
 atılır.
+
+#### Faz 12 alt-pass'leri özet
+
+- **Faz 12.A** — somut p intrinsik (MultiEval + p=2,3 için
+  InteriorProduct / LieDerivative intrinsic definitions).
+- **Faz 12.B** — sembolik p (parametrik sum, hat generator,
+  ExteriorDIntrinsicDefinition).
+- **Faz 12.C** — `examples/2*.ipynb` pass'inden gelen ergonomi
+  wrapper'ları (SymplecticProblem + sign flag + Closed property +
+  Hamiltonian auto-register + Poisson bracket Expr entegrasyonu).
+  İntrinsik altyapı (12.A) beklemeden de **yararlı** — textbook
+  şıkkı yazma iş yükünü doğrudan azaltır.
+
+### Faz 13 — Derived Bracket Theorem'in makina-seviyesi ispatı *(opsiyonel, ağır)*
+
+**Tetikleyici.** `examples/2f-theo.ipynb` (2026-04-25) Koszul Jacobi
+$\Leftrightarrow [π,π]_{SN}=0$ özdeşliğini paketin seeded
+`poisson_koszul_jacobi` teoremini cite ederek tek-adım kapatıyor;
+Poisson Jacobi $\Leftrightarrow [π,π]_{SN}=0$ için seeded
+`poisson_jacobi` (Faz 9 Stage B.1) eşdeğer 1-adım yol sunar.
+Pedagojik tamamlayıcı sual: aynı sonuç **paketin teoremi siteden
+kullanmadan**, sıfırdan, 27-terim açılımıyla kapatılabilir mi? Bu pass
+o sorunun cevabıdır — `2f-deep` (form-level) ve `2g-deep`
+(function-level) notebook'ları + altında yatan engine genişlemesi.
+
+**Amaç.** Derived Bracket Theorem'in iki özel hâli için
+**engine-derived** ispat:
+1. Koszul Jacobi (1-form'lar) ↔ SN öz-bracket — 27-ground-term
+   cancellation zinciri, ~80-150 adım (2f-deep, 13.A-D).
+2. Poisson Jacobi (fonksiyonlar) ↔ SN öz-bracket — function-level
+   cyclic sum, ~30-50 adım (2g-deep, 13.A axiom 2 + 13.C + 13.E).
+
+Sonuç iki notebook olarak iner; teoremleri siteden kullanmazlar.
+
+**Niye Faz 12 değil.** Faz 12 *intrinsik tanımları* tanımak veya
+*ergonomi wrapper'ları* için. Bu pass farklı: yeni geometrik
+axiom'lar + yeni `Expr` node ($[X,Y]_{VF}$ vector field Lie bracket)
++ yeni engine rule grupları. Blast radius core katmanına dokunuyor
+(yeni node, yeni rewrite kategorisi). Dolayısıyla ayrı faz.
+
+#### 4 alt-faz iskeleti
+
+**13.A — Sharp $\mathbb{R}$-linearity + Hamiltonian VF.**
+
+- *Yeni axiom 1 — Sharp on Sum:* $\pi^\sharp(A+B+C) = \pi^\sharp A +
+  \pi^\sharp B + \pi^\sharp C$. Engine-level rewrite: `Sharp(π)` bir
+  `Sum` üzerinde uygulandığında dağıtsın.
+- *Yeni axiom 2 — Sharp on $df$:* $\pi^\sharp(df)$ Hamiltonian VF
+  $X_f$'e iner. Engine-level: `Sharp(π)` bir `Act(d, f)` üzerinde
+  uygulandığında named `Derivation` $X_f$'e replace edilsin (factory
+  paterni: ad çakışmasını önlemek için pairing-symmetric ad).
+- *Test:* 2f-deep probe — 27-shape açılımı 9-shape'ten 18-terim
+  ground'a açılır (sharp linearity ile). Birim test seti: ~10 vaka.
+
+**13.B — Pairing $\mathbb{R}$-linearity + Pairing-Lie Leibniz.**
+
+- *Yeni axiom 3 — Pairing on Sum:* $\langle X, A+B+C\rangle =
+  \langle X,A\rangle + \langle X,B\rangle + \langle X,C\rangle$
+  (her iki slot için). 12 #12 (Pairing $C^\infty$-linearity) ile
+  uyumlu, ondan farklı: bu $\mathbb{R}$-linearity, slot
+  $C^\infty$-modül lineerliğin daha zayıf hâli. Aynı node üzerinde
+  ortak rewrite.
+- *Yeni axiom 4 — Pairing-Lie Leibniz:* $L_X\langle Y,\beta\rangle =
+  \langle L_X Y,\beta\rangle + \langle Y, L_X \beta\rangle$. Pairing
+  bilinear olarak Lie türevi altında Leibniz uyar; engine bunu
+  bilmiyor.
+- *Test:* 2f-deep probe — $d\langle X_α, [β,γ]_K\rangle$ türü grup
+  iç açılım yapsın, 27-ground şekli netleşsin. Birim test: ~12 vaka.
+
+**13.C — Vector field Lie bracket node + commutator + Lie-Jacobi.**
+
+- *Yeni Expr node:* `LieBracketVF(X, Y)` — vektör alanlarının Lie
+  bracket'i, kendisi `Derivation` (graded degree 0, anti-symmetric).
+  `jacopy/algebra/lie_bracket_vf.py` içinde tanımlanır.
+- *Yeni axiom 5 — Operator commutator → VF Lie:*
+  $L_X \circ L_Y - L_Y \circ L_X = L_{[X,Y]_{VF}}$. Engine rewrite:
+  Sum içinde `Act(L_X, Act(L_Y, ω)) - Act(L_Y, Act(L_X, ω))` paterni
+  görüldüğünde `Act(L_{[X,Y]_VF}, ω)`'e indir.
+- *Yeni axiom — Lie-Jacobi for VF:* $[X,[Y,Z]_{VF}]_{VF} +
+  [Y,[Z,X]_{VF}]_{VF} + [Z,[X,Y]_{VF}]_{VF} = 0$. Cyclic operator
+  pattern.
+- *Test:* 2f-deep'in 27-ground açılımının iterated-Lie grubu
+  cyclic toplamda sıfıra düşsün; residue $L_X \pi$ türü bivector
+  türevlerine collapse etsin. Birim test: ~15 vaka.
+
+**13.D — SN-bivector formula + 2f-deep notebook'u kapatma.**
+
+- *Yeni axiom 6 — SN expansion on bivector:* $[\pi,\pi]_{SN}$'ın
+  evaluator formülü — pairing yoluyla operator residue ile eşleşmesi.
+  Ya `SchoutenBracket._try_base_cases`'e bivector self-bracket
+  durumu eklenir, ya da inline definition olarak. Tetikte kalan
+  cyclic residue'nun bu formüle iner şekilde rewrite edilmesi.
+- *2f-deep notebook'u:* 6 axiom yüklenmiş engine üzerinde,
+  cyclic Koszul Jacobi sum LHS, $[\pi,\pi]_{SN}$ bivector formülü
+  RHS, `ExpandAndSimplify().prove(...)` ile zincirin kapanması.
+  Tahmini: 80-150 step.
+- *Test:* 2f-deep notebook'u execute edilir; tam-suite (mevcut 1496
+  test) yeşil kalır; yeni axiom'lar ~30 birim test.
+
+**13.E — Function-level Poisson Jacobi (2g-deep), opsiyonel paralel pass.**
+
+- *Tetik:* `examples/2g-theo.ipynb` (planlı) Poisson Jacobi
+  $\Leftrightarrow [π,π]_{SN}=0$'ı seeded `poisson_jacobi` teoremini
+  cite ederek 1-adımda kapatır. 2g-deep aynı sonucu **fonksiyon-level
+  cyclic sum**'ı 27-terim üzerinden açarak ispatlar — 2f-deep'in
+  function-ikizi.
+- *Probe bulgusu (2026-04-25):* Mevcut
+  `DerivedBracket(acting_on=Sharp(π))._koszul_expand` 0-form operandlar
+  için `Sharp(π)(f)` üretiyor (anlamsız: sharp 1-form'a uygulanır).
+  Function-level dispatch yapısal olarak farklı: anchor değil,
+  **anchor ∘ d**. Yani $\{f, g\}_\pi := X_f(g)$ where
+  $X_f := \pi^\sharp(df)$.
+- *2f-deep ile axiom paylaşımı:*
+  - **Reused:** 13.A axiom 2 (`Sharp(d(f)) → X_f`), 13.C tamamı
+    (`LieBracketVF` Expr node + Op-commutator → VF-Lie + Lie-Jacobi).
+  - **Skipped:** 13.B tamamı (Pairing R-lin + Pairing-Lie Leibniz).
+    Function chain'de nested 1-form pairing yapısı yok; gereksiz.
+  - **Replaced:** 13.D (form-level SN formülü) → function-level
+    Hamiltonian morphism failure ile yer değiştirir.
+- *Yeni axiom-2g-1 — Function-level Poisson defining:*
+  $\{f, g\}_\pi \to X_f(g)$. 2g-deep'in inline axiom'u olarak eklenir
+  (core'a dokunmaz; 2f-deep zaten core değişikliği gerektirir,
+  2g-deep'i saf inline axiom pass'i olarak korumak tercih edilir).
+- *Yeni axiom-2g-2 — Hamiltonian morphism failure (kalp):*
+  $[X_f, X_g]_{VF} - X_{\{f,g\}} = \tfrac12\langle [\pi,\pi]_{SN},
+  df \wedge dg\rangle^\sharp$. Bu axiom $\pi$'in Poisson olması
+  $\Leftrightarrow$ Hamiltonian map $f \mapsto X_f$'in Lie morphism
+  olması içeriğini taşır. 2g-deep zincirinin $[\pi,\pi]_{SN}$'i sokan
+  tek noktası budur. Pratik formülasyonu: cyclic toplamda
+  $X_a X_b(c) - X_b X_a(c) = X_{\{a,b\}}(c) + \text{SN-pair}(a,b,c)$.
+- *2g-deep notebook'u:* 13.A axiom 2 + 13.C tamamı + 13.E iki yeni
+  axiom yüklü engine üzerinde, function-level cyclic Jacobi sum LHS,
+  $[\pi,\pi]_{SN}$-pairing residue RHS, `ExpandAndSimplify().prove(...)`
+  ile zincirin kapanması. Tahmini: 30-50 step (2f-deep'in %30-40'ı).
+- *Test:* 2g-deep notebook'u execute edilir; tam-suite yeşil; yeni
+  axiom'lar ~15 birim test.
+- *Bağımsızlık:* 13.E yalnızca 13.A axiom 2 + 13.C'ye bağlı.
+  **2f-deep'i beklemeden 13.A+13.C+13.E olarak kısaltılmış pass
+  açılabilir** (tek başına lighter çalışma). Faz 13 narrative'i iki
+  notebook'un birlikte oluşu, ama sıralama pratik (hangi pass açılırsa).
+
+#### Toplam
+
+- **Yeni axiom sayısı:** 8 (13.A-D'den 6 + 13.E'den 2: function-level
+  Poisson defining + Hamiltonian morphism failure).
+- **Yeni Expr node:** 1 (`LieBracketVF`, 13.C; 13.E reuse).
+- **Yeni engine rewrite kategorisi:** ~6 (Sharp distribution, Pairing
+  distribution, Pairing-Lie Leibniz, Operator commutator collapse,
+  SN bivector expansion, function-level Poisson dispatch).
+- **Yeni notebook:** `examples/2f-deep.ipynb` + `examples/2g-deep.ipynb`.
+- **Tahmini test eklemesi:** ~82 birim test (2f-deep ~67 + 2g-deep ~15).
+
+#### Niye opsiyonel
+
+- Pratik kullanıcı için 2f-theo + 2g-theo (1-adım theorem cite)
+  yeterli — sonuç kanıtlanmış teorem, paket onu zaten taşıyor
+  (Faz 9 Stage B.1 ve B.3 seeded).
+- 2f-deep / 2g-deep'in değer önerisi pedagojik: "engine teoremi
+  *yeniden* türetir, derived-bracket evrenselliğini terim cancellation
+  seviyesinde gözlemler".
+- Blast radius core katmanına dokunuyor (yeni Expr node `LieBracketVF`)
+  — talep gelmeden başlatılmaz.
+
+#### Ne zaman açılır
+
+- Kullanıcı 2f-theo / 2g-theo cite-zincirinin yetersizliğini ifade
+  ettiğinde — "engine teoremi cite etmesin, ispatlasın" istemi (bu
+  pass'in başlangıç tetikleyicisi: 2026-04-25).
+- Vinogradov / big-bracket / $T^*[1]M$ büyük cebir ispatlarına
+  pedagojik giriş gerekirse — Faz 13 onun engine-katmanlı önçalışması
+  olur.
+- 2g-deep tek başına (13.A+13.C+13.E) açılabilir — 2f-deep'in 13.B
+  yükünü beklemeden function-level pedagojik narrative.
+
+### Faz 14 — Tilde Calculus (Koszul-tarafı Cartan operatörleri) *(opsiyonel, multivektör katmanı)*
+
+**Tetikleyici.** 3.1.2 (`examples/3.1.2.ipynb`, 2026-04-25) standart
+Cartan'ın 7 ilişkisini 0-form ve 1-form üzerinde kapatıyor. Pedagojik
+bir-sonraki adım §3.1.3: aynı kapanışı *Koszul tarafında* —
+$\tilde{d}, \tilde{\iota}_\omega, \tilde{\mathcal{L}}_\omega$ — yapmak.
+Sistem şu anda KoszulBracket + KoszulProblem + SN bracket + Sharp
+katmanlarını taşıyor; tilde *operatörleri* henüz Expr seviyesinde
+yok. Bu pass o boşluğu kapatır.
+
+**Amaç.** Üç tilde operatörünü Expr olarak tanımlamak, defining
+axiom'larını engine kuralı olarak yazmak, mevcut KoszulProblem
+wrapper'ını tilde-aware hâle getirmek; ardından §3.1.3'ün hedef
+6 Cartan ilişkisinin **engine ile kapanmasını** sağlamak.
+
+**Niye Faz 12/13 değil.** Faz 12 standart Cartan tarafında
+*intrinsik* tanımları + ergonomi'yi tamamladı. Faz 13 derived bracket
+Jacobi-zincirinin makina-seviyesi ispatı için core'a `LieBracketVF`
+node'u soktu. Faz 14 farklı bir eksen: tilde tarafının operatör
+katmanı — yeni *operatör tipleri* ve onları açan rewrite kuralları.
+Standart `LieDerivative`/`InteriorProduct`/`ExteriorDerivative`
+sınıflarına sığmıyor (parametre tipleri farklı: tilde ι forma indeksli,
+tilde d bivektör-bağımlı), dolayısıyla ayrı bir submodül.
+
+**Dayanak tanımlar (3.1.3 textbook formülasyonu).** Bir Poisson
+bivektörü $\pi$ ve onun anchor'ı $\rho = \pi^\sharp$ verildiğinde:
+
+* $\tilde{\iota}_\omega V := \iota_V \omega$ — formla indekslenmiş,
+  multivektör operandı; çıktı türü $\iota_V \omega$'nın türü
+  (1-vektör + 1-form girdisinde sonuç bir 0-form / fonksiyon).
+* $\tilde{d}V := [\pi, V]_{SN}$ — Lichnerowicz türevi; multivektör
+  $V$'nin SN-derecesini $+1$ artırır.
+* $\tilde{\mathcal{L}}_\omega := \tilde{d}\circ\tilde{\iota}_\omega +
+  \tilde{\iota}_\omega\circ\tilde{d}$ — Cartan magic (Koszul
+  tarafının tanımı).
+
+**Hedef 6 Cartan ilişkisi (3.1.3, ispat fazında doğrulanacak).**
+
+| # | İlişki | Tip yorumu |
+|---|---|---|
+| 1 | $\tilde{\iota}_\omega \tilde{\iota}_\eta + \tilde{\iota}_\eta \tilde{\iota}_\omega = 0$ | tilde-iota anti-commute |
+| 2 | $\tilde{\mathcal{L}}_\omega = \tilde{d}\tilde{\iota}_\omega + \tilde{\iota}_\omega \tilde{d}$ | tilde Cartan magic (tanım) |
+| 3 | $[\tilde{\mathcal{L}}_\omega, \tilde{\iota}_\eta] = \tilde{\iota}_{[\omega,\eta]_K}$ | tilde komütatör Koszul bracket'e iner |
+| 4 | $[\tilde{d}, \tilde{\mathcal{L}}_\omega] = 0$ | tilde-d ve tilde-L commute |
+| 5 | $\tilde{d}^2 = 0$ | $\Leftrightarrow [\pi,\pi]_{SN}=0$ Poisson koşulu |
+| 6 | $[\tilde{\mathcal{L}}_\omega, \tilde{\mathcal{L}}_\eta] = \tilde{\mathcal{L}}_{[\omega,\eta]_K}$ | tilde-Lie bracket'i Koszul'a iner |
+
+#### Yeniden kullanılan altyapı
+
+| Bileşen | Konum | Rolü |
+|---|---|---|
+| `sn` SN bracketi | [jacopy/brackets/schouten.py](jacopy/brackets/schouten.py) | $\tilde{d}V = [\pi,V]_{SN}$ açılımı |
+| `KoszulBracket` | [jacopy/brackets/koszul.py](jacopy/brackets/koszul.py) | Relasyon (3)/(6) sağ tarafları |
+| `KoszulProblem` | [jacopy/library/koszul_problem.py](jacopy/library/koszul_problem.py) | π + sharp + engine bundle (genişletilecek) |
+| `Sharp(π)` | [jacopy/calculus/musical.py](jacopy/calculus/musical.py) | $\rho = \pi^\sharp$ anchor |
+| `InteriorProduct`, `multi_eval` | calculus/interior + core/multi_eval | Tilde-iota swap aksiyomunun hedefi |
+| `Antisymmetric(π)`, registry | core/properties + core/registry | Π'nin antisimetrisi (KoszulProblem auto-declare) |
+| `MultiEvalScalarPullDefinition`, `PairingScalarPullDefinition`, `LieRescalingDefinition` | Faz 12.B #6/#10/#12 | C∞-linearity altyapısı (tilde-side de gerekiyor) |
+
+#### 4 alt-faz iskeleti (A → C zorunlu sıra; D ayrı pass)
+
+**14.A — Tilde operatör Expr tipleri (skeleton).**
+
+- *Yeni dosya:* `jacopy/calculus/tilde/operators.py`.
+- *Üç `Derivation` subclass:*
+  - `TildeInteriorProduct(omega)` — `omega` bir form Expr; `degree =
+    -1` (multivektör-derecesi azaltıcı). Hash key'inde `omega` taşır.
+    LaTeX: `\tilde{\iota}_{\omega}`.
+  - `TildeExteriorDerivative(pi)` — `pi` bir bivektör Expr; `degree =
+    +1`. Singleton-per-π via `pi` kimliği. LaTeX: `\tilde{d}` (alt-
+    indis isteğe bağlı π adı).
+  - `TildeLieDerivative(omega, pi)` — `degree = 0`; iki parametre
+    (form + bivektör). LaTeX: `\tilde{\mathcal{L}}_{\omega}`.
+- *Factory shortcut'lar:* `tilde_interior(omega)`, `tilde_d(pi)`,
+  `tilde_lie(omega, pi)`.
+- *Display dispatch:* `display/latex.py` + `display/ascii.py` üç tipi
+  de tanır; mevcut iota/d/L dispatch'lerinin yanına eklenir.
+- *Submodül ihracı:* `jacopy/calculus/__init__.py`'de tilde
+  operatörleri ve factory'ler `__all__` listesinde görünür.
+- *Test bütçesi:* ~12 birim test — construction, hash/eq tutarlılığı,
+  derece, LaTeX/ASCII render, factory caching.
+
+**14.B — Tilde defining-axiom'ları (engine kuralları).**
+
+- *Yeni dosya:* `jacopy/calculus/tilde/axioms.py`.
+- *Üç `Definition`:*
+
+  1. `TildeIotaSwapDefinition` — köprü aksiyom.
+     - matches: `Act(TildeInteriorProduct(ω), V)`.
+     - rewrite: `Act(InteriorProduct(V), ω)` (V bir 1-vektör
+       (`Derivation`) ise; daha yüksek multivektör için
+       `multi_eval(ω, V_1, …, V_k)` formuna açılır).
+     - Köşe durumu: V bir 0-vektör (skaler fonksiyon) ise sonuç
+       `Zero` — tilde-iota'nın yutucu kuralı (registry'de
+       `Graded(degree=0)` tanılı operandlar için).
+
+  2. `TildeExteriorDLichnerowiczDefinition(pi)` — Lichnerowicz tanımı.
+     - matches: `Act(TildeExteriorDerivative(π), V)`.
+     - rewrite: `BracketApply(sn, π, V)`.
+     - Engine fix-point'inde `sn.expand` zincirleri devralır
+       (mevcut SN base-cases + wedge Leibniz).
+     - Scoped to specific π (instance-bound; iki tilde-d kuralı
+       birbirine sızmaz).
+
+  3. `TildeLieMagicDefinition(pi)` — tilde Cartan magic.
+     - matches: `Act(TildeLieDerivative(ω, π), V)`.
+     - rewrite: `Sum(Act(d̃, Act(ι̃_ω, V)), Act(ι̃_ω, Act(d̃, V)))`
+       (standart `LieDerivativeCartanDefinition`'ın dual karşılığı).
+
+- *Test bütçesi:* ~18 birim test — her aksiyom için match/no-match
+  eksen vakaları, rewrite hedef şekli, iki π-tipli tilde-d karışmaz,
+  registry-aware iota swap'in 0-vektör'de Zero üretmesi.
+
+**14.C — KoszulProblem entegrasyonu.**
+
+- *Dosya değişikliği:* [jacopy/library/koszul_problem.py](jacopy/library/koszul_problem.py).
+- *KoszulProblem `__init__` genişlemesi:*
+  - `multivectors` (opsiyonel) parametresi: SN-graded multivektör
+    operandlarının listesi (`(f, X, V, ...)`); auto-declare ederek
+    her birine uygun derece koyar (skaler `Graded(degree=0)`,
+    1-vektör `Graded(degree=0)` + `Derivation`, 2-vektör
+    `Graded(degree=1)` SN-shifted, vb.).
+  - Tilde aksiyomlarını engine'e register eder:
+    `TildeIotaSwapDefinition`, `TildeExteriorDLichnerowiczDefinition(pi)`,
+    `TildeLieMagicDefinition(pi)`.
+  - 14.D'de eklenecek auxiliary 0-vektör/1-vektör closure aksiyomları
+    da varsayılan olarak register edilir (D bağımsız landed olduğunda).
+- *Yeni metodlar:*
+  - `tilde_d() -> TildeExteriorDerivative` — π-bound singleton.
+  - `tilde_interior(omega) -> TildeInteriorProduct` — caller-supplied
+    1-form üzerinden factory.
+  - `tilde_lie(omega) -> TildeLieDerivative` — caller-supplied 1-form
+    + π üzerinden factory.
+  - `assume_poisson() -> None` — `[π,π]_{SN} = 0` aksiyomunu
+    declarative bayrak olarak işaretler (yeni `Poisson(π)` registry
+    property; ilgili engine kuralı 14.D'de). Idempotent.
+- *Test bütçesi:* ~15 birim test — auto-declare, factory'lerin
+  doğru registry/π wire'ı, `assume_poisson` idempotency, iki ayrı
+  KoszulProblem birbirinden bağımsız.
+
+**14.D — İspat-için-gerekli auxiliary aksiyomlar (3.1.3 kapanışı).**
+
+3.1.3'ün 6 ilişkisini bir 0-vektör $f$ ve bir 1-vektör $X$ üzerinde
+test ederken, 14.A-C'nin üç-aksiyomu yetmez. Aşağıdaki 5 ek aksiyom
+gereklidir; her biri standart Cartan tarafının doğal karşılığıdır.
+
+  *Aux-1.* `TildeIotaOnZeroVectorDefinition` — $\tilde{\iota}_\omega f
+  = 0$ (f registry'de `Graded(degree=0)`).
+  - 14.B'deki `TildeIotaSwapDefinition`'ın "0-vektör girdisinde Zero"
+    köşe durumunu *bağımsız* bir kural olarak ayrıştırır (engine
+    log'unda görünür kalsın).
+
+  *Aux-2.* `TildeIotaSquaredZeroDefinition` — $\tilde{\iota}_\omega^2
+  = 0$ on multivectors (relasyon (1)'in $\eta = \omega$ özel hâli).
+  - matches: `Act(ι̃_ω, Act(ι̃_ω, V))` → `Zero`.
+  - Standart `IotaSquaredZeroDefinition` paterninin tilde-aynası.
+
+  *Aux-3.* `TildeLieOnZeroVectorDefinition` — $\tilde{\mathcal{L}}_\omega
+  f$ skalere iner.
+  - rewrite: `Act(Sharp(π), ω)(f)` türünde → registry'deki
+    Hamiltonian VF $X_\omega$'a eşleşirse o; aksi hâlde
+    `Act(Sharp(π)·ω, df)` kanonik şeklinde tutar.
+  - Bu, 14.B magic kuralının fix-point sonrasında `Sum(d̃(ι̃_ω(f)),
+    ι̃_ω(d̃(f))) = Sum(0, ι̃_ω(-X_f)) = ω(X_f)` zincirini biriktirir;
+    auxiliary kural yalnızca son skalere collapse adımını ekler.
+
+  *Aux-4.* `TildeDOfFunctionDefinition` — $\tilde{d}f = -X_f$
+  (Hamiltonian VF). Mevcut SN base-cases'in tilde-aware aynası;
+  `TildeExteriorDLichnerowiczDefinition` zaten `[π, f]_{SN}` üretiyor,
+  ama SN base case 2 ($[f,X]_{SN} = -X(f)$) doğrudan eşleşmiyor —
+  `[π, f]_{SN}` SN-Leibniz ile $-X_f$'e iner; o zincirde Sharp +
+  exterior-d kuralları lazım. Bu aksiyom kestirme ekler:
+  doğrudan `Act(d̃, f) → Neg(Act(Sharp(π), Act(d, f)))`. Engine
+  derinliğini ~5 adım keser.
+
+  *Aux-5.* `TildeDSquaredPoissonDefinition` — $\tilde{d}^2 = 0$ aksiyomu
+  (registry'de `Poisson(π)` tanılı).
+  - matches: `Act(d̃, Act(d̃, V))` AND `registry.has(π, Poisson)`.
+  - rewrite: `Zero`.
+  - 14.C `assume_poisson()` ile bayrak yakılır; bu aksiyom o bayrağı
+    tüketir. Relasyon (5)'in tek adımda kapanmasını sağlar.
+
+- *Test bütçesi:* ~25 birim test — 5 auxiliary'nin her biri için
+  match/no-match + rewrite hedefi + registry-aware fall-through;
+  bayrak yokluğunda Aux-5 no-op.
+
+#### Stage E — 6 Cartan ilişkisinin engine ile kapanması (sonraki pass)
+
+14.A-D landed olduktan sonra, 3.1.3 ispatları **mevcut**
+`prove_intrinsic_equivalence` API'siyle yazılır (notebook bu plan
+kapsamı dışı; ayrı pedagojik pass). Her ilişkinin beklenen kapanış
+maliyeti:
+
+| # | Engine adımı tahmini (0-vektör + 1-vektör) | Yer-tutucu darboğaz |
+|---|---|---|
+| 1 | 1 + 3 | Aux-2 (anti-commute reduce) |
+| 2 | 0 (tanım gereği) + 0 | tilde magic *tanım*, ispat değil — `cartan_obstruction`-tipi 0-residue testi yeterli |
+| 3 | 5 + 8-12 | Cartan-magic + Koszul expansion + Aux-1/3 |
+| 4 | 6 + 10-15 | Aux-3 + Aux-4 + Sharp linearity |
+| 5 | 1 + 1 | Aux-5 (Poisson bayrağı tüketir) |
+| 6 | 8-12 + 15-20 | İki tilde-magic + Koszul expansion + cyclic SN-Leibniz |
+
+Stage E sırasında çıkacak muhtemel ek ihtiyaçlar (ön-keşif, plan
+yapısı içinde gelişigüzel artırılmaması için listelenir):
+
+- **Sharp(π)·ω = X_ω hizalaması**: relasyon (3)/(4)'te
+  $\tilde{\iota}_{[\omega,\eta]_K}V$ açılımı `[ω,η]_K`'yı Cartan
+  formülüne açar; engine'in fix-point'inde sonuç `Sharp(π)`'a
+  uygulanmış sum'a iner. Mevcut `SharpLinearityDefinition` +
+  `SharpOnExactDefinition` (Faz 13.A) yeter; ek aksiyom
+  beklenmiyor — ama keşif sırasında darboğaz bulunursa
+  `tilde/aux_axioms.py`'a Aux-6 olarak eklenir.
+- **SN-Leibniz çift sarımı**: relasyon (6)'da
+  `[π, [π, X]_{SN}]_{SN}` yapısı görünür; mevcut SN expand'in
+  `Antisymmetric(π)` + Aux-5 (Poisson) etkileşimi gerek; engine
+  sırasının doğru olması (önce SN açılımı, sonra
+  registry-canonicalize) `KoszulProblem`'in mevcut
+  registration sırasıyla uyumlu — ama Stage E'de doğrulanır.
+- **Cyclic SN-Jacobi**: relasyon (6)'nın derinliğine bağlı olarak
+  Faz 13.D'deki `SnBivectorFormulaDefinition`-tipi cyclic bir
+  formül-aksiyomu gerekebilir; eğer çıkarsa Aux-7 olarak landed.
+
+Stage E'nin her ilişkisi için ölçüm: `prove_intrinsic_equivalence`
+adım sayısı + zincirin SN/Sharp/Koszul aksiyom dağılımı. Tablodaki
+tahminler aşılırsa hangi auxiliary'in eksik olduğu tespit edilir;
+14.D listesi büyütülebilir.
+
+#### Toplam
+
+- **Yeni Expr tipi:** 3 (`TildeInteriorProduct`,
+  `TildeExteriorDerivative`, `TildeLieDerivative`).
+- **Yeni axiom sayısı:** 8 (14.B'den 3 + 14.D'den 5).
+- **Yeni registry property:** 1 (`Poisson(π)`; standart
+  `Antisymmetric(π)` yanına bayrak).
+- **Yeni library API:** `KoszulProblem.tilde_d / tilde_interior /
+  tilde_lie / assume_poisson` + `multivectors` constructor parametresi.
+- **Yeni submodül:** `jacopy/calculus/tilde/{operators.py, axioms.py,
+  aux_axioms.py}`.
+- **Tahmini test eklemesi:** ~70 birim test (14.A ~12 + 14.B ~18 +
+  14.C ~15 + 14.D ~25).
+- **Stage E (ayrı pass):** 6 ilişki ispatı, tahmini ~50-80 toplam
+  engine adımı, ek test ~30-50.
+
+#### Niye opsiyonel
+
+- Standart Cartan tarafı 3.1.2 ile zaten kapalı; tilde tarafı
+  pedagojik tamamlayıcı (Lie algebroid $T^*M$ örneğinin
+  Cartan-katmanı). Pratik kullanıcı bu pass olmadan da Poisson +
+  Koszul + SN'i tam kullanabilir (Faz 9 Stage B + Faz 12.C).
+- Blast radius görece kontrollü: yeni submodül, yeni 3 Expr tipi,
+  KoszulProblem'in genişlemesi; *core* katmanına dokunmaz.
+- Yine de yeni Expr tipi olduğu için "talep gelmeden açılmaz"
+  sınıfında — Faz 13 ile aynı disiplin.
+
+#### Ne zaman açılır
+
+- Kullanıcı 3.1.3 (Koszul tarafı Cartan ilişkileri) ispatlarını
+  istediğinde.
+- Lie algebroid intrinsik Koszul-engine'i (anchor-Koszul rule
+  parametrizasyonu) talep edildiğinde — Faz 14 bu pass'in operatör
+  katmanlı önçalışmasıdır; sonraki adım `intrinsic_axioms.py`'ı
+  anchor + algebroid bracket parametresine açmaktır (ayrı bir
+  Faz, talep gelirse).
+
+### Faz 16 — Bianchi kimlikleri (afin bağlantı ∇) *(opsiyonel, yeni operatör katmanı)*
+
+**Tetikleyici.** §3.1.5 derivator identities (Faz 15.C) §3.1.6'a
+geçişin önünü açtı: aynı pedagojik kalıbın bir sonraki örneği bir
+afin bağlantı $\nabla$ üzerindeki iki Bianchi kimliği:
+
+- **Bianchi I:**
+  $\operatorname{cycl}_{U,V,W} R(\nabla)(U,V)W
+   = \operatorname{cycl}_{U,V,W}\bigl[(\nabla_U T(\nabla))(V,W)
+   + T(\nabla)(T(\nabla)(U,V), W)\bigr]$
+- **Bianchi II:**
+  $\operatorname{cycl}_{U,V,W} (\nabla_U R(\nabla))(V,W)W'
+   = \operatorname{cycl}_{U,V,W} R(\nabla)(U, T(\nabla)(V,W))W'$
+
+Burada $T(\nabla)(X,Y) = \nabla_X Y - \nabla_Y X - [X,Y]_{VF}$ ve
+$R(\nabla)(X,Y)Z = \nabla_X\nabla_Y Z - \nabla_Y\nabla_X Z -
+\nabla_{[X,Y]_{VF}} Z$. `LieBracketVF` Faz 13.C'den geliyor;
+**`AffineConnection`, `Torsion`, `Curvature` katmanı yok** — bu pass
+o boşluğu kapatır.
+
+**Amaç.** İki Bianchi kimliğinin **engine ile kapanması**. Bianchi I
+$\sim$ 80-150 adım (LBVF Jacobi cyclic kapatır), Bianchi II $\sim$
+100-180 adım (∇-on-curvature Leibniz açılımı + cyclic). Sonuç bir
+notebook (`examples/3.1.6.ipynb`) — §3.1.5 stilinde
+`display_chain` rendering'iyle PDF'e iner.
+
+**Niye Faz 14 / 15 değil.** Faz 14 tilde-Cartan operatörleri
+(Koszul tarafı), Faz 15.C derivator-on-Koszul-bracket §3.1.5
+identities. Bianchi farklı bir eksen: **afin bağlantı katmanı** —
+ne SN-derivator ne tilde-Cartan; tamamen yeni operatör tipleri ve
+yeni axiom ailesi. Cartan / SN / Koszul / tilde altyapısının hiçbiri
+∇'yı tanımıyor.
+
+**Mimari karar (en temiz yol).** $T(\nabla)$ ve $R(\nabla)$
+**MultiEval-tabanlı operatör atomları** olarak modellenir
+(`Torsion(nabla)` 2-arity, `Curvature(nabla)` 3-arity). Bu sayede
+Faz 15.C'nin `AtomSlotLift` pre-pass borcuna girilmez —
+`operator_atom_index_opacity.md` deferred sorunu burada baştan
+yoktur. Slotlar engine-walkable, antisimetri / Sum-linearity /
+Neg-linearity ailesi bedavadan üzerine oturur.
+
+#### Yeniden kullanılan altyapı
+
+| Bileşen | Konum | Rolü |
+|---|---|---|
+| `LieBracketVF` Expr | [jacopy/algebra/lie_bracket_vf.py](jacopy/algebra/lie_bracket_vf.py) | $[X,Y]_{VF}$ T tanımında ve LBVF Jacobi'de |
+| LBVF Jacobi axiom | [jacopy/calculus/sn_function_axiom.py](jacopy/calculus/sn_function_axiom.py) | Faz 13.C — Bianchi I cyclic kapanışı |
+| `Sum`/`Neg`/`MultiEval` | core | T/R MultiEval şekli + cyclic 3-terim Sum |
+| `collect_terms` | proof/simplify | Cyclic pair-cancel |
+| `IntrinsicEngine` factory | [jacopy/calculus/intrinsic_engine.py](jacopy/calculus/intrinsic_engine.py) | Bianchi engine bundle (KoszulProblem analogu) |
+| `display_chain` + LaTeX `gather*` | [jacopy/display/jupyter.py](jacopy/display/jupyter.py) | §3.1.5'te düzelmiş PDF rendering — birebir reuse |
+
+#### 5 alt-faz iskeleti (16.A → 16.D zorunlu sıra; 16.E paralel pass)
+
+**16.A — AffineConnection Expr + ∇ defining axiom'ları.**
+
+- *Yeni dosya:* `jacopy/calculus/connection.py`.
+- *Yeni Expr tipi:* `AffineConnectionAct(nabla, X, Y)` — `nabla`
+  bağlantı sembolü (`Symbol`), `X` ikinci slot (Derivation), `Y`
+  üçüncü slot (Derivation veya tensor argümanı). Kendisi
+  `Derivation`-benzeri (degree 0); X-slot'unda C∞-lineer, Y-slot'unda
+  Leibniz uyar. LaTeX: `\nabla_{X} Y`.
+- *Factory:* `connection("∇")` → `AffineConnection` wrapper, içinde
+  `act(X, Y)` çağrısı `AffineConnectionAct` üretir.
+- *Engine kuralları (yeni axiom'lar):*
+  1. **`ConnectionXLinearityDefinition`** — $\nabla_{fX+gY} Z = f
+     \nabla_X Z + g \nabla_Y Z$ (X-slot C∞-lineer). Sum + scalar-
+     pull paterni Faz 12.B #6 ile uyumlu, MultiEval-üstü reuse.
+  2. **`ConnectionYLeibnizDefinition`** — $\nabla_X (fY) = X(f) Y +
+     f \nabla_X Y$ (Y-slot Leibniz). `Act(X, f)` + `f \nabla_X Y`
+     iki-terim Sum'a açılır.
+  3. **`ConnectionYAdditivityDefinition`** — $\nabla_X (Y+Z) =
+     \nabla_X Y + \nabla_X Z$ (Y-slot Sum-linearity).
+- *Display dispatch:* `display/latex.py` + `display/ascii.py`
+  `AffineConnectionAct`'ı tanır.
+- *Test bütçesi:* ~14 birim test — construction, hash/eq, üç axiom
+  fire kuralı, slot tipleri.
+
+**16.B — Torsion + Curvature MultiEval atomları + tanım/antisimetri.**
+
+- *Yeni dosya:* `jacopy/calculus/torsion_curvature.py`.
+- *İki MultiEval-tabanlı operatör atomu:*
+  - `TorsionOp(nabla)` — 2-arity. `MultiEval(TorsionOp(nabla),
+    [X, Y])`. LaTeX: `T(\nabla)(X, Y)`.
+  - `CurvatureOp(nabla)` — 3-arity. `MultiEval(CurvatureOp(nabla),
+    [X, Y, Z])`. LaTeX: `R(\nabla)(X, Y)Z`.
+- *Engine kuralları (yeni axiom'lar):*
+  4. **`TorsionDefinitionDefinition`** — `MultiEval(TorsionOp(∇),
+     [X,Y]) → ∇_X Y - ∇_Y X - [X,Y]_VF`. Üç-terim Sum (iki Neg).
+  5. **`CurvatureDefinitionDefinition`** — `MultiEval(CurvatureOp(∇),
+     [X,Y,Z]) → ∇_X(∇_Y Z) - ∇_Y(∇_X Z) - ∇_{[X,Y]_VF} Z`.
+     Üç-terim Sum.
+  6. **`TorsionAntisymmetryDefinition`** — `T(∇)(X,Y) → -T(∇)(Y,X)`.
+     MultiEval-bilinear-arg flip. (Tanım aksiyomundan türetilebilir
+     ama doğrudan vermek 16.D'de cyclic kapanışı kısaltır.)
+  7. **`CurvatureFirstSlotAntisymmetryDefinition`** — `R(∇)(X,Y)Z →
+     -R(∇)(Y,X)Z`. Aynı şekilde shortcut.
+- *Test bütçesi:* ~16 birim test — iki tanım fire kuralı, iki
+  antisimetri, MultiEval slot opacity yokluğunun verifikasyonu
+  (engine T/R'nin iç slotlarına doğal yürüyebiliyor mu).
+
+**16.C — ∇-on-tensor Leibniz axiom'ları.**
+
+- *Aynı dosya:* `torsion_curvature.py` (devam).
+- *Engine kuralları (yeni axiom'lar):*
+  8. **`ConnectionOnTorsionLeibnizDefinition`** — $(\nabla_U T)(V,W)
+     = \nabla_U(T(V,W)) - T(\nabla_U V, W) - T(V, \nabla_U W)$.
+     `Act(∇_U, MultiEval(T,[V,W]))` paterni → 3-terim Sum'a açılır.
+     Bu Bianchi I'in sağ tarafının ana açılım kuralı.
+  9. **`ConnectionOnCurvatureLeibnizDefinition`** — $(\nabla_U R)
+     (V,W)W' = \nabla_U(R(V,W)W') - R(\nabla_U V, W)W' -
+     R(V, \nabla_U W)W' - R(V,W)(\nabla_U W')$. 4-terim Sum
+     (üçüncü argüman dahil tensor-ekstensiyon). Bu Bianchi II'nin
+     sağ tarafının ana açılım kuralı.
+- *Test bütçesi:* ~10 birim test — iki Leibniz fire kuralı, slot
+  tipleri (1-vektör + multi_eval arg), Sum açılımı doğru sayıda
+  terim üretiyor mu.
+
+**16.D — `cyclic_sum` helper + `BianchiProblem` + Bianchi I notebook.**
+
+- *Yeni dosya:* `jacopy/library/bianchi_problem.py`.
+- *Helper:* `cyclic_sum(expr, args=[U,V,W]) → Sum`.
+  Argümanların 3 cyclic permütasyonunu (U→V→W→U) `expr`'e yerleştirip
+  3-terim Sum üretir. Saf expression-builder, axiom değil.
+- *Wrapper:* `BianchiProblem(nabla)` — `AffineConnection` taşır,
+  engine bundle olarak 16.A-C'nin 9 axiom'unu + LBVF Jacobi'yi +
+  collect_terms'i taşır. Metot:
+  - `prove_first_bianchi(U, V, W) → ProofChain`. Lhs
+    `cyclic_sum(R(∇)(U,V)W, [U,V,W])`; rhs
+    `cyclic_sum(∇_U T(∇)(V,W) + T(∇)(T(∇)(U,V),W), [U,V,W])`.
+    Strateji: lhs'i Curvature-tanımıyla aç → 9-terim
+    Sum (3 cyclic × 3-terim); cyclic permütasyon altında
+    $\nabla_X\nabla_Y Z$ çiftleri tek $\nabla_U(...)$ ve T
+    terimlerine grupanır; LBVF Jacobi cyclic toplamda
+    $-\nabla_{[U,V]_{VF}} W + \text{cycl}$ kalanını yutar.
+- *Notebook:* `examples/3.1.6.ipynb` — §3.1.5 birebir kalıbı:
+  setup hücresi, Bianchi I bölümü, `display_chain(chain)`
+  rendering. PDF §3.1.5 düzeltmeleriyle (gather* + scriptsize +
+  allowdisplaybreaks) sorunsuz çıkmalı.
+- *Test bütçesi:* ~14 birim test — `cyclic_sum` correctness,
+  `BianchiProblem.prove_first_bianchi` ProofChain hash kararlılığı,
+  notebook execute.
+
+**16.E — Bianchi II notebook *(paralel pass; 16.D'den bağımsız)*.**
+
+- *Aynı `BianchiProblem` üzerinde:*
+  `prove_second_bianchi(U, V, W, Wp) → ProofChain`. Lhs
+  `cyclic_sum((∇_U R(∇))(V,W)Wp, [U,V,W])`; rhs
+  `cyclic_sum(R(∇)(U, T(∇)(V,W))Wp, [U,V,W])`.
+  Strateji: lhs'i 16.C axiom 9 (∇-on-Curvature Leibniz) ile aç →
+  cyclic toplamda $\nabla_U \nabla_X (...)$ çiftleri yine LBVF Jacobi
+  ile çöker; Torsion-tanımı (16.B axiom 4) sağ taraftaki
+  $T(V,W)$'yi açar ve $\nabla_{V}\nabla_W - \nabla_W\nabla_V -
+  \nabla_{[V,W]}$ ile R'ye yeniden grupanır.
+- *Notebook:* `examples/3.1.6.ipynb`'a ikinci bölüm olarak eklenir
+  (veya `3.1.6_b.ipynb` — §3.1.5'in iki notebook'lu örüntüsünden
+  bağımsız tek-notebook tercihi).
+- *Test bütçesi:* ~10 birim test — sadece `prove_second_bianchi`
+  ProofChain kararlılığı + notebook execute.
+- *Bağımsızlık:* 16.E sadece 16.A+B+C'ye bağlı — 16.D'siz
+  çalıştırılabilir; ama Bianchi I'i kapatmadan açmak pedagojik
+  olarak ters.
+
+#### Toplam
+
+- **Yeni axiom sayısı:** 9 (16.A: 3, 16.B: 4, 16.C: 2).
+- **Yeni Expr tipi:** 1 (`AffineConnectionAct`); **2 yeni operatör
+  atomu** (`TorsionOp`, `CurvatureOp` — MultiEval'a oturan).
+- **Yeni engine bundle:** `BianchiProblem` (KoszulProblem analogu).
+- **Yeni notebook:** `examples/3.1.6.ipynb`.
+- **Tahmini test eklemesi:** ~64 birim test (16.A: 14, 16.B: 16,
+  16.C: 10, 16.D: 14, 16.E: 10).
+- **Tahmini ispat zincir uzunluğu:** Bianchi I 80-150 step,
+  Bianchi II 100-180 step.
+
+#### Niye opsiyonel
+
+- Mevcut paket Cartan + SN + Koszul + tilde + derivator katmanlarını
+  taşıyor; afin bağlantı bunlardan farklı bir geometrik objedir,
+  Poisson/multivektör hattının doğal devamı değil.
+- Pratik kullanıcı simplektik / Poisson / Lie algebroid hattında
+  bu pass olmadan tam donanımlı.
+- Blast radius: yeni Expr + 2 operatör atomu + 9 axiom + 1 wrapper
+  — orta. Faz 13'e benzer büyüklük.
+
+#### Ne zaman açılır
+
+- §3.1.5 derivator pass'inden sonra §3.1.6 (Bianchi) talep
+  edildiğinde — bu pass'in tetikleyicisi.
+- Riemann / Cartan geometri tarafına pedagojik açılım istendiğinde.
+- Bianchi I tek başına (16.A+B+C+D) Bianchi II'siz açılabilir;
+  16.E'nin değeri tamamlayıcı.
 
 ## Geliştirme Sırası (Bağımlılık Grafiği)
 
@@ -1352,7 +2159,7 @@ doldurulur ama her faz tamamlandığında ilgili teoremler eklenir.
 Paket bittiğinde kullanıcı kodu:
 
 ```python
-from gradalg import *
+from jacopy import *
 
 # ---------- Temel ----------
 f, g, h = Functions("f g h")

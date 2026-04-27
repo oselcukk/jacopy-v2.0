@@ -1,29 +1,29 @@
-"""Tests for ``gradalg.library.lie_algebroid``."""
+"""Tests for ``jacopy.library.lie_algebroid``."""
 
 from __future__ import annotations
 
 import pytest
 
-from gradalg.algebra.derivation import Derivation
-from gradalg.brackets.base import GradedBracket
-from gradalg.brackets.derived import VanishingCondition
-from gradalg.brackets.lie import LieBracket, lie
-from gradalg.calculus.anchor import Anchor
-from gradalg.calculus.cartan import CartanCalculus
-from gradalg.calculus.exterior_algebra import ExteriorAlgebra
-from gradalg.calculus.exterior_d import ExteriorDerivative
-from gradalg.calculus.interior import InteriorProduct
-from gradalg.calculus.lie_derivative import LieDerivative
-from gradalg.core.expr import Expr, Integer, Sum, Symbol
-from gradalg.core.properties import Graded
-from gradalg.core.registry import PropertyRegistry
-from gradalg.library import theorem_book
-from gradalg.library.lie_algebroid import (
+from jacopy.algebra.derivation import Derivation
+from jacopy.brackets.base import GradedBracket
+from jacopy.brackets.derived import VanishingCondition
+from jacopy.brackets.lie import LieBracket, lie
+from jacopy.calculus.anchor import Anchor
+from jacopy.calculus.cartan import CartanCalculus
+from jacopy.calculus.exterior_algebra import ExteriorAlgebra
+from jacopy.calculus.exterior_d import ExteriorDerivative
+from jacopy.calculus.interior import InteriorProduct
+from jacopy.calculus.lie_derivative import LieDerivative
+from jacopy.core.expr import Expr, Integer, Sum, Symbol
+from jacopy.core.properties import Graded
+from jacopy.core.registry import PropertyRegistry
+from jacopy.library import theorem_book
+from jacopy.library.lie_algebroid import (
     THEOREM_LIE_ALGEBROID_ANCHOR_COMPAT,
     LieAlgebroid,
     lie_algebroid,
 )
-from gradalg.proof.chain import ProofChain
+from jacopy.proof.chain import ProofChain
 
 
 # --------------------------------------------------------------------- #
@@ -130,7 +130,7 @@ class TestAlgebroidCartanBundle:
         assert algebroid.d.name == "d_E"
 
     def test_d_is_distinct_from_tm_d(self, algebroid):
-        from gradalg.calculus.exterior_d import d as d_TM
+        from jacopy.calculus.exterior_d import d as d_TM
         assert algebroid.d != d_TM
 
     def test_cartan_type(self, algebroid):
@@ -178,7 +178,7 @@ class TestAlgebroidCartanBundle:
         We don't run it through :meth:`verify` because the equation
         sides disagree on degree (``|d² | = 2`` vs ``|0| = 0``); the
         axiomatic rewrite path in
-        :mod:`gradalg.calculus.exterior_d.apply_d_squared_zero` is how
+        :mod:`jacopy.calculus.exterior_d.apply_d_squared_zero` is how
         downstream code actually discharges it."""
         f = Symbol("f")
         reg = PropertyRegistry()
@@ -282,7 +282,7 @@ class TestAnchorCompatibilityObstruction:
     def test_matches_helper_output(self, algebroid, registry):
         """The method is a thin forwarder to the calculus-level
         helper; equality on the same inputs is the direct check."""
-        from gradalg.calculus.anchor import bracket_compatibility_obstruction
+        from jacopy.calculus.anchor import bracket_compatibility_obstruction
         X, Y = Symbol("X"), Symbol("Y")
         helper_ob = bracket_compatibility_obstruction(
             algebroid.anchor,

@@ -2,18 +2,18 @@
 
 import pytest
 
-from gradalg.algebra.derivation import Derivation
-from gradalg.brackets.lie import LieBracket
-from gradalg.calculus.cartan import MODES, RELATIONS, CartanCalculus
-from gradalg.calculus.exterior_algebra import ExteriorAlgebra
-from gradalg.calculus.exterior_d import d
-from gradalg.calculus.interior import interior
-from gradalg.calculus.lie_derivative import LieDerivative, lie_derivative
-from gradalg.calculus.operator_equation import OperatorEquation
-from gradalg.core.expr import Integer, Symbol
-from gradalg.core.properties import Graded
-from gradalg.core.registry import PropertyRegistry
-from gradalg.proof import ProofChain, ProofFailure
+from jacopy.algebra.derivation import Derivation
+from jacopy.brackets.lie import LieBracket
+from jacopy.calculus.cartan import MODES, RELATIONS, CartanCalculus
+from jacopy.calculus.exterior_algebra import ExteriorAlgebra
+from jacopy.calculus.exterior_d import d
+from jacopy.calculus.interior import interior
+from jacopy.calculus.lie_derivative import LieDerivative, lie_derivative
+from jacopy.calculus.operator_equation import OperatorEquation
+from jacopy.core.expr import Integer, Symbol
+from jacopy.core.properties import Graded
+from jacopy.core.registry import PropertyRegistry
+from jacopy.proof import ProofChain, ProofFailure
 
 
 # --------------------------------------------------------------------- #
@@ -247,7 +247,7 @@ class TestVerifyOtherRelations:
         every ``L_{E,X}`` it produces — that's what the algebroid
         ``LieAlgebroid`` wrapper does, and the full five-relation
         parity test lives on the algebroid side."""
-        from gradalg.calculus.exterior_d import ExteriorDerivative
+        from jacopy.calculus.exterior_d import ExteriorDerivative
 
         d_E = ExteriorDerivative("d_E")
         custom_calc = CartanCalculus(

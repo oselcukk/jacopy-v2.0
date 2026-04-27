@@ -25,7 +25,7 @@ kural ya aksiyom (`is_theorem=False`) ya da theorem (`is_theorem=True`);
 theorem olanlar `theorem_proof_builder()`'ından bir sub-proof çıkarabilir.
 
 ```python
-from gradalg.proof.expansion import default_engine
+from jacopy.proof.expansion import default_engine
 
 eng = default_engine()
 for d in eng.definitions:
@@ -68,11 +68,11 @@ adımda atar, arkasında sub-proof yok.
 primitive aksiyom(lar)a dayandığını gösterir.
 
 ```python
-from gradalg.calculus.invariant_d import default_d
-from gradalg.core.registry import PropertyRegistry
-from gradalg.core.expr import Symbol, Integer
-from gradalg.core.properties import Graded
-from gradalg.proof.verifier import prove_equivalence
+from jacopy.calculus.invariant_d import default_d
+from jacopy.core.registry import PropertyRegistry
+from jacopy.core.expr import Symbol, Integer
+from jacopy.core.properties import Graded
+from jacopy.proof.verifier import prove_equivalence
 
 reg = PropertyRegistry()
 omega = Symbol("ω")
@@ -129,8 +129,8 @@ Aşağıda `c_zero` sembolünü sıfıra indiren bir kural. Kendi engine'ini
 bırakıp sadece bu kuralı çalıştırıyorsun:
 
 ```python
-from gradalg.proof.expansion import Definition, ExpansionEngine
-from gradalg.core.expr import Symbol, Integer, Sum
+from jacopy.proof.expansion import Definition, ExpansionEngine
+from jacopy.core.expr import Symbol, Integer, Sum
 
 class ZeroConstAxiom(Definition):
     name = "c_zero := 0 (axiom)"
@@ -156,8 +156,8 @@ Aynı kuralı theorem olarak sunmak için `theorem_proof_builder` bir
 `ProofChain` builder'ı döndürür:
 
 ```python
-from gradalg.proof.chain import ProofChain
-from gradalg.proof.step import ProofStep
+from jacopy.proof.chain import ProofChain
+from jacopy.proof.step import ProofStep
 
 class ZeroConstTheorem(Definition):
     name = "c_zero := 0 (theorem)"
@@ -201,11 +201,11 @@ builder'ı `d(df) = 0` generator axiom'una atıf yapıyor.
 ## Theorem Book yapısı
 
 Expansion kuralları operatör-seviyesi provenance taşır; teorem-seviyesi
-provenance ise [`gradalg.library.theorem_book`](../../gradalg/library/theorem_book.py)
+provenance ise [`jacopy.library.theorem_book`](../../jacopy/library/theorem_book.py)
 altında. Veri yapısı:
 
 ```python
-from gradalg.library.theorem_book import Theorem
+from jacopy.library.theorem_book import Theorem
 import dataclasses
 
 [f.name for f in dataclasses.fields(Theorem)]
@@ -223,7 +223,7 @@ Beş alan:
 Singleton registry `theorem_book`'a sorgu atmak:
 
 ```python
-from gradalg.library import theorem_book
+from jacopy.library import theorem_book
 
 theorem_book.names()
 # ('poisson_jacobi', 'poisson_koszul_equivalence',
@@ -241,7 +241,7 @@ thm.proof.steps[0].rule
 ```
 
 Seeded teoremler paket initialization sırasında register edilir
-(`gradalg/library/__init__.py` submodule yüklemeleri). Downstream kod
+(`jacopy/library/__init__.py` submodule yüklemeleri). Downstream kod
 bir teoremi *yeniden ispatlamaz*; `theorem_book.get(name).proof`
 chain'ini alıp daha büyük bir `ProofChain`'in içine gömer. Bu paketin
 "tek citation, çok kullanım" stratejisinin omurgası — her yeni library

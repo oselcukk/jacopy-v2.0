@@ -8,7 +8,7 @@ Diferansiyel geometrinin aritmetik çekirdeği beş bağıntıya indirger:
 4. `[L_X, L_Y] = L_{[X, Y]}`
 5. `[L_X, ι_Y] = ι_{[X, Y]}`
 
-`gradalg` bu beşliyi `CartanCalculus(d, lie_derivative, interior, vector_bracket)`
+`jacopy` bu beşliyi `CartanCalculus(d, lie_derivative, interior, vector_bracket)`
 bundle'ı etrafında toplar ve her birini bir `OperatorEquation` olarak
 verir. Bu tutorial (a) bağıntıları *operatör denklemi* olarak nasıl
 okunacağını, (b) hangi bağıntıların hangi mod'da (efficient vs
@@ -21,16 +21,16 @@ operatörlerle çalıştırıyor; buradaki canlı ispatlar `TM` üstünde.
 ## Bundle
 
 ```python
-from gradalg.algebra.derivation import Derivation
-from gradalg.brackets.lie import LieBracket
-from gradalg.calculus.cartan import CartanCalculus, RELATIONS
-from gradalg.calculus.exterior_algebra import ExteriorAlgebra
-from gradalg.calculus.exterior_d import d
-from gradalg.calculus.interior import interior
-from gradalg.calculus.lie_derivative import lie_derivative
-from gradalg.core.expr import Symbol
-from gradalg.core.properties import Graded
-from gradalg.core.registry import PropertyRegistry
+from jacopy.algebra.derivation import Derivation
+from jacopy.brackets.lie import LieBracket
+from jacopy.calculus.cartan import CartanCalculus, RELATIONS
+from jacopy.calculus.exterior_algebra import ExteriorAlgebra
+from jacopy.calculus.exterior_d import d
+from jacopy.calculus.interior import interior
+from jacopy.calculus.lie_derivative import lie_derivative
+from jacopy.core.expr import Symbol
+from jacopy.core.properties import Graded
+from jacopy.core.registry import PropertyRegistry
 
 cart = CartanCalculus(
     d=d,
@@ -75,8 +75,8 @@ foundational modda açar). `default_engine(..., d_squared_mode=...)`
 ile seçilir:
 
 ```python
-from gradalg.calculus.exterior_d import apply_d_squared_zero
-from gradalg.proof.expansion import default_engine
+from jacopy.calculus.exterior_d import apply_d_squared_zero
+from jacopy.proof.expansion import default_engine
 
 x = Symbol("x")
 reg.declare(x, Graded(degree=0))
@@ -142,12 +142,12 @@ bilinen bir deferral.
 
 Classical Koszul-Cartan "invariant d" formülü
 `dω(X, Y) = X(ω(Y)) − Y(ω(X)) − ω([X, Y])` — bu, magic ve lie_iota
-bağıntılarından türetilen *teorem*. `gradalg` bunu tek helper ile
+bağıntılarından türetilen *teorem*. `jacopy` bunu tek helper ile
 verir:
 
 ```python
-from gradalg.calculus.invariant_d import invariant_d_one_form
-from gradalg.brackets.lie import lie
+from jacopy.calculus.invariant_d import invariant_d_one_form
+from jacopy.brackets.lie import lie
 
 omega = Symbol("ω")
 reg.declare(omega, Graded(degree=1))
@@ -167,14 +167,14 @@ olarak bu iki bağıntıdan çıkıyor, aksiyomatik bir giriş noktası değil.
 ## Twisted Cartan bundle — `d_H = d + H∧`
 
 Kapalı bir 3-form `H` ile H-twisted exterior derivative `d_H` Cartan
-calculus'ünü aynı beş bağıntıyla taşıyor. `gradalg` bunu
+calculus'ünü aynı beş bağıntıyla taşıyor. `jacopy` bunu
 `TwistedCartanBundle(H)` wrapper'ı olarak verir: bundle, `d_H`'yi
 taze bir `ExteriorDerivative` olarak inşa eder ve Lie-türevi
 factory'sini `d_H`'yi bundle slot'una geçecek şekilde kurar —
 algebroid bundle'ının birebir twisted muadili.
 
 ```python
-from gradalg.library import TwistedCartanBundle
+from jacopy.library import TwistedCartanBundle
 
 H = Symbol("H")
 reg.declare(H, Graded(degree=3))

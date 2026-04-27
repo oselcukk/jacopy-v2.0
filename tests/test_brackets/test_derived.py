@@ -1,22 +1,22 @@
-"""Tests for gradalg.brackets.derived."""
+"""Tests for jacopy.brackets.derived."""
 
 import pytest
 
-from gradalg.algebra.derivation import Act
-from gradalg.algorithms.simplify import simplify
-from gradalg.brackets.base import BracketApply
-from gradalg.brackets.derived import DerivedBracket, derived_bracket
-from gradalg.brackets.koszul import KoszulBracket
-from gradalg.brackets.lie import LieBracket
-from gradalg.brackets.schouten import sn
-from gradalg.calculus.anchor import Anchor
-from gradalg.calculus.exterior_d import d as d_op
-from gradalg.calculus.lie_derivative import lie_derivative
-from gradalg.calculus.pairing import Pairing, pairing
-from gradalg.core.expr import Neg, Product, Sum, Symbol
-from gradalg.core.properties import Graded
-from gradalg.core.registry import PropertyRegistry
-from gradalg.core.symbolic_degree import Degree
+from jacopy.algebra.derivation import Act
+from jacopy.algorithms.simplify import simplify
+from jacopy.brackets.base import BracketApply
+from jacopy.brackets.derived import DerivedBracket, derived_bracket
+from jacopy.brackets.koszul import KoszulBracket
+from jacopy.brackets.lie import LieBracket
+from jacopy.brackets.schouten import sn
+from jacopy.calculus.anchor import Anchor
+from jacopy.calculus.exterior_d import d as d_op
+from jacopy.calculus.lie_derivative import lie_derivative
+from jacopy.calculus.pairing import Pairing, pairing
+from jacopy.core.expr import Neg, Product, Sum, Symbol
+from jacopy.core.properties import Graded
+from jacopy.core.registry import PropertyRegistry
+from jacopy.core.symbolic_degree import Degree
 
 
 # --------------------------------------------------------------------- #
@@ -198,7 +198,7 @@ class TestDerivedBracketTheorem:
     """
 
     def test_jacobi_obstruction_has_three_cyclic_terms(self, reg):
-        from gradalg.brackets.base import BracketApply
+        from jacopy.brackets.base import BracketApply
 
         lie = LieBracket()
         Q = Symbol("Q")
@@ -227,7 +227,7 @@ class TestDerivedBracketTheorem:
 
 class TestJacobiCondition:
     def test_returns_vanishing_condition(self, reg):
-        from gradalg.brackets.derived import VanishingCondition
+        from jacopy.brackets.derived import VanishingCondition
         lie = LieBracket()
         d = DerivedBracket(lie, Symbol("Q"), degree_Q=1)
         cond = d.jacobi_condition(reg)
@@ -285,7 +285,7 @@ class TestActingOn:
 
     def test_accepts_musical_sharp_as_anchor(self):
         """``Sharp`` is a ``Derivation`` too — any ``Derivation`` works."""
-        from gradalg.calculus.musical import sharp
+        from jacopy.calculus.musical import sharp
         pi = Symbol("π")
         sh = sharp(pi)
         d = DerivedBracket(sn, pi, degree_Q=1, acting_on=sh)

@@ -1,7 +1,7 @@
-"""Tests for gradalg.algorithms.collect_terms."""
+"""Tests for jacopy.algorithms.collect_terms."""
 
-from gradalg.algorithms.collect_terms import CollectTerms, collect_terms
-from gradalg.core.expr import (
+from jacopy.algorithms.collect_terms import CollectTerms, collect_terms
+from jacopy.core.expr import (
     Integer,
     Neg,
     Product,

@@ -32,28 +32,28 @@ THIS_DIR = Path(__file__).resolve().parent
 # --------------------------------------------------------------------- #
 
 
-# Every notebook opens with a bootstrap cell that ensures ``gradalg``
+# Every notebook opens with a bootstrap cell that ensures ``jacopy``
 # is importable even when the notebook is opened directly in the IDE
 # (not via pytest, which has its own PYTHONPATH fixture). We try a
 # plain import first and only touch ``sys.path`` on failure, so a
 # user who ``pip install -e .``'d the repo sees no side-effects.
 _BOOTSTRAP = (
     "code",
-    "# Ensure gradalg is importable when this notebook is opened\n"
+    "# Ensure jacopy is importable when this notebook is opened\n"
     "# directly (not via pytest). Walks up from the notebook's\n"
     "# directory to the repo root and prepends it to sys.path if\n"
-    "# gradalg isn't already installed into this kernel.\n"
+    "# jacopy isn't already installed into this kernel.\n"
     "try:\n"
-    "    import gradalg  # noqa: F401\n"
+    "    import jacopy  # noqa: F401\n"
     "except ModuleNotFoundError:\n"
     "    import sys\n"
     "    from pathlib import Path\n"
     "    here = Path.cwd().resolve()\n"
     "    for candidate in (here, *here.parents):\n"
-    "        if (candidate / \"gradalg\" / \"__init__.py\").is_file():\n"
+    "        if (candidate / \"jacopy\" / \"__init__.py\").is_file():\n"
     "            sys.path.insert(0, str(candidate))\n"
     "            break\n"
-    "    import gradalg  # noqa: F401",
+    "    import jacopy  # noqa: F401",
 )
 
 
@@ -63,7 +63,7 @@ TUTORIAL_01: list[tuple[str, str]] = [
         "markdown",
         "# 01 — İlk Adımlar\n\n"
         "Bu notebook [01_first_steps.md](01_first_steps.md) markdown'ının "
-        "çalıştırılabilir sürümüdür. `gradalg`'de sembolik ifade kurma, "
+        "çalıştırılabilir sürümüdür. `jacopy`'de sembolik ifade kurma, "
         "özellik atama ve sadeleştirmenin temelleri.",
     ),
     (
@@ -74,7 +74,7 @@ TUTORIAL_01: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.core.expr import Symbol, Integer, Sum, Product, Neg\n\n"
+        "from jacopy.core.expr import Symbol, Integer, Sum, Product, Neg\n\n"
         "x, y, z = Symbol(\"x\"), Symbol(\"y\"), Symbol(\"z\")\n\n"
         "expr = x + y - z\n"
         "assert expr == Sum(x, y, Neg(z))\n"
@@ -96,8 +96,8 @@ TUTORIAL_01: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.core.properties import Graded, Scalar\n"
-        "from gradalg.core.registry import PropertyRegistry\n\n"
+        "from jacopy.core.properties import Graded, Scalar\n"
+        "from jacopy.core.registry import PropertyRegistry\n\n"
         "reg = PropertyRegistry()\n"
         "reg.declare(x, Scalar())\n"
         "reg.declare(y, Scalar())\n"
@@ -107,14 +107,14 @@ TUTORIAL_01: list[tuple[str, str]] = [
         "markdown",
         "### Role-driven kısayollar\n\n"
         "Sık tekrarlanan desenler — fonksiyon, vektör alanı, form, "
-        "bivector — için `gradalg.library.declarations` altında "
+        "bivector — için `jacopy.library.declarations` altında "
         "`Functions`, `VectorFields`, `Forms`, `Bivector` yardımcıları "
         "var. Her biri `Symbol(...)` + uygun `reg.declare(...)` "
         "çağrısını tek satıra indirir.",
     ),
     (
         "code",
-        "from gradalg import Functions, VectorFields, Forms, Bivector\n\n"
+        "from jacopy import Functions, VectorFields, Forms, Bivector\n\n"
         "reg2 = PropertyRegistry()\n"
         "f, g = Functions(\"f g\", registry=reg2)\n"
         "X, Y = VectorFields(\"X Y\", registry=reg2)\n"
@@ -132,7 +132,7 @@ TUTORIAL_01: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.algorithms.simplify import simplify\n\n"
+        "from jacopy.algorithms.simplify import simplify\n\n"
         "assert simplify(x + x - x) == x\n"
         "assert simplify(Product(Integer(2), x, Integer(3)), reg) \\\n"
         "    == Product(Integer(6), x)\n"
@@ -148,7 +148,7 @@ TUTORIAL_01: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.display import to_ascii, to_latex\n\n"
+        "from jacopy.display import to_ascii, to_latex\n\n"
         "e = x + y - z\n"
         "print('ascii:', to_ascii(e))\n"
         "print('latex:', to_latex(e))",
@@ -175,7 +175,7 @@ TUTORIAL_02: list[tuple[str, str]] = [
     (
         "markdown",
         "## Lie bracket ve üç vector field\n\n"
-        "`gradalg.brackets.lie.lie` standart manifold Lie bracket'inin "
+        "`jacopy.brackets.lie.lie` standart manifold Lie bracket'inin "
         "modül-seviyesi singleton'ıdır. Üç vector field'ı `VectorFields` "
         "yardımcısıyla tek satırda deklare ediyoruz — her birine "
         "`Graded(degree=0)` iliştirilir, Jacobi expansion'ın işaret "
@@ -183,9 +183,9 @@ TUTORIAL_02: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg import VectorFields\n"
-        "from gradalg.brackets.lie import lie\n"
-        "from gradalg.core.registry import PropertyRegistry\n\n"
+        "from jacopy import VectorFields\n"
+        "from jacopy.brackets.lie import lie\n"
+        "from jacopy.core.registry import PropertyRegistry\n\n"
         "reg = PropertyRegistry()\n"
         "X, Y, Z = VectorFields(\"X Y Z\", registry=reg)",
     ),
@@ -202,7 +202,7 @@ TUTORIAL_02: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.proof import prove_jacobi\n\n"
+        "from jacopy.proof import prove_jacobi\n\n"
         "chain = prove_jacobi(lie, X, Y, Z, registry=reg)\n"
         "print('chain length:', len(chain))\n"
         "print('final:', chain.steps[-1].after)",
@@ -216,13 +216,13 @@ TUTORIAL_02: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.display import chain_to_ascii\n\n"
+        "from jacopy.display import chain_to_ascii\n\n"
         "print(chain_to_ascii(chain))",
     ),
     (
         "code",
         "# Jupyter'da otomatik LaTeX render (align* blokları):\n"
-        "from gradalg.display import display_chain\n"
+        "from jacopy.display import display_chain\n"
         "display_chain(chain)",
     ),
     (
@@ -268,9 +268,9 @@ TUTORIAL_03: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg import Bivector, Forms, Functions\n"
-        "from gradalg.core.registry import PropertyRegistry\n"
-        "from gradalg.library.symplectic import SymplecticManifold\n\n"
+        "from jacopy import Bivector, Forms, Functions\n"
+        "from jacopy.core.registry import PropertyRegistry\n"
+        "from jacopy.library.symplectic import SymplecticManifold\n\n"
         "reg = PropertyRegistry()\n"
         "(omega,) = Forms(\"ω\", degree=2, registry=reg)\n"
         "pi = Bivector(\"π\", registry=reg)\n\n"
@@ -288,7 +288,7 @@ TUTORIAL_03: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.library.poisson import PoissonBracket\n\n"
+        "from jacopy.library.poisson import PoissonBracket\n\n"
         "f, g, h = Functions(\"f g h\", degree=-1, registry=reg)\n"
         "poisson = PoissonBracket.from_bivector(pi)\n"
         "print('bracket:', poisson)",
@@ -311,7 +311,7 @@ TUTORIAL_03: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.display import chain_to_ascii\n\n"
+        "from jacopy.display import chain_to_ascii\n\n"
         "print('X_f =', poisson.hamiltonian_vf(f))\n"
         "print('X_f(g) =', poisson.via_hamiltonian(f, g))\n"
         "\n"
@@ -362,7 +362,7 @@ TUTORIAL_03: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.library import theorem_book\n\n"
+        "from jacopy.library import theorem_book\n\n"
         "thm = theorem_book.get(\"poisson_jacobi\")\n"
         "print('statement:', thm.statement)\n"
         "print('from_axioms:', thm.from_axioms)",
@@ -384,7 +384,7 @@ TUTORIAL_04: list[tuple[str, str]] = [
         "# 04 — Lie Algebroid\n\n"
         "Bu notebook [04_lie_algebroid.md](04_lie_algebroid.md) "
         "markdown'ının çalıştırılabilir sürümüdür. `(E, [·,·]_E, ρ)` "
-        "üçlüsünün `gradalg` içindeki nesneleşmesi, anchor "
+        "üçlüsünün `jacopy` içindeki nesneleşmesi, anchor "
         "compatibility'nin ayrı aksiyom olarak ele alınışı, ve "
         "algebroid Cartan bundle'ına giriş.",
     ),
@@ -396,12 +396,12 @@ TUTORIAL_04: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg import VectorFields\n"
-        "from gradalg.brackets.lie import LieBracket\n"
-        "from gradalg.calculus.anchor import Anchor\n"
-        "from gradalg.core.expr import Symbol\n"
-        "from gradalg.core.registry import PropertyRegistry\n"
-        "from gradalg.library.lie_algebroid import LieAlgebroid\n\n"
+        "from jacopy import VectorFields\n"
+        "from jacopy.brackets.lie import LieBracket\n"
+        "from jacopy.calculus.anchor import Anchor\n"
+        "from jacopy.core.expr import Symbol\n"
+        "from jacopy.core.registry import PropertyRegistry\n"
+        "from jacopy.library.lie_algebroid import LieAlgebroid\n\n"
         "reg = PropertyRegistry()\n"
         "E = Symbol(\"E\")\n"
         "bracket_E = LieBracket(name=\"[·,·]_E\")\n"
@@ -460,7 +460,7 @@ TUTORIAL_04: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.library import theorem_book\n\n"
+        "from jacopy.library import theorem_book\n\n"
         "thm = theorem_book.get(\"lie_algebroid_anchor_compat\")\n"
         "print('statement:', thm.statement)\n"
         "print('from_axioms:', thm.from_axioms)",
@@ -492,16 +492,16 @@ TUTORIAL_05: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.algebra.derivation import Derivation\n"
-        "from gradalg.brackets.lie import LieBracket\n"
-        "from gradalg.calculus.cartan import CartanCalculus, RELATIONS\n"
-        "from gradalg.calculus.exterior_algebra import ExteriorAlgebra\n"
-        "from gradalg.calculus.exterior_d import d\n"
-        "from gradalg.calculus.interior import interior\n"
-        "from gradalg.calculus.lie_derivative import lie_derivative\n"
-        "from gradalg.core.expr import Symbol\n"
-        "from gradalg.core.properties import Graded\n"
-        "from gradalg.core.registry import PropertyRegistry\n\n"
+        "from jacopy.algebra.derivation import Derivation\n"
+        "from jacopy.brackets.lie import LieBracket\n"
+        "from jacopy.calculus.cartan import CartanCalculus, RELATIONS\n"
+        "from jacopy.calculus.exterior_algebra import ExteriorAlgebra\n"
+        "from jacopy.calculus.exterior_d import d\n"
+        "from jacopy.calculus.interior import interior\n"
+        "from jacopy.calculus.lie_derivative import lie_derivative\n"
+        "from jacopy.core.expr import Symbol\n"
+        "from jacopy.core.properties import Graded\n"
+        "from jacopy.core.registry import PropertyRegistry\n\n"
         "cart = CartanCalculus(\n"
         "    d=d, lie_derivative=lie_derivative,\n"
         "    interior=interior, vector_bracket=LieBracket(),\n"
@@ -539,8 +539,8 @@ TUTORIAL_05: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.calculus.exterior_d import apply_d_squared_zero\n"
-        "from gradalg.proof.expansion import default_engine\n\n"
+        "from jacopy.calculus.exterior_d import apply_d_squared_zero\n"
+        "from jacopy.proof.expansion import default_engine\n\n"
         "x = Symbol(\"x\")\n"
         "reg.declare(x, Graded(degree=0))\n"
         "print('axiom rewrite:', apply_d_squared_zero(d(d(x))))\n\n"
@@ -581,8 +581,8 @@ TUTORIAL_05: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.calculus.invariant_d import invariant_d_one_form\n"
-        "from gradalg.brackets.lie import lie\n\n"
+        "from jacopy.calculus.invariant_d import invariant_d_one_form\n"
+        "from jacopy.brackets.lie import lie\n\n"
         "omega = Symbol(\"ω\")\n"
         "reg.declare(omega, Graded(degree=1))\n"
         "print(invariant_d_one_form(omega, X, Y, bracket=lie))",
@@ -599,7 +599,7 @@ TUTORIAL_05: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.library import TwistedCartanBundle\n\n"
+        "from jacopy.library import TwistedCartanBundle\n\n"
         "H = Symbol(\"H\")\n"
         "reg.declare(H, Graded(degree=3))\n"
         "bundle = TwistedCartanBundle(H)\n"
@@ -641,8 +641,8 @@ TUTORIAL_06: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.brackets.custom import CustomBracket\n"
-        "from gradalg.core.expr import Neg, Product, Sum, Symbol\n\n"
+        "from jacopy.brackets.custom import CustomBracket\n"
+        "from jacopy.core.expr import Neg, Product, Sum, Symbol\n\n"
         "def commutator(a, b, registry):\n"
         "    return Sum(Product(a, b), Neg(Product(b, a)))\n\n"
         "B = CustomBracket(\"[·,·]\", commutator)\n"
@@ -679,10 +679,10 @@ TUTORIAL_06: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.core.properties import Graded\n"
-        "from gradalg.core.registry import PropertyRegistry\n"
-        "from gradalg.proof.verifier import prove_jacobi\n"
-        "from gradalg.proof.strategies import ProofFailure\n\n"
+        "from jacopy.core.properties import Graded\n"
+        "from jacopy.core.registry import PropertyRegistry\n"
+        "from jacopy.proof.verifier import prove_jacobi\n"
+        "from jacopy.proof.strategies import ProofFailure\n\n"
         "reg = PropertyRegistry()\n"
         "for s in (Symbol('X'), Symbol('Y'), Symbol('Z')):\n"
         "    reg.declare(s, Graded(degree=0))\n\n"
@@ -754,11 +754,11 @@ TUTORIAL_07: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.brackets.derived import DerivedBracket\n"
-        "from gradalg.brackets.lie import LieBracket\n"
-        "from gradalg.core.expr import Symbol\n"
-        "from gradalg.core.properties import Graded\n"
-        "from gradalg.core.registry import PropertyRegistry\n\n"
+        "from jacopy.brackets.derived import DerivedBracket\n"
+        "from jacopy.brackets.lie import LieBracket\n"
+        "from jacopy.core.expr import Symbol\n"
+        "from jacopy.core.properties import Graded\n"
+        "from jacopy.core.registry import PropertyRegistry\n\n"
         "reg = PropertyRegistry()\n"
         "Q = Symbol('Q')\n"
         "reg.declare(Q, Graded(degree=1))\n"
@@ -806,7 +806,7 @@ TUTORIAL_07: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.proof.verifier import prove_jacobi\n\n"
+        "from jacopy.proof.verifier import prove_jacobi\n\n"
         "# a, b zaten yukarıda Graded(0) olarak kayıtlı — sadece c'yi ekle.\n"
         "c = Symbol('c')\n"
         "reg.declare(c, Graded(degree=0))\n\n"
@@ -825,9 +825,9 @@ TUTORIAL_07: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.brackets.schouten import sn\n"
-        "from gradalg.brackets.koszul import KoszulBracket\n"
-        "from gradalg.calculus.anchor import Anchor\n\n"
+        "from jacopy.brackets.schouten import sn\n"
+        "from jacopy.brackets.koszul import KoszulBracket\n"
+        "from jacopy.calculus.anchor import Anchor\n\n"
         "reg2 = PropertyRegistry()\n"
         "pi = Symbol('π')\n"
         "reg2.declare(pi, Graded(degree=1))\n"
@@ -855,9 +855,9 @@ TUTORIAL_07: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.library import theorem_book\n"
-        "from gradalg.library.declarations import Bivector, Functions\n"
-        "from gradalg.library.poisson import PoissonBracket\n\n"
+        "from jacopy.library import theorem_book\n"
+        "from jacopy.library.declarations import Bivector, Functions\n"
+        "from jacopy.library.poisson import PoissonBracket\n\n"
         "reg3 = PropertyRegistry()\n"
         "pi3 = Bivector('π', registry=reg3)\n"
         "f, g, h = Functions('f g h', degree=-1, registry=reg3)\n\n"
@@ -877,7 +877,7 @@ TUTORIAL_07: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.brackets.courant import CourantBracket\n\n"
+        "from jacopy.brackets.courant import CourantBracket\n\n"
         "reg4 = PropertyRegistry()\n"
         "H = Symbol('H')\n"
         "reg4.declare(H, Graded(degree=3))\n\n"
@@ -916,9 +916,9 @@ TUTORIAL_08: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.library.declarations import Bivector, Forms, Functions\n"
-        "from gradalg.library.poisson import PoissonBracket\n"
-        "from gradalg.core.registry import PropertyRegistry\n\n"
+        "from jacopy.library.declarations import Bivector, Forms, Functions\n"
+        "from jacopy.library.poisson import PoissonBracket\n"
+        "from jacopy.core.registry import PropertyRegistry\n\n"
         "reg = PropertyRegistry()\n"
         "pi = Bivector('π', registry=reg)\n"
         "poisson = PoissonBracket.from_bivector(pi)\n\n"
@@ -963,7 +963,7 @@ TUTORIAL_08: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.library import theorem_book\n\n"
+        "from jacopy.library import theorem_book\n\n"
         "for name in (\n"
         "    'poisson_jacobi',\n"
         "    'poisson_koszul_equivalence',\n"
@@ -980,9 +980,9 @@ TUTORIAL_08: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.brackets.courant import CourantBracket\n"
-        "from gradalg.core.expr import Symbol\n"
-        "from gradalg.core.properties import Graded\n\n"
+        "from jacopy.brackets.courant import CourantBracket\n"
+        "from jacopy.core.expr import Symbol\n"
+        "from jacopy.core.properties import Graded\n\n"
         "reg_h = PropertyRegistry()\n"
         "H = Symbol('H')\n"
         "reg_h.declare(H, Graded(degree=3))\n\n"
@@ -1018,7 +1018,7 @@ TUTORIAL_09: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.proof.expansion import default_engine\n\n"
+        "from jacopy.proof.expansion import default_engine\n\n"
         "eng = default_engine()\n"
         "for d in eng.definitions:\n"
         "    label = 'theorem' if d.is_theorem else 'axiom'\n"
@@ -1045,11 +1045,11 @@ TUTORIAL_09: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.calculus.invariant_d import default_d\n"
-        "from gradalg.core.registry import PropertyRegistry\n"
-        "from gradalg.core.expr import Symbol, Integer\n"
-        "from gradalg.core.properties import Graded\n"
-        "from gradalg.proof.verifier import prove_equivalence\n\n"
+        "from jacopy.calculus.invariant_d import default_d\n"
+        "from jacopy.core.registry import PropertyRegistry\n"
+        "from jacopy.core.expr import Symbol, Integer\n"
+        "from jacopy.core.properties import Graded\n"
+        "from jacopy.proof.verifier import prove_equivalence\n\n"
         "reg = PropertyRegistry()\n"
         "omega = Symbol('ω')\n"
         "reg.declare(omega, Graded(degree=2))\n"
@@ -1091,8 +1091,8 @@ TUTORIAL_09: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.proof.expansion import Definition, ExpansionEngine\n"
-        "from gradalg.core.expr import Sum\n\n"
+        "from jacopy.proof.expansion import Definition, ExpansionEngine\n"
+        "from jacopy.core.expr import Sum\n\n"
         "class ZeroConstAxiom(Definition):\n"
         "    name = 'c_zero := 0 (axiom)'\n\n"
         "    def matches(self, expr):\n"
@@ -1115,8 +1115,8 @@ TUTORIAL_09: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.proof.chain import ProofChain\n"
-        "from gradalg.proof.step import ProofStep\n\n"
+        "from jacopy.proof.chain import ProofChain\n"
+        "from jacopy.proof.step import ProofStep\n\n"
         "class ZeroConstTheorem(Definition):\n"
         "    name = 'c_zero := 0 (theorem)'\n\n"
         "    def matches(self, expr):\n"
@@ -1153,8 +1153,8 @@ TUTORIAL_09: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "from gradalg.library.theorem_book import Theorem\n"
-        "from gradalg.library import theorem_book\n"
+        "from jacopy.library.theorem_book import Theorem\n"
+        "from jacopy.library import theorem_book\n"
         "import dataclasses\n\n"
         "print('fields:', [f.name for f in dataclasses.fields(Theorem)])\n"
         "print('registry size:', len(theorem_book))\n"

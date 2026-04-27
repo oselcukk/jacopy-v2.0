@@ -1,0 +1,1214 @@
+\documentclass[11pt]{article}
+
+    \usepackage[breakable]{tcolorbox}
+    \usepackage{parskip} % Stop auto-indenting (to mimic markdown behaviour)
+    
+
+    % Basic figure setup, for now with no caption control since it's done
+    % automatically by Pandoc (which extracts ![](path) syntax from Markdown).
+    \usepackage{graphicx}
+    % Keep aspect ratio if custom image width or height is specified
+    \setkeys{Gin}{keepaspectratio}
+    % Maintain compatibility with old templates. Remove in nbconvert 6.0
+    \let\Oldincludegraphics\includegraphics
+    % Ensure that by default, figures have no caption (until we provide a
+    % proper Figure object with a Caption API and a way to capture that
+    % in the conversion process - todo).
+    \usepackage{caption}
+    \DeclareCaptionFormat{nocaption}{}
+    \captionsetup{format=nocaption,aboveskip=0pt,belowskip=0pt}
+
+    \usepackage{float}
+    \floatplacement{figure}{H} % forces figures to be placed at the correct location
+    \usepackage{xcolor} % Allow colors to be defined
+    \usepackage{enumerate} % Needed for markdown enumerations to work
+    \usepackage{geometry} % Used to adjust the document margins
+    \usepackage{amsmath} % Equations
+    \usepackage{amssymb} % Equations
+    \usepackage{textcomp} % defines textquotesingle
+    % Hack from http://tex.stackexchange.com/a/47451/13684:
+    \AtBeginDocument{%
+        \def\PYZsq{\textquotesingle}% Upright quotes in Pygmentized code
+    }
+    \usepackage{upquote} % Upright quotes for verbatim code
+    \usepackage{eurosym} % defines \euro
+
+    \usepackage{iftex}
+    \ifPDFTeX
+        \usepackage[T1]{fontenc}
+        \IfFileExists{alphabeta.sty}{
+              \usepackage{alphabeta}
+          }{
+              \usepackage[mathletters]{ucs}
+              \usepackage[utf8x]{inputenc}
+          }
+    \else
+        \usepackage{fontspec}
+        \usepackage{unicode-math}
+    \fi
+
+    \usepackage{fancyvrb} % verbatim replacement that allows latex
+    \usepackage{grffile} % extends the file name processing of package graphics
+                         % to support a larger range
+    \makeatletter % fix for old versions of grffile with XeLaTeX
+    \@ifpackagelater{grffile}{2019/11/01}
+    {
+      % Do nothing on new versions
+    }
+    {
+      \def\Gread@@xetex#1{%
+        \IfFileExists{"\Gin@base".bb}%
+        {\Gread@eps{\Gin@base.bb}}%
+        {\Gread@@xetex@aux#1}%
+      }
+    }
+    \makeatother
+    \usepackage[Export]{adjustbox} % Used to constrain images to a maximum size
+    \adjustboxset{max size={0.9\linewidth}{0.9\paperheight}}
+
+    % The hyperref package gives us a pdf with properly built
+    % internal navigation ('pdf bookmarks' for the table of contents,
+    % internal cross-reference links, web links for URLs, etc.)
+    \usepackage{hyperref}
+    % The default LaTeX title has an obnoxious amount of whitespace. By default,
+    % titling removes some of it. It also provides customization options.
+    \usepackage{titling}
+    \usepackage{longtable} % longtable support required by pandoc >1.10
+    \usepackage{booktabs}  % table support for pandoc > 1.12.2
+    \usepackage{array}     % table support for pandoc >= 2.11.3
+    \usepackage{calc}      % table minipage width calculation for pandoc >= 2.11.1
+    \usepackage[inline]{enumitem} % IRkernel/repr support (it uses the enumerate* environment)
+    \usepackage[normalem]{ulem} % ulem is needed to support strikethroughs (\sout)
+                                % normalem makes italics be italics, not underlines
+    \usepackage{soul}      % strikethrough (\st) support for pandoc >= 3.0.0
+    \usepackage{mathrsfs}
+    
+
+    
+    % Colors for the hyperref package
+    \definecolor{urlcolor}{rgb}{0,.145,.698}
+    \definecolor{linkcolor}{rgb}{.71,0.21,0.01}
+    \definecolor{citecolor}{rgb}{.12,.54,.11}
+
+    % ANSI colors
+    \definecolor{ansi-black}{HTML}{3E424D}
+    \definecolor{ansi-black-intense}{HTML}{282C36}
+    \definecolor{ansi-red}{HTML}{E75C58}
+    \definecolor{ansi-red-intense}{HTML}{B22B31}
+    \definecolor{ansi-green}{HTML}{00A250}
+    \definecolor{ansi-green-intense}{HTML}{007427}
+    \definecolor{ansi-yellow}{HTML}{DDB62B}
+    \definecolor{ansi-yellow-intense}{HTML}{B27D12}
+    \definecolor{ansi-blue}{HTML}{208FFB}
+    \definecolor{ansi-blue-intense}{HTML}{0065CA}
+    \definecolor{ansi-magenta}{HTML}{D160C4}
+    \definecolor{ansi-magenta-intense}{HTML}{A03196}
+    \definecolor{ansi-cyan}{HTML}{60C6C8}
+    \definecolor{ansi-cyan-intense}{HTML}{258F8F}
+    \definecolor{ansi-white}{HTML}{C5C1B4}
+    \definecolor{ansi-white-intense}{HTML}{A1A6B2}
+    \definecolor{ansi-default-inverse-fg}{HTML}{FFFFFF}
+    \definecolor{ansi-default-inverse-bg}{HTML}{000000}
+
+    % common color for the border for error outputs.
+    \definecolor{outerrorbackground}{HTML}{FFDFDF}
+
+    % commands and environments needed by pandoc snippets
+    % extracted from the output of `pandoc -s`
+    \providecommand{\tightlist}{%
+      \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+    \DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+    % Add ',fontsize=\small' for more characters per line
+    \newenvironment{Shaded}{}{}
+    \newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{{#1}}}}
+    \newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.56,0.13,0.00}{{#1}}}
+    \newcommand{\DecValTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\FloatTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\CharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\StringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\CommentTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textit{{#1}}}}
+    \newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{{#1}}}
+    \newcommand{\AlertTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{{#1}}}}
+    \newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.02,0.16,0.49}{{#1}}}
+    \newcommand{\RegionMarkerTok}[1]{{#1}}
+    \newcommand{\ErrorTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{{#1}}}}
+    \newcommand{\NormalTok}[1]{{#1}}
+
+    % Additional commands for more recent versions of Pandoc
+    \newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.53,0.00,0.00}{{#1}}}
+    \newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.73,0.40,0.53}{{#1}}}
+    \newcommand{\ImportTok}[1]{{#1}}
+    \newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.73,0.13,0.13}{\textit{{#1}}}}
+    \newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \newcommand{\VariableTok}[1]{\textcolor[rgb]{0.10,0.09,0.49}{{#1}}}
+    \newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{{#1}}}}
+    \newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.40,0.40,0.40}{{#1}}}
+    \newcommand{\BuiltInTok}[1]{{#1}}
+    \newcommand{\ExtensionTok}[1]{{#1}}
+    \newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.74,0.48,0.00}{{#1}}}
+    \newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.49,0.56,0.16}{{#1}}}
+    \newcommand{\InformationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \newcommand{\WarningTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \makeatletter
+    \newsavebox\pandoc@box
+    \newcommand*\pandocbounded[1]{%
+      \sbox\pandoc@box{#1}%
+      % scaling factors for width and height
+      \Gscale@div\@tempa\textheight{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+      \Gscale@div\@tempb\linewidth{\wd\pandoc@box}%
+      % select the smaller of both
+      \ifdim\@tempb\p@<\@tempa\p@
+        \let\@tempa\@tempb
+      \fi
+      % scaling accordingly (\@tempa < 1)
+      \ifdim\@tempa\p@<\p@
+        \scalebox{\@tempa}{\usebox\pandoc@box}%
+      % scaling not needed, use as it is
+      \else
+        \usebox{\pandoc@box}%
+      \fi
+    }
+    \makeatother
+
+    % Define a nice break command that doesn't care if a line doesn't already
+    % exist.
+    \def\br{\hspace*{\fill} \\* }
+    % Math Jax compatibility definitions
+    \def\gt{>}
+    \def\lt{<}
+    \let\Oldtex\TeX
+    \let\Oldlatex\LaTeX
+    \renewcommand{\TeX}{\textrm{\Oldtex}}
+    \renewcommand{\LaTeX}{\textrm{\Oldlatex}}
+    % Document parameters
+    % Document title
+    \title{3.1.5}
+    
+    
+    
+    
+    
+    
+    
+% Pygments definitions
+\makeatletter
+\def\PY@reset{\let\PY@it=\relax \let\PY@bf=\relax%
+    \let\PY@ul=\relax \let\PY@tc=\relax%
+    \let\PY@bc=\relax \let\PY@ff=\relax}
+\def\PY@tok#1{\csname PY@tok@#1\endcsname}
+\def\PY@toks#1+{\ifx\relax#1\empty\else%
+    \PY@tok{#1}\expandafter\PY@toks\fi}
+\def\PY@do#1{\PY@bc{\PY@tc{\PY@ul{%
+    \PY@it{\PY@bf{\PY@ff{#1}}}}}}}
+\def\PY#1#2{\PY@reset\PY@toks#1+\relax+\PY@do{#2}}
+
+\@namedef{PY@tok@w}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.73,0.73}{##1}}}
+\@namedef{PY@tok@c}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@cp}{\def\PY@tc##1{\textcolor[rgb]{0.61,0.40,0.00}{##1}}}
+\@namedef{PY@tok@k}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kp}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kt}{\def\PY@tc##1{\textcolor[rgb]{0.69,0.00,0.25}{##1}}}
+\@namedef{PY@tok@o}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@ow}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.67,0.13,1.00}{##1}}}
+\@namedef{PY@tok@nb}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@nf}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\@namedef{PY@tok@nc}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\@namedef{PY@tok@nn}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\@namedef{PY@tok@ne}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.80,0.25,0.22}{##1}}}
+\@namedef{PY@tok@nv}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@no}{\def\PY@tc##1{\textcolor[rgb]{0.53,0.00,0.00}{##1}}}
+\@namedef{PY@tok@nl}{\def\PY@tc##1{\textcolor[rgb]{0.46,0.46,0.00}{##1}}}
+\@namedef{PY@tok@ni}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.44,0.44,0.44}{##1}}}
+\@namedef{PY@tok@na}{\def\PY@tc##1{\textcolor[rgb]{0.41,0.47,0.13}{##1}}}
+\@namedef{PY@tok@nt}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@nd}{\def\PY@tc##1{\textcolor[rgb]{0.67,0.13,1.00}{##1}}}
+\@namedef{PY@tok@s}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@sd}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@si}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.64,0.35,0.47}{##1}}}
+\@namedef{PY@tok@se}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.67,0.36,0.12}{##1}}}
+\@namedef{PY@tok@sr}{\def\PY@tc##1{\textcolor[rgb]{0.64,0.35,0.47}{##1}}}
+\@namedef{PY@tok@ss}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@sx}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@m}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@gh}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.50}{##1}}}
+\@namedef{PY@tok@gu}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.50,0.00,0.50}{##1}}}
+\@namedef{PY@tok@gd}{\def\PY@tc##1{\textcolor[rgb]{0.63,0.00,0.00}{##1}}}
+\@namedef{PY@tok@gi}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.52,0.00}{##1}}}
+\@namedef{PY@tok@gr}{\def\PY@tc##1{\textcolor[rgb]{0.89,0.00,0.00}{##1}}}
+\@namedef{PY@tok@ge}{\let\PY@it=\textit}
+\@namedef{PY@tok@gs}{\let\PY@bf=\textbf}
+\@namedef{PY@tok@ges}{\let\PY@bf=\textbf\let\PY@it=\textit}
+\@namedef{PY@tok@gp}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.50}{##1}}}
+\@namedef{PY@tok@go}{\def\PY@tc##1{\textcolor[rgb]{0.44,0.44,0.44}{##1}}}
+\@namedef{PY@tok@gt}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.27,0.87}{##1}}}
+\@namedef{PY@tok@err}{\def\PY@bc##1{{\setlength{\fboxsep}{\string -\fboxrule}\fcolorbox[rgb]{1.00,0.00,0.00}{1,1,1}{\strut ##1}}}}
+\@namedef{PY@tok@kc}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kd}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kn}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kr}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@bp}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@fm}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\@namedef{PY@tok@vc}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@vg}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@vi}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@vm}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@sa}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@sb}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@sc}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@dl}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@s2}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@sh}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@s1}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@mb}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@mf}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@mh}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@mi}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@il}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@mo}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@ch}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@cm}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@cpf}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@c1}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@cs}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+
+\def\PYZbs{\char`\\}
+\def\PYZus{\char`\_}
+\def\PYZob{\char`\{}
+\def\PYZcb{\char`\}}
+\def\PYZca{\char`\^}
+\def\PYZam{\char`\&}
+\def\PYZlt{\char`\<}
+\def\PYZgt{\char`\>}
+\def\PYZsh{\char`\#}
+\def\PYZpc{\char`\%}
+\def\PYZdl{\char`\$}
+\def\PYZhy{\char`\-}
+\def\PYZsq{\char`\'}
+\def\PYZdq{\char`\"}
+\def\PYZti{\char`\~}
+% for compatibility with earlier versions
+\def\PYZat{@}
+\def\PYZlb{[}
+\def\PYZrb{]}
+\makeatother
+
+
+    % For linebreaks inside Verbatim environment from package fancyvrb.
+    \makeatletter
+        \newbox\Wrappedcontinuationbox
+        \newbox\Wrappedvisiblespacebox
+        \newcommand*\Wrappedvisiblespace {\textcolor{red}{\textvisiblespace}}
+        \newcommand*\Wrappedcontinuationsymbol {\textcolor{red}{\llap{\tiny$\m@th\hookrightarrow$}}}
+        \newcommand*\Wrappedcontinuationindent {3ex }
+        \newcommand*\Wrappedafterbreak {\kern\Wrappedcontinuationindent\copy\Wrappedcontinuationbox}
+        % Take advantage of the already applied Pygments mark-up to insert
+        % potential linebreaks for TeX processing.
+        %        {, <, #, %, $, ' and ": go to next line.
+        %        _, }, ^, &, >, - and ~: stay at end of broken line.
+        % Use of \textquotesingle for straight quote.
+        \newcommand*\Wrappedbreaksatspecials {%
+            \def\PYGZus{\discretionary{\char`\_}{\Wrappedafterbreak}{\char`\_}}%
+            \def\PYGZob{\discretionary{}{\Wrappedafterbreak\char`\{}{\char`\{}}%
+            \def\PYGZcb{\discretionary{\char`\}}{\Wrappedafterbreak}{\char`\}}}%
+            \def\PYGZca{\discretionary{\char`\^}{\Wrappedafterbreak}{\char`\^}}%
+            \def\PYGZam{\discretionary{\char`\&}{\Wrappedafterbreak}{\char`\&}}%
+            \def\PYGZlt{\discretionary{}{\Wrappedafterbreak\char`\<}{\char`\<}}%
+            \def\PYGZgt{\discretionary{\char`\>}{\Wrappedafterbreak}{\char`\>}}%
+            \def\PYGZsh{\discretionary{}{\Wrappedafterbreak\char`\#}{\char`\#}}%
+            \def\PYGZpc{\discretionary{}{\Wrappedafterbreak\char`\%}{\char`\%}}%
+            \def\PYGZdl{\discretionary{}{\Wrappedafterbreak\char`\$}{\char`\$}}%
+            \def\PYGZhy{\discretionary{\char`\-}{\Wrappedafterbreak}{\char`\-}}%
+            \def\PYGZsq{\discretionary{}{\Wrappedafterbreak\textquotesingle}{\textquotesingle}}%
+            \def\PYGZdq{\discretionary{}{\Wrappedafterbreak\char`\"}{\char`\"}}%
+            \def\PYGZti{\discretionary{\char`\~}{\Wrappedafterbreak}{\char`\~}}%
+        }
+        % Some characters . , ; ? ! / are not pygmentized.
+        % This macro makes them "active" and they will insert potential linebreaks
+        \newcommand*\Wrappedbreaksatpunct {%
+            \lccode`\~`\.\lowercase{\def~}{\discretionary{\hbox{\char`\.}}{\Wrappedafterbreak}{\hbox{\char`\.}}}%
+            \lccode`\~`\,\lowercase{\def~}{\discretionary{\hbox{\char`\,}}{\Wrappedafterbreak}{\hbox{\char`\,}}}%
+            \lccode`\~`\;\lowercase{\def~}{\discretionary{\hbox{\char`\;}}{\Wrappedafterbreak}{\hbox{\char`\;}}}%
+            \lccode`\~`\:\lowercase{\def~}{\discretionary{\hbox{\char`\:}}{\Wrappedafterbreak}{\hbox{\char`\:}}}%
+            \lccode`\~`\?\lowercase{\def~}{\discretionary{\hbox{\char`\?}}{\Wrappedafterbreak}{\hbox{\char`\?}}}%
+            \lccode`\~`\!\lowercase{\def~}{\discretionary{\hbox{\char`\!}}{\Wrappedafterbreak}{\hbox{\char`\!}}}%
+            \lccode`\~`\/\lowercase{\def~}{\discretionary{\hbox{\char`\/}}{\Wrappedafterbreak}{\hbox{\char`\/}}}%
+            \catcode`\.\active
+            \catcode`\,\active
+            \catcode`\;\active
+            \catcode`\:\active
+            \catcode`\?\active
+            \catcode`\!\active
+            \catcode`\/\active
+            \lccode`\~`\~
+        }
+    \makeatother
+
+    \let\OriginalVerbatim=\Verbatim
+    \makeatletter
+    \renewcommand{\Verbatim}[1][1]{%
+        %\parskip\z@skip
+        \sbox\Wrappedcontinuationbox {\Wrappedcontinuationsymbol}%
+        \sbox\Wrappedvisiblespacebox {\FV@SetupFont\Wrappedvisiblespace}%
+        \def\FancyVerbFormatLine ##1{\hsize\linewidth
+            \vtop{\raggedright\hyphenpenalty\z@\exhyphenpenalty\z@
+                \doublehyphendemerits\z@\finalhyphendemerits\z@
+                \strut ##1\strut}%
+        }%
+        % If the linebreak is at a space, the latter will be displayed as visible
+        % space at end of first line, and a continuation symbol starts next line.
+        % Stretch/shrink are however usually zero for typewriter font.
+        \def\FV@Space {%
+            \nobreak\hskip\z@ plus\fontdimen3\font minus\fontdimen4\font
+            \discretionary{\copy\Wrappedvisiblespacebox}{\Wrappedafterbreak}
+            {\kern\fontdimen2\font}%
+        }%
+
+        % Allow breaks at special characters using \PYG... macros.
+        \Wrappedbreaksatspecials
+        % Breaks at punctuation characters . , ; ? ! and / need catcode=\active
+        \OriginalVerbatim[#1,codes*=\Wrappedbreaksatpunct]%
+    }
+    \makeatother
+
+    % Exact colors from NB
+    \definecolor{incolor}{HTML}{303F9F}
+    \definecolor{outcolor}{HTML}{D84315}
+    \definecolor{cellborder}{HTML}{CFCFCF}
+    \definecolor{cellbackground}{HTML}{F7F7F7}
+
+    % prompt
+    \makeatletter
+    \newcommand{\boxspacing}{\kern\kvtcb@left@rule\kern\kvtcb@boxsep}
+    \makeatother
+    \newcommand{\prompt}[4]{
+        {\ttfamily\llap{{\color{#2}[#3]:\hspace{3pt}#4}}\vspace{-\baselineskip}}
+    }
+    
+
+    
+    % Prevent overflowing lines due to hard-to-break entities
+    \sloppy
+    % Setup hyperref package
+    \hypersetup{
+      breaklinks=true,  % so long urls are correctly broken across lines
+      colorlinks=true,
+      urlcolor=urlcolor,
+      linkcolor=linkcolor,
+      citecolor=citecolor,
+      }
+    % Slightly bigger margins than the latex defaults
+    
+    \geometry{verbose,tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
+    
+    
+
+\begin{document}
+    
+    \maketitle
+    
+    
+
+    
+    \section{3.1.5 --- Cartan / SN derivator özdeşlikleri (form + dual
+multivector)}\label{cartan-sn-derivator-uxf6zdeux15flikleri-form-dual-multivector}
+
+\textbf{Hedef.} 3.1.4'ün üç türetilmiş özdeşliği gibi, ama bu sefer
+\emph{derivator-of-derivation} yapısında: bir derivasyon \(D\) ve bir
+bracket \([\cdot,\cdot]\) ikilisi için \emph{derivator} obstruction
+\(D^{[\cdot,\cdot]}_D(a,b) := D[a,b] - [Da, b] - (-1)^{|a||D|}[a, Db]\)
+sıfırdan farklı kalan altı kanonik kurguyu (üçü Koszul-bracket'i form
+tarafında, üçü Schouten--Nijenhuis bracket'i multivector tarafında)
+sentaktik olarak kapatmak:
+
+\[
+\begin{aligned}
+\textbf{Form } &\\
+(1)\;& D^{T^{*}M}_{\mathcal{L}_U}(\eta, \mu)
+       \;=\; \mathcal{L}_{\tilde{K}_\eta U}\,\mu + K_{\tilde{K}_\mu U}\,\eta, \\
+(2)\;& \mathcal{L}_{\tilde{d}\,\tilde{\iota}_\eta U}\,\mu
+       \;=\; -\,[d\,\iota_U \eta,\;\mu]_K, \\
+(3)\;& 0 \;=\; d\,\iota_{\tilde{\mathcal{L}}_\omega W}\,\eta
+       - d\,\iota_{\tilde{d}\,\tilde{\iota}_\eta W}\,\omega
+       + d\,\iota_W\,[\omega, \eta]_K. \\[4pt]
+\textbf{Dual (multivector) } &\\
+(1')\;& \tilde{D}^{\mathrm{SN}}_{\tilde{\mathcal{L}}_\eta}(U, V)
+       \;=\; \tilde{\mathcal{L}}_{K_U \eta}\,V + \tilde{K}_{K_V \eta}\,U, \\
+(2')\;& \tilde{\mathcal{L}}_{d\,\iota_U \eta}\,V
+       \;=\; -\,[\tilde{d}\,\tilde{\iota}_\eta U,\;V]_{\mathrm{SN}}, \\
+(3')\;& 0 \;=\; \tilde{d}\,\tilde{\iota}_{\mathcal{L}_U \eta}\,V
+       - \tilde{d}\,\tilde{\iota}_{d\,\iota_V \eta}\,U
+       + \tilde{d}\,\tilde{\iota}_\eta\,[U, V]_{\mathrm{SN}}.
+\end{aligned}
+\]
+
+Tu/Cattaneo §3.1.5'in altı özdeşliği bu çiftleme ---
+\((1)\leftrightarrow(1')\), \((2)\leftrightarrow(2')\),
+\((3)\leftrightarrow(3')\) --- Koszul ile Schouten--Nijenhuis bracket
+arasındaki form/multivector dualitesini somutlaştırıyor. Tüm kanıtlar
+Poisson varsayımı altında (\([\pi,\pi]_{\mathrm{SN}} = 0\)).
+
+    \subsection{Strateji}\label{strateji}
+
+\textbf{Form tarafı (1)/(2)/(3).}
+\texttt{KoszulProblem.derivator\_form\_engine()} ---
+\texttt{intrinsic\_engine\_with\_closure} tabanı + form-side Cartan
+intrinsics + 10 closure aksiyomu (Faz 15.C pass 1) ---
+\texttt{prove\_derivator(\ …,\ side="form")} üzerinden \(Y\) bir vector
+field probe'u ile değerlendirilen \texttt{MultiEval} sarması altında
+kapanıyor.
+
+\textbf{Multivector tarafı (1')/(2')/(3').}
+\texttt{derivator\_multivector\_engine()} form tarafının dual
+genişlemesi: aynı tabana 13 closure aksiyomu (Faz 15.C pass 2 + pass 3)
+ekleniyor:
+
+\begin{itemize}
+\tightlist
+\item
+  SN→LBVF coercion (1-vfs için), tilde-iota / pairing-flip / d-on-scalar
+  / L-on-scalar bridge'leri, HVF iç-iota normalizasyonu, SN/LBVF Neg ve
+  Sum doğrusallıkları (pass 2),
+\item
+  \texttt{TildeLieOnOneVectorLichnerowiczDefinition} ---
+  \(\tilde{\mathcal{L}}_\alpha U
+  = -X_{\alpha(U)} + \pi^\sharp(\mathcal{L}_U \alpha) - [U, \pi^\sharp \alpha]_{VF}\)
+  Lichnerowicz açılımı,
+\item
+  \texttt{SharpNegLinearityDefinition} ---
+  \(\pi^\sharp(\mathrm{Neg}(A)) \to
+  \mathrm{Neg}(\pi^\sharp(A))\) böylece işaretler dışarı çıkıp eşleşip
+  iptal olabiliyor,
+\item
+  \texttt{BareAtomSlotLiftDefinition} --- \texttt{LieBracketVF} gibi
+  opak operator atomlarının özel slotları, atom doğrudan
+  \texttt{MultiEval} argümanı olduğunda da inner-engine ile açılıyor
+  (pass 3).
+\end{itemize}
+
+\texttt{prove\_derivator(…,\ side="multivector")} \(\xi\) bir 1-form
+probe'u ile (\texttt{slot\_kind="covector"}) değerlendiriyor. Y ve
+U/V/W'nin ayarları \texttt{KoszulProblem} ile çözülüyor: Y, Z probe'lar
+\texttt{Derivation} atom; U, V, W ise registry-declare edilmiş
+\texttt{Symbol} 1-vector --- bu sayede \texttt{\_is\_plain\_vf} ve
+closure aksiyomları doğru şekilde tanıyor.
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{1}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{c+c1}{\PYZsh{} Notebook doğrudan açıldığında jacopy\PYZsq{}ı import edilebilir hâle getirir.}
+\PY{k}{try}\PY{p}{:}
+    \PY{k+kn}{import}\PY{+w}{ }\PY{n+nn}{jacopy}  \PY{c+c1}{\PYZsh{} noqa: F401}
+\PY{k}{except} \PY{n+ne}{ModuleNotFoundError}\PY{p}{:}
+    \PY{k+kn}{import}\PY{+w}{ }\PY{n+nn}{sys}
+    \PY{k+kn}{from}\PY{+w}{ }\PY{n+nn}{pathlib}\PY{+w}{ }\PY{k+kn}{import} \PY{n}{Path}
+    \PY{n}{here} \PY{o}{=} \PY{n}{Path}\PY{o}{.}\PY{n}{cwd}\PY{p}{(}\PY{p}{)}\PY{o}{.}\PY{n}{resolve}\PY{p}{(}\PY{p}{)}
+    \PY{k}{for} \PY{n}{candidate} \PY{o+ow}{in} \PY{p}{(}\PY{n}{here}\PY{p}{,} \PY{o}{*}\PY{n}{here}\PY{o}{.}\PY{n}{parents}\PY{p}{)}\PY{p}{:}
+        \PY{k}{if} \PY{p}{(}\PY{n}{candidate} \PY{o}{/} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{jacopy}\PY{l+s+s2}{\PYZdq{}} \PY{o}{/} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{\PYZus{}\PYZus{}init\PYZus{}\PYZus{}.py}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}\PY{o}{.}\PY{n}{is\PYZus{}file}\PY{p}{(}\PY{p}{)}\PY{p}{:}
+            \PY{n}{sys}\PY{o}{.}\PY{n}{path}\PY{o}{.}\PY{n}{insert}\PY{p}{(}\PY{l+m+mi}{0}\PY{p}{,} \PY{n+nb}{str}\PY{p}{(}\PY{n}{candidate}\PY{p}{)}\PY{p}{)}
+            \PY{k}{break}
+    \PY{k+kn}{import}\PY{+w}{ }\PY{n+nn}{jacopy}  \PY{c+c1}{\PYZsh{} noqa: F401}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \subsection{1. Kurulum}\label{kurulum}
+
+Tek bir \texttt{KoszulProblem} üzerinden hem form hem multivector
+tarafını test ediyoruz: form inventory \((\omega, \eta, \mu)\) 1-formlar
++ multivector inventory \((U, V, W)\) 1-vfs. Probe değişkenleri:
+
+\begin{itemize}
+\tightlist
+\item
+  \(Y\), \(Z\) --- \texttt{Derivation} atomları (form-side
+  \texttt{MultiEval} evaluasyonu),
+\item
+  \(\xi\), \(\zeta\) --- registry-declare edilmiş 1-form
+  \texttt{Symbol}'leri (multivector-side \texttt{MultiEval}
+  evaluasyonu).
+\end{itemize}
+
+\texttt{prob.assume\_poisson()} Jacobi koşulunu varsayıyor; tilde
+tarafının \(\tilde{d}^2 = 0\), \(\tilde{\mathcal{L}}_\pi = 0\)
+vs.~kuralları bu varsayım üzerinden tetikleniyor.
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{2}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k+kn}{from}\PY{+w}{ }\PY{n+nn}{jacopy}\PY{n+nn}{.}\PY{n+nn}{algebra}\PY{n+nn}{.}\PY{n+nn}{derivation}\PY{+w}{ }\PY{k+kn}{import} \PY{n}{Act}\PY{p}{,} \PY{n}{Derivation}
+\PY{k+kn}{from}\PY{+w}{ }\PY{n+nn}{jacopy}\PY{n+nn}{.}\PY{n+nn}{brackets}\PY{n+nn}{.}\PY{n+nn}{base}\PY{+w}{ }\PY{k+kn}{import} \PY{n}{BracketApply}
+\PY{k+kn}{from}\PY{+w}{ }\PY{n+nn}{jacopy}\PY{n+nn}{.}\PY{n+nn}{brackets}\PY{n+nn}{.}\PY{n+nn}{schouten}\PY{+w}{ }\PY{k+kn}{import} \PY{n}{sn} \PY{k}{as} \PY{n}{default\PYZus{}sn}
+\PY{k+kn}{from}\PY{+w}{ }\PY{n+nn}{jacopy}\PY{n+nn}{.}\PY{n+nn}{calculus}\PY{n+nn}{.}\PY{n+nn}{cartan\PYZus{}remainder}\PY{+w}{ }\PY{k+kn}{import} \PY{n}{K}
+\PY{k+kn}{from}\PY{+w}{ }\PY{n+nn}{jacopy}\PY{n+nn}{.}\PY{n+nn}{calculus}\PY{n+nn}{.}\PY{n+nn}{derivator}\PY{+w}{ }\PY{k+kn}{import} \PY{n}{derivator}
+\PY{k+kn}{from}\PY{+w}{ }\PY{n+nn}{jacopy}\PY{n+nn}{.}\PY{n+nn}{calculus}\PY{n+nn}{.}\PY{n+nn}{exterior\PYZus{}d}\PY{+w}{ }\PY{k+kn}{import} \PY{n}{d} \PY{k}{as} \PY{n}{default\PYZus{}d}
+\PY{k+kn}{from}\PY{+w}{ }\PY{n+nn}{jacopy}\PY{n+nn}{.}\PY{n+nn}{calculus}\PY{n+nn}{.}\PY{n+nn}{interior}\PY{+w}{ }\PY{k+kn}{import} \PY{n}{interior}
+\PY{k+kn}{from}\PY{+w}{ }\PY{n+nn}{jacopy}\PY{n+nn}{.}\PY{n+nn}{calculus}\PY{n+nn}{.}\PY{n+nn}{lie\PYZus{}derivative}\PY{+w}{ }\PY{k+kn}{import} \PY{n}{lie\PYZus{}derivative}
+\PY{k+kn}{from}\PY{+w}{ }\PY{n+nn}{jacopy}\PY{n+nn}{.}\PY{n+nn}{calculus}\PY{n+nn}{.}\PY{n+nn}{tilde}\PY{+w}{ }\PY{k+kn}{import} \PY{n}{K\PYZus{}tilde}\PY{p}{,} \PY{n}{tilde\PYZus{}d}\PY{p}{,} \PY{n}{tilde\PYZus{}interior}\PY{p}{,} \PY{n}{tilde\PYZus{}lie}
+\PY{k+kn}{from}\PY{+w}{ }\PY{n+nn}{jacopy}\PY{n+nn}{.}\PY{n+nn}{core}\PY{n+nn}{.}\PY{n+nn}{expr}\PY{+w}{ }\PY{k+kn}{import} \PY{n}{Neg}\PY{p}{,} \PY{n}{Sum}\PY{p}{,} \PY{n}{Symbol}
+\PY{k+kn}{from}\PY{+w}{ }\PY{n+nn}{jacopy}\PY{n+nn}{.}\PY{n+nn}{core}\PY{n+nn}{.}\PY{n+nn}{properties}\PY{+w}{ }\PY{k+kn}{import} \PY{n}{Graded}
+\PY{k+kn}{from}\PY{+w}{ }\PY{n+nn}{jacopy}\PY{n+nn}{.}\PY{n+nn}{core}\PY{n+nn}{.}\PY{n+nn}{registry}\PY{+w}{ }\PY{k+kn}{import} \PY{n}{PropertyRegistry}
+\PY{k+kn}{from}\PY{+w}{ }\PY{n+nn}{jacopy}\PY{n+nn}{.}\PY{n+nn}{display}\PY{n+nn}{.}\PY{n+nn}{jupyter}\PY{+w}{ }\PY{k+kn}{import} \PY{n}{display\PYZus{}chain}
+\PY{k+kn}{from}\PY{+w}{ }\PY{n+nn}{jacopy}\PY{n+nn}{.}\PY{n+nn}{library}\PY{n+nn}{.}\PY{n+nn}{koszul\PYZus{}problem}\PY{+w}{ }\PY{k+kn}{import} \PY{n}{KoszulProblem}
+
+
+\PY{n}{reg} \PY{o}{=} \PY{n}{PropertyRegistry}\PY{p}{(}\PY{p}{)}
+\PY{n}{pi} \PY{o}{=} \PY{n}{Symbol}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{π}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n}{omega} \PY{o}{=} \PY{n}{Symbol}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{ω}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}\PY{p}{;} \PY{n}{reg}\PY{o}{.}\PY{n}{declare}\PY{p}{(}\PY{n}{omega}\PY{p}{,} \PY{n}{Graded}\PY{p}{(}\PY{n}{degree}\PY{o}{=}\PY{l+m+mi}{1}\PY{p}{)}\PY{p}{)}
+\PY{n}{eta} \PY{o}{=} \PY{n}{Symbol}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{η}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}\PY{p}{;}   \PY{n}{reg}\PY{o}{.}\PY{n}{declare}\PY{p}{(}\PY{n}{eta}\PY{p}{,} \PY{n}{Graded}\PY{p}{(}\PY{n}{degree}\PY{o}{=}\PY{l+m+mi}{1}\PY{p}{)}\PY{p}{)}
+\PY{n}{mu} \PY{o}{=} \PY{n}{Symbol}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{μ}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}\PY{p}{;}    \PY{n}{reg}\PY{o}{.}\PY{n}{declare}\PY{p}{(}\PY{n}{mu}\PY{p}{,} \PY{n}{Graded}\PY{p}{(}\PY{n}{degree}\PY{o}{=}\PY{l+m+mi}{1}\PY{p}{)}\PY{p}{)}
+\PY{n}{U} \PY{o}{=} \PY{n}{Symbol}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{U}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}\PY{p}{;}     \PY{n}{reg}\PY{o}{.}\PY{n}{declare}\PY{p}{(}\PY{n}{U}\PY{p}{,} \PY{n}{Graded}\PY{p}{(}\PY{n}{degree}\PY{o}{=}\PY{l+m+mi}{1}\PY{p}{)}\PY{p}{)}
+\PY{n}{V} \PY{o}{=} \PY{n}{Symbol}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{V}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}\PY{p}{;}     \PY{n}{reg}\PY{o}{.}\PY{n}{declare}\PY{p}{(}\PY{n}{V}\PY{p}{,} \PY{n}{Graded}\PY{p}{(}\PY{n}{degree}\PY{o}{=}\PY{l+m+mi}{1}\PY{p}{)}\PY{p}{)}
+\PY{n}{W} \PY{o}{=} \PY{n}{Symbol}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{W}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}\PY{p}{;}     \PY{n}{reg}\PY{o}{.}\PY{n}{declare}\PY{p}{(}\PY{n}{W}\PY{p}{,} \PY{n}{Graded}\PY{p}{(}\PY{n}{degree}\PY{o}{=}\PY{l+m+mi}{1}\PY{p}{)}\PY{p}{)}
+
+\PY{n}{Y} \PY{o}{=} \PY{n}{Derivation}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Y}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{l+m+mi}{0}\PY{p}{)}
+\PY{n}{Z} \PY{o}{=} \PY{n}{Derivation}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Z}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{l+m+mi}{0}\PY{p}{)}
+\PY{n}{xi} \PY{o}{=} \PY{n}{Symbol}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{ξ}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}\PY{p}{;}    \PY{n}{reg}\PY{o}{.}\PY{n}{declare}\PY{p}{(}\PY{n}{xi}\PY{p}{,} \PY{n}{Graded}\PY{p}{(}\PY{n}{degree}\PY{o}{=}\PY{l+m+mi}{1}\PY{p}{)}\PY{p}{)}
+\PY{n}{zeta} \PY{o}{=} \PY{n}{Symbol}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{ζ}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}\PY{p}{;}  \PY{n}{reg}\PY{o}{.}\PY{n}{declare}\PY{p}{(}\PY{n}{zeta}\PY{p}{,} \PY{n}{Graded}\PY{p}{(}\PY{n}{degree}\PY{o}{=}\PY{l+m+mi}{1}\PY{p}{)}\PY{p}{)}
+
+\PY{n}{prob} \PY{o}{=} \PY{n}{KoszulProblem}\PY{p}{(}
+    \PY{n}{pi}\PY{p}{,} \PY{p}{(}\PY{n}{omega}\PY{p}{,} \PY{n}{eta}\PY{p}{,} \PY{n}{mu}\PY{p}{)}\PY{p}{,}
+    \PY{n}{registry}\PY{o}{=}\PY{n}{reg}\PY{p}{,}
+    \PY{n}{multivectors}\PY{o}{=}\PY{p}{(}\PY{p}{(}\PY{n}{U}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{)}\PY{p}{,} \PY{p}{(}\PY{n}{V}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{)}\PY{p}{,} \PY{p}{(}\PY{n}{W}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{)}\PY{p}{)}\PY{p}{,}
+\PY{p}{)}
+\PY{n}{prob}\PY{o}{.}\PY{n}{assume\PYZus{}poisson}\PY{p}{(}\PY{p}{)}
+\PY{n}{K\PYZus{}b} \PY{o}{=} \PY{n}{prob}\PY{o}{.}\PY{n}{koszul\PYZus{}bracket}
+
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Form\PYZhy{}side engine kural sayısı       :}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}
+      \PY{n+nb}{len}\PY{p}{(}\PY{n}{prob}\PY{o}{.}\PY{n}{derivator\PYZus{}form\PYZus{}engine}\PY{p}{(}\PY{p}{)}\PY{o}{.}\PY{n}{definitions}\PY{p}{)}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Multivector\PYZhy{}side engine kural sayısı:}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}
+      \PY{n+nb}{len}\PY{p}{(}\PY{n}{prob}\PY{o}{.}\PY{n}{derivator\PYZus{}multivector\PYZus{}engine}\PY{p}{(}\PY{p}{)}\PY{o}{.}\PY{n}{definitions}\PY{p}{)}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+Form-side engine kural sayısı       : 33
+Multivector-side engine kural sayısı: 63
+    \end{Verbatim}
+
+    \subsection{2. Form tarafı}\label{form-tarafux131}
+
+\subsubsection{\texorpdfstring{(1)
+\(D^{T^*M}_{\mathcal{L}_U}(\eta, \mu) = \mathcal{L}_{\tilde{K}_\eta U}\,\mu + K_{\tilde{K}_\mu U}\,\eta\)}{(1) D\^{}\{T\^{}*M\}\_\{\textbackslash mathcal\{L\}\_U\}(\textbackslash eta, \textbackslash mu) = \textbackslash mathcal\{L\}\_\{\textbackslash tilde\{K\}\_\textbackslash eta U\}\textbackslash,\textbackslash mu + K\_\{\textbackslash tilde\{K\}\_\textbackslash mu U\}\textbackslash,\textbackslash eta}}\label{dtm_mathcall_ueta-mu-mathcall_tildek_eta-umu-k_tildek_mu-ueta}
+
+Sol taraf \(\mathcal{L}_U\) derivasyonunun Koszul bracket
+\([\eta, \mu]_K\) üzerindeki obstruction'ı; sağ tarafta \(\tilde{K}\)
+(tilde Cartan-remainder) ile bağlanan iki düzeltme terimi. \(Y\) ile
+değerlendirilip skalere düşülüyor.
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{3}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{lhs} \PY{o}{=} \PY{n}{derivator}\PY{p}{(}\PY{n}{lie\PYZus{}derivative}\PY{p}{(}\PY{n}{U}\PY{p}{)}\PY{p}{,} \PY{n}{K\PYZus{}b}\PY{p}{,} \PY{n}{eta}\PY{p}{,} \PY{n}{mu}\PY{p}{)}
+\PY{n}{K\PYZus{}tilde\PYZus{}eta\PYZus{}U} \PY{o}{=} \PY{n}{Act}\PY{p}{(}\PY{n}{K\PYZus{}tilde}\PY{p}{(}\PY{n}{eta}\PY{p}{,} \PY{n}{pi}\PY{p}{)}\PY{p}{,} \PY{n}{U}\PY{p}{)}
+\PY{n}{K\PYZus{}tilde\PYZus{}mu\PYZus{}U}  \PY{o}{=} \PY{n}{Act}\PY{p}{(}\PY{n}{K\PYZus{}tilde}\PY{p}{(}\PY{n}{mu}\PY{p}{,} \PY{n}{pi}\PY{p}{)}\PY{p}{,}  \PY{n}{U}\PY{p}{)}
+\PY{n}{rhs} \PY{o}{=} \PY{n}{Sum}\PY{p}{(}
+    \PY{n}{Act}\PY{p}{(}\PY{n}{lie\PYZus{}derivative}\PY{p}{(}\PY{n}{K\PYZus{}tilde\PYZus{}eta\PYZus{}U}\PY{p}{)}\PY{p}{,} \PY{n}{mu}\PY{p}{)}\PY{p}{,}
+    \PY{n}{Act}\PY{p}{(}\PY{n}{K}\PY{p}{(}\PY{n}{K\PYZus{}tilde\PYZus{}mu\PYZus{}U}\PY{p}{)}\PY{p}{,} \PY{n}{eta}\PY{p}{)}\PY{p}{,}
+\PY{p}{)}
+\PY{n}{chain} \PY{o}{=} \PY{n}{prob}\PY{o}{.}\PY{n}{prove\PYZus{}derivator}\PY{p}{(}\PY{n}{lhs}\PY{p}{,} \PY{n}{rhs}\PY{p}{,} \PY{n}{eval\PYZus{}args}\PY{o}{=}\PY{p}{(}\PY{n}{Y}\PY{p}{,}\PY{p}{)}\PY{p}{,} \PY{n}{side}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{form}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{(1) form\PYZhy{}side, D\PYZca{}K\PYZus{}}\PY{l+s+se}{\PYZob{}\PYZob{}}\PY{l+s+s2}{L\PYZus{}U}\PY{l+s+se}{\PYZcb{}\PYZcb{}}\PY{l+s+s2}{(eta,mu) = L\PYZus{}}\PY{l+s+se}{\PYZob{}\PYZob{}}\PY{l+s+s2}{Ktilde\PYZus{}eta U}\PY{l+s+se}{\PYZcb{}\PYZcb{}}\PY{l+s+s2}{ mu + K\PYZus{}}\PY{l+s+se}{\PYZob{}\PYZob{}}\PY{l+s+s2}{Ktilde\PYZus{}mu U}\PY{l+s+se}{\PYZcb{}\PYZcb{}}\PY{l+s+s2}{ eta  \PYZhy{}\PYZhy{}\PYZgt{}  }\PY{l+s+si}{\PYZob{}}\PY{n+nb}{len}\PY{p}{(}\PY{n}{chain}\PY{p}{)}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{ adimda kapandi}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n}{display\PYZus{}chain}\PY{p}{(}\PY{n}{chain}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+(1) form-side, D\^{}K\_\{L\_U\}(eta,mu) = L\_\{Ktilde\_eta U\} mu + K\_\{Ktilde\_mu U\} eta
+-->  109 adimda kapandi
+    \end{Verbatim}
+ 
+            
+\prompt{Out}{outcolor}{3}{}
+    
+    {\allowdisplaybreaks\scriptsize
+\begin{gather*}
+\left[\eta,\, \mu\right]_{[\cdot,\cdot]_K[\pi]} \to L_\pi\sharp(\eta)\!\left(\mu\right) - L_\pi\sharp(\mu)\!\left(\eta\right) - d\!\left(\langle \pi\sharp\!\left(\eta\right),\, \mu \rangle\right) \quad \text{[[\ensuremath{\alpha}, \ensuremath{\beta}]\_K = L\_\ensuremath{\rho}\ensuremath{\alpha}(\ensuremath{\beta}) \ensuremath{-} L\_\ensuremath{\rho}\ensuremath{\beta}(\ensuremath{\alpha}) \ensuremath{-} d\ensuremath{\langle}\ensuremath{\rho}\ensuremath{\alpha}, \ensuremath{\beta}\ensuremath{\rangle} [[\ensuremath{\cdot},\ensuremath{\cdot}]\_K[\ensuremath{\pi}]]]\,(axiom)} \\
+\langle \pi\sharp\!\left(\eta\right),\, \mu \rangle \to \mu\!\left(\pi\sharp\!\left(\eta\right)\right) \quad \text{[\ensuremath{\langle}\ensuremath{\alpha}, X\ensuremath{\rangle} \ensuremath{\to} \ensuremath{\alpha}(X)]\,(axiom)} \\
+\mu\!\left(\pi\sharp\!\left(\eta\right)\right) \to -\eta\!\left(\pi\sharp\!\left(\mu\right)\right) \quad \text{[\ensuremath{\alpha}(\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\beta})) \ensuremath{\to} \ensuremath{-}\ensuremath{\beta}(\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\alpha})) [\ensuremath{\pi}]]\,(axiom)} \\
+\left[L_U\!\left(\eta\right),\, \mu\right]_{[\cdot,\cdot]_K[\pi]} \to L_{\pi\sharp(L_U(\eta))}\!\left(\mu\right) - L_\pi\sharp(\mu)\!\left(L_U\!\left(\eta\right)\right) - d\!\left(\langle \pi\sharp\!\left(L_U\!\left(\eta\right)\right),\, \mu \rangle\right) \quad \text{[[\ensuremath{\alpha}, \ensuremath{\beta}]\_K = L\_\ensuremath{\rho}\ensuremath{\alpha}(\ensuremath{\beta}) \ensuremath{-} L\_\ensuremath{\rho}\ensuremath{\beta}(\ensuremath{\alpha}) \ensuremath{-} d\ensuremath{\langle}\ensuremath{\rho}\ensuremath{\alpha}, \ensuremath{\beta}\ensuremath{\rangle} [[\ensuremath{\cdot},\ensuremath{\cdot}]\_K[\ensuremath{\pi}]]]\,(axiom)} \\
+\langle \pi\sharp\!\left(L_U\!\left(\eta\right)\right),\, \mu \rangle \to \mu\!\left(\pi\sharp\!\left(L_U\!\left(\eta\right)\right)\right) \quad \text{[\ensuremath{\langle}\ensuremath{\alpha}, X\ensuremath{\rangle} \ensuremath{\to} \ensuremath{\alpha}(X)]\,(axiom)} \\
+\mu\!\left(\pi\sharp\!\left(L_U\!\left(\eta\right)\right)\right) \to -\left(L_U\!\left(\eta\right)\right)\!\left(\pi\sharp\!\left(\mu\right)\right) \quad \text{[\ensuremath{\alpha}(\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\beta})) \ensuremath{\to} \ensuremath{-}\ensuremath{\beta}(\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\alpha})) [\ensuremath{\pi}]]\,(axiom)} \\
+\left(L_U\!\left(\eta\right)\right)\!\left(\pi\sharp\!\left(\mu\right)\right) \to U\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - \eta\!\left([U,\pi\sharp(\mu)]_{VF}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\left[\eta,\, L_U\!\left(\mu\right)\right]_{[\cdot,\cdot]_K[\pi]} \to L_\pi\sharp(\eta)\!\left(L_U\!\left(\mu\right)\right) - L_{\pi\sharp(L_U(\mu))}\!\left(\eta\right) - d\!\left(\langle \pi\sharp\!\left(\eta\right),\, L_U\!\left(\mu\right) \rangle\right) \quad \text{[[\ensuremath{\alpha}, \ensuremath{\beta}]\_K = L\_\ensuremath{\rho}\ensuremath{\alpha}(\ensuremath{\beta}) \ensuremath{-} L\_\ensuremath{\rho}\ensuremath{\beta}(\ensuremath{\alpha}) \ensuremath{-} d\ensuremath{\langle}\ensuremath{\rho}\ensuremath{\alpha}, \ensuremath{\beta}\ensuremath{\rangle} [[\ensuremath{\cdot},\ensuremath{\cdot}]\_K[\ensuremath{\pi}]]]\,(axiom)} \\
+\langle \pi\sharp\!\left(\eta\right),\, L_U\!\left(\mu\right) \rangle \to \left(L_U\!\left(\mu\right)\right)\!\left(\pi\sharp\!\left(\eta\right)\right) \quad \text{[\ensuremath{\langle}\ensuremath{\alpha}, X\ensuremath{\rangle} \ensuremath{\to} \ensuremath{\alpha}(X)]\,(axiom)} \\
+\left(L_U\!\left(\mu\right)\right)\!\left(\pi\sharp\!\left(\eta\right)\right) \to U\!\left(\mu\!\left(\pi\sharp\!\left(\eta\right)\right)\right) - \mu\!\left([U,\pi\sharp(\eta)]_{VF}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\mu\!\left(\pi\sharp\!\left(\eta\right)\right) \to -\eta\!\left(\pi\sharp\!\left(\mu\right)\right) \quad \text{[\ensuremath{\alpha}(\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\beta})) \ensuremath{\to} \ensuremath{-}\ensuremath{\beta}(\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\alpha})) [\ensuremath{\pi}]]\,(axiom)} \\
+\left(L_U\!\left(L_\pi\sharp(\eta)\!\left(\mu\right) - L_\pi\sharp(\mu)\!\left(\eta\right) - d\!\left(-\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right) - \left(L_{\pi\sharp(L_U(\eta))}\!\left(\mu\right) - L_\pi\sharp(\mu)\!\left(L_U\!\left(\eta\right)\right) - d\!\left(-\left(U\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - \eta\!\left([U,\pi\sharp(\mu)]_{VF}\right)\right)\right)\right) - \left(L_\pi\sharp(\eta)\!\left(L_U\!\left(\mu\right)\right) - L_{\pi\sharp(L_U(\mu))}\!\left(\eta\right) - d\!\left(U\!\left(-\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - \mu\!\left([U,\pi\sharp(\eta)]_{VF}\right)\right)\right)\right)\!\left(Y\right) \to \left(L_U\!\left(L_\pi\sharp(\eta)\!\left(\mu\right) - L_\pi\sharp(\mu)\!\left(\eta\right) - d\!\left(-\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right)\right)\!\left(Y\right) - \left(L_{\pi\sharp(L_U(\eta))}\!\left(\mu\right) - L_\pi\sharp(\mu)\!\left(L_U\!\left(\eta\right)\right) - d\!\left(-\left(U\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - \eta\!\left([U,\pi\sharp(\mu)]_{VF}\right)\right)\right)\right)\!\left(Y\right) - \left(L_\pi\sharp(\eta)\!\left(L_U\!\left(\mu\right)\right) - L_{\pi\sharp(L_U(\mu))}\!\left(\eta\right) - d\!\left(U\!\left(-\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - \mu\!\left([U,\pi\sharp(\eta)]_{VF}\right)\right)\right)\!\left(Y\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(L_U\!\left(L_\pi\sharp(\eta)\!\left(\mu\right) - L_\pi\sharp(\mu)\!\left(\eta\right) - d\!\left(-\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right)\right)\!\left(Y\right) \to U\!\left(\left(L_\pi\sharp(\eta)\!\left(\mu\right) - L_\pi\sharp(\mu)\!\left(\eta\right) - d\!\left(-\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right)\!\left(Y\right)\right) - \left(L_\pi\sharp(\eta)\!\left(\mu\right) - L_\pi\sharp(\mu)\!\left(\eta\right) - d\!\left(-\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right)\!\left([U,Y]_{VF}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\left(L_\pi\sharp(\eta)\!\left(\mu\right) - L_\pi\sharp(\mu)\!\left(\eta\right) - d\!\left(-\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right)\!\left(Y\right) \to \left(L_\pi\sharp(\eta)\!\left(\mu\right)\right)\!\left(Y\right) - \left(L_\pi\sharp(\mu)\!\left(\eta\right)\right)\!\left(Y\right) - \left(d\!\left(-\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right)\!\left(Y\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(L_\pi\sharp(\eta)\!\left(\mu\right)\right)\!\left(Y\right) \to \left(\pi\sharp\!\left(\eta\right)\right)\!\left(\mu\!\left(Y\right)\right) - \mu\!\left([\pi\sharp(\eta),Y]_{VF}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+[\pi\sharp(\eta),Y]_{VF} \to -[Y,\pi\sharp(\eta)]_{VF} \quad \text{[[Y, X]\_VF \ensuremath{\to} \ensuremath{-}[X, Y]\_VF  [repr-canonical]]\,(axiom)} \\
+\mu\!\left(-[Y,\pi\sharp(\eta)]_{VF}\right) \to -\mu\!\left([Y,\pi\sharp(\eta)]_{VF}\right) \quad \text{[MultiEval arg slot linearity]\,(axiom)} \\
+\left(L_\pi\sharp(\mu)\!\left(\eta\right)\right)\!\left(Y\right) \to \left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left(Y\right)\right) - \eta\!\left([\pi\sharp(\mu),Y]_{VF}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+[\pi\sharp(\mu),Y]_{VF} \to -[Y,\pi\sharp(\mu)]_{VF} \quad \text{[[Y, X]\_VF \ensuremath{\to} \ensuremath{-}[X, Y]\_VF  [repr-canonical]]\,(axiom)} \\
+\eta\!\left(-[Y,\pi\sharp(\mu)]_{VF}\right) \to -\eta\!\left([Y,\pi\sharp(\mu)]_{VF}\right) \quad \text{[MultiEval arg slot linearity]\,(axiom)} \\
+\left(d\!\left(-\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right)\!\left(Y\right) \to Y\!\left(-\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) \quad \text{[d intrinsic (Koszul): (d\ensuremath{\omega})(X\_0, \ensuremath{\dots}, X\_p) = \ensuremath{\Sigma} \ensuremath{\pm}X\_i(\ensuremath{\omega}(\ensuremath{\dots},hat\_i,\ensuremath{\dots})) + \ensuremath{\Sigma} \ensuremath{\pm}\ensuremath{\omega}([X\_i,X\_j]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\left(L_\pi\sharp(\eta)\!\left(\mu\right) - L_\pi\sharp(\mu)\!\left(\eta\right) - d\!\left(-\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right)\!\left([U,Y]_{VF}\right) \to \left(L_\pi\sharp(\eta)\!\left(\mu\right)\right)\!\left([U,Y]_{VF}\right) - \left(L_\pi\sharp(\mu)\!\left(\eta\right)\right)\!\left([U,Y]_{VF}\right) - \left(d\!\left(-\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right)\!\left([U,Y]_{VF}\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(L_\pi\sharp(\eta)\!\left(\mu\right)\right)\!\left([U,Y]_{VF}\right) \to \left(\pi\sharp\!\left(\eta\right)\right)\!\left(\mu\!\left([U,Y]_{VF}\right)\right) - \mu\!\left([\pi\sharp(\eta),[U,Y]_{VF]_{VF}}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+[\pi\sharp(\eta),[U,Y]_{VF]_{VF}} \to -[[U,Y]_{VF,\pi\sharp(\eta)]_{VF}} \quad \text{[[Y, X]\_VF \ensuremath{\to} \ensuremath{-}[X, Y]\_VF  [repr-canonical]]\,(axiom)} \\
+\mu\!\left(-[[U,Y]_{VF,\pi\sharp(\eta)]_{VF}}\right) \to -\mu\!\left([[U,Y]_{VF,\pi\sharp(\eta)]_{VF}}\right) \quad \text{[MultiEval arg slot linearity]\,(axiom)} \\
+\left(L_\pi\sharp(\mu)\!\left(\eta\right)\right)\!\left([U,Y]_{VF}\right) \to \left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left([U,Y]_{VF}\right)\right) - \eta\!\left([\pi\sharp(\mu),[U,Y]_{VF]_{VF}}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+[\pi\sharp(\mu),[U,Y]_{VF]_{VF}} \to -[[U,Y]_{VF,\pi\sharp(\mu)]_{VF}} \quad \text{[[Y, X]\_VF \ensuremath{\to} \ensuremath{-}[X, Y]\_VF  [repr-canonical]]\,(axiom)} \\
+\eta\!\left(-[[U,Y]_{VF,\pi\sharp(\mu)]_{VF}}\right) \to -\eta\!\left([[U,Y]_{VF,\pi\sharp(\mu)]_{VF}}\right) \quad \text{[MultiEval arg slot linearity]\,(axiom)} \\
+\left(d\!\left(-\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right)\!\left([U,Y]_{VF}\right) \to [U,Y]_{VF}\!\left(-\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) \quad \text{[d intrinsic (Koszul): (d\ensuremath{\omega})(X\_0, \ensuremath{\dots}, X\_p) = \ensuremath{\Sigma} \ensuremath{\pm}X\_i(\ensuremath{\omega}(\ensuremath{\dots},hat\_i,\ensuremath{\dots})) + \ensuremath{\Sigma} \ensuremath{\pm}\ensuremath{\omega}([X\_i,X\_j]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\left(L_{\pi\sharp(L_U(\eta))}\!\left(\mu\right) - L_\pi\sharp(\mu)\!\left(L_U\!\left(\eta\right)\right) - d\!\left(-\left(U\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - \eta\!\left([U,\pi\sharp(\mu)]_{VF}\right)\right)\right)\right)\!\left(Y\right) \to \left(L_{\pi\sharp(L_U(\eta))}\!\left(\mu\right)\right)\!\left(Y\right) - \left(L_\pi\sharp(\mu)\!\left(L_U\!\left(\eta\right)\right)\right)\!\left(Y\right) - \left(d\!\left(-\left(U\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - \eta\!\left([U,\pi\sharp(\mu)]_{VF}\right)\right)\right)\right)\!\left(Y\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(L_{\pi\sharp(L_U(\eta))}\!\left(\mu\right)\right)\!\left(Y\right) \to \left(\pi\sharp\!\left(L_U\!\left(\eta\right)\right)\right)\!\left(\mu\!\left(Y\right)\right) - \mu\!\left([\pi\sharp(L_{U(\eta)),Y]_{VF}}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+[\pi\sharp(L_{U(\eta)),Y]_{VF}} \to -[Y,\pi\sharp(L_{U(\eta))]_{VF}} \quad \text{[[Y, X]\_VF \ensuremath{\to} \ensuremath{-}[X, Y]\_VF  [repr-canonical]]\,(axiom)} \\
+\mu\!\left(-[Y,\pi\sharp(L_{U(\eta))]_{VF}}\right) \to -\mu\!\left([Y,\pi\sharp(L_{U(\eta))]_{VF}}\right) \quad \text{[MultiEval arg slot linearity]\,(axiom)} \\
+\left(L_\pi\sharp(\mu)\!\left(L_U\!\left(\eta\right)\right)\right)\!\left(Y\right) \to \left(\pi\sharp\!\left(\mu\right)\right)\!\left(\left(L_U\!\left(\eta\right)\right)\!\left(Y\right)\right) - \left(L_U\!\left(\eta\right)\right)\!\left([\pi\sharp(\mu),Y]_{VF}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\left(L_U\!\left(\eta\right)\right)\!\left(Y\right) \to U\!\left(\eta\!\left(Y\right)\right) - \eta\!\left([U,Y]_{VF}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+[\pi\sharp(\mu),Y]_{VF} \to -[Y,\pi\sharp(\mu)]_{VF} \quad \text{[[Y, X]\_VF \ensuremath{\to} \ensuremath{-}[X, Y]\_VF  [repr-canonical]]\,(axiom)} \\
+\left(L_U\!\left(\eta\right)\right)\!\left(-[Y,\pi\sharp(\mu)]_{VF}\right) \to U\!\left(\eta\!\left(-[Y,\pi\sharp(\mu)]_{VF}\right)\right) - \eta\!\left([U,(-[Y,\pi\sharp(\mu)]_{VF)]_{VF}}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\eta\!\left(-[Y,\pi\sharp(\mu)]_{VF}\right) \to -\eta\!\left([Y,\pi\sharp(\mu)]_{VF}\right) \quad \text{[MultiEval arg slot linearity]\,(axiom)} \\
+[U,(-[Y,\pi\sharp(\mu)]_{VF)]_{VF}} \to -[U,[Y,\pi\sharp(\mu)]_{VF]_{VF}} \quad \text{[[(\ensuremath{-}X), Y]\_VF \ensuremath{\to} \ensuremath{-}[X, Y]\_VF]\,(axiom)} \\
+\eta\!\left(-[U,[Y,\pi\sharp(\mu)]_{VF]_{VF}}\right) \to -\eta\!\left([U,[Y,\pi\sharp(\mu)]_{VF]_{VF}}\right) \quad \text{[MultiEval arg slot linearity]\,(axiom)} \\
+\left(d\!\left(-\left(U\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - \eta\!\left([U,\pi\sharp(\mu)]_{VF}\right)\right)\right)\right)\!\left(Y\right) \to Y\!\left(-\left(U\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - \eta\!\left([U,\pi\sharp(\mu)]_{VF}\right)\right)\right) \quad \text{[d intrinsic (Koszul): (d\ensuremath{\omega})(X\_0, \ensuremath{\dots}, X\_p) = \ensuremath{\Sigma} \ensuremath{\pm}X\_i(\ensuremath{\omega}(\ensuremath{\dots},hat\_i,\ensuremath{\dots})) + \ensuremath{\Sigma} \ensuremath{\pm}\ensuremath{\omega}([X\_i,X\_j]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\left(L_\pi\sharp(\eta)\!\left(L_U\!\left(\mu\right)\right) - L_{\pi\sharp(L_U(\mu))}\!\left(\eta\right) - d\!\left(U\!\left(-\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - \mu\!\left([U,\pi\sharp(\eta)]_{VF}\right)\right)\right)\!\left(Y\right) \to \left(L_\pi\sharp(\eta)\!\left(L_U\!\left(\mu\right)\right)\right)\!\left(Y\right) - \left(L_{\pi\sharp(L_U(\mu))}\!\left(\eta\right)\right)\!\left(Y\right) - \left(d\!\left(U\!\left(-\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - \mu\!\left([U,\pi\sharp(\eta)]_{VF}\right)\right)\right)\!\left(Y\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(L_\pi\sharp(\eta)\!\left(L_U\!\left(\mu\right)\right)\right)\!\left(Y\right) \to \left(\pi\sharp\!\left(\eta\right)\right)\!\left(\left(L_U\!\left(\mu\right)\right)\!\left(Y\right)\right) - \left(L_U\!\left(\mu\right)\right)\!\left([\pi\sharp(\eta),Y]_{VF}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\left(L_U\!\left(\mu\right)\right)\!\left(Y\right) \to U\!\left(\mu\!\left(Y\right)\right) - \mu\!\left([U,Y]_{VF}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+[\pi\sharp(\eta),Y]_{VF} \to -[Y,\pi\sharp(\eta)]_{VF} \quad \text{[[Y, X]\_VF \ensuremath{\to} \ensuremath{-}[X, Y]\_VF  [repr-canonical]]\,(axiom)} \\
+\left(L_U\!\left(\mu\right)\right)\!\left(-[Y,\pi\sharp(\eta)]_{VF}\right) \to U\!\left(\mu\!\left(-[Y,\pi\sharp(\eta)]_{VF}\right)\right) - \mu\!\left([U,(-[Y,\pi\sharp(\eta)]_{VF)]_{VF}}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\mu\!\left(-[Y,\pi\sharp(\eta)]_{VF}\right) \to -\mu\!\left([Y,\pi\sharp(\eta)]_{VF}\right) \quad \text{[MultiEval arg slot linearity]\,(axiom)} \\
+[U,(-[Y,\pi\sharp(\eta)]_{VF)]_{VF}} \to -[U,[Y,\pi\sharp(\eta)]_{VF]_{VF}} \quad \text{[[(\ensuremath{-}X), Y]\_VF \ensuremath{\to} \ensuremath{-}[X, Y]\_VF]\,(axiom)} \\
+\mu\!\left(-[U,[Y,\pi\sharp(\eta)]_{VF]_{VF}}\right) \to -\mu\!\left([U,[Y,\pi\sharp(\eta)]_{VF]_{VF}}\right) \quad \text{[MultiEval arg slot linearity]\,(axiom)} \\
+\left(L_{\pi\sharp(L_U(\mu))}\!\left(\eta\right)\right)\!\left(Y\right) \to \left(\pi\sharp\!\left(L_U\!\left(\mu\right)\right)\right)\!\left(\eta\!\left(Y\right)\right) - \eta\!\left([\pi\sharp(L_{U(\mu)),Y]_{VF}}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+[\pi\sharp(L_{U(\mu)),Y]_{VF}} \to -[Y,\pi\sharp(L_{U(\mu))]_{VF}} \quad \text{[[Y, X]\_VF \ensuremath{\to} \ensuremath{-}[X, Y]\_VF  [repr-canonical]]\,(axiom)} \\
+\eta\!\left(-[Y,\pi\sharp(L_{U(\mu))]_{VF}}\right) \to -\eta\!\left([Y,\pi\sharp(L_{U(\mu))]_{VF}}\right) \quad \text{[MultiEval arg slot linearity]\,(axiom)} \\
+\left(d\!\left(U\!\left(-\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - \mu\!\left([U,\pi\sharp(\eta)]_{VF}\right)\right)\right)\!\left(Y\right) \to Y\!\left(U\!\left(-\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - \mu\!\left([U,\pi\sharp(\eta)]_{VF}\right)\right) \quad \text{[d intrinsic (Koszul): (d\ensuremath{\omega})(X\_0, \ensuremath{\dots}, X\_p) = \ensuremath{\Sigma} \ensuremath{\pm}X\_i(\ensuremath{\omega}(\ensuremath{\dots},hat\_i,\ensuremath{\dots})) + \ensuremath{\Sigma} \ensuremath{\pm}\ensuremath{\omega}([X\_i,X\_j]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+K_{X_{\iota_U(\mu)}}\!\left(\eta\right) \to -L_{X_{\iota_U(\mu)}}\!\left(\eta\right) + d\!\left(\iota_{X_{\iota_U(\mu)}}\!\left(\eta\right)\right) \quad \text{[K\_V \ensuremath{\omega} = \ensuremath{-}L\_V \ensuremath{\omega} + d(\ensuremath{\iota}\_V \ensuremath{\omega})]\,(axiom)} \\
+K_{\pi\sharp(L_U(\mu))}\!\left(\eta\right) \to -L_{\pi\sharp(L_U(\mu))}\!\left(\eta\right) + d\!\left(\iota_{\pi\sharp(L_U(\mu))}\!\left(\eta\right)\right) \quad \text{[K\_V \ensuremath{\omega} = \ensuremath{-}L\_V \ensuremath{\omega} + d(\ensuremath{\iota}\_V \ensuremath{\omega})]\,(axiom)} \\
+K_{[U,\pi\sharp(\mu)]_{VF}}\!\left(\eta\right) \to -L_{[U,\pi\sharp(\mu)]_{VF}}\!\left(\eta\right) + d\!\left(\iota_{[U,\pi\sharp(\mu)]_{VF}}\!\left(\eta\right)\right) \quad \text{[K\_V \ensuremath{\omega} = \ensuremath{-}L\_V \ensuremath{\omega} + d(\ensuremath{\iota}\_V \ensuremath{\omega})]\,(axiom)} \\
+K_{X_{\iota_U(\mu)}}\!\left(\eta\right) \to -L_{X_{\iota_U(\mu)}}\!\left(\eta\right) + d\!\left(\iota_{X_{\iota_U(\mu)}}\!\left(\eta\right)\right) \quad \text{[K\_V \ensuremath{\omega} = \ensuremath{-}L\_V \ensuremath{\omega} + d(\ensuremath{\iota}\_V \ensuremath{\omega})]\,(axiom)} \\
+\left(\left(-\left(-L_{X_{\iota_U(\eta)}}\!\left(\mu\right) + \left(L_{\pi\sharp(L_U(\eta))}\!\left(\mu\right) - L_{[U,\pi\sharp(\eta)]_{VF}}\!\left(\mu\right)\right)\right) - L_{X_{\iota_U(\eta)}}\!\left(\mu\right)\right) + \left(-\left(-\left(-L_{X_{\iota_U(\mu)}}\!\left(\eta\right) + d\!\left(\iota_{X_{\iota_U(\mu)}}\!\left(\eta\right)\right)\right) + \left(\left(-L_{\pi\sharp(L_U(\mu))}\!\left(\eta\right) + d\!\left(\iota_{\pi\sharp(L_U(\mu))}\!\left(\eta\right)\right)\right) - \left(-L_{[U,\pi\sharp(\mu)]_{VF}}\!\left(\eta\right) + d\!\left(\iota_{[U,\pi\sharp(\mu)]_{VF}}\!\left(\eta\right)\right)\right)\right)\right) - \left(-L_{X_{\iota_U(\mu)}}\!\left(\eta\right) + d\!\left(\iota_{X_{\iota_U(\mu)}}\!\left(\eta\right)\right)\right)\right)\right)\!\left(Y\right) \to \left(-\left(-L_{X_{\iota_U(\eta)}}\!\left(\mu\right) + \left(L_{\pi\sharp(L_U(\eta))}\!\left(\mu\right) - L_{[U,\pi\sharp(\eta)]_{VF}}\!\left(\mu\right)\right)\right) - L_{X_{\iota_U(\eta)}}\!\left(\mu\right)\right)\!\left(Y\right) + \left(-\left(-\left(-L_{X_{\iota_U(\mu)}}\!\left(\eta\right) + d\!\left(\iota_{X_{\iota_U(\mu)}}\!\left(\eta\right)\right)\right) + \left(\left(-L_{\pi\sharp(L_U(\mu))}\!\left(\eta\right) + d\!\left(\iota_{\pi\sharp(L_U(\mu))}\!\left(\eta\right)\right)\right) - \left(-L_{[U,\pi\sharp(\mu)]_{VF}}\!\left(\eta\right) + d\!\left(\iota_{[U,\pi\sharp(\mu)]_{VF}}\!\left(\eta\right)\right)\right)\right)\right) - \left(-L_{X_{\iota_U(\mu)}}\!\left(\eta\right) + d\!\left(\iota_{X_{\iota_U(\mu)}}\!\left(\eta\right)\right)\right)\right)\!\left(Y\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(-\left(-L_{X_{\iota_U(\eta)}}\!\left(\mu\right) + \left(L_{\pi\sharp(L_U(\eta))}\!\left(\mu\right) - L_{[U,\pi\sharp(\eta)]_{VF}}\!\left(\mu\right)\right)\right) - L_{X_{\iota_U(\eta)}}\!\left(\mu\right)\right)\!\left(Y\right) \to -\left(-L_{X_{\iota_U(\eta)}}\!\left(\mu\right) + \left(L_{\pi\sharp(L_U(\eta))}\!\left(\mu\right) - L_{[U,\pi\sharp(\eta)]_{VF}}\!\left(\mu\right)\right)\right)\!\left(Y\right) - \left(L_{X_{\iota_U(\eta)}}\!\left(\mu\right)\right)\!\left(Y\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(-L_{X_{\iota_U(\eta)}}\!\left(\mu\right) + \left(L_{\pi\sharp(L_U(\eta))}\!\left(\mu\right) - L_{[U,\pi\sharp(\eta)]_{VF}}\!\left(\mu\right)\right)\right)\!\left(Y\right) \to -\left(L_{X_{\iota_U(\eta)}}\!\left(\mu\right)\right)\!\left(Y\right) + \left(L_{\pi\sharp(L_U(\eta))}\!\left(\mu\right) - L_{[U,\pi\sharp(\eta)]_{VF}}\!\left(\mu\right)\right)\!\left(Y\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(L_{X_{\iota_U(\eta)}}\!\left(\mu\right)\right)\!\left(Y\right) \to X_{\iota_U(\eta)}\!\left(\mu\!\left(Y\right)\right) - \mu\!\left([X_{\iota_{U(\eta),Y]_{VF}}}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\left(L_{\pi\sharp(L_U(\eta))}\!\left(\mu\right) - L_{[U,\pi\sharp(\eta)]_{VF}}\!\left(\mu\right)\right)\!\left(Y\right) \to \left(L_{\pi\sharp(L_U(\eta))}\!\left(\mu\right)\right)\!\left(Y\right) - \left(L_{[U,\pi\sharp(\eta)]_{VF}}\!\left(\mu\right)\right)\!\left(Y\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(L_{\pi\sharp(L_U(\eta))}\!\left(\mu\right)\right)\!\left(Y\right) \to \left(\pi\sharp\!\left(L_U\!\left(\eta\right)\right)\right)\!\left(\mu\!\left(Y\right)\right) - \mu\!\left([\pi\sharp(L_{U(\eta)),Y]_{VF}}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+[\pi\sharp(L_{U(\eta)),Y]_{VF}} \to -[Y,\pi\sharp(L_{U(\eta))]_{VF}} \quad \text{[[Y, X]\_VF \ensuremath{\to} \ensuremath{-}[X, Y]\_VF  [repr-canonical]]\,(axiom)} \\
+\mu\!\left(-[Y,\pi\sharp(L_{U(\eta))]_{VF}}\right) \to -\mu\!\left([Y,\pi\sharp(L_{U(\eta))]_{VF}}\right) \quad \text{[MultiEval arg slot linearity]\,(axiom)} \\
+\left(L_{[U,\pi\sharp(\eta)]_{VF}}\!\left(\mu\right)\right)\!\left(Y\right) \to [U,\pi\sharp(\eta)]_{VF}\!\left(\mu\!\left(Y\right)\right) - \mu\!\left([[U,\pi\sharp(\eta)]_{VF,Y]_{VF}}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+[[U,\pi\sharp(\eta)]_{VF,Y]_{VF}} \to -[Y,[U,\pi\sharp(\eta)]_{VF]_{VF}} \quad \text{[[Y, X]\_VF \ensuremath{\to} \ensuremath{-}[X, Y]\_VF  [repr-canonical]]\,(axiom)} \\
+\mu\!\left(-[Y,[U,\pi\sharp(\eta)]_{VF]_{VF}}\right) \to -\mu\!\left([Y,[U,\pi\sharp(\eta)]_{VF]_{VF}}\right) \quad \text{[MultiEval arg slot linearity]\,(axiom)} \\
+\left(L_{X_{\iota_U(\eta)}}\!\left(\mu\right)\right)\!\left(Y\right) \to X_{\iota_U(\eta)}\!\left(\mu\!\left(Y\right)\right) - \mu\!\left([X_{\iota_{U(\eta),Y]_{VF}}}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\left(-\left(-\left(-L_{X_{\iota_U(\mu)}}\!\left(\eta\right) + d\!\left(\iota_{X_{\iota_U(\mu)}}\!\left(\eta\right)\right)\right) + \left(\left(-L_{\pi\sharp(L_U(\mu))}\!\left(\eta\right) + d\!\left(\iota_{\pi\sharp(L_U(\mu))}\!\left(\eta\right)\right)\right) - \left(-L_{[U,\pi\sharp(\mu)]_{VF}}\!\left(\eta\right) + d\!\left(\iota_{[U,\pi\sharp(\mu)]_{VF}}\!\left(\eta\right)\right)\right)\right)\right) - \left(-L_{X_{\iota_U(\mu)}}\!\left(\eta\right) + d\!\left(\iota_{X_{\iota_U(\mu)}}\!\left(\eta\right)\right)\right)\right)\!\left(Y\right) \to -\left(-\left(-L_{X_{\iota_U(\mu)}}\!\left(\eta\right) + d\!\left(\iota_{X_{\iota_U(\mu)}}\!\left(\eta\right)\right)\right) + \left(\left(-L_{\pi\sharp(L_U(\mu))}\!\left(\eta\right) + d\!\left(\iota_{\pi\sharp(L_U(\mu))}\!\left(\eta\right)\right)\right) - \left(-L_{[U,\pi\sharp(\mu)]_{VF}}\!\left(\eta\right) + d\!\left(\iota_{[U,\pi\sharp(\mu)]_{VF}}\!\left(\eta\right)\right)\right)\right)\right)\!\left(Y\right) - \left(-L_{X_{\iota_U(\mu)}}\!\left(\eta\right) + d\!\left(\iota_{X_{\iota_U(\mu)}}\!\left(\eta\right)\right)\right)\!\left(Y\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(-\left(-L_{X_{\iota_U(\mu)}}\!\left(\eta\right) + d\!\left(\iota_{X_{\iota_U(\mu)}}\!\left(\eta\right)\right)\right) + \left(\left(-L_{\pi\sharp(L_U(\mu))}\!\left(\eta\right) + d\!\left(\iota_{\pi\sharp(L_U(\mu))}\!\left(\eta\right)\right)\right) - \left(-L_{[U,\pi\sharp(\mu)]_{VF}}\!\left(\eta\right) + d\!\left(\iota_{[U,\pi\sharp(\mu)]_{VF}}\!\left(\eta\right)\right)\right)\right)\right)\!\left(Y\right) \to -\left(-L_{X_{\iota_U(\mu)}}\!\left(\eta\right) + d\!\left(\iota_{X_{\iota_U(\mu)}}\!\left(\eta\right)\right)\right)\!\left(Y\right) + \left(\left(-L_{\pi\sharp(L_U(\mu))}\!\left(\eta\right) + d\!\left(\iota_{\pi\sharp(L_U(\mu))}\!\left(\eta\right)\right)\right) - \left(-L_{[U,\pi\sharp(\mu)]_{VF}}\!\left(\eta\right) + d\!\left(\iota_{[U,\pi\sharp(\mu)]_{VF}}\!\left(\eta\right)\right)\right)\right)\!\left(Y\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(-L_{X_{\iota_U(\mu)}}\!\left(\eta\right) + d\!\left(\iota_{X_{\iota_U(\mu)}}\!\left(\eta\right)\right)\right)\!\left(Y\right) \to -\left(L_{X_{\iota_U(\mu)}}\!\left(\eta\right)\right)\!\left(Y\right) + \left(d\!\left(\iota_{X_{\iota_U(\mu)}}\!\left(\eta\right)\right)\right)\!\left(Y\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(L_{X_{\iota_U(\mu)}}\!\left(\eta\right)\right)\!\left(Y\right) \to X_{\iota_U(\mu)}\!\left(\eta\!\left(Y\right)\right) - \eta\!\left([X_{\iota_{U(\mu),Y]_{VF}}}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\left(d\!\left(\iota_{X_{\iota_U(\mu)}}\!\left(\eta\right)\right)\right)\!\left(Y\right) \to Y\!\left(\iota_{X_{\iota_U(\mu)}}\!\left(\eta\right)\right) \quad \text{[d intrinsic (Koszul): (d\ensuremath{\omega})(X\_0, \ensuremath{\dots}, X\_p) = \ensuremath{\Sigma} \ensuremath{\pm}X\_i(\ensuremath{\omega}(\ensuremath{\dots},hat\_i,\ensuremath{\dots})) + \ensuremath{\Sigma} \ensuremath{\pm}\ensuremath{\omega}([X\_i,X\_j]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+Y\!\left(\iota_{X_{\iota_U(\mu)}}\!\left(\eta\right)\right) \to Y\!\left(\eta\!\left(X_{\iota_U(\mu)}\right)\right) \quad \text{[bare \ensuremath{\iota}\_X(\ensuremath{\omega}) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(\ensuremath{\omega}, X))]\,(axiom)} \\
+\eta\!\left(X_{\iota_U(\mu)}\right) \to -\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\iota_U\!\left(\mu\right)\right) \quad \text{[\ensuremath{\alpha}(X\_f) = \ensuremath{-}\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\alpha})(f) [\ensuremath{\pi}]]\,(axiom)} \\
+\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\iota_U\!\left(\mu\right)\right) \to \left(\pi\sharp\!\left(\eta\right)\right)\!\left(\mu\!\left(U\right)\right) \quad \text{[bare \ensuremath{\iota}\_X(\ensuremath{\omega}) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(\ensuremath{\omega}, X))]\,(axiom)} \\
+\left(\left(-L_{\pi\sharp(L_U(\mu))}\!\left(\eta\right) + d\!\left(\iota_{\pi\sharp(L_U(\mu))}\!\left(\eta\right)\right)\right) - \left(-L_{[U,\pi\sharp(\mu)]_{VF}}\!\left(\eta\right) + d\!\left(\iota_{[U,\pi\sharp(\mu)]_{VF}}\!\left(\eta\right)\right)\right)\right)\!\left(Y\right) \to \left(-L_{\pi\sharp(L_U(\mu))}\!\left(\eta\right) + d\!\left(\iota_{\pi\sharp(L_U(\mu))}\!\left(\eta\right)\right)\right)\!\left(Y\right) - \left(-L_{[U,\pi\sharp(\mu)]_{VF}}\!\left(\eta\right) + d\!\left(\iota_{[U,\pi\sharp(\mu)]_{VF}}\!\left(\eta\right)\right)\right)\!\left(Y\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(-L_{\pi\sharp(L_U(\mu))}\!\left(\eta\right) + d\!\left(\iota_{\pi\sharp(L_U(\mu))}\!\left(\eta\right)\right)\right)\!\left(Y\right) \to -\left(L_{\pi\sharp(L_U(\mu))}\!\left(\eta\right)\right)\!\left(Y\right) + \left(d\!\left(\iota_{\pi\sharp(L_U(\mu))}\!\left(\eta\right)\right)\right)\!\left(Y\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(L_{\pi\sharp(L_U(\mu))}\!\left(\eta\right)\right)\!\left(Y\right) \to \left(\pi\sharp\!\left(L_U\!\left(\mu\right)\right)\right)\!\left(\eta\!\left(Y\right)\right) - \eta\!\left([\pi\sharp(L_{U(\mu)),Y]_{VF}}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+[\pi\sharp(L_{U(\mu)),Y]_{VF}} \to -[Y,\pi\sharp(L_{U(\mu))]_{VF}} \quad \text{[[Y, X]\_VF \ensuremath{\to} \ensuremath{-}[X, Y]\_VF  [repr-canonical]]\,(axiom)} \\
+\eta\!\left(-[Y,\pi\sharp(L_{U(\mu))]_{VF}}\right) \to -\eta\!\left([Y,\pi\sharp(L_{U(\mu))]_{VF}}\right) \quad \text{[MultiEval arg slot linearity]\,(axiom)} \\
+\left(d\!\left(\iota_{\pi\sharp(L_U(\mu))}\!\left(\eta\right)\right)\right)\!\left(Y\right) \to Y\!\left(\iota_{\pi\sharp(L_U(\mu))}\!\left(\eta\right)\right) \quad \text{[d intrinsic (Koszul): (d\ensuremath{\omega})(X\_0, \ensuremath{\dots}, X\_p) = \ensuremath{\Sigma} \ensuremath{\pm}X\_i(\ensuremath{\omega}(\ensuremath{\dots},hat\_i,\ensuremath{\dots})) + \ensuremath{\Sigma} \ensuremath{\pm}\ensuremath{\omega}([X\_i,X\_j]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+Y\!\left(\iota_{\pi\sharp(L_U(\mu))}\!\left(\eta\right)\right) \to Y\!\left(\eta\!\left(\pi\sharp\!\left(L_U\!\left(\mu\right)\right)\right)\right) \quad \text{[bare \ensuremath{\iota}\_X(\ensuremath{\omega}) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(\ensuremath{\omega}, X))]\,(axiom)} \\
+\eta\!\left(\pi\sharp\!\left(L_U\!\left(\mu\right)\right)\right) \to -\left(L_U\!\left(\mu\right)\right)\!\left(\pi\sharp\!\left(\eta\right)\right) \quad \text{[\ensuremath{\alpha}(\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\beta})) \ensuremath{\to} \ensuremath{-}\ensuremath{\beta}(\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\alpha})) [\ensuremath{\pi}]]\,(axiom)} \\
+\left(L_U\!\left(\mu\right)\right)\!\left(\pi\sharp\!\left(\eta\right)\right) \to U\!\left(\mu\!\left(\pi\sharp\!\left(\eta\right)\right)\right) - \mu\!\left([U,\pi\sharp(\eta)]_{VF}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\mu\!\left(\pi\sharp\!\left(\eta\right)\right) \to -\eta\!\left(\pi\sharp\!\left(\mu\right)\right) \quad \text{[\ensuremath{\alpha}(\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\beta})) \ensuremath{\to} \ensuremath{-}\ensuremath{\beta}(\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\alpha})) [\ensuremath{\pi}]]\,(axiom)} \\
+\left(-L_{[U,\pi\sharp(\mu)]_{VF}}\!\left(\eta\right) + d\!\left(\iota_{[U,\pi\sharp(\mu)]_{VF}}\!\left(\eta\right)\right)\right)\!\left(Y\right) \to -\left(L_{[U,\pi\sharp(\mu)]_{VF}}\!\left(\eta\right)\right)\!\left(Y\right) + \left(d\!\left(\iota_{[U,\pi\sharp(\mu)]_{VF}}\!\left(\eta\right)\right)\right)\!\left(Y\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(L_{[U,\pi\sharp(\mu)]_{VF}}\!\left(\eta\right)\right)\!\left(Y\right) \to [U,\pi\sharp(\mu)]_{VF}\!\left(\eta\!\left(Y\right)\right) - \eta\!\left([[U,\pi\sharp(\mu)]_{VF,Y]_{VF}}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+[[U,\pi\sharp(\mu)]_{VF,Y]_{VF}} \to -[Y,[U,\pi\sharp(\mu)]_{VF]_{VF}} \quad \text{[[Y, X]\_VF \ensuremath{\to} \ensuremath{-}[X, Y]\_VF  [repr-canonical]]\,(axiom)} \\
+\eta\!\left(-[Y,[U,\pi\sharp(\mu)]_{VF]_{VF}}\right) \to -\eta\!\left([Y,[U,\pi\sharp(\mu)]_{VF]_{VF}}\right) \quad \text{[MultiEval arg slot linearity]\,(axiom)} \\
+\left(d\!\left(\iota_{[U,\pi\sharp(\mu)]_{VF}}\!\left(\eta\right)\right)\right)\!\left(Y\right) \to Y\!\left(\iota_{[U,\pi\sharp(\mu)]_{VF}}\!\left(\eta\right)\right) \quad \text{[d intrinsic (Koszul): (d\ensuremath{\omega})(X\_0, \ensuremath{\dots}, X\_p) = \ensuremath{\Sigma} \ensuremath{\pm}X\_i(\ensuremath{\omega}(\ensuremath{\dots},hat\_i,\ensuremath{\dots})) + \ensuremath{\Sigma} \ensuremath{\pm}\ensuremath{\omega}([X\_i,X\_j]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+Y\!\left(\iota_{[U,\pi\sharp(\mu)]_{VF}}\!\left(\eta\right)\right) \to Y\!\left(\eta\!\left([U,\pi\sharp(\mu)]_{VF}\right)\right) \quad \text{[bare \ensuremath{\iota}\_X(\ensuremath{\omega}) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(\ensuremath{\omega}, X))]\,(axiom)} \\
+\left(-L_{X_{\iota_U(\mu)}}\!\left(\eta\right) + d\!\left(\iota_{X_{\iota_U(\mu)}}\!\left(\eta\right)\right)\right)\!\left(Y\right) \to -\left(L_{X_{\iota_U(\mu)}}\!\left(\eta\right)\right)\!\left(Y\right) + \left(d\!\left(\iota_{X_{\iota_U(\mu)}}\!\left(\eta\right)\right)\right)\!\left(Y\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(L_{X_{\iota_U(\mu)}}\!\left(\eta\right)\right)\!\left(Y\right) \to X_{\iota_U(\mu)}\!\left(\eta\!\left(Y\right)\right) - \eta\!\left([X_{\iota_{U(\mu),Y]_{VF}}}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\left(d\!\left(\iota_{X_{\iota_U(\mu)}}\!\left(\eta\right)\right)\right)\!\left(Y\right) \to Y\!\left(\iota_{X_{\iota_U(\mu)}}\!\left(\eta\right)\right) \quad \text{[d intrinsic (Koszul): (d\ensuremath{\omega})(X\_0, \ensuremath{\dots}, X\_p) = \ensuremath{\Sigma} \ensuremath{\pm}X\_i(\ensuremath{\omega}(\ensuremath{\dots},hat\_i,\ensuremath{\dots})) + \ensuremath{\Sigma} \ensuremath{\pm}\ensuremath{\omega}([X\_i,X\_j]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+Y\!\left(\iota_{X_{\iota_U(\mu)}}\!\left(\eta\right)\right) \to Y\!\left(\eta\!\left(X_{\iota_U(\mu)}\right)\right) \quad \text{[bare \ensuremath{\iota}\_X(\ensuremath{\omega}) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(\ensuremath{\omega}, X))]\,(axiom)} \\
+\eta\!\left(X_{\iota_U(\mu)}\right) \to -\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\iota_U\!\left(\mu\right)\right) \quad \text{[\ensuremath{\alpha}(X\_f) = \ensuremath{-}\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\alpha})(f) [\ensuremath{\pi}]]\,(axiom)} \\
+\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\iota_U\!\left(\mu\right)\right) \to \left(\pi\sharp\!\left(\eta\right)\right)\!\left(\mu\!\left(U\right)\right) \quad \text{[bare \ensuremath{\iota}\_X(\ensuremath{\omega}) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(\ensuremath{\omega}, X))]\,(axiom)} \\
+\left(\left(U\!\left(\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\mu\!\left(Y\right)\right) - \left(-\mu\!\left([Y,\pi\sharp(\eta)]_{VF}\right)\right)\right) - \left(\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left(Y\right)\right) - \left(-\eta\!\left([Y,\pi\sharp(\mu)]_{VF}\right)\right)\right) - Y\!\left(-\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right) - \left(\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\mu\!\left([U,Y]_{VF}\right)\right) - \left(-\mu\!\left([[U,Y]_{VF,\pi\sharp(\eta)]_{VF}}\right)\right)\right) - \left(\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left([U,Y]_{VF}\right)\right) - \left(-\eta\!\left([[U,Y]_{VF,\pi\sharp(\mu)]_{VF}}\right)\right)\right) - [U,Y]_{VF}\!\left(-\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right)\right) - \left(\left(\left(\pi\sharp\!\left(L_U\!\left(\eta\right)\right)\right)\!\left(\mu\!\left(Y\right)\right) - \left(-\mu\!\left([Y,\pi\sharp(L_{U(\eta))]_{VF}}\right)\right)\right) - \left(\left(\pi\sharp\!\left(\mu\right)\right)\!\left(U\!\left(\eta\!\left(Y\right)\right) - \eta\!\left([U,Y]_{VF}\right)\right) - \left(U\!\left(-\eta\!\left([Y,\pi\sharp(\mu)]_{VF}\right)\right) - \left(-\eta\!\left([U,[Y,\pi\sharp(\mu)]_{VF]_{VF}}\right)\right)\right)\right) - Y\!\left(-\left(U\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - \eta\!\left([U,\pi\sharp(\mu)]_{VF}\right)\right)\right)\right) - \left(\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(U\!\left(\mu\!\left(Y\right)\right) - \mu\!\left([U,Y]_{VF}\right)\right) - \left(U\!\left(-\mu\!\left([Y,\pi\sharp(\eta)]_{VF}\right)\right) - \left(-\mu\!\left([U,[Y,\pi\sharp(\eta)]_{VF]_{VF}}\right)\right)\right)\right) - \left(\left(\pi\sharp\!\left(L_U\!\left(\mu\right)\right)\right)\!\left(\eta\!\left(Y\right)\right) - \left(-\eta\!\left([Y,\pi\sharp(L_{U(\mu))]_{VF}}\right)\right)\right) - Y\!\left(U\!\left(-\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - \mu\!\left([U,\pi\sharp(\eta)]_{VF}\right)\right)\right)\right) - \left(\left(-\left(-\left(X_{\iota_U(\eta)}\!\left(\mu\!\left(Y\right)\right) - \mu\!\left([X_{\iota_{U(\eta),Y]_{VF}}}\right)\right) + \left(\left(\left(\pi\sharp\!\left(L_U\!\left(\eta\right)\right)\right)\!\left(\mu\!\left(Y\right)\right) - \left(-\mu\!\left([Y,\pi\sharp(L_{U(\eta))]_{VF}}\right)\right)\right) - \left([U,\pi\sharp(\eta)]_{VF}\!\left(\mu\!\left(Y\right)\right) - \left(-\mu\!\left([Y,[U,\pi\sharp(\eta)]_{VF]_{VF}}\right)\right)\right)\right)\right) - \left(X_{\iota_U(\eta)}\!\left(\mu\!\left(Y\right)\right) - \mu\!\left([X_{\iota_{U(\eta),Y]_{VF}}}\right)\right)\right) + \left(-\left(-\left(-\left(X_{\iota_U(\mu)}\!\left(\eta\!\left(Y\right)\right) - \eta\!\left([X_{\iota_{U(\mu),Y]_{VF}}}\right)\right) + Y\!\left(-\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\mu\!\left(U\right)\right)\right)\right) + \left(\left(-\left(\left(\pi\sharp\!\left(L_U\!\left(\mu\right)\right)\right)\!\left(\eta\!\left(Y\right)\right) - \left(-\eta\!\left([Y,\pi\sharp(L_{U(\mu))]_{VF}}\right)\right)\right) + Y\!\left(-\left(U\!\left(-\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - \mu\!\left([U,\pi\sharp(\eta)]_{VF}\right)\right)\right)\right) - \left(-\left([U,\pi\sharp(\mu)]_{VF}\!\left(\eta\!\left(Y\right)\right) - \left(-\eta\!\left([Y,[U,\pi\sharp(\mu)]_{VF]_{VF}}\right)\right)\right) + Y\!\left(\eta\!\left([U,\pi\sharp(\mu)]_{VF}\right)\right)\right)\right)\right) - \left(-\left(X_{\iota_U(\mu)}\!\left(\eta\!\left(Y\right)\right) - \eta\!\left([X_{\iota_{U(\mu),Y]_{VF}}}\right)\right) + Y\!\left(-\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\mu\!\left(U\right)\right)\right)\right)\right)\right) \to \left(\left(\left(U\!\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\mu\!\left(Y\right)\right)\right) - \left(-U\!\left(\mu\!\left([Y,\pi\sharp(\eta)]_{VF}\right)\right)\right) - \left(U\!\left(\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left(Y\right)\right)\right) - \left(-U\!\left(\eta\!\left([Y,\pi\sharp(\mu)]_{VF}\right)\right)\right)\right) - \left(-U\!\left(Y\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right)\right)\right) - \left(\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\mu\!\left([U,Y]_{VF}\right)\right) - \left(-\mu\!\left([[U,Y]_{VF,\pi\sharp(\eta)]_{VF}}\right)\right)\right) - \left(\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left([U,Y]_{VF}\right)\right) - \left(-\eta\!\left([[U,Y]_{VF,\pi\sharp(\mu)]_{VF}}\right)\right)\right) - \left(-[U,Y]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right)\right)\right) - \left(\left(\left(\pi\sharp\!\left(L_U\!\left(\eta\right)\right)\right)\!\left(\mu\!\left(Y\right)\right) - \left(-\mu\!\left([Y,\pi\sharp(L_{U(\eta))]_{VF}}\right)\right)\right) - \left(\left(\left(\pi\sharp\!\left(\mu\right)\right)\!\left(U\!\left(\eta\!\left(Y\right)\right)\right) - \left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left([U,Y]_{VF}\right)\right)\right) - \left(-U\!\left(\eta\!\left([Y,\pi\sharp(\mu)]_{VF}\right)\right) - \left(-\eta\!\left([U,[Y,\pi\sharp(\mu)]_{VF]_{VF}}\right)\right)\right)\right) - \left(-\left(Y\!\left(U\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right) - Y\!\left(\eta\!\left([U,\pi\sharp(\mu)]_{VF}\right)\right)\right)\right)\right) - \left(\left(\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(U\!\left(\mu\!\left(Y\right)\right)\right) - \left(\pi\sharp\!\left(\eta\right)\right)\!\left(\mu\!\left([U,Y]_{VF}\right)\right)\right) - \left(-U\!\left(\mu\!\left([Y,\pi\sharp(\eta)]_{VF}\right)\right) - \left(-\mu\!\left([U,[Y,\pi\sharp(\eta)]_{VF]_{VF}}\right)\right)\right)\right) - \left(\left(\pi\sharp\!\left(L_U\!\left(\mu\right)\right)\right)\!\left(\eta\!\left(Y\right)\right) - \left(-\eta\!\left([Y,\pi\sharp(L_{U(\mu))]_{VF}}\right)\right)\right) - \left(-Y\!\left(U\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right) - Y\!\left(\mu\!\left([U,\pi\sharp(\eta)]_{VF}\right)\right)\right)\right)\right) - \left(\left(-\left(-\left(X_{\iota_U(\eta)}\!\left(\mu\!\left(Y\right)\right) - \mu\!\left([X_{\iota_{U(\eta),Y]_{VF}}}\right)\right) + \left(\left(\left(\pi\sharp\!\left(L_U\!\left(\eta\right)\right)\right)\!\left(\mu\!\left(Y\right)\right) - \left(-\mu\!\left([Y,\pi\sharp(L_{U(\eta))]_{VF}}\right)\right)\right) - \left([U,\pi\sharp(\eta)]_{VF}\!\left(\mu\!\left(Y\right)\right) - \left(-\mu\!\left([Y,[U,\pi\sharp(\eta)]_{VF]_{VF}}\right)\right)\right)\right)\right) - \left(X_{\iota_U(\eta)}\!\left(\mu\!\left(Y\right)\right) - \mu\!\left([X_{\iota_{U(\eta),Y]_{VF}}}\right)\right)\right) + \left(-\left(-\left(-\left(X_{\iota_U(\mu)}\!\left(\eta\!\left(Y\right)\right) - \eta\!\left([X_{\iota_{U(\mu),Y]_{VF}}}\right)\right) - Y\!\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\mu\!\left(U\right)\right)\right)\right) + \left(\left(-\left(\left(\pi\sharp\!\left(L_U\!\left(\mu\right)\right)\right)\!\left(\eta\!\left(Y\right)\right) - \left(-\eta\!\left([Y,\pi\sharp(L_{U(\mu))]_{VF}}\right)\right)\right) - \left(-Y\!\left(U\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right) - Y\!\left(\mu\!\left([U,\pi\sharp(\eta)]_{VF}\right)\right)\right)\right) - \left(-\left([U,\pi\sharp(\mu)]_{VF}\!\left(\eta\!\left(Y\right)\right) - \left(-\eta\!\left([Y,[U,\pi\sharp(\mu)]_{VF]_{VF}}\right)\right)\right) + Y\!\left(\eta\!\left([U,\pi\sharp(\mu)]_{VF}\right)\right)\right)\right)\right) - \left(-\left(X_{\iota_U(\mu)}\!\left(\eta\!\left(Y\right)\right) - \eta\!\left([X_{\iota_{U(\mu),Y]_{VF}}}\right)\right) - Y\!\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\mu\!\left(U\right)\right)\right)\right)\right)\right) \quad \text{[product-rule]}\;\text{--- graded Leibniz + linearity} \\
+\left(\left(\left(U\!\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\mu\!\left(Y\right)\right)\right) - \left(-U\!\left(\mu\!\left([Y,\pi\sharp(\eta)]_{VF}\right)\right)\right) - \left(U\!\left(\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left(Y\right)\right)\right) - \left(-U\!\left(\eta\!\left([Y,\pi\sharp(\mu)]_{VF}\right)\right)\right)\right) - \left(-U\!\left(Y\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right)\right)\right) - \left(\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\mu\!\left([U,Y]_{VF}\right)\right) - \left(-\mu\!\left([[U,Y]_{VF,\pi\sharp(\eta)]_{VF}}\right)\right)\right) - \left(\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left([U,Y]_{VF}\right)\right) - \left(-\eta\!\left([[U,Y]_{VF,\pi\sharp(\mu)]_{VF}}\right)\right)\right) - \left(-[U,Y]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right)\right)\right) - \left(\left(\left(\pi\sharp\!\left(L_U\!\left(\eta\right)\right)\right)\!\left(\mu\!\left(Y\right)\right) - \left(-\mu\!\left([Y,\pi\sharp(L_{U(\eta))]_{VF}}\right)\right)\right) - \left(\left(\left(\pi\sharp\!\left(\mu\right)\right)\!\left(U\!\left(\eta\!\left(Y\right)\right)\right) - \left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left([U,Y]_{VF}\right)\right)\right) - \left(-U\!\left(\eta\!\left([Y,\pi\sharp(\mu)]_{VF}\right)\right) - \left(-\eta\!\left([U,[Y,\pi\sharp(\mu)]_{VF]_{VF}}\right)\right)\right)\right) - \left(-\left(Y\!\left(U\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right) - Y\!\left(\eta\!\left([U,\pi\sharp(\mu)]_{VF}\right)\right)\right)\right)\right) - \left(\left(\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(U\!\left(\mu\!\left(Y\right)\right)\right) - \left(\pi\sharp\!\left(\eta\right)\right)\!\left(\mu\!\left([U,Y]_{VF}\right)\right)\right) - \left(-U\!\left(\mu\!\left([Y,\pi\sharp(\eta)]_{VF}\right)\right) - \left(-\mu\!\left([U,[Y,\pi\sharp(\eta)]_{VF]_{VF}}\right)\right)\right)\right) - \left(\left(\pi\sharp\!\left(L_U\!\left(\mu\right)\right)\right)\!\left(\eta\!\left(Y\right)\right) - \left(-\eta\!\left([Y,\pi\sharp(L_{U(\mu))]_{VF}}\right)\right)\right) - \left(-Y\!\left(U\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right) - Y\!\left(\mu\!\left([U,\pi\sharp(\eta)]_{VF}\right)\right)\right)\right)\right) - \left(\left(-\left(-\left(X_{\iota_U(\eta)}\!\left(\mu\!\left(Y\right)\right) - \mu\!\left([X_{\iota_{U(\eta),Y]_{VF}}}\right)\right) + \left(\left(\left(\pi\sharp\!\left(L_U\!\left(\eta\right)\right)\right)\!\left(\mu\!\left(Y\right)\right) - \left(-\mu\!\left([Y,\pi\sharp(L_{U(\eta))]_{VF}}\right)\right)\right) - \left([U,\pi\sharp(\eta)]_{VF}\!\left(\mu\!\left(Y\right)\right) - \left(-\mu\!\left([Y,[U,\pi\sharp(\eta)]_{VF]_{VF}}\right)\right)\right)\right)\right) - \left(X_{\iota_U(\eta)}\!\left(\mu\!\left(Y\right)\right) - \mu\!\left([X_{\iota_{U(\eta),Y]_{VF}}}\right)\right)\right) + \left(-\left(-\left(-\left(X_{\iota_U(\mu)}\!\left(\eta\!\left(Y\right)\right) - \eta\!\left([X_{\iota_{U(\mu),Y]_{VF}}}\right)\right) - Y\!\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\mu\!\left(U\right)\right)\right)\right) + \left(\left(-\left(\left(\pi\sharp\!\left(L_U\!\left(\mu\right)\right)\right)\!\left(\eta\!\left(Y\right)\right) - \left(-\eta\!\left([Y,\pi\sharp(L_{U(\mu))]_{VF}}\right)\right)\right) - \left(-Y\!\left(U\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right) - Y\!\left(\mu\!\left([U,\pi\sharp(\eta)]_{VF}\right)\right)\right)\right) - \left(-\left([U,\pi\sharp(\mu)]_{VF}\!\left(\eta\!\left(Y\right)\right) - \left(-\eta\!\left([Y,[U,\pi\sharp(\mu)]_{VF]_{VF}}\right)\right)\right) + Y\!\left(\eta\!\left([U,\pi\sharp(\mu)]_{VF}\right)\right)\right)\right)\right) - \left(-\left(X_{\iota_U(\mu)}\!\left(\eta\!\left(Y\right)\right) - \eta\!\left([X_{\iota_{U(\mu),Y]_{VF}}}\right)\right) - Y\!\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\mu\!\left(U\right)\right)\right)\right)\right)\right) \to U\!\left(Y\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right) + U\!\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\mu\!\left(Y\right)\right)\right) - U\!\left(\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left(Y\right)\right)\right) - Y\!\left(U\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right) - [U,Y]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - [U,\pi\sharp(\eta)]_{VF}\!\left(\mu\!\left(Y\right)\right) + [U,\pi\sharp(\mu)]_{VF}\!\left(\eta\!\left(Y\right)\right) - \eta\!\left([U,[Y,\pi\sharp(\mu)]_{VF]_{VF}}\right) + \eta\!\left([Y,[U,\pi\sharp(\mu)]_{VF]_{VF}}\right) + \eta\!\left([[U,Y]_{VF,\pi\sharp(\mu)]_{VF}}\right) + \mu\!\left([U,[Y,\pi\sharp(\eta)]_{VF]_{VF}}\right) - \mu\!\left([Y,[U,\pi\sharp(\eta)]_{VF]_{VF}}\right) - \mu\!\left([[U,Y]_{VF,\pi\sharp(\eta)]_{VF}}\right) - \left(\pi\sharp\!\left(\eta\right)\right)\!\left(U\!\left(\mu\!\left(Y\right)\right)\right) + \left(\pi\sharp\!\left(\mu\right)\right)\!\left(U\!\left(\eta\!\left(Y\right)\right)\right) \quad \text{[simplify]}\;\text{--- canonical-form pipeline (intra-loop)} \\
+U\!\left(Y\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right) + U\!\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\mu\!\left(Y\right)\right)\right) - U\!\left(\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left(Y\right)\right)\right) - Y\!\left(U\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right) - [U,Y]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - [U,\pi\sharp(\eta)]_{VF}\!\left(\mu\!\left(Y\right)\right) + [U,\pi\sharp(\mu)]_{VF}\!\left(\eta\!\left(Y\right)\right) - \eta\!\left([U,[Y,\pi\sharp(\mu)]_{VF]_{VF}}\right) + \eta\!\left([Y,[U,\pi\sharp(\mu)]_{VF]_{VF}}\right) + \eta\!\left([[U,Y]_{VF,\pi\sharp(\mu)]_{VF}}\right) + \mu\!\left([U,[Y,\pi\sharp(\eta)]_{VF]_{VF}}\right) - \mu\!\left([Y,[U,\pi\sharp(\eta)]_{VF]_{VF}}\right) - \mu\!\left([[U,Y]_{VF,\pi\sharp(\eta)]_{VF}}\right) - \left(\pi\sharp\!\left(\eta\right)\right)\!\left(U\!\left(\mu\!\left(Y\right)\right)\right) + \left(\pi\sharp\!\left(\mu\right)\right)\!\left(U\!\left(\eta\!\left(Y\right)\right)\right) \to U\!\left(Y\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right) + U\!\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\mu\!\left(Y\right)\right)\right) - U\!\left(\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left(Y\right)\right)\right) - Y\!\left(U\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right) - [U,Y]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - [U,\pi\sharp(\eta)]_{VF}\!\left(\mu\!\left(Y\right)\right) + [U,\pi\sharp(\mu)]_{VF}\!\left(\eta\!\left(Y\right)\right) + \mu\!\left([U,[Y,\pi\sharp(\eta)]_{VF]_{VF}}\right) - \mu\!\left([Y,[U,\pi\sharp(\eta)]_{VF]_{VF}}\right) - \mu\!\left([[U,Y]_{VF,\pi\sharp(\eta)]_{VF}}\right) - \left(\pi\sharp\!\left(\eta\right)\right)\!\left(U\!\left(\mu\!\left(Y\right)\right)\right) + \left(\pi\sharp\!\left(\mu\right)\right)\!\left(U\!\left(\eta\!\left(Y\right)\right)\right) \quad \text{[Lie-bracket Jacobi for vector fields]\,(axiom)} \\
+U\!\left(Y\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right) + U\!\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\mu\!\left(Y\right)\right)\right) - U\!\left(\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left(Y\right)\right)\right) - Y\!\left(U\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right) - [U,Y]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - [U,\pi\sharp(\eta)]_{VF}\!\left(\mu\!\left(Y\right)\right) + [U,\pi\sharp(\mu)]_{VF}\!\left(\eta\!\left(Y\right)\right) + \mu\!\left([U,[Y,\pi\sharp(\eta)]_{VF]_{VF}}\right) - \mu\!\left([Y,[U,\pi\sharp(\eta)]_{VF]_{VF}}\right) - \mu\!\left([[U,Y]_{VF,\pi\sharp(\eta)]_{VF}}\right) - \left(\pi\sharp\!\left(\eta\right)\right)\!\left(U\!\left(\mu\!\left(Y\right)\right)\right) + \left(\pi\sharp\!\left(\mu\right)\right)\!\left(U\!\left(\eta\!\left(Y\right)\right)\right) \to U\!\left(Y\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right) + U\!\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\mu\!\left(Y\right)\right)\right) - U\!\left(\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left(Y\right)\right)\right) - Y\!\left(U\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right) - [U,Y]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - [U,\pi\sharp(\eta)]_{VF}\!\left(\mu\!\left(Y\right)\right) + [U,\pi\sharp(\mu)]_{VF}\!\left(\eta\!\left(Y\right)\right) - \left(\pi\sharp\!\left(\eta\right)\right)\!\left(U\!\left(\mu\!\left(Y\right)\right)\right) + \left(\pi\sharp\!\left(\mu\right)\right)\!\left(U\!\left(\eta\!\left(Y\right)\right)\right) \quad \text{[Lie-bracket Jacobi for vector fields]\,(axiom)} \\
+U\!\left(Y\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right) + U\!\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\mu\!\left(Y\right)\right)\right) - U\!\left(\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left(Y\right)\right)\right) - Y\!\left(U\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right)\right) - [U,Y]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - [U,\pi\sharp(\eta)]_{VF}\!\left(\mu\!\left(Y\right)\right) + [U,\pi\sharp(\mu)]_{VF}\!\left(\eta\!\left(Y\right)\right) - \left(\pi\sharp\!\left(\eta\right)\right)\!\left(U\!\left(\mu\!\left(Y\right)\right)\right) + \left(\pi\sharp\!\left(\mu\right)\right)\!\left(U\!\left(\eta\!\left(Y\right)\right)\right) \to [U,Y]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) + U\!\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\mu\!\left(Y\right)\right)\right) - U\!\left(\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left(Y\right)\right)\right) - [U,Y]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - [U,\pi\sharp(\eta)]_{VF}\!\left(\mu\!\left(Y\right)\right) + [U,\pi\sharp(\mu)]_{VF}\!\left(\eta\!\left(Y\right)\right) - \left(\pi\sharp\!\left(\eta\right)\right)\!\left(U\!\left(\mu\!\left(Y\right)\right)\right) + \left(\pi\sharp\!\left(\mu\right)\right)\!\left(U\!\left(\eta\!\left(Y\right)\right)\right) \quad \text{[X(Y(f)) \ensuremath{-} Y(X(f)) = [X,Y]\_VF(f)  [permissive]]\,(axiom)} \\
+[U,Y]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) + U\!\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\mu\!\left(Y\right)\right)\right) - U\!\left(\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left(Y\right)\right)\right) - [U,Y]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - [U,\pi\sharp(\eta)]_{VF}\!\left(\mu\!\left(Y\right)\right) + [U,\pi\sharp(\mu)]_{VF}\!\left(\eta\!\left(Y\right)\right) - \left(\pi\sharp\!\left(\eta\right)\right)\!\left(U\!\left(\mu\!\left(Y\right)\right)\right) + \left(\pi\sharp\!\left(\mu\right)\right)\!\left(U\!\left(\eta\!\left(Y\right)\right)\right) \to [U,\pi\sharp(\eta)]_{VF}\!\left(\mu\!\left(Y\right)\right) + [U,Y]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - U\!\left(\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left(Y\right)\right)\right) - [U,Y]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - [U,\pi\sharp(\eta)]_{VF}\!\left(\mu\!\left(Y\right)\right) + [U,\pi\sharp(\mu)]_{VF}\!\left(\eta\!\left(Y\right)\right) + \left(\pi\sharp\!\left(\mu\right)\right)\!\left(U\!\left(\eta\!\left(Y\right)\right)\right) \quad \text{[X(Y(f)) \ensuremath{-} Y(X(f)) = [X,Y]\_VF(f)  [permissive]]\,(axiom)} \\
+[U,\pi\sharp(\eta)]_{VF}\!\left(\mu\!\left(Y\right)\right) + [U,Y]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - U\!\left(\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left(Y\right)\right)\right) - [U,Y]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - [U,\pi\sharp(\eta)]_{VF}\!\left(\mu\!\left(Y\right)\right) + [U,\pi\sharp(\mu)]_{VF}\!\left(\eta\!\left(Y\right)\right) + \left(\pi\sharp\!\left(\mu\right)\right)\!\left(U\!\left(\eta\!\left(Y\right)\right)\right) \to [\pi\sharp(\mu),U]_{VF}\!\left(\eta\!\left(Y\right)\right) + [U,\pi\sharp(\eta)]_{VF}\!\left(\mu\!\left(Y\right)\right) + [U,Y]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - [U,Y]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - [U,\pi\sharp(\eta)]_{VF}\!\left(\mu\!\left(Y\right)\right) + [U,\pi\sharp(\mu)]_{VF}\!\left(\eta\!\left(Y\right)\right) \quad \text{[X(Y(f)) \ensuremath{-} Y(X(f)) = [X,Y]\_VF(f)  [permissive]]\,(axiom)} \\
+[\pi\sharp(\mu),U]_{VF} \to -[U,\pi\sharp(\mu)]_{VF} \quad \text{[[Y, X]\_VF \ensuremath{\to} \ensuremath{-}[X, Y]\_VF  [repr-canonical]]\,(axiom)} \\
+\left(-[U,\pi\sharp(\mu)]_{VF}\right)\!\left(\eta\!\left(Y\right)\right) + [U,\pi\sharp(\eta)]_{VF}\!\left(\mu\!\left(Y\right)\right) + [U,Y]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - [U,Y]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - [U,\pi\sharp(\eta)]_{VF}\!\left(\mu\!\left(Y\right)\right) + [U,\pi\sharp(\mu)]_{VF}\!\left(\eta\!\left(Y\right)\right) \to -[U,\pi\sharp(\mu)]_{VF}\!\left(\eta\!\left(Y\right)\right) + [U,\pi\sharp(\eta)]_{VF}\!\left(\mu\!\left(Y\right)\right) + [U,Y]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - [U,Y]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - [U,\pi\sharp(\eta)]_{VF}\!\left(\mu\!\left(Y\right)\right) + [U,\pi\sharp(\mu)]_{VF}\!\left(\eta\!\left(Y\right)\right) \quad \text{[product-rule]}\;\text{--- graded Leibniz + linearity} \\
+-[U,\pi\sharp(\mu)]_{VF}\!\left(\eta\!\left(Y\right)\right) + [U,\pi\sharp(\eta)]_{VF}\!\left(\mu\!\left(Y\right)\right) + [U,Y]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - [U,Y]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\mu\right)\right)\right) - [U,\pi\sharp(\eta)]_{VF}\!\left(\mu\!\left(Y\right)\right) + [U,\pi\sharp(\mu)]_{VF}\!\left(\eta\!\left(Y\right)\right) \to 0 \quad \text{[simplify]}\;\text{--- canonical-form pipeline (intra-loop)}
+\end{gather*}
+}
+
+    
+
+    \subsubsection{\texorpdfstring{(2)
+\(\mathcal{L}_{\tilde{d}\,\tilde{\iota}_\eta U}\,\mu = -[d\,\iota_U \eta,\;\mu]_K\)}{(2) \textbackslash mathcal\{L\}\_\{\textbackslash tilde\{d\}\textbackslash,\textbackslash tilde\{\textbackslash iota\}\_\textbackslash eta U\}\textbackslash,\textbackslash mu = -{[}d\textbackslash,\textbackslash iota\_U \textbackslash eta,\textbackslash;\textbackslash mu{]}\_K}}\label{mathcall_tildedtildeiota_eta-umu--diota_u-etamu_k}
+
+Sol taraftaki \(\tilde{d}\,\tilde{\iota}_\eta U\) bir vektör alanı
+(\(\tilde{\iota}_\eta\) SN-derecesini düşürür, \(\tilde{d}_\pi\)
+yükseltir; 1-vector \(U\)'dan başlayınca yine 1-vector). Sağ taraftaki
+\(d\,\iota_U \eta\) bir 1-form, Koszul bracket \(\mu\) ile alınıyor.
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{4}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{head\PYZus{}lhs} \PY{o}{=} \PY{n}{Act}\PY{p}{(}\PY{n}{tilde\PYZus{}d}\PY{p}{(}\PY{n}{pi}\PY{p}{)}\PY{p}{,} \PY{n}{Act}\PY{p}{(}\PY{n}{tilde\PYZus{}interior}\PY{p}{(}\PY{n}{eta}\PY{p}{)}\PY{p}{,} \PY{n}{U}\PY{p}{)}\PY{p}{)}
+\PY{n}{lhs} \PY{o}{=} \PY{n}{Act}\PY{p}{(}\PY{n}{lie\PYZus{}derivative}\PY{p}{(}\PY{n}{head\PYZus{}lhs}\PY{p}{)}\PY{p}{,} \PY{n}{mu}\PY{p}{)}
+\PY{n}{head\PYZus{}rhs} \PY{o}{=} \PY{n}{Act}\PY{p}{(}\PY{n}{default\PYZus{}d}\PY{p}{,} \PY{n}{Act}\PY{p}{(}\PY{n}{interior}\PY{p}{(}\PY{n}{U}\PY{p}{)}\PY{p}{,} \PY{n}{eta}\PY{p}{)}\PY{p}{)}
+\PY{n}{rhs} \PY{o}{=} \PY{n}{Neg}\PY{p}{(}\PY{n}{BracketApply}\PY{p}{(}\PY{n}{K\PYZus{}b}\PY{p}{,} \PY{n}{head\PYZus{}rhs}\PY{p}{,} \PY{n}{mu}\PY{p}{)}\PY{p}{)}
+\PY{n}{chain} \PY{o}{=} \PY{n}{prob}\PY{o}{.}\PY{n}{prove\PYZus{}derivator}\PY{p}{(}\PY{n}{lhs}\PY{p}{,} \PY{n}{rhs}\PY{p}{,} \PY{n}{eval\PYZus{}args}\PY{o}{=}\PY{p}{(}\PY{n}{Y}\PY{p}{,}\PY{p}{)}\PY{p}{,} \PY{n}{side}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{form}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{(2) form\PYZhy{}side, L\PYZus{}}\PY{l+s+se}{\PYZob{}\PYZob{}}\PY{l+s+s2}{dtilde iotatilde\PYZus{}eta U}\PY{l+s+se}{\PYZcb{}\PYZcb{}}\PY{l+s+s2}{ mu = \PYZhy{}[d iota\PYZus{}U eta, mu]\PYZus{}K  \PYZhy{}\PYZhy{}\PYZgt{}  }\PY{l+s+si}{\PYZob{}}\PY{n+nb}{len}\PY{p}{(}\PY{n}{chain}\PY{p}{)}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{ adimda kapandi}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n}{display\PYZus{}chain}\PY{p}{(}\PY{n}{chain}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+(2) form-side, L\_\{dtilde iotatilde\_eta U\} mu = -[d iota\_U eta, mu]\_K  -->  21
+adimda kapandi
+    \end{Verbatim}
+ 
+            
+\prompt{Out}{outcolor}{4}{}
+    
+    {\allowdisplaybreaks\scriptsize
+\begin{gather*}
+\left(-L_{X_{\iota_U(\eta)}}\!\left(\mu\right)\right)\!\left(Y\right) \to -\left(L_{X_{\iota_U(\eta)}}\!\left(\mu\right)\right)\!\left(Y\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(L_{X_{\iota_U(\eta)}}\!\left(\mu\right)\right)\!\left(Y\right) \to X_{\iota_U(\eta)}\!\left(\mu\!\left(Y\right)\right) - \mu\!\left([X_{\iota_{U(\eta),Y]_{VF}}}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\left[d\!\left(\iota_U\!\left(\eta\right)\right),\, \mu\right]_{[\cdot,\cdot]_K[\pi]} \to L_{\pi\sharp(d(\iota_U(\eta)))}\!\left(\mu\right) - L_\pi\sharp(\mu)\!\left(d\!\left(\iota_U\!\left(\eta\right)\right)\right) - d\!\left(\langle \pi\sharp\!\left(d\!\left(\iota_U\!\left(\eta\right)\right)\right),\, \mu \rangle\right) \quad \text{[[\ensuremath{\alpha}, \ensuremath{\beta}]\_K = L\_\ensuremath{\rho}\ensuremath{\alpha}(\ensuremath{\beta}) \ensuremath{-} L\_\ensuremath{\rho}\ensuremath{\beta}(\ensuremath{\alpha}) \ensuremath{-} d\ensuremath{\langle}\ensuremath{\rho}\ensuremath{\alpha}, \ensuremath{\beta}\ensuremath{\rangle} [[\ensuremath{\cdot},\ensuremath{\cdot}]\_K[\ensuremath{\pi}]]]\,(axiom)} \\
+L_{\pi\sharp(d(\iota_U(\eta)))}\!\left(\mu\right) \to L_{X_{\iota_U(\eta)}}\!\left(\mu\right) \quad \text{[atom-slot lift]\,(axiom)} \\
+\pi\sharp\!\left(d\!\left(\iota_U\!\left(\eta\right)\right)\right) \to X_{\iota_U(\eta)} \quad \text{[\ensuremath{\pi}\ensuremath{\sharp}(df) = X\_f [\ensuremath{\pi}]]\,(axiom)} \\
+\langle X_{\iota_U(\eta)},\, \mu \rangle \to -\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\iota_U\!\left(\eta\right)\right) \quad \text{[\ensuremath{\langle}X\_f, \ensuremath{\mu}\ensuremath{\rangle} = \ensuremath{-}\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\mu})(f) [\ensuremath{\pi}]]\,(axiom)} \\
+\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\iota_U\!\left(\eta\right)\right) \to \left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left(U\right)\right) \quad \text{[bare \ensuremath{\iota}\_X(\ensuremath{\omega}) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(\ensuremath{\omega}, X))]\,(axiom)} \\
+\left(-\left(L_{X_{\iota_U(\eta)}}\!\left(\mu\right) - L_\pi\sharp(\mu)\!\left(d\!\left(\iota_U\!\left(\eta\right)\right)\right) - d\!\left(-\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left(U\right)\right)\right)\right)\right)\!\left(Y\right) \to -\left(L_{X_{\iota_U(\eta)}}\!\left(\mu\right) - L_\pi\sharp(\mu)\!\left(d\!\left(\iota_U\!\left(\eta\right)\right)\right) - d\!\left(-\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left(U\right)\right)\right)\right)\!\left(Y\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(L_{X_{\iota_U(\eta)}}\!\left(\mu\right) - L_\pi\sharp(\mu)\!\left(d\!\left(\iota_U\!\left(\eta\right)\right)\right) - d\!\left(-\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left(U\right)\right)\right)\right)\!\left(Y\right) \to \left(L_{X_{\iota_U(\eta)}}\!\left(\mu\right)\right)\!\left(Y\right) - \left(L_\pi\sharp(\mu)\!\left(d\!\left(\iota_U\!\left(\eta\right)\right)\right)\right)\!\left(Y\right) - \left(d\!\left(-\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left(U\right)\right)\right)\right)\!\left(Y\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(L_{X_{\iota_U(\eta)}}\!\left(\mu\right)\right)\!\left(Y\right) \to X_{\iota_U(\eta)}\!\left(\mu\!\left(Y\right)\right) - \mu\!\left([X_{\iota_{U(\eta),Y]_{VF}}}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\left(L_\pi\sharp(\mu)\!\left(d\!\left(\iota_U\!\left(\eta\right)\right)\right)\right)\!\left(Y\right) \to \left(\pi\sharp\!\left(\mu\right)\right)\!\left(\left(d\!\left(\iota_U\!\left(\eta\right)\right)\right)\!\left(Y\right)\right) - \left(d\!\left(\iota_U\!\left(\eta\right)\right)\right)\!\left([\pi\sharp(\mu),Y]_{VF}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\left(d\!\left(\iota_U\!\left(\eta\right)\right)\right)\!\left(Y\right) \to Y\!\left(\iota_U\!\left(\eta\right)\right) \quad \text{[d intrinsic (Koszul): (d\ensuremath{\omega})(X\_0, \ensuremath{\dots}, X\_p) = \ensuremath{\Sigma} \ensuremath{\pm}X\_i(\ensuremath{\omega}(\ensuremath{\dots},hat\_i,\ensuremath{\dots})) + \ensuremath{\Sigma} \ensuremath{\pm}\ensuremath{\omega}([X\_i,X\_j]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+Y\!\left(\iota_U\!\left(\eta\right)\right) \to Y\!\left(\eta\!\left(U\right)\right) \quad \text{[bare \ensuremath{\iota}\_X(\ensuremath{\omega}) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(\ensuremath{\omega}, X))]\,(axiom)} \\
+[\pi\sharp(\mu),Y]_{VF} \to -[Y,\pi\sharp(\mu)]_{VF} \quad \text{[[Y, X]\_VF \ensuremath{\to} \ensuremath{-}[X, Y]\_VF  [repr-canonical]]\,(axiom)} \\
+\left(d\!\left(\iota_U\!\left(\eta\right)\right)\right)\!\left(-[Y,\pi\sharp(\mu)]_{VF}\right) \to \left(-[Y,\pi\sharp(\mu)]_{VF}\right)\!\left(\iota_U\!\left(\eta\right)\right) \quad \text{[d intrinsic (Koszul): (d\ensuremath{\omega})(X\_0, \ensuremath{\dots}, X\_p) = \ensuremath{\Sigma} \ensuremath{\pm}X\_i(\ensuremath{\omega}(\ensuremath{\dots},hat\_i,\ensuremath{\dots})) + \ensuremath{\Sigma} \ensuremath{\pm}\ensuremath{\omega}([X\_i,X\_j]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\left(d\!\left(-\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left(U\right)\right)\right)\right)\!\left(Y\right) \to Y\!\left(-\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left(U\right)\right)\right) \quad \text{[d intrinsic (Koszul): (d\ensuremath{\omega})(X\_0, \ensuremath{\dots}, X\_p) = \ensuremath{\Sigma} \ensuremath{\pm}X\_i(\ensuremath{\omega}(\ensuremath{\dots},hat\_i,\ensuremath{\dots})) + \ensuremath{\Sigma} \ensuremath{\pm}\ensuremath{\omega}([X\_i,X\_j]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+-\left(X_{\iota_U(\eta)}\!\left(\mu\!\left(Y\right)\right) - \mu\!\left([X_{\iota_{U(\eta),Y]_{VF}}}\right)\right) - \left(-\left(\left(X_{\iota_U(\eta)}\!\left(\mu\!\left(Y\right)\right) - \mu\!\left([X_{\iota_{U(\eta),Y]_{VF}}}\right)\right) - \left(\left(\pi\sharp\!\left(\mu\right)\right)\!\left(Y\!\left(\eta\!\left(U\right)\right)\right) - \left(-[Y,\pi\sharp(\mu)]_{VF}\right)\!\left(\iota_U\!\left(\eta\right)\right)\right) - Y\!\left(-\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left(U\right)\right)\right)\right)\right) \to -\left(X_{\iota_U(\eta)}\!\left(\mu\!\left(Y\right)\right) - \mu\!\left([X_{\iota_{U(\eta),Y]_{VF}}}\right)\right) - \left(-\left(\left(X_{\iota_U(\eta)}\!\left(\mu\!\left(Y\right)\right) - \mu\!\left([X_{\iota_{U(\eta),Y]_{VF}}}\right)\right) - \left(\left(\pi\sharp\!\left(\mu\right)\right)\!\left(Y\!\left(\eta\!\left(U\right)\right)\right) - \left(-[Y,\pi\sharp(\mu)]_{VF}\!\left(\iota_U\!\left(\eta\right)\right)\right)\right) - \left(-Y\!\left(\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left(U\right)\right)\right)\right)\right)\right) \quad \text{[product-rule]}\;\text{--- graded Leibniz + linearity} \\
+-\left(X_{\iota_U(\eta)}\!\left(\mu\!\left(Y\right)\right) - \mu\!\left([X_{\iota_{U(\eta),Y]_{VF}}}\right)\right) - \left(-\left(\left(X_{\iota_U(\eta)}\!\left(\mu\!\left(Y\right)\right) - \mu\!\left([X_{\iota_{U(\eta),Y]_{VF}}}\right)\right) - \left(\left(\pi\sharp\!\left(\mu\right)\right)\!\left(Y\!\left(\eta\!\left(U\right)\right)\right) - \left(-[Y,\pi\sharp(\mu)]_{VF}\!\left(\iota_U\!\left(\eta\right)\right)\right)\right) - \left(-Y\!\left(\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left(U\right)\right)\right)\right)\right)\right) \to Y\!\left(\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left(U\right)\right)\right) - [Y,\pi\sharp(\mu)]_{VF}\!\left(\iota_U\!\left(\eta\right)\right) - \left(\pi\sharp\!\left(\mu\right)\right)\!\left(Y\!\left(\eta\!\left(U\right)\right)\right) \quad \text{[simplify]}\;\text{--- canonical-form pipeline (intra-loop)} \\
+[Y,\pi\sharp(\mu)]_{VF}\!\left(\iota_U\!\left(\eta\right)\right) \to [Y,\pi\sharp(\mu)]_{VF}\!\left(\eta\!\left(U\right)\right) \quad \text{[bare \ensuremath{\iota}\_X(\ensuremath{\omega}) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(\ensuremath{\omega}, X))]\,(axiom)} \\
+Y\!\left(\left(\pi\sharp\!\left(\mu\right)\right)\!\left(\eta\!\left(U\right)\right)\right) - [Y,\pi\sharp(\mu)]_{VF}\!\left(\eta\!\left(U\right)\right) - \left(\pi\sharp\!\left(\mu\right)\right)\!\left(Y\!\left(\eta\!\left(U\right)\right)\right) \to [Y,\pi\sharp(\mu)]_{VF}\!\left(\eta\!\left(U\right)\right) - [Y,\pi\sharp(\mu)]_{VF}\!\left(\eta\!\left(U\right)\right) \quad \text{[X(Y(f)) \ensuremath{-} Y(X(f)) = [X,Y]\_VF(f)]\,(axiom)} \\
+[Y,\pi\sharp(\mu)]_{VF}\!\left(\eta\!\left(U\right)\right) - [Y,\pi\sharp(\mu)]_{VF}\!\left(\eta\!\left(U\right)\right) \to 0 \quad \text{[simplify]}\;\text{--- canonical-form pipeline (intra-loop)}
+\end{gather*}
+}
+
+    
+
+    \subsubsection{\texorpdfstring{(3)
+\(0 = d\,\iota_{\tilde{\mathcal{L}}_\omega W}\,\eta - d\,\iota_{\tilde{d}\,\tilde{\iota}_\eta W}\,\omega + d\,\iota_W\,[\omega, \eta]_K\)}{(3) 0 = d\textbackslash,\textbackslash iota\_\{\textbackslash tilde\{\textbackslash mathcal\{L\}\}\_\textbackslash omega W\}\textbackslash,\textbackslash eta - d\textbackslash,\textbackslash iota\_\{\textbackslash tilde\{d\}\textbackslash,\textbackslash tilde\{\textbackslash iota\}\_\textbackslash eta W\}\textbackslash,\textbackslash omega + d\textbackslash,\textbackslash iota\_W\textbackslash,{[}\textbackslash omega, \textbackslash eta{]}\_K}}\label{diota_tildemathcall_omega-weta---diota_tildedtildeiota_eta-womega-diota_womega-eta_k}
+
+Sıfır-toplam özdeşliği; \texttt{prove\_derivator} iki Expr alıyor, bu
+yüzden ilk iki terim \(\mathrm{lhs}_{\mathrm{pair}}\), üçüncü (pozitif)
+terim de \(\mathrm{rhs}_{\mathrm{third}}\) olarak gruplanıp
+\texttt{lhs\_pair\ =\ rhs\_third} formatında veriliyor.
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{5}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{v1} \PY{o}{=} \PY{n}{Act}\PY{p}{(}\PY{n}{tilde\PYZus{}lie}\PY{p}{(}\PY{n}{omega}\PY{p}{,} \PY{n}{pi}\PY{p}{)}\PY{p}{,} \PY{n}{W}\PY{p}{)}
+\PY{n}{v2} \PY{o}{=} \PY{n}{Act}\PY{p}{(}\PY{n}{tilde\PYZus{}d}\PY{p}{(}\PY{n}{pi}\PY{p}{)}\PY{p}{,} \PY{n}{Act}\PY{p}{(}\PY{n}{tilde\PYZus{}interior}\PY{p}{(}\PY{n}{eta}\PY{p}{)}\PY{p}{,} \PY{n}{W}\PY{p}{)}\PY{p}{)}
+\PY{n}{bracket\PYZus{}oe} \PY{o}{=} \PY{n}{BracketApply}\PY{p}{(}\PY{n}{K\PYZus{}b}\PY{p}{,} \PY{n}{omega}\PY{p}{,} \PY{n}{eta}\PY{p}{)}
+
+\PY{n}{lhs\PYZus{}pair} \PY{o}{=} \PY{n}{Sum}\PY{p}{(}
+    \PY{n}{Act}\PY{p}{(}\PY{n}{default\PYZus{}d}\PY{p}{,} \PY{n}{Act}\PY{p}{(}\PY{n}{interior}\PY{p}{(}\PY{n}{v1}\PY{p}{)}\PY{p}{,} \PY{n}{eta}\PY{p}{)}\PY{p}{)}\PY{p}{,}
+    \PY{n}{Act}\PY{p}{(}\PY{n}{default\PYZus{}d}\PY{p}{,} \PY{n}{Act}\PY{p}{(}\PY{n}{interior}\PY{p}{(}\PY{n}{W}\PY{p}{)}\PY{p}{,} \PY{n}{bracket\PYZus{}oe}\PY{p}{)}\PY{p}{)}\PY{p}{,}
+\PY{p}{)}
+\PY{n}{rhs\PYZus{}third} \PY{o}{=} \PY{n}{Act}\PY{p}{(}\PY{n}{default\PYZus{}d}\PY{p}{,} \PY{n}{Act}\PY{p}{(}\PY{n}{interior}\PY{p}{(}\PY{n}{v2}\PY{p}{)}\PY{p}{,} \PY{n}{omega}\PY{p}{)}\PY{p}{)}
+\PY{n}{chain} \PY{o}{=} \PY{n}{prob}\PY{o}{.}\PY{n}{prove\PYZus{}derivator}\PY{p}{(}\PY{n}{lhs\PYZus{}pair}\PY{p}{,} \PY{n}{rhs\PYZus{}third}\PY{p}{,} \PY{n}{eval\PYZus{}args}\PY{o}{=}\PY{p}{(}\PY{n}{Y}\PY{p}{,}\PY{p}{)}\PY{p}{,} \PY{n}{side}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{form}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{(3) form\PYZhy{}side, zero\PYZhy{}sum reformulated lhs\PYZus{}pair = rhs\PYZus{}third  \PYZhy{}\PYZhy{}\PYZgt{}  }\PY{l+s+si}{\PYZob{}}\PY{n+nb}{len}\PY{p}{(}\PY{n}{chain}\PY{p}{)}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{ adimda kapandi}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n}{display\PYZus{}chain}\PY{p}{(}\PY{n}{chain}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+(3) form-side, zero-sum reformulated lhs\_pair = rhs\_third  -->  30 adimda
+kapandi
+    \end{Verbatim}
+ 
+            
+\prompt{Out}{outcolor}{5}{}
+    
+    {\allowdisplaybreaks\scriptsize
+\begin{gather*}
+\left[\omega,\, \eta\right]_{[\cdot,\cdot]_K[\pi]} \to L_\pi\sharp(\omega)\!\left(\eta\right) - L_\pi\sharp(\eta)\!\left(\omega\right) - d\!\left(\langle \pi\sharp\!\left(\omega\right),\, \eta \rangle\right) \quad \text{[[\ensuremath{\alpha}, \ensuremath{\beta}]\_K = L\_\ensuremath{\rho}\ensuremath{\alpha}(\ensuremath{\beta}) \ensuremath{-} L\_\ensuremath{\rho}\ensuremath{\beta}(\ensuremath{\alpha}) \ensuremath{-} d\ensuremath{\langle}\ensuremath{\rho}\ensuremath{\alpha}, \ensuremath{\beta}\ensuremath{\rangle} [[\ensuremath{\cdot},\ensuremath{\cdot}]\_K[\ensuremath{\pi}]]]\,(axiom)} \\
+\langle \pi\sharp\!\left(\omega\right),\, \eta \rangle \to \eta\!\left(\pi\sharp\!\left(\omega\right)\right) \quad \text{[\ensuremath{\langle}\ensuremath{\alpha}, X\ensuremath{\rangle} \ensuremath{\to} \ensuremath{\alpha}(X)]\,(axiom)} \\
+\left(d\!\left(-\iota_{X_{\iota_W(\omega)}}\!\left(\eta\right) + \left(\iota_{\pi\sharp(L_W(\omega))}\!\left(\eta\right) - \iota_{[W,\pi\sharp(\omega)]_{VF}}\!\left(\eta\right)\right)\right) + d\!\left(\iota_W\!\left(L_\pi\sharp(\omega)\!\left(\eta\right) - L_\pi\sharp(\eta)\!\left(\omega\right) - d\!\left(\eta\!\left(\pi\sharp\!\left(\omega\right)\right)\right)\right)\right)\right)\!\left(Y\right) \to \left(d\!\left(-\iota_{X_{\iota_W(\omega)}}\!\left(\eta\right) + \left(\iota_{\pi\sharp(L_W(\omega))}\!\left(\eta\right) - \iota_{[W,\pi\sharp(\omega)]_{VF}}\!\left(\eta\right)\right)\right)\right)\!\left(Y\right) + \left(d\!\left(\iota_W\!\left(L_\pi\sharp(\omega)\!\left(\eta\right) - L_\pi\sharp(\eta)\!\left(\omega\right) - d\!\left(\eta\!\left(\pi\sharp\!\left(\omega\right)\right)\right)\right)\right)\right)\!\left(Y\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(d\!\left(-\iota_{X_{\iota_W(\omega)}}\!\left(\eta\right) + \left(\iota_{\pi\sharp(L_W(\omega))}\!\left(\eta\right) - \iota_{[W,\pi\sharp(\omega)]_{VF}}\!\left(\eta\right)\right)\right)\right)\!\left(Y\right) \to Y\!\left(-\iota_{X_{\iota_W(\omega)}}\!\left(\eta\right) + \left(\iota_{\pi\sharp(L_W(\omega))}\!\left(\eta\right) - \iota_{[W,\pi\sharp(\omega)]_{VF}}\!\left(\eta\right)\right)\right) \quad \text{[d intrinsic (Koszul): (d\ensuremath{\omega})(X\_0, \ensuremath{\dots}, X\_p) = \ensuremath{\Sigma} \ensuremath{\pm}X\_i(\ensuremath{\omega}(\ensuremath{\dots},hat\_i,\ensuremath{\dots})) + \ensuremath{\Sigma} \ensuremath{\pm}\ensuremath{\omega}([X\_i,X\_j]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\left(d\!\left(\iota_W\!\left(L_\pi\sharp(\omega)\!\left(\eta\right) - L_\pi\sharp(\eta)\!\left(\omega\right) - d\!\left(\eta\!\left(\pi\sharp\!\left(\omega\right)\right)\right)\right)\right)\right)\!\left(Y\right) \to Y\!\left(\iota_W\!\left(L_\pi\sharp(\omega)\!\left(\eta\right) - L_\pi\sharp(\eta)\!\left(\omega\right) - d\!\left(\eta\!\left(\pi\sharp\!\left(\omega\right)\right)\right)\right)\right) \quad \text{[d intrinsic (Koszul): (d\ensuremath{\omega})(X\_0, \ensuremath{\dots}, X\_p) = \ensuremath{\Sigma} \ensuremath{\pm}X\_i(\ensuremath{\omega}(\ensuremath{\dots},hat\_i,\ensuremath{\dots})) + \ensuremath{\Sigma} \ensuremath{\pm}\ensuremath{\omega}([X\_i,X\_j]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+Y\!\left(\iota_W\!\left(L_\pi\sharp(\omega)\!\left(\eta\right) - L_\pi\sharp(\eta)\!\left(\omega\right) - d\!\left(\eta\!\left(\pi\sharp\!\left(\omega\right)\right)\right)\right)\right) \to Y\!\left(\left(L_\pi\sharp(\omega)\!\left(\eta\right) - L_\pi\sharp(\eta)\!\left(\omega\right) - d\!\left(\eta\!\left(\pi\sharp\!\left(\omega\right)\right)\right)\right)\!\left(W\right)\right) \quad \text{[bare \ensuremath{\iota}\_X(\ensuremath{\omega}) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(\ensuremath{\omega}, X))]\,(axiom)} \\
+\left(L_\pi\sharp(\omega)\!\left(\eta\right) - L_\pi\sharp(\eta)\!\left(\omega\right) - d\!\left(\eta\!\left(\pi\sharp\!\left(\omega\right)\right)\right)\right)\!\left(W\right) \to \left(L_\pi\sharp(\omega)\!\left(\eta\right)\right)\!\left(W\right) - \left(L_\pi\sharp(\eta)\!\left(\omega\right)\right)\!\left(W\right) - \left(d\!\left(\eta\!\left(\pi\sharp\!\left(\omega\right)\right)\right)\right)\!\left(W\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(L_\pi\sharp(\omega)\!\left(\eta\right)\right)\!\left(W\right) \to \left(\pi\sharp\!\left(\omega\right)\right)\!\left(\eta\!\left(W\right)\right) - \eta\!\left([\pi\sharp(\omega),W]_{VF}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+[\pi\sharp(\omega),W]_{VF} \to -[W,\pi\sharp(\omega)]_{VF} \quad \text{[[Y, X]\_VF \ensuremath{\to} \ensuremath{-}[X, Y]\_VF  [repr-canonical]]\,(axiom)} \\
+\eta\!\left(-[W,\pi\sharp(\omega)]_{VF}\right) \to -\eta\!\left([W,\pi\sharp(\omega)]_{VF}\right) \quad \text{[MultiEval arg slot linearity]\,(axiom)} \\
+\left(L_\pi\sharp(\eta)\!\left(\omega\right)\right)\!\left(W\right) \to \left(\pi\sharp\!\left(\eta\right)\right)\!\left(\omega\!\left(W\right)\right) - \omega\!\left([\pi\sharp(\eta),W]_{VF}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+[\pi\sharp(\eta),W]_{VF} \to -[W,\pi\sharp(\eta)]_{VF} \quad \text{[[Y, X]\_VF \ensuremath{\to} \ensuremath{-}[X, Y]\_VF  [repr-canonical]]\,(axiom)} \\
+\omega\!\left(-[W,\pi\sharp(\eta)]_{VF}\right) \to -\omega\!\left([W,\pi\sharp(\eta)]_{VF}\right) \quad \text{[MultiEval arg slot linearity]\,(axiom)} \\
+\left(d\!\left(\eta\!\left(\pi\sharp\!\left(\omega\right)\right)\right)\right)\!\left(W\right) \to W\!\left(\eta\!\left(\pi\sharp\!\left(\omega\right)\right)\right) \quad \text{[d intrinsic (Koszul): (d\ensuremath{\omega})(X\_0, \ensuremath{\dots}, X\_p) = \ensuremath{\Sigma} \ensuremath{\pm}X\_i(\ensuremath{\omega}(\ensuremath{\dots},hat\_i,\ensuremath{\dots})) + \ensuremath{\Sigma} \ensuremath{\pm}\ensuremath{\omega}([X\_i,X\_j]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\left(d\!\left(-\iota_{X_{\iota_W(\eta)}}\!\left(\omega\right)\right)\right)\!\left(Y\right) \to Y\!\left(-\iota_{X_{\iota_W(\eta)}}\!\left(\omega\right)\right) \quad \text{[d intrinsic (Koszul): (d\ensuremath{\omega})(X\_0, \ensuremath{\dots}, X\_p) = \ensuremath{\Sigma} \ensuremath{\pm}X\_i(\ensuremath{\omega}(\ensuremath{\dots},hat\_i,\ensuremath{\dots})) + \ensuremath{\Sigma} \ensuremath{\pm}\ensuremath{\omega}([X\_i,X\_j]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\left(Y\!\left(-\iota_{X_{\iota_W(\omega)}}\!\left(\eta\right) + \left(\iota_{\pi\sharp(L_W(\omega))}\!\left(\eta\right) - \iota_{[W,\pi\sharp(\omega)]_{VF}}\!\left(\eta\right)\right)\right) + Y\!\left(\left(\left(\pi\sharp\!\left(\omega\right)\right)\!\left(\eta\!\left(W\right)\right) - \left(-\eta\!\left([W,\pi\sharp(\omega)]_{VF}\right)\right)\right) - \left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\omega\!\left(W\right)\right) - \left(-\omega\!\left([W,\pi\sharp(\eta)]_{VF}\right)\right)\right) - W\!\left(\eta\!\left(\pi\sharp\!\left(\omega\right)\right)\right)\right)\right) - Y\!\left(-\iota_{X_{\iota_W(\eta)}}\!\left(\omega\right)\right) \to \left(\left(-Y\!\left(\iota_{X_{\iota_W(\omega)}}\!\left(\eta\right)\right) + Y\!\left(\iota_{\pi\sharp(L_W(\omega))}\!\left(\eta\right)\right) - Y\!\left(\iota_{[W,\pi\sharp(\omega)]_{VF}}\!\left(\eta\right)\right)\right) + \left(Y\!\left(\left(\pi\sharp\!\left(\omega\right)\right)\!\left(\eta\!\left(W\right)\right)\right) - \left(-Y\!\left(\eta\!\left([W,\pi\sharp(\omega)]_{VF}\right)\right)\right) - \left(Y\!\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\omega\!\left(W\right)\right)\right) - \left(-Y\!\left(\omega\!\left([W,\pi\sharp(\eta)]_{VF}\right)\right)\right)\right) - Y\!\left(W\!\left(\eta\!\left(\pi\sharp\!\left(\omega\right)\right)\right)\right)\right)\right) - \left(-Y\!\left(\iota_{X_{\iota_W(\eta)}}\!\left(\omega\right)\right)\right) \quad \text{[product-rule]}\;\text{--- graded Leibniz + linearity} \\
+\left(\left(-Y\!\left(\iota_{X_{\iota_W(\omega)}}\!\left(\eta\right)\right) + Y\!\left(\iota_{\pi\sharp(L_W(\omega))}\!\left(\eta\right)\right) - Y\!\left(\iota_{[W,\pi\sharp(\omega)]_{VF}}\!\left(\eta\right)\right)\right) + \left(Y\!\left(\left(\pi\sharp\!\left(\omega\right)\right)\!\left(\eta\!\left(W\right)\right)\right) - \left(-Y\!\left(\eta\!\left([W,\pi\sharp(\omega)]_{VF}\right)\right)\right) - \left(Y\!\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\omega\!\left(W\right)\right)\right) - \left(-Y\!\left(\omega\!\left([W,\pi\sharp(\eta)]_{VF}\right)\right)\right)\right) - Y\!\left(W\!\left(\eta\!\left(\pi\sharp\!\left(\omega\right)\right)\right)\right)\right)\right) - \left(-Y\!\left(\iota_{X_{\iota_W(\eta)}}\!\left(\omega\right)\right)\right) \to -Y\!\left(W\!\left(\eta\!\left(\pi\sharp\!\left(\omega\right)\right)\right)\right) + Y\!\left(\eta\!\left([W,\pi\sharp(\omega)]_{VF}\right)\right) + Y\!\left(\iota_{X_{\iota_W(\eta)}}\!\left(\omega\right)\right) - Y\!\left(\iota_{X_{\iota_W(\omega)}}\!\left(\eta\right)\right) - Y\!\left(\iota_{[W,\pi\sharp(\omega)]_{VF}}\!\left(\eta\right)\right) + Y\!\left(\iota_{\pi\sharp(L_W(\omega))}\!\left(\eta\right)\right) - Y\!\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\omega\!\left(W\right)\right)\right) + Y\!\left(\left(\pi\sharp\!\left(\omega\right)\right)\!\left(\eta\!\left(W\right)\right)\right) - Y\!\left(\omega\!\left([W,\pi\sharp(\eta)]_{VF}\right)\right) \quad \text{[simplify]}\;\text{--- canonical-form pipeline (intra-loop)} \\
+Y\!\left(\iota_{X_{\iota_W(\eta)}}\!\left(\omega\right)\right) \to Y\!\left(\omega\!\left(X_{\iota_W(\eta)}\right)\right) \quad \text{[bare \ensuremath{\iota}\_X(\ensuremath{\omega}) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(\ensuremath{\omega}, X))]\,(axiom)} \\
+\omega\!\left(X_{\iota_W(\eta)}\right) \to -\left(\pi\sharp\!\left(\omega\right)\right)\!\left(\iota_W\!\left(\eta\right)\right) \quad \text{[\ensuremath{\alpha}(X\_f) = \ensuremath{-}\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\alpha})(f) [\ensuremath{\pi}]]\,(axiom)} \\
+\left(\pi\sharp\!\left(\omega\right)\right)\!\left(\iota_W\!\left(\eta\right)\right) \to \left(\pi\sharp\!\left(\omega\right)\right)\!\left(\eta\!\left(W\right)\right) \quad \text{[bare \ensuremath{\iota}\_X(\ensuremath{\omega}) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(\ensuremath{\omega}, X))]\,(axiom)} \\
+Y\!\left(\iota_{X_{\iota_W(\omega)}}\!\left(\eta\right)\right) \to Y\!\left(\eta\!\left(X_{\iota_W(\omega)}\right)\right) \quad \text{[bare \ensuremath{\iota}\_X(\ensuremath{\omega}) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(\ensuremath{\omega}, X))]\,(axiom)} \\
+\eta\!\left(X_{\iota_W(\omega)}\right) \to -\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\iota_W\!\left(\omega\right)\right) \quad \text{[\ensuremath{\alpha}(X\_f) = \ensuremath{-}\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\alpha})(f) [\ensuremath{\pi}]]\,(axiom)} \\
+\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\iota_W\!\left(\omega\right)\right) \to \left(\pi\sharp\!\left(\eta\right)\right)\!\left(\omega\!\left(W\right)\right) \quad \text{[bare \ensuremath{\iota}\_X(\ensuremath{\omega}) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(\ensuremath{\omega}, X))]\,(axiom)} \\
+Y\!\left(\iota_{[W,\pi\sharp(\omega)]_{VF}}\!\left(\eta\right)\right) \to Y\!\left(\eta\!\left([W,\pi\sharp(\omega)]_{VF}\right)\right) \quad \text{[bare \ensuremath{\iota}\_X(\ensuremath{\omega}) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(\ensuremath{\omega}, X))]\,(axiom)} \\
+Y\!\left(\iota_{\pi\sharp(L_W(\omega))}\!\left(\eta\right)\right) \to Y\!\left(\eta\!\left(\pi\sharp\!\left(L_W\!\left(\omega\right)\right)\right)\right) \quad \text{[bare \ensuremath{\iota}\_X(\ensuremath{\omega}) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(\ensuremath{\omega}, X))]\,(axiom)} \\
+\eta\!\left(\pi\sharp\!\left(L_W\!\left(\omega\right)\right)\right) \to -\left(L_W\!\left(\omega\right)\right)\!\left(\pi\sharp\!\left(\eta\right)\right) \quad \text{[\ensuremath{\alpha}(\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\beta})) \ensuremath{\to} \ensuremath{-}\ensuremath{\beta}(\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\alpha})) [\ensuremath{\pi}]]\,(axiom)} \\
+\left(L_W\!\left(\omega\right)\right)\!\left(\pi\sharp\!\left(\eta\right)\right) \to W\!\left(\omega\!\left(\pi\sharp\!\left(\eta\right)\right)\right) - \omega\!\left([W,\pi\sharp(\eta)]_{VF}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\omega\!\left(\pi\sharp\!\left(\eta\right)\right) \to -\eta\!\left(\pi\sharp\!\left(\omega\right)\right) \quad \text{[\ensuremath{\alpha}(\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\beta})) \ensuremath{\to} \ensuremath{-}\ensuremath{\beta}(\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\alpha})) [\ensuremath{\pi}]]\,(axiom)} \\
+-Y\!\left(W\!\left(\eta\!\left(\pi\sharp\!\left(\omega\right)\right)\right)\right) + Y\!\left(\eta\!\left([W,\pi\sharp(\omega)]_{VF}\right)\right) + Y\!\left(-\left(\pi\sharp\!\left(\omega\right)\right)\!\left(\eta\!\left(W\right)\right)\right) - Y\!\left(-\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\omega\!\left(W\right)\right)\right) - Y\!\left(\eta\!\left([W,\pi\sharp(\omega)]_{VF}\right)\right) + Y\!\left(-\left(W\!\left(-\eta\!\left(\pi\sharp\!\left(\omega\right)\right)\right) - \omega\!\left([W,\pi\sharp(\eta)]_{VF}\right)\right)\right) - Y\!\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\omega\!\left(W\right)\right)\right) + Y\!\left(\left(\pi\sharp\!\left(\omega\right)\right)\!\left(\eta\!\left(W\right)\right)\right) - Y\!\left(\omega\!\left([W,\pi\sharp(\eta)]_{VF}\right)\right) \to -Y\!\left(W\!\left(\eta\!\left(\pi\sharp\!\left(\omega\right)\right)\right)\right) + Y\!\left(\eta\!\left([W,\pi\sharp(\omega)]_{VF}\right)\right) - Y\!\left(\left(\pi\sharp\!\left(\omega\right)\right)\!\left(\eta\!\left(W\right)\right)\right) - \left(-Y\!\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\omega\!\left(W\right)\right)\right)\right) - Y\!\left(\eta\!\left([W,\pi\sharp(\omega)]_{VF}\right)\right) - \left(-Y\!\left(W\!\left(\eta\!\left(\pi\sharp\!\left(\omega\right)\right)\right)\right) - Y\!\left(\omega\!\left([W,\pi\sharp(\eta)]_{VF}\right)\right)\right) - Y\!\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\omega\!\left(W\right)\right)\right) + Y\!\left(\left(\pi\sharp\!\left(\omega\right)\right)\!\left(\eta\!\left(W\right)\right)\right) - Y\!\left(\omega\!\left([W,\pi\sharp(\eta)]_{VF}\right)\right) \quad \text{[product-rule]}\;\text{--- graded Leibniz + linearity} \\
+-Y\!\left(W\!\left(\eta\!\left(\pi\sharp\!\left(\omega\right)\right)\right)\right) + Y\!\left(\eta\!\left([W,\pi\sharp(\omega)]_{VF}\right)\right) - Y\!\left(\left(\pi\sharp\!\left(\omega\right)\right)\!\left(\eta\!\left(W\right)\right)\right) - \left(-Y\!\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\omega\!\left(W\right)\right)\right)\right) - Y\!\left(\eta\!\left([W,\pi\sharp(\omega)]_{VF}\right)\right) - \left(-Y\!\left(W\!\left(\eta\!\left(\pi\sharp\!\left(\omega\right)\right)\right)\right) - Y\!\left(\omega\!\left([W,\pi\sharp(\eta)]_{VF}\right)\right)\right) - Y\!\left(\left(\pi\sharp\!\left(\eta\right)\right)\!\left(\omega\!\left(W\right)\right)\right) + Y\!\left(\left(\pi\sharp\!\left(\omega\right)\right)\!\left(\eta\!\left(W\right)\right)\right) - Y\!\left(\omega\!\left([W,\pi\sharp(\eta)]_{VF}\right)\right) \to 0 \quad \text{[simplify]}\;\text{--- canonical-form pipeline (intra-loop)}
+\end{gather*}
+}
+
+    
+
+    \subsection{3. Dual multivector
+tarafı}\label{dual-multivector-tarafux131}
+
+\subsubsection{\texorpdfstring{(1')
+\(\tilde{D}^{\mathrm{SN}}_{\tilde{\mathcal{L}}_\eta}(U, V) = \tilde{\mathcal{L}}_{K_U \eta}\,V + \tilde{K}_{K_V \eta}\,U\)}{(1') \textbackslash tilde\{D\}\^{}\{\textbackslash mathrm\{SN\}\}\_\{\textbackslash tilde\{\textbackslash mathcal\{L\}\}\_\textbackslash eta\}(U, V) = \textbackslash tilde\{\textbackslash mathcal\{L\}\}\_\{K\_U \textbackslash eta\}\textbackslash,V + \textbackslash tilde\{K\}\_\{K\_V \textbackslash eta\}\textbackslash,U}}\label{tildedmathrmsn_tildemathcall_etau-v-tildemathcall_k_u-etav-tildek_k_v-etau}
+
+Sol taraftaki \(\tilde{D}^{\mathrm{SN}}_{\tilde{\mathcal{L}}_\eta}(U,V)
+= \tilde{\mathcal{L}}_\eta[U,V]_{\mathrm{SN}} - [\tilde{\mathcal{L}}_\eta U, V]_{\mathrm{SN}}
+- [U, \tilde{\mathcal{L}}_\eta V]_{\mathrm{SN}}\) obstruction'ı; sağ
+tarafta \(K\) (form Cartan-remainder) ile bağlanan iki Lichnerowicz
+düzeltmesi. Engine 117 adımda kapatıyor --- Lichnerowicz açılımı +
+SN/LBVF Sum-doğrusallığı + Sharp-Neg-doğrusallığı + LBVF Jacobi zinciri
+üzerinden.
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{6}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{lhs} \PY{o}{=} \PY{n}{derivator}\PY{p}{(}\PY{n}{tilde\PYZus{}lie}\PY{p}{(}\PY{n}{eta}\PY{p}{,} \PY{n}{pi}\PY{p}{)}\PY{p}{,} \PY{n}{default\PYZus{}sn}\PY{p}{,} \PY{n}{U}\PY{p}{,} \PY{n}{V}\PY{p}{)}
+\PY{n}{K\PYZus{}U\PYZus{}eta} \PY{o}{=} \PY{n}{Act}\PY{p}{(}\PY{n}{K}\PY{p}{(}\PY{n}{U}\PY{p}{)}\PY{p}{,} \PY{n}{eta}\PY{p}{)}
+\PY{n}{K\PYZus{}V\PYZus{}eta} \PY{o}{=} \PY{n}{Act}\PY{p}{(}\PY{n}{K}\PY{p}{(}\PY{n}{V}\PY{p}{)}\PY{p}{,} \PY{n}{eta}\PY{p}{)}
+\PY{n}{rhs} \PY{o}{=} \PY{n}{Sum}\PY{p}{(}
+    \PY{n}{Act}\PY{p}{(}\PY{n}{tilde\PYZus{}lie}\PY{p}{(}\PY{n}{K\PYZus{}U\PYZus{}eta}\PY{p}{,} \PY{n}{pi}\PY{p}{)}\PY{p}{,} \PY{n}{V}\PY{p}{)}\PY{p}{,}
+    \PY{n}{Act}\PY{p}{(}\PY{n}{K\PYZus{}tilde}\PY{p}{(}\PY{n}{K\PYZus{}V\PYZus{}eta}\PY{p}{,} \PY{n}{pi}\PY{p}{)}\PY{p}{,} \PY{n}{U}\PY{p}{)}\PY{p}{,}
+\PY{p}{)}
+\PY{n}{chain} \PY{o}{=} \PY{n}{prob}\PY{o}{.}\PY{n}{prove\PYZus{}derivator}\PY{p}{(}\PY{n}{lhs}\PY{p}{,} \PY{n}{rhs}\PY{p}{,} \PY{n}{eval\PYZus{}args}\PY{o}{=}\PY{p}{(}\PY{n}{xi}\PY{p}{,}\PY{p}{)}\PY{p}{,} \PY{n}{side}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{multivector}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{(1}\PY{l+s+s2}{\PYZsq{}}\PY{l+s+s2}{) multivec, Dtilde\PYZca{}SN\PYZus{}}\PY{l+s+se}{\PYZob{}\PYZob{}}\PY{l+s+s2}{Ltilde\PYZus{}eta}\PY{l+s+se}{\PYZcb{}\PYZcb{}}\PY{l+s+s2}{(U,V) = Ltilde\PYZus{}}\PY{l+s+se}{\PYZob{}\PYZob{}}\PY{l+s+s2}{K\PYZus{}U eta}\PY{l+s+se}{\PYZcb{}\PYZcb{}}\PY{l+s+s2}{ V + Ktilde\PYZus{}}\PY{l+s+se}{\PYZob{}\PYZob{}}\PY{l+s+s2}{K\PYZus{}V eta}\PY{l+s+se}{\PYZcb{}\PYZcb{}}\PY{l+s+s2}{ U  \PYZhy{}\PYZhy{}\PYZgt{}  }\PY{l+s+si}{\PYZob{}}\PY{n+nb}{len}\PY{p}{(}\PY{n}{chain}\PY{p}{)}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{ adimda kapandi}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n}{display\PYZus{}chain}\PY{p}{(}\PY{n}{chain}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+(1') multivec, Dtilde\^{}SN\_\{Ltilde\_eta\}(U,V) = Ltilde\_\{K\_U eta\} V + Ktilde\_\{K\_V
+eta\} U  -->  117 adimda kapandi
+    \end{Verbatim}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+
+    \end{Verbatim}
+ 
+            
+\prompt{Out}{outcolor}{6}{}
+    
+    {\allowdisplaybreaks\scriptsize
+\begin{gather*}
+\left[U,\, V\right]_{[\cdot,\cdot]_{SN}} \to [U,V]_{VF} \quad \text{[[U, V]\_SN \ensuremath{\to} [U, V]\_VF  [both 1-vectors]]\,(axiom)} \\
+\tilde{\mathcal{L}}_{\eta}\!\left([U,V]_{VF}\right) \to -X_{\eta([U,V]_{VF})} + \pi\sharp\!\left(L_{[U,V]_{VF}}\!\left(\eta\right)\right) - [[U,V]_{VF,\pi\sharp(\eta)]_{VF}} \quad \text{[\ensuremath{\tilde{L}}\_\ensuremath{\alpha}(U) = \ensuremath{-}X\_{\ensuremath{\alpha}(U)} + \ensuremath{\pi}\ensuremath{\sharp}(L\_U \ensuremath{\alpha}) \ensuremath{-} [U, \ensuremath{\pi}\ensuremath{\sharp} \ensuremath{\alpha}]\_VF [\ensuremath{\pi}]]\,(axiom)} \\
+\tilde{\mathcal{L}}_{\eta}\!\left(U\right) \to -X_\eta(U) + \pi\sharp\!\left(L_U\!\left(\eta\right)\right) - [U,\pi\sharp(\eta)]_{VF} \quad \text{[\ensuremath{\tilde{L}}\_\ensuremath{\alpha}(U) = \ensuremath{-}X\_{\ensuremath{\alpha}(U)} + \ensuremath{\pi}\ensuremath{\sharp}(L\_U \ensuremath{\alpha}) \ensuremath{-} [U, \ensuremath{\pi}\ensuremath{\sharp} \ensuremath{\alpha}]\_VF [\ensuremath{\pi}]]\,(axiom)} \\
+\left[-X_\eta(U) + \pi\sharp\!\left(L_U\!\left(\eta\right)\right) - [U,\pi\sharp(\eta)]_{VF},\, V\right]_{[\cdot,\cdot]_{SN}} \to \left[-X_\eta(U),\, V\right]_{[\cdot,\cdot]_{SN}} + \left[\pi\sharp\!\left(L_U\!\left(\eta\right)\right),\, V\right]_{[\cdot,\cdot]_{SN}} + \left[-[U,\pi\sharp(\eta)]_{VF},\, V\right]_{[\cdot,\cdot]_{SN}} \quad \text{[[Sum(a,b,\ensuremath{\dots}), Z]\_SN \ensuremath{\to} \ensuremath{\Sigma}\_i [a\_i, Z]\_SN  (and mirror)]\,(axiom)} \\
+\left[-X_\eta(U),\, V\right]_{[\cdot,\cdot]_{SN}} \to -\left[X_\eta(U),\, V\right]_{[\cdot,\cdot]_{SN}} \quad \text{[[(\ensuremath{-}a), b]\_SN \ensuremath{\to} \ensuremath{-}[a, b]\_SN  /  [a, (\ensuremath{-}b)]\_SN \ensuremath{\to} \ensuremath{-}[a, b]\_SN]\,(axiom)} \\
+\left[X_\eta(U),\, V\right]_{[\cdot,\cdot]_{SN}} \to [X_{\eta(U),V]_{VF}} \quad \text{[[U, V]\_SN \ensuremath{\to} [U, V]\_VF  [both 1-vectors]]\,(axiom)} \\
+[X_{\eta(U),V]_{VF}} \to -[V,X_{\eta(U)]_{VF}} \quad \text{[[Y, X]\_VF \ensuremath{\to} \ensuremath{-}[X, Y]\_VF  [repr-canonical]]\,(axiom)} \\
+\left[\pi\sharp\!\left(L_U\!\left(\eta\right)\right),\, V\right]_{[\cdot,\cdot]_{SN}} \to [\pi\sharp(L_{U(\eta)),V]_{VF}} \quad \text{[[U, V]\_SN \ensuremath{\to} [U, V]\_VF  [both 1-vectors]]\,(axiom)} \\
+[\pi\sharp(L_{U(\eta)),V]_{VF}} \to -[V,\pi\sharp(L_{U(\eta))]_{VF}} \quad \text{[[Y, X]\_VF \ensuremath{\to} \ensuremath{-}[X, Y]\_VF  [repr-canonical]]\,(axiom)} \\
+\left[-[U,\pi\sharp(\eta)]_{VF},\, V\right]_{[\cdot,\cdot]_{SN}} \to -\left[[U,\pi\sharp(\eta)]_{VF},\, V\right]_{[\cdot,\cdot]_{SN}} \quad \text{[[(\ensuremath{-}a), b]\_SN \ensuremath{\to} \ensuremath{-}[a, b]\_SN  /  [a, (\ensuremath{-}b)]\_SN \ensuremath{\to} \ensuremath{-}[a, b]\_SN]\,(axiom)} \\
+\left[[U,\pi\sharp(\eta)]_{VF},\, V\right]_{[\cdot,\cdot]_{SN}} \to [[U,\pi\sharp(\eta)]_{VF,V]_{VF}} \quad \text{[[U, V]\_SN \ensuremath{\to} [U, V]\_VF  [both 1-vectors]]\,(axiom)} \\
+[[U,\pi\sharp(\eta)]_{VF,V]_{VF}} \to -[V,[U,\pi\sharp(\eta)]_{VF]_{VF}} \quad \text{[[Y, X]\_VF \ensuremath{\to} \ensuremath{-}[X, Y]\_VF  [repr-canonical]]\,(axiom)} \\
+\tilde{\mathcal{L}}_{\eta}\!\left(V\right) \to -X_\eta(V) + \pi\sharp\!\left(L_V\!\left(\eta\right)\right) - [V,\pi\sharp(\eta)]_{VF} \quad \text{[\ensuremath{\tilde{L}}\_\ensuremath{\alpha}(U) = \ensuremath{-}X\_{\ensuremath{\alpha}(U)} + \ensuremath{\pi}\ensuremath{\sharp}(L\_U \ensuremath{\alpha}) \ensuremath{-} [U, \ensuremath{\pi}\ensuremath{\sharp} \ensuremath{\alpha}]\_VF [\ensuremath{\pi}]]\,(axiom)} \\
+\left[U,\, -X_\eta(V) + \pi\sharp\!\left(L_V\!\left(\eta\right)\right) - [V,\pi\sharp(\eta)]_{VF}\right]_{[\cdot,\cdot]_{SN}} \to \left[U,\, -X_\eta(V)\right]_{[\cdot,\cdot]_{SN}} + \left[U,\, \pi\sharp\!\left(L_V\!\left(\eta\right)\right)\right]_{[\cdot,\cdot]_{SN}} + \left[U,\, -[V,\pi\sharp(\eta)]_{VF}\right]_{[\cdot,\cdot]_{SN}} \quad \text{[[Sum(a,b,\ensuremath{\dots}), Z]\_SN \ensuremath{\to} \ensuremath{\Sigma}\_i [a\_i, Z]\_SN  (and mirror)]\,(axiom)} \\
+\left[U,\, -X_\eta(V)\right]_{[\cdot,\cdot]_{SN}} \to -\left[U,\, X_\eta(V)\right]_{[\cdot,\cdot]_{SN}} \quad \text{[[(\ensuremath{-}a), b]\_SN \ensuremath{\to} \ensuremath{-}[a, b]\_SN  /  [a, (\ensuremath{-}b)]\_SN \ensuremath{\to} \ensuremath{-}[a, b]\_SN]\,(axiom)} \\
+\left[U,\, X_\eta(V)\right]_{[\cdot,\cdot]_{SN}} \to [U,X_{\eta(V)]_{VF}} \quad \text{[[U, V]\_SN \ensuremath{\to} [U, V]\_VF  [both 1-vectors]]\,(axiom)} \\
+\left[U,\, \pi\sharp\!\left(L_V\!\left(\eta\right)\right)\right]_{[\cdot,\cdot]_{SN}} \to [U,\pi\sharp(L_{V(\eta))]_{VF}} \quad \text{[[U, V]\_SN \ensuremath{\to} [U, V]\_VF  [both 1-vectors]]\,(axiom)} \\
+\left[U,\, -[V,\pi\sharp(\eta)]_{VF}\right]_{[\cdot,\cdot]_{SN}} \to -\left[U,\, [V,\pi\sharp(\eta)]_{VF}\right]_{[\cdot,\cdot]_{SN}} \quad \text{[[(\ensuremath{-}a), b]\_SN \ensuremath{\to} \ensuremath{-}[a, b]\_SN  /  [a, (\ensuremath{-}b)]\_SN \ensuremath{\to} \ensuremath{-}[a, b]\_SN]\,(axiom)} \\
+\left[U,\, [V,\pi\sharp(\eta)]_{VF}\right]_{[\cdot,\cdot]_{SN}} \to [U,[V,\pi\sharp(\eta)]_{VF]_{VF}} \quad \text{[[U, V]\_SN \ensuremath{\to} [U, V]\_VF  [both 1-vectors]]\,(axiom)} \\
+\left(\left(-X_{\eta([U,V]_{VF})} + \pi\sharp\!\left(L_{[U,V]_{VF}}\!\left(\eta\right)\right) - [[U,V]_{VF,\pi\sharp(\eta)]_{VF}}\right) - \left(-\left(-[V,X_{\eta(U)]_{VF}}\right) - [V,\pi\sharp(L_{U(\eta))]_{VF}} - \left(-[V,[U,\pi\sharp(\eta)]_{VF]_{VF}}\right)\right) - \left(-[U,X_{\eta(V)]_{VF}} + [U,\pi\sharp(L_{V(\eta))]_{VF}} - [U,[V,\pi\sharp(\eta)]_{VF]_{VF}}\right)\right)\!\left(\xi\right) \to \left(-X_{\eta([U,V]_{VF})} + \pi\sharp\!\left(L_{[U,V]_{VF}}\!\left(\eta\right)\right) - [[U,V]_{VF,\pi\sharp(\eta)]_{VF}}\right)\!\left(\xi\right) - \left(-\left(-[V,X_{\eta(U)]_{VF}}\right) - [V,\pi\sharp(L_{U(\eta))]_{VF}} - \left(-[V,[U,\pi\sharp(\eta)]_{VF]_{VF}}\right)\right)\!\left(\xi\right) - \left(-[U,X_{\eta(V)]_{VF}} + [U,\pi\sharp(L_{V(\eta))]_{VF}} - [U,[V,\pi\sharp(\eta)]_{VF]_{VF}}\right)\!\left(\xi\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(-X_{\eta([U,V]_{VF})} + \pi\sharp\!\left(L_{[U,V]_{VF}}\!\left(\eta\right)\right) - [[U,V]_{VF,\pi\sharp(\eta)]_{VF}}\right)\!\left(\xi\right) \to -X_{\eta([U,V]_{VF})}\!\left(\xi\right) + \left(\pi\sharp\!\left(L_{[U,V]_{VF}}\!\left(\eta\right)\right)\right)\!\left(\xi\right) - [[U,V]_{VF,\pi\sharp(\eta)]_{VF}}\!\left(\xi\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+X_{\eta([U,V]_{VF})}\!\left(\xi\right) \to \xi\!\left(X_{\eta([U,V]_{VF})}\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\xi\!\left(X_{\eta([U,V]_{VF})}\right) \to -\left(\pi\sharp\!\left(\xi\right)\right)\!\left(\eta\!\left([U,V]_{VF}\right)\right) \quad \text{[\ensuremath{\alpha}(X\_f) = \ensuremath{-}\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\alpha})(f) [\ensuremath{\pi}]]\,(axiom)} \\
+\left(\pi\sharp\!\left(L_{[U,V]_{VF}}\!\left(\eta\right)\right)\right)\!\left(\xi\right) \to \xi\!\left(\pi\sharp\!\left(L_{[U,V]_{VF}}\!\left(\eta\right)\right)\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\xi\!\left(\pi\sharp\!\left(L_{[U,V]_{VF}}\!\left(\eta\right)\right)\right) \to -\left(L_{[U,V]_{VF}}\!\left(\eta\right)\right)\!\left(\pi\sharp\!\left(\xi\right)\right) \quad \text{[\ensuremath{\alpha}(\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\beta})) \ensuremath{\to} \ensuremath{-}\ensuremath{\beta}(\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\alpha})) [\ensuremath{\pi}]]\,(axiom)} \\
+\left(L_{[U,V]_{VF}}\!\left(\eta\right)\right)\!\left(\pi\sharp\!\left(\xi\right)\right) \to [U,V]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right) - \eta\!\left([[U,V]_{VF,\pi\sharp(\xi)]_{VF}}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+[[U,V]_{VF,\pi\sharp(\eta)]_{VF}}\!\left(\xi\right) \to \xi\!\left([[U,V]_{VF,\pi\sharp(\eta)]_{VF}}\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\left(-\left(-[V,X_{\eta(U)]_{VF}}\right) - [V,\pi\sharp(L_{U(\eta))]_{VF}} - \left(-[V,[U,\pi\sharp(\eta)]_{VF]_{VF}}\right)\right)\!\left(\xi\right) \to -\left(-[V,X_{\eta(U)]_{VF}}\right)\!\left(\xi\right) - [V,\pi\sharp(L_{U(\eta))]_{VF}}\!\left(\xi\right) - \left(-[V,[U,\pi\sharp(\eta)]_{VF]_{VF}}\right)\!\left(\xi\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(-[V,X_{\eta(U)]_{VF}}\right)\!\left(\xi\right) \to -[V,X_{\eta(U)]_{VF}}\!\left(\xi\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+[V,X_{\eta(U)]_{VF}}\!\left(\xi\right) \to \xi\!\left([V,X_{\eta(U)]_{VF}}\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+[V,\pi\sharp(L_{U(\eta))]_{VF}}\!\left(\xi\right) \to \xi\!\left([V,\pi\sharp(L_{U(\eta))]_{VF}}\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\left(-[V,[U,\pi\sharp(\eta)]_{VF]_{VF}}\right)\!\left(\xi\right) \to -[V,[U,\pi\sharp(\eta)]_{VF]_{VF}}\!\left(\xi\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+[V,[U,\pi\sharp(\eta)]_{VF]_{VF}}\!\left(\xi\right) \to \xi\!\left([V,[U,\pi\sharp(\eta)]_{VF]_{VF}}\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\left(-[U,X_{\eta(V)]_{VF}} + [U,\pi\sharp(L_{V(\eta))]_{VF}} - [U,[V,\pi\sharp(\eta)]_{VF]_{VF}}\right)\!\left(\xi\right) \to -[U,X_{\eta(V)]_{VF}}\!\left(\xi\right) + [U,\pi\sharp(L_{V(\eta))]_{VF}}\!\left(\xi\right) - [U,[V,\pi\sharp(\eta)]_{VF]_{VF}}\!\left(\xi\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+[U,X_{\eta(V)]_{VF}}\!\left(\xi\right) \to \xi\!\left([U,X_{\eta(V)]_{VF}}\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+[U,\pi\sharp(L_{V(\eta))]_{VF}}\!\left(\xi\right) \to \xi\!\left([U,\pi\sharp(L_{V(\eta))]_{VF}}\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+[U,[V,\pi\sharp(\eta)]_{VF]_{VF}}\!\left(\xi\right) \to \xi\!\left([U,[V,\pi\sharp(\eta)]_{VF]_{VF}}\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\tilde{\mathcal{L}}_{L_U\!\left(\eta\right)}\!\left(V\right) \to -X_{L_U(\eta)(V)} + \pi\sharp\!\left(L_V\!\left(L_U\!\left(\eta\right)\right)\right) - [V,\pi\sharp(L_{U(\eta))]_{VF}} \quad \text{[\ensuremath{\tilde{L}}\_\ensuremath{\alpha}(U) = \ensuremath{-}X\_{\ensuremath{\alpha}(U)} + \ensuremath{\pi}\ensuremath{\sharp}(L\_U \ensuremath{\alpha}) \ensuremath{-} [U, \ensuremath{\pi}\ensuremath{\sharp} \ensuremath{\alpha}]\_VF [\ensuremath{\pi}]]\,(axiom)} \\
+\tilde{\mathcal{L}}_{d\!\left(\iota_U\!\left(\eta\right)\right)}\!\left(V\right) \to -X_{d(\iota_U(\eta))(V)} + \pi\sharp\!\left(L_V\!\left(d\!\left(\iota_U\!\left(\eta\right)\right)\right)\right) - [V,\pi\sharp(d(\iota_{U(\eta)))]_{VF}} \quad \text{[\ensuremath{\tilde{L}}\_\ensuremath{\alpha}(U) = \ensuremath{-}X\_{\ensuremath{\alpha}(U)} + \ensuremath{\pi}\ensuremath{\sharp}(L\_U \ensuremath{\alpha}) \ensuremath{-} [U, \ensuremath{\pi}\ensuremath{\sharp} \ensuremath{\alpha}]\_VF [\ensuremath{\pi}]]\,(axiom)} \\
+L_V\!\left(d\!\left(\iota_U\!\left(\eta\right)\right)\right) \to d\!\left(L_V\!\left(\iota_U\!\left(\eta\right)\right)\right) \quad \text{[L\_X \ensuremath{\circ} d = d \ensuremath{\circ} L\_X (tilde, any mode)]\,(axiom)} \\
+\pi\sharp\!\left(d\!\left(L_V\!\left(\iota_U\!\left(\eta\right)\right)\right)\right) \to X_{L_{V(\iota_U(\eta))}} \quad \text{[\ensuremath{\pi}\ensuremath{\sharp}(df) = X\_f [\ensuremath{\pi}]]\,(axiom)} \\
+[V,\pi\sharp(d(\iota_{U(\eta)))]_{VF}} \to [V,X_{\eta(U)]_{VF}} \quad \text{[bare-atom-slot lift]\,(axiom)} \\
+\tilde{K}_{L_V(\eta)}\!\left(U\right) \to -\tilde{\mathcal{L}}_{L_V\!\left(\eta\right)}\!\left(U\right) + \tilde{d}\!\left(\tilde{\iota}_{L_V\!\left(\eta\right)}\!\left(U\right)\right) \quad \text{[\ensuremath{\tilde{K}}\_\ensuremath{\eta} V = \ensuremath{-}\ensuremath{\tilde{L}}\_\ensuremath{\eta} V + \ensuremath{\tilde{d}}(\ensuremath{\tilde{\ensuremath{\iota}}}\_\ensuremath{\eta} V)]\,(axiom)} \\
+\tilde{\mathcal{L}}_{L_V\!\left(\eta\right)}\!\left(U\right) \to -X_{L_V(\eta)(U)} + \pi\sharp\!\left(L_U\!\left(L_V\!\left(\eta\right)\right)\right) - [U,\pi\sharp(L_{V(\eta))]_{VF}} \quad \text{[\ensuremath{\tilde{L}}\_\ensuremath{\alpha}(U) = \ensuremath{-}X\_{\ensuremath{\alpha}(U)} + \ensuremath{\pi}\ensuremath{\sharp}(L\_U \ensuremath{\alpha}) \ensuremath{-} [U, \ensuremath{\pi}\ensuremath{\sharp} \ensuremath{\alpha}]\_VF [\ensuremath{\pi}]]\,(axiom)} \\
+\tilde{d}\!\left(\tilde{\iota}_{L_V\!\left(\eta\right)}\!\left(U\right)\right) \to \tilde{d}\!\left(U\!\left(L_V\!\left(\eta\right)\right)\right) \quad \text{[bare \ensuremath{\tilde{\ensuremath{\iota}}}\_\ensuremath{\omega}(V) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(V, \ensuremath{\omega}))  (V deg 1)]\,(axiom)} \\
+U\!\left(L_V\!\left(\eta\right)\right) \to \left(L_V\!\left(\eta\right)\right)\!\left(U\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\left(L_V\!\left(\eta\right)\right)\!\left(U\right) \to V\!\left(\eta\!\left(U\right)\right) - \eta\!\left([V,U]_{VF}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+[V,U]_{VF} \to -[U,V]_{VF} \quad \text{[[Y, X]\_VF \ensuremath{\to} \ensuremath{-}[X, Y]\_VF  [repr-canonical]]\,(axiom)} \\
+\eta\!\left(-[U,V]_{VF}\right) \to -\eta\!\left([U,V]_{VF}\right) \quad \text{[MultiEval arg slot linearity]\,(axiom)} \\
+\tilde{d}\!\left(V\!\left(\eta\!\left(U\right)\right) - \left(-\eta\!\left([U,V]_{VF}\right)\right)\right) \to -X_{(V(\eta(U)) + (-(-\eta([U,V]_{VF}))))} \quad \text{[Act(\ensuremath{\tilde{d}}\_\ensuremath{\pi}, f) \ensuremath{\to} \ensuremath{-}X\_f  [geometer sign]]\,(axiom)} \\
+\tilde{K}_{d(\iota_V(\eta))}\!\left(U\right) \to -\tilde{\mathcal{L}}_{d\!\left(\iota_V\!\left(\eta\right)\right)}\!\left(U\right) + \tilde{d}\!\left(\tilde{\iota}_{d\!\left(\iota_V\!\left(\eta\right)\right)}\!\left(U\right)\right) \quad \text{[\ensuremath{\tilde{K}}\_\ensuremath{\eta} V = \ensuremath{-}\ensuremath{\tilde{L}}\_\ensuremath{\eta} V + \ensuremath{\tilde{d}}(\ensuremath{\tilde{\ensuremath{\iota}}}\_\ensuremath{\eta} V)]\,(axiom)} \\
+\tilde{\mathcal{L}}_{d\!\left(\iota_V\!\left(\eta\right)\right)}\!\left(U\right) \to -X_{d(\iota_V(\eta))(U)} + \pi\sharp\!\left(L_U\!\left(d\!\left(\iota_V\!\left(\eta\right)\right)\right)\right) - [U,\pi\sharp(d(\iota_{V(\eta)))]_{VF}} \quad \text{[\ensuremath{\tilde{L}}\_\ensuremath{\alpha}(U) = \ensuremath{-}X\_{\ensuremath{\alpha}(U)} + \ensuremath{\pi}\ensuremath{\sharp}(L\_U \ensuremath{\alpha}) \ensuremath{-} [U, \ensuremath{\pi}\ensuremath{\sharp} \ensuremath{\alpha}]\_VF [\ensuremath{\pi}]]\,(axiom)} \\
+L_U\!\left(d\!\left(\iota_V\!\left(\eta\right)\right)\right) \to d\!\left(L_U\!\left(\iota_V\!\left(\eta\right)\right)\right) \quad \text{[L\_X \ensuremath{\circ} d = d \ensuremath{\circ} L\_X (tilde, any mode)]\,(axiom)} \\
+\pi\sharp\!\left(d\!\left(L_U\!\left(\iota_V\!\left(\eta\right)\right)\right)\right) \to X_{L_{U(\iota_V(\eta))}} \quad \text{[\ensuremath{\pi}\ensuremath{\sharp}(df) = X\_f [\ensuremath{\pi}]]\,(axiom)} \\
+[U,\pi\sharp(d(\iota_{V(\eta)))]_{VF}} \to [U,X_{\eta(V)]_{VF}} \quad \text{[bare-atom-slot lift]\,(axiom)} \\
+\tilde{d}\!\left(\tilde{\iota}_{d\!\left(\iota_V\!\left(\eta\right)\right)}\!\left(U\right)\right) \to \tilde{d}\!\left(U\!\left(d\!\left(\iota_V\!\left(\eta\right)\right)\right)\right) \quad \text{[bare \ensuremath{\tilde{\ensuremath{\iota}}}\_\ensuremath{\omega}(V) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(V, \ensuremath{\omega}))  (V deg 1)]\,(axiom)} \\
+U\!\left(d\!\left(\iota_V\!\left(\eta\right)\right)\right) \to \left(d\!\left(\iota_V\!\left(\eta\right)\right)\right)\!\left(U\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\left(d\!\left(\iota_V\!\left(\eta\right)\right)\right)\!\left(U\right) \to U\!\left(\iota_V\!\left(\eta\right)\right) \quad \text{[d intrinsic (Koszul): (d\ensuremath{\omega})(X\_0, \ensuremath{\dots}, X\_p) = \ensuremath{\Sigma} \ensuremath{\pm}X\_i(\ensuremath{\omega}(\ensuremath{\dots},hat\_i,\ensuremath{\dots})) + \ensuremath{\Sigma} \ensuremath{\pm}\ensuremath{\omega}([X\_i,X\_j]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+U\!\left(\iota_V\!\left(\eta\right)\right) \to U\!\left(\eta\!\left(V\right)\right) \quad \text{[bare \ensuremath{\iota}\_X(\ensuremath{\omega}) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(\ensuremath{\omega}, X))  [permissive]]\,(axiom)} \\
+\tilde{d}\!\left(U\!\left(\eta\!\left(V\right)\right)\right) \to -X_U(\eta(V)) \quad \text{[Act(\ensuremath{\tilde{d}}\_\ensuremath{\pi}, f) \ensuremath{\to} \ensuremath{-}X\_f  [geometer sign]]\,(axiom)} \\
+\left(\left(-\left(-X_{L_U(\eta)(V)} + \pi\sharp\!\left(L_V\!\left(L_U\!\left(\eta\right)\right)\right) - [V,\pi\sharp(L_{U(\eta))]_{VF}}\right) + \left(-X_{d(\iota_U(\eta))(V)} + X_{L_{V(\iota_U(\eta))}} - [V,X_{\eta(U)]_{VF}}\right)\right) + \left(-\left(-\left(-X_{L_V(\eta)(U)} + \pi\sharp\!\left(L_U\!\left(L_V\!\left(\eta\right)\right)\right) - [U,\pi\sharp(L_{V(\eta))]_{VF}}\right) - X_{(V(\eta(U)) + (-(-\eta([U,V]_{VF}))))}\right) + \left(-\left(-X_{d(\iota_V(\eta))(U)} + X_{L_{U(\iota_V(\eta))}} - [U,X_{\eta(V)]_{VF}}\right) - X_U(\eta(V))\right)\right)\right)\!\left(\xi\right) \to \left(-\left(-X_{L_U(\eta)(V)} + \pi\sharp\!\left(L_V\!\left(L_U\!\left(\eta\right)\right)\right) - [V,\pi\sharp(L_{U(\eta))]_{VF}}\right) + \left(-X_{d(\iota_U(\eta))(V)} + X_{L_{V(\iota_U(\eta))}} - [V,X_{\eta(U)]_{VF}}\right)\right)\!\left(\xi\right) + \left(-\left(-\left(-X_{L_V(\eta)(U)} + \pi\sharp\!\left(L_U\!\left(L_V\!\left(\eta\right)\right)\right) - [U,\pi\sharp(L_{V(\eta))]_{VF}}\right) - X_{(V(\eta(U)) + (-(-\eta([U,V]_{VF}))))}\right) + \left(-\left(-X_{d(\iota_V(\eta))(U)} + X_{L_{U(\iota_V(\eta))}} - [U,X_{\eta(V)]_{VF}}\right) - X_U(\eta(V))\right)\right)\!\left(\xi\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(-\left(-X_{L_U(\eta)(V)} + \pi\sharp\!\left(L_V\!\left(L_U\!\left(\eta\right)\right)\right) - [V,\pi\sharp(L_{U(\eta))]_{VF}}\right) + \left(-X_{d(\iota_U(\eta))(V)} + X_{L_{V(\iota_U(\eta))}} - [V,X_{\eta(U)]_{VF}}\right)\right)\!\left(\xi\right) \to -\left(-X_{L_U(\eta)(V)} + \pi\sharp\!\left(L_V\!\left(L_U\!\left(\eta\right)\right)\right) - [V,\pi\sharp(L_{U(\eta))]_{VF}}\right)\!\left(\xi\right) + \left(-X_{d(\iota_U(\eta))(V)} + X_{L_{V(\iota_U(\eta))}} - [V,X_{\eta(U)]_{VF}}\right)\!\left(\xi\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(-X_{L_U(\eta)(V)} + \pi\sharp\!\left(L_V\!\left(L_U\!\left(\eta\right)\right)\right) - [V,\pi\sharp(L_{U(\eta))]_{VF}}\right)\!\left(\xi\right) \to -X_{L_U(\eta)(V)}\!\left(\xi\right) + \left(\pi\sharp\!\left(L_V\!\left(L_U\!\left(\eta\right)\right)\right)\right)\!\left(\xi\right) - [V,\pi\sharp(L_{U(\eta))]_{VF}}\!\left(\xi\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+X_{L_U(\eta)(V)}\!\left(\xi\right) \to \xi\!\left(X_{L_U(\eta)(V)}\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\xi\!\left(X_{L_U(\eta)(V)}\right) \to -\left(\pi\sharp\!\left(\xi\right)\right)\!\left(\left(L_U\!\left(\eta\right)\right)\!\left(V\right)\right) \quad \text{[\ensuremath{\alpha}(X\_f) = \ensuremath{-}\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\alpha})(f) [\ensuremath{\pi}]]\,(axiom)} \\
+\left(L_U\!\left(\eta\right)\right)\!\left(V\right) \to U\!\left(\eta\!\left(V\right)\right) - \eta\!\left([U,V]_{VF}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\left(\pi\sharp\!\left(L_V\!\left(L_U\!\left(\eta\right)\right)\right)\right)\!\left(\xi\right) \to \xi\!\left(\pi\sharp\!\left(L_V\!\left(L_U\!\left(\eta\right)\right)\right)\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\xi\!\left(\pi\sharp\!\left(L_V\!\left(L_U\!\left(\eta\right)\right)\right)\right) \to -\left(L_V\!\left(L_U\!\left(\eta\right)\right)\right)\!\left(\pi\sharp\!\left(\xi\right)\right) \quad \text{[\ensuremath{\alpha}(\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\beta})) \ensuremath{\to} \ensuremath{-}\ensuremath{\beta}(\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\alpha})) [\ensuremath{\pi}]]\,(axiom)} \\
+\left(L_V\!\left(L_U\!\left(\eta\right)\right)\right)\!\left(\pi\sharp\!\left(\xi\right)\right) \to V\!\left(\left(L_U\!\left(\eta\right)\right)\!\left(\pi\sharp\!\left(\xi\right)\right)\right) - \left(L_U\!\left(\eta\right)\right)\!\left([V,\pi\sharp(\xi)]_{VF}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\left(L_U\!\left(\eta\right)\right)\!\left(\pi\sharp\!\left(\xi\right)\right) \to U\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right) - \eta\!\left([U,\pi\sharp(\xi)]_{VF}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\left(L_U\!\left(\eta\right)\right)\!\left([V,\pi\sharp(\xi)]_{VF}\right) \to U\!\left(\eta\!\left([V,\pi\sharp(\xi)]_{VF}\right)\right) - \eta\!\left([U,[V,\pi\sharp(\xi)]_{VF]_{VF}}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+[V,\pi\sharp(L_{U(\eta))]_{VF}}\!\left(\xi\right) \to \xi\!\left([V,\pi\sharp(L_{U(\eta))]_{VF}}\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\left(-X_{d(\iota_U(\eta))(V)} + X_{L_{V(\iota_U(\eta))}} - [V,X_{\eta(U)]_{VF}}\right)\!\left(\xi\right) \to -X_{d(\iota_U(\eta))(V)}\!\left(\xi\right) + X_{L_{V(\iota_U(\eta))}}\!\left(\xi\right) - [V,X_{\eta(U)]_{VF}}\!\left(\xi\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+X_{d(\iota_U(\eta))(V)}\!\left(\xi\right) \to \xi\!\left(X_{d(\iota_U(\eta))(V)}\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\xi\!\left(X_{d(\iota_U(\eta))(V)}\right) \to -\left(\pi\sharp\!\left(\xi\right)\right)\!\left(\left(d\!\left(\iota_U\!\left(\eta\right)\right)\right)\!\left(V\right)\right) \quad \text{[\ensuremath{\alpha}(X\_f) = \ensuremath{-}\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\alpha})(f) [\ensuremath{\pi}]]\,(axiom)} \\
+\left(d\!\left(\iota_U\!\left(\eta\right)\right)\right)\!\left(V\right) \to V\!\left(\iota_U\!\left(\eta\right)\right) \quad \text{[d intrinsic (Koszul): (d\ensuremath{\omega})(X\_0, \ensuremath{\dots}, X\_p) = \ensuremath{\Sigma} \ensuremath{\pm}X\_i(\ensuremath{\omega}(\ensuremath{\dots},hat\_i,\ensuremath{\dots})) + \ensuremath{\Sigma} \ensuremath{\pm}\ensuremath{\omega}([X\_i,X\_j]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+V\!\left(\iota_U\!\left(\eta\right)\right) \to V\!\left(\eta\!\left(U\right)\right) \quad \text{[bare \ensuremath{\iota}\_X(\ensuremath{\omega}) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(\ensuremath{\omega}, X))  [permissive]]\,(axiom)} \\
+X_{L_{V(\iota_U(\eta))}}\!\left(\xi\right) \to \xi\!\left(X_{L_{V(\iota_U(\eta))}}\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\xi\!\left(X_{L_{V(\iota_U(\eta))}}\right) \to -\left(\pi\sharp\!\left(\xi\right)\right)\!\left(L_V\!\left(\iota_U\!\left(\eta\right)\right)\right) \quad \text{[\ensuremath{\alpha}(X\_f) = \ensuremath{-}\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\alpha})(f) [\ensuremath{\pi}]]\,(axiom)} \\
+\left(\pi\sharp\!\left(\xi\right)\right)\!\left(L_V\!\left(\iota_U\!\left(\eta\right)\right)\right) \to \left(\pi\sharp\!\left(\xi\right)\right)\!\left(V\!\left(\iota_U\!\left(\eta\right)\right)\right) \quad \text{[Act(D, L\_X(f)) \ensuremath{\to} Act(D, X(f))  [D vf-like, f 0-form]]\,(axiom)} \\
+V\!\left(\iota_U\!\left(\eta\right)\right) \to V\!\left(\eta\!\left(U\right)\right) \quad \text{[bare \ensuremath{\iota}\_X(\ensuremath{\omega}) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(\ensuremath{\omega}, X))  [permissive]]\,(axiom)} \\
+[V,X_{\eta(U)]_{VF}}\!\left(\xi\right) \to \xi\!\left([V,X_{\eta(U)]_{VF}}\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\left(-\left(-\left(-X_{L_V(\eta)(U)} + \pi\sharp\!\left(L_U\!\left(L_V\!\left(\eta\right)\right)\right) - [U,\pi\sharp(L_{V(\eta))]_{VF}}\right) - X_{(V(\eta(U)) + (-(-\eta([U,V]_{VF}))))}\right) + \left(-\left(-X_{d(\iota_V(\eta))(U)} + X_{L_{U(\iota_V(\eta))}} - [U,X_{\eta(V)]_{VF}}\right) - X_U(\eta(V))\right)\right)\!\left(\xi\right) \to -\left(-\left(-X_{L_V(\eta)(U)} + \pi\sharp\!\left(L_U\!\left(L_V\!\left(\eta\right)\right)\right) - [U,\pi\sharp(L_{V(\eta))]_{VF}}\right) - X_{(V(\eta(U)) + (-(-\eta([U,V]_{VF}))))}\right)\!\left(\xi\right) + \left(-\left(-X_{d(\iota_V(\eta))(U)} + X_{L_{U(\iota_V(\eta))}} - [U,X_{\eta(V)]_{VF}}\right) - X_U(\eta(V))\right)\!\left(\xi\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(-\left(-X_{L_V(\eta)(U)} + \pi\sharp\!\left(L_U\!\left(L_V\!\left(\eta\right)\right)\right) - [U,\pi\sharp(L_{V(\eta))]_{VF}}\right) - X_{(V(\eta(U)) + (-(-\eta([U,V]_{VF}))))}\right)\!\left(\xi\right) \to -\left(-X_{L_V(\eta)(U)} + \pi\sharp\!\left(L_U\!\left(L_V\!\left(\eta\right)\right)\right) - [U,\pi\sharp(L_{V(\eta))]_{VF}}\right)\!\left(\xi\right) - X_{(V(\eta(U)) + (-(-\eta([U,V]_{VF}))))}\!\left(\xi\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(-X_{L_V(\eta)(U)} + \pi\sharp\!\left(L_U\!\left(L_V\!\left(\eta\right)\right)\right) - [U,\pi\sharp(L_{V(\eta))]_{VF}}\right)\!\left(\xi\right) \to -X_{L_V(\eta)(U)}\!\left(\xi\right) + \left(\pi\sharp\!\left(L_U\!\left(L_V\!\left(\eta\right)\right)\right)\right)\!\left(\xi\right) - [U,\pi\sharp(L_{V(\eta))]_{VF}}\!\left(\xi\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+X_{L_V(\eta)(U)}\!\left(\xi\right) \to \xi\!\left(X_{L_V(\eta)(U)}\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\xi\!\left(X_{L_V(\eta)(U)}\right) \to -\left(\pi\sharp\!\left(\xi\right)\right)\!\left(\left(L_V\!\left(\eta\right)\right)\!\left(U\right)\right) \quad \text{[\ensuremath{\alpha}(X\_f) = \ensuremath{-}\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\alpha})(f) [\ensuremath{\pi}]]\,(axiom)} \\
+\left(L_V\!\left(\eta\right)\right)\!\left(U\right) \to V\!\left(\eta\!\left(U\right)\right) - \eta\!\left([V,U]_{VF}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+[V,U]_{VF} \to -[U,V]_{VF} \quad \text{[[Y, X]\_VF \ensuremath{\to} \ensuremath{-}[X, Y]\_VF  [repr-canonical]]\,(axiom)} \\
+\eta\!\left(-[U,V]_{VF}\right) \to -\eta\!\left([U,V]_{VF}\right) \quad \text{[MultiEval arg slot linearity]\,(axiom)} \\
+\left(\pi\sharp\!\left(L_U\!\left(L_V\!\left(\eta\right)\right)\right)\right)\!\left(\xi\right) \to \xi\!\left(\pi\sharp\!\left(L_U\!\left(L_V\!\left(\eta\right)\right)\right)\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\xi\!\left(\pi\sharp\!\left(L_U\!\left(L_V\!\left(\eta\right)\right)\right)\right) \to -\left(L_U\!\left(L_V\!\left(\eta\right)\right)\right)\!\left(\pi\sharp\!\left(\xi\right)\right) \quad \text{[\ensuremath{\alpha}(\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\beta})) \ensuremath{\to} \ensuremath{-}\ensuremath{\beta}(\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\alpha})) [\ensuremath{\pi}]]\,(axiom)} \\
+\left(L_U\!\left(L_V\!\left(\eta\right)\right)\right)\!\left(\pi\sharp\!\left(\xi\right)\right) \to U\!\left(\left(L_V\!\left(\eta\right)\right)\!\left(\pi\sharp\!\left(\xi\right)\right)\right) - \left(L_V\!\left(\eta\right)\right)\!\left([U,\pi\sharp(\xi)]_{VF}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\left(L_V\!\left(\eta\right)\right)\!\left(\pi\sharp\!\left(\xi\right)\right) \to V\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right) - \eta\!\left([V,\pi\sharp(\xi)]_{VF}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\left(L_V\!\left(\eta\right)\right)\!\left([U,\pi\sharp(\xi)]_{VF}\right) \to V\!\left(\eta\!\left([U,\pi\sharp(\xi)]_{VF}\right)\right) - \eta\!\left([V,[U,\pi\sharp(\xi)]_{VF]_{VF}}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+[U,\pi\sharp(L_{V(\eta))]_{VF}}\!\left(\xi\right) \to \xi\!\left([U,\pi\sharp(L_{V(\eta))]_{VF}}\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+X_{(V(\eta(U)) + (-(-\eta([U,V]_{VF}))))}\!\left(\xi\right) \to \xi\!\left(X_{(V(\eta(U)) + (-(-\eta([U,V]_{VF}))))}\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\xi\!\left(X_{(V(\eta(U)) + (-(-\eta([U,V]_{VF}))))}\right) \to -\left(\pi\sharp\!\left(\xi\right)\right)\!\left(V\!\left(\eta\!\left(U\right)\right) - \left(-\eta\!\left([U,V]_{VF}\right)\right)\right) \quad \text{[\ensuremath{\alpha}(X\_f) = \ensuremath{-}\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\alpha})(f) [\ensuremath{\pi}]]\,(axiom)} \\
+\left(-\left(-X_{d(\iota_V(\eta))(U)} + X_{L_{U(\iota_V(\eta))}} - [U,X_{\eta(V)]_{VF}}\right) - X_U(\eta(V))\right)\!\left(\xi\right) \to -\left(-X_{d(\iota_V(\eta))(U)} + X_{L_{U(\iota_V(\eta))}} - [U,X_{\eta(V)]_{VF}}\right)\!\left(\xi\right) - X_U(\eta(V))\!\left(\xi\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(-X_{d(\iota_V(\eta))(U)} + X_{L_{U(\iota_V(\eta))}} - [U,X_{\eta(V)]_{VF}}\right)\!\left(\xi\right) \to -X_{d(\iota_V(\eta))(U)}\!\left(\xi\right) + X_{L_{U(\iota_V(\eta))}}\!\left(\xi\right) - [U,X_{\eta(V)]_{VF}}\!\left(\xi\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+X_{d(\iota_V(\eta))(U)}\!\left(\xi\right) \to \xi\!\left(X_{d(\iota_V(\eta))(U)}\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\xi\!\left(X_{d(\iota_V(\eta))(U)}\right) \to -\left(\pi\sharp\!\left(\xi\right)\right)\!\left(\left(d\!\left(\iota_V\!\left(\eta\right)\right)\right)\!\left(U\right)\right) \quad \text{[\ensuremath{\alpha}(X\_f) = \ensuremath{-}\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\alpha})(f) [\ensuremath{\pi}]]\,(axiom)} \\
+\left(d\!\left(\iota_V\!\left(\eta\right)\right)\right)\!\left(U\right) \to U\!\left(\iota_V\!\left(\eta\right)\right) \quad \text{[d intrinsic (Koszul): (d\ensuremath{\omega})(X\_0, \ensuremath{\dots}, X\_p) = \ensuremath{\Sigma} \ensuremath{\pm}X\_i(\ensuremath{\omega}(\ensuremath{\dots},hat\_i,\ensuremath{\dots})) + \ensuremath{\Sigma} \ensuremath{\pm}\ensuremath{\omega}([X\_i,X\_j]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+U\!\left(\iota_V\!\left(\eta\right)\right) \to U\!\left(\eta\!\left(V\right)\right) \quad \text{[bare \ensuremath{\iota}\_X(\ensuremath{\omega}) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(\ensuremath{\omega}, X))  [permissive]]\,(axiom)} \\
+X_{L_{U(\iota_V(\eta))}}\!\left(\xi\right) \to \xi\!\left(X_{L_{U(\iota_V(\eta))}}\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\xi\!\left(X_{L_{U(\iota_V(\eta))}}\right) \to -\left(\pi\sharp\!\left(\xi\right)\right)\!\left(L_U\!\left(\iota_V\!\left(\eta\right)\right)\right) \quad \text{[\ensuremath{\alpha}(X\_f) = \ensuremath{-}\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\alpha})(f) [\ensuremath{\pi}]]\,(axiom)} \\
+\left(\pi\sharp\!\left(\xi\right)\right)\!\left(L_U\!\left(\iota_V\!\left(\eta\right)\right)\right) \to \left(\pi\sharp\!\left(\xi\right)\right)\!\left(U\!\left(\iota_V\!\left(\eta\right)\right)\right) \quad \text{[Act(D, L\_X(f)) \ensuremath{\to} Act(D, X(f))  [D vf-like, f 0-form]]\,(axiom)} \\
+U\!\left(\iota_V\!\left(\eta\right)\right) \to U\!\left(\eta\!\left(V\right)\right) \quad \text{[bare \ensuremath{\iota}\_X(\ensuremath{\omega}) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(\ensuremath{\omega}, X))  [permissive]]\,(axiom)} \\
+[U,X_{\eta(V)]_{VF}}\!\left(\xi\right) \to \xi\!\left([U,X_{\eta(V)]_{VF}}\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+X_U(\eta(V))\!\left(\xi\right) \to \xi\!\left(X_U(\eta(V))\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\xi\!\left(X_U(\eta(V))\right) \to -\left(\pi\sharp\!\left(\xi\right)\right)\!\left(U\!\left(\eta\!\left(V\right)\right)\right) \quad \text{[\ensuremath{\alpha}(X\_f) = \ensuremath{-}\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\alpha})(f) [\ensuremath{\pi}]]\,(axiom)} \\
+\left(\left(-\left(-\left(\pi\sharp\!\left(\xi\right)\right)\!\left(\eta\!\left([U,V]_{VF}\right)\right)\right) - \left([U,V]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right) - \eta\!\left([[U,V]_{VF,\pi\sharp(\xi)]_{VF}}\right)\right) - \xi\!\left([[U,V]_{VF,\pi\sharp(\eta)]_{VF}}\right)\right) - \left(-\left(-\xi\!\left([V,X_{\eta(U)]_{VF}}\right)\right) - \xi\!\left([V,\pi\sharp(L_{U(\eta))]_{VF}}\right) - \left(-\xi\!\left([V,[U,\pi\sharp(\eta)]_{VF]_{VF}}\right)\right)\right) - \left(-\xi\!\left([U,X_{\eta(V)]_{VF}}\right) + \xi\!\left([U,\pi\sharp(L_{V(\eta))]_{VF}}\right) - \xi\!\left([U,[V,\pi\sharp(\eta)]_{VF]_{VF}}\right)\right)\right) - \left(\left(-\left(-\left(-\left(\pi\sharp\!\left(\xi\right)\right)\!\left(U\!\left(\eta\!\left(V\right)\right) - \eta\!\left([U,V]_{VF}\right)\right)\right) - \left(V\!\left(U\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right) - \eta\!\left([U,\pi\sharp(\xi)]_{VF}\right)\right) - \left(U\!\left(\eta\!\left([V,\pi\sharp(\xi)]_{VF}\right)\right) - \eta\!\left([U,[V,\pi\sharp(\xi)]_{VF]_{VF}}\right)\right)\right) - \xi\!\left([V,\pi\sharp(L_{U(\eta))]_{VF}}\right)\right) + \left(-\left(-\left(\pi\sharp\!\left(\xi\right)\right)\!\left(V\!\left(\eta\!\left(U\right)\right)\right)\right) - \left(\pi\sharp\!\left(\xi\right)\right)\!\left(V\!\left(\eta\!\left(U\right)\right)\right) - \xi\!\left([V,X_{\eta(U)]_{VF}}\right)\right)\right) + \left(-\left(-\left(-\left(-\left(\pi\sharp\!\left(\xi\right)\right)\!\left(V\!\left(\eta\!\left(U\right)\right) - \left(-\eta\!\left([U,V]_{VF}\right)\right)\right)\right) - \left(U\!\left(V\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right) - \eta\!\left([V,\pi\sharp(\xi)]_{VF}\right)\right) - \left(V\!\left(\eta\!\left([U,\pi\sharp(\xi)]_{VF}\right)\right) - \eta\!\left([V,[U,\pi\sharp(\xi)]_{VF]_{VF}}\right)\right)\right) - \xi\!\left([U,\pi\sharp(L_{V(\eta))]_{VF}}\right)\right) - \left(-\left(\pi\sharp\!\left(\xi\right)\right)\!\left(V\!\left(\eta\!\left(U\right)\right) - \left(-\eta\!\left([U,V]_{VF}\right)\right)\right)\right)\right) + \left(-\left(-\left(-\left(\pi\sharp\!\left(\xi\right)\right)\!\left(U\!\left(\eta\!\left(V\right)\right)\right)\right) - \left(\pi\sharp\!\left(\xi\right)\right)\!\left(U\!\left(\eta\!\left(V\right)\right)\right) - \xi\!\left([U,X_{\eta(V)]_{VF}}\right)\right) - \left(-\left(\pi\sharp\!\left(\xi\right)\right)\!\left(U\!\left(\eta\!\left(V\right)\right)\right)\right)\right)\right)\right) \to \left(\left(-\left(-\left(\pi\sharp\!\left(\xi\right)\right)\!\left(\eta\!\left([U,V]_{VF}\right)\right)\right) - \left([U,V]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right) - \eta\!\left([[U,V]_{VF,\pi\sharp(\xi)]_{VF}}\right)\right) - \xi\!\left([[U,V]_{VF,\pi\sharp(\eta)]_{VF}}\right)\right) - \left(-\left(-\xi\!\left([V,X_{\eta(U)]_{VF}}\right)\right) - \xi\!\left([V,\pi\sharp(L_{U(\eta))]_{VF}}\right) - \left(-\xi\!\left([V,[U,\pi\sharp(\eta)]_{VF]_{VF}}\right)\right)\right) - \left(-\xi\!\left([U,X_{\eta(V)]_{VF}}\right) + \xi\!\left([U,\pi\sharp(L_{V(\eta))]_{VF}}\right) - \xi\!\left([U,[V,\pi\sharp(\eta)]_{VF]_{VF}}\right)\right)\right) - \left(\left(-\left(-\left(-\left(\left(\pi\sharp\!\left(\xi\right)\right)\!\left(U\!\left(\eta\!\left(V\right)\right)\right) - \left(\pi\sharp\!\left(\xi\right)\right)\!\left(\eta\!\left([U,V]_{VF}\right)\right)\right)\right) - \left(\left(V\!\left(U\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right)\right) - V\!\left(\eta\!\left([U,\pi\sharp(\xi)]_{VF}\right)\right)\right) - \left(U\!\left(\eta\!\left([V,\pi\sharp(\xi)]_{VF}\right)\right) - \eta\!\left([U,[V,\pi\sharp(\xi)]_{VF]_{VF}}\right)\right)\right) - \xi\!\left([V,\pi\sharp(L_{U(\eta))]_{VF}}\right)\right) + \left(-\left(-\left(\pi\sharp\!\left(\xi\right)\right)\!\left(V\!\left(\eta\!\left(U\right)\right)\right)\right) - \left(\pi\sharp\!\left(\xi\right)\right)\!\left(V\!\left(\eta\!\left(U\right)\right)\right) - \xi\!\left([V,X_{\eta(U)]_{VF}}\right)\right)\right) + \left(-\left(-\left(-\left(-\left(\left(\pi\sharp\!\left(\xi\right)\right)\!\left(V\!\left(\eta\!\left(U\right)\right)\right) - \left(-\left(\pi\sharp\!\left(\xi\right)\right)\!\left(\eta\!\left([U,V]_{VF}\right)\right)\right)\right)\right) - \left(\left(U\!\left(V\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right)\right) - U\!\left(\eta\!\left([V,\pi\sharp(\xi)]_{VF}\right)\right)\right) - \left(V\!\left(\eta\!\left([U,\pi\sharp(\xi)]_{VF}\right)\right) - \eta\!\left([V,[U,\pi\sharp(\xi)]_{VF]_{VF}}\right)\right)\right) - \xi\!\left([U,\pi\sharp(L_{V(\eta))]_{VF}}\right)\right) - \left(-\left(\left(\pi\sharp\!\left(\xi\right)\right)\!\left(V\!\left(\eta\!\left(U\right)\right)\right) - \left(-\left(\pi\sharp\!\left(\xi\right)\right)\!\left(\eta\!\left([U,V]_{VF}\right)\right)\right)\right)\right)\right) + \left(-\left(-\left(-\left(\pi\sharp\!\left(\xi\right)\right)\!\left(U\!\left(\eta\!\left(V\right)\right)\right)\right) - \left(\pi\sharp\!\left(\xi\right)\right)\!\left(U\!\left(\eta\!\left(V\right)\right)\right) - \xi\!\left([U,X_{\eta(V)]_{VF}}\right)\right) - \left(-\left(\pi\sharp\!\left(\xi\right)\right)\!\left(U\!\left(\eta\!\left(V\right)\right)\right)\right)\right)\right)\right) \quad \text{[product-rule]}\;\text{--- graded Leibniz + linearity} \\
+\left(\left(-\left(-\left(\pi\sharp\!\left(\xi\right)\right)\!\left(\eta\!\left([U,V]_{VF}\right)\right)\right) - \left([U,V]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right) - \eta\!\left([[U,V]_{VF,\pi\sharp(\xi)]_{VF}}\right)\right) - \xi\!\left([[U,V]_{VF,\pi\sharp(\eta)]_{VF}}\right)\right) - \left(-\left(-\xi\!\left([V,X_{\eta(U)]_{VF}}\right)\right) - \xi\!\left([V,\pi\sharp(L_{U(\eta))]_{VF}}\right) - \left(-\xi\!\left([V,[U,\pi\sharp(\eta)]_{VF]_{VF}}\right)\right)\right) - \left(-\xi\!\left([U,X_{\eta(V)]_{VF}}\right) + \xi\!\left([U,\pi\sharp(L_{V(\eta))]_{VF}}\right) - \xi\!\left([U,[V,\pi\sharp(\eta)]_{VF]_{VF}}\right)\right)\right) - \left(\left(-\left(-\left(-\left(\left(\pi\sharp\!\left(\xi\right)\right)\!\left(U\!\left(\eta\!\left(V\right)\right)\right) - \left(\pi\sharp\!\left(\xi\right)\right)\!\left(\eta\!\left([U,V]_{VF}\right)\right)\right)\right) - \left(\left(V\!\left(U\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right)\right) - V\!\left(\eta\!\left([U,\pi\sharp(\xi)]_{VF}\right)\right)\right) - \left(U\!\left(\eta\!\left([V,\pi\sharp(\xi)]_{VF}\right)\right) - \eta\!\left([U,[V,\pi\sharp(\xi)]_{VF]_{VF}}\right)\right)\right) - \xi\!\left([V,\pi\sharp(L_{U(\eta))]_{VF}}\right)\right) + \left(-\left(-\left(\pi\sharp\!\left(\xi\right)\right)\!\left(V\!\left(\eta\!\left(U\right)\right)\right)\right) - \left(\pi\sharp\!\left(\xi\right)\right)\!\left(V\!\left(\eta\!\left(U\right)\right)\right) - \xi\!\left([V,X_{\eta(U)]_{VF}}\right)\right)\right) + \left(-\left(-\left(-\left(-\left(\left(\pi\sharp\!\left(\xi\right)\right)\!\left(V\!\left(\eta\!\left(U\right)\right)\right) - \left(-\left(\pi\sharp\!\left(\xi\right)\right)\!\left(\eta\!\left([U,V]_{VF}\right)\right)\right)\right)\right) - \left(\left(U\!\left(V\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right)\right) - U\!\left(\eta\!\left([V,\pi\sharp(\xi)]_{VF}\right)\right)\right) - \left(V\!\left(\eta\!\left([U,\pi\sharp(\xi)]_{VF}\right)\right) - \eta\!\left([V,[U,\pi\sharp(\xi)]_{VF]_{VF}}\right)\right)\right) - \xi\!\left([U,\pi\sharp(L_{V(\eta))]_{VF}}\right)\right) - \left(-\left(\left(\pi\sharp\!\left(\xi\right)\right)\!\left(V\!\left(\eta\!\left(U\right)\right)\right) - \left(-\left(\pi\sharp\!\left(\xi\right)\right)\!\left(\eta\!\left([U,V]_{VF}\right)\right)\right)\right)\right)\right) + \left(-\left(-\left(-\left(\pi\sharp\!\left(\xi\right)\right)\!\left(U\!\left(\eta\!\left(V\right)\right)\right)\right) - \left(\pi\sharp\!\left(\xi\right)\right)\!\left(U\!\left(\eta\!\left(V\right)\right)\right) - \xi\!\left([U,X_{\eta(V)]_{VF}}\right)\right) - \left(-\left(\pi\sharp\!\left(\xi\right)\right)\!\left(U\!\left(\eta\!\left(V\right)\right)\right)\right)\right)\right)\right) \to U\!\left(V\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right)\right) - V\!\left(U\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right)\right) - [U,V]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right) - \eta\!\left([U,[V,\pi\sharp(\xi)]_{VF]_{VF}}\right) + \eta\!\left([V,[U,\pi\sharp(\xi)]_{VF]_{VF}}\right) + \eta\!\left([[U,V]_{VF,\pi\sharp(\xi)]_{VF}}\right) + \xi\!\left([U,[V,\pi\sharp(\eta)]_{VF]_{VF}}\right) - \xi\!\left([V,[U,\pi\sharp(\eta)]_{VF]_{VF}}\right) - \xi\!\left([[U,V]_{VF,\pi\sharp(\eta)]_{VF}}\right) \quad \text{[simplify]}\;\text{--- canonical-form pipeline (intra-loop)} \\
+U\!\left(V\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right)\right) - V\!\left(U\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right)\right) - [U,V]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right) - \eta\!\left([U,[V,\pi\sharp(\xi)]_{VF]_{VF}}\right) + \eta\!\left([V,[U,\pi\sharp(\xi)]_{VF]_{VF}}\right) + \eta\!\left([[U,V]_{VF,\pi\sharp(\xi)]_{VF}}\right) + \xi\!\left([U,[V,\pi\sharp(\eta)]_{VF]_{VF}}\right) - \xi\!\left([V,[U,\pi\sharp(\eta)]_{VF]_{VF}}\right) - \xi\!\left([[U,V]_{VF,\pi\sharp(\eta)]_{VF}}\right) \to U\!\left(V\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right)\right) - V\!\left(U\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right)\right) - [U,V]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right) + \xi\!\left([U,[V,\pi\sharp(\eta)]_{VF]_{VF}}\right) - \xi\!\left([V,[U,\pi\sharp(\eta)]_{VF]_{VF}}\right) - \xi\!\left([[U,V]_{VF,\pi\sharp(\eta)]_{VF}}\right) \quad \text{[Lie-bracket Jacobi for vector fields]\,(axiom)} \\
+U\!\left(V\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right)\right) - V\!\left(U\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right)\right) - [U,V]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right) + \xi\!\left([U,[V,\pi\sharp(\eta)]_{VF]_{VF}}\right) - \xi\!\left([V,[U,\pi\sharp(\eta)]_{VF]_{VF}}\right) - \xi\!\left([[U,V]_{VF,\pi\sharp(\eta)]_{VF}}\right) \to U\!\left(V\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right)\right) - V\!\left(U\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right)\right) - [U,V]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right) \quad \text{[Lie-bracket Jacobi for vector fields]\,(axiom)} \\
+U\!\left(V\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right)\right) - V\!\left(U\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right)\right) - [U,V]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right) \to [U,V]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right) - [U,V]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right) \quad \text{[X(Y(f)) \ensuremath{-} Y(X(f)) = [X,Y]\_VF(f)  [permissive]]\,(axiom)} \\
+[U,V]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right) - [U,V]_{VF}\!\left(\eta\!\left(\pi\sharp\!\left(\xi\right)\right)\right) \to 0 \quad \text{[simplify]}\;\text{--- canonical-form pipeline (intra-loop)}
+\end{gather*}
+}
+
+    
+
+    \subsubsection{\texorpdfstring{(2')
+\(\tilde{\mathcal{L}}_{d\,\iota_U \eta}\,V = -[\tilde{d}\,\tilde{\iota}_\eta U,\;V]_{\mathrm{SN}}\)}{(2') \textbackslash tilde\{\textbackslash mathcal\{L\}\}\_\{d\textbackslash,\textbackslash iota\_U \textbackslash eta\}\textbackslash,V = -{[}\textbackslash tilde\{d\}\textbackslash,\textbackslash tilde\{\textbackslash iota\}\_\textbackslash eta U,\textbackslash;V{]}\_\{\textbackslash mathrm\{SN\}\}}}\label{tildemathcall_diota_u-etav--tildedtildeiota_eta-uv_mathrmsn}
+
+(2)'nin doğrudan duali: \(\tilde{\mathcal{L}}\) rolünde Lichnerowicz
+açılımı, SN bracket \(V\) ile alınıyor. Lhs ve rhs her iki tarafta da
+Hamilton vektör alanı \(X_{\eta(U)}\)'ya iniyor --- biri (lhs)
+SnBracket-on-1-forms üzerinden HVF (sign \(-\)), diğeri (rhs)
+\(\tilde{d}_\pi\) uygulamasından pozitif \(\pi^\sharp \circ d\) ---
+\(\mathrm{Act}(\tilde{d}_\pi,\, f) \to \mathrm{Neg}(\mathrm{HVF}(f))\)
+köprüsü ikisini birleştiriyor.
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{7}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{head\PYZus{}lhs} \PY{o}{=} \PY{n}{Act}\PY{p}{(}\PY{n}{default\PYZus{}d}\PY{p}{,} \PY{n}{Act}\PY{p}{(}\PY{n}{interior}\PY{p}{(}\PY{n}{U}\PY{p}{)}\PY{p}{,} \PY{n}{eta}\PY{p}{)}\PY{p}{)}
+\PY{n}{lhs} \PY{o}{=} \PY{n}{Act}\PY{p}{(}\PY{n}{tilde\PYZus{}lie}\PY{p}{(}\PY{n}{head\PYZus{}lhs}\PY{p}{,} \PY{n}{pi}\PY{p}{)}\PY{p}{,} \PY{n}{V}\PY{p}{)}
+\PY{n}{head\PYZus{}rhs} \PY{o}{=} \PY{n}{Act}\PY{p}{(}\PY{n}{tilde\PYZus{}d}\PY{p}{(}\PY{n}{pi}\PY{p}{)}\PY{p}{,} \PY{n}{Act}\PY{p}{(}\PY{n}{tilde\PYZus{}interior}\PY{p}{(}\PY{n}{eta}\PY{p}{)}\PY{p}{,} \PY{n}{U}\PY{p}{)}\PY{p}{)}
+\PY{n}{rhs} \PY{o}{=} \PY{n}{Neg}\PY{p}{(}\PY{n}{BracketApply}\PY{p}{(}\PY{n}{default\PYZus{}sn}\PY{p}{,} \PY{n}{head\PYZus{}rhs}\PY{p}{,} \PY{n}{V}\PY{p}{)}\PY{p}{)}
+\PY{n}{chain} \PY{o}{=} \PY{n}{prob}\PY{o}{.}\PY{n}{prove\PYZus{}derivator}\PY{p}{(}\PY{n}{lhs}\PY{p}{,} \PY{n}{rhs}\PY{p}{,} \PY{n}{eval\PYZus{}args}\PY{o}{=}\PY{p}{(}\PY{n}{xi}\PY{p}{,}\PY{p}{)}\PY{p}{,} \PY{n}{side}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{multivector}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{(2}\PY{l+s+s2}{\PYZsq{}}\PY{l+s+s2}{) multivec, Ltilde\PYZus{}}\PY{l+s+se}{\PYZob{}\PYZob{}}\PY{l+s+s2}{d iota\PYZus{}U eta}\PY{l+s+se}{\PYZcb{}\PYZcb{}}\PY{l+s+s2}{ V = \PYZhy{}[dtilde iotatilde\PYZus{}eta U, V]\PYZus{}SN  \PYZhy{}\PYZhy{}\PYZgt{}  }\PY{l+s+si}{\PYZob{}}\PY{n+nb}{len}\PY{p}{(}\PY{n}{chain}\PY{p}{)}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{ adimda kapandi}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n}{display\PYZus{}chain}\PY{p}{(}\PY{n}{chain}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+(2') multivec, Ltilde\_\{d iota\_U eta\} V = -[dtilde iotatilde\_eta U, V]\_SN  -->
+25 adimda kapandi
+    \end{Verbatim}
+ 
+            
+\prompt{Out}{outcolor}{7}{}
+    
+    {\allowdisplaybreaks\scriptsize
+\begin{gather*}
+\tilde{\mathcal{L}}_{d\!\left(\iota_U\!\left(\eta\right)\right)}\!\left(V\right) \to -X_{d(\iota_U(\eta))(V)} + \pi\sharp\!\left(L_V\!\left(d\!\left(\iota_U\!\left(\eta\right)\right)\right)\right) - [V,\pi\sharp(d(\iota_{U(\eta)))]_{VF}} \quad \text{[\ensuremath{\tilde{L}}\_\ensuremath{\alpha}(U) = \ensuremath{-}X\_{\ensuremath{\alpha}(U)} + \ensuremath{\pi}\ensuremath{\sharp}(L\_U \ensuremath{\alpha}) \ensuremath{-} [U, \ensuremath{\pi}\ensuremath{\sharp} \ensuremath{\alpha}]\_VF [\ensuremath{\pi}]]\,(axiom)} \\
+L_V\!\left(d\!\left(\iota_U\!\left(\eta\right)\right)\right) \to d\!\left(L_V\!\left(\iota_U\!\left(\eta\right)\right)\right) \quad \text{[L\_X \ensuremath{\circ} d = d \ensuremath{\circ} L\_X (tilde, any mode)]\,(axiom)} \\
+\pi\sharp\!\left(d\!\left(L_V\!\left(\iota_U\!\left(\eta\right)\right)\right)\right) \to X_{L_{V(\iota_U(\eta))}} \quad \text{[\ensuremath{\pi}\ensuremath{\sharp}(df) = X\_f [\ensuremath{\pi}]]\,(axiom)} \\
+[V,\pi\sharp(d(\iota_{U(\eta)))]_{VF}} \to [V,X_{\eta(U)]_{VF}} \quad \text{[bare-atom-slot lift]\,(axiom)} \\
+\left(-X_{d(\iota_U(\eta))(V)} + X_{L_{V(\iota_U(\eta))}} - [V,X_{\eta(U)]_{VF}}\right)\!\left(\xi\right) \to -X_{d(\iota_U(\eta))(V)}\!\left(\xi\right) + X_{L_{V(\iota_U(\eta))}}\!\left(\xi\right) - [V,X_{\eta(U)]_{VF}}\!\left(\xi\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+X_{d(\iota_U(\eta))(V)}\!\left(\xi\right) \to \xi\!\left(X_{d(\iota_U(\eta))(V)}\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\xi\!\left(X_{d(\iota_U(\eta))(V)}\right) \to -\left(\pi\sharp\!\left(\xi\right)\right)\!\left(\left(d\!\left(\iota_U\!\left(\eta\right)\right)\right)\!\left(V\right)\right) \quad \text{[\ensuremath{\alpha}(X\_f) = \ensuremath{-}\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\alpha})(f) [\ensuremath{\pi}]]\,(axiom)} \\
+\left(d\!\left(\iota_U\!\left(\eta\right)\right)\right)\!\left(V\right) \to V\!\left(\iota_U\!\left(\eta\right)\right) \quad \text{[d intrinsic (Koszul): (d\ensuremath{\omega})(X\_0, \ensuremath{\dots}, X\_p) = \ensuremath{\Sigma} \ensuremath{\pm}X\_i(\ensuremath{\omega}(\ensuremath{\dots},hat\_i,\ensuremath{\dots})) + \ensuremath{\Sigma} \ensuremath{\pm}\ensuremath{\omega}([X\_i,X\_j]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+V\!\left(\iota_U\!\left(\eta\right)\right) \to V\!\left(\eta\!\left(U\right)\right) \quad \text{[bare \ensuremath{\iota}\_X(\ensuremath{\omega}) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(\ensuremath{\omega}, X))  [permissive]]\,(axiom)} \\
+X_{L_{V(\iota_U(\eta))}}\!\left(\xi\right) \to \xi\!\left(X_{L_{V(\iota_U(\eta))}}\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\xi\!\left(X_{L_{V(\iota_U(\eta))}}\right) \to -\left(\pi\sharp\!\left(\xi\right)\right)\!\left(L_V\!\left(\iota_U\!\left(\eta\right)\right)\right) \quad \text{[\ensuremath{\alpha}(X\_f) = \ensuremath{-}\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\alpha})(f) [\ensuremath{\pi}]]\,(axiom)} \\
+\left(\pi\sharp\!\left(\xi\right)\right)\!\left(L_V\!\left(\iota_U\!\left(\eta\right)\right)\right) \to \left(\pi\sharp\!\left(\xi\right)\right)\!\left(V\!\left(\iota_U\!\left(\eta\right)\right)\right) \quad \text{[Act(D, L\_X(f)) \ensuremath{\to} Act(D, X(f))  [D vf-like, f 0-form]]\,(axiom)} \\
+V\!\left(\iota_U\!\left(\eta\right)\right) \to V\!\left(\eta\!\left(U\right)\right) \quad \text{[bare \ensuremath{\iota}\_X(\ensuremath{\omega}) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(\ensuremath{\omega}, X))  [permissive]]\,(axiom)} \\
+[V,X_{\eta(U)]_{VF}}\!\left(\xi\right) \to \xi\!\left([V,X_{\eta(U)]_{VF}}\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\tilde{d}\!\left(\tilde{\iota}_{\eta}\!\left(U\right)\right) \to \tilde{d}\!\left(U\!\left(\eta\right)\right) \quad \text{[bare \ensuremath{\tilde{\ensuremath{\iota}}}\_\ensuremath{\omega}(V) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(V, \ensuremath{\omega}))  (V deg 1)]\,(axiom)} \\
+U\!\left(\eta\right) \to \eta\!\left(U\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\tilde{d}\!\left(\eta\!\left(U\right)\right) \to -X_\eta(U) \quad \text{[Act(\ensuremath{\tilde{d}}\_\ensuremath{\pi}, f) \ensuremath{\to} \ensuremath{-}X\_f  [geometer sign]]\,(axiom)} \\
+\left[-X_\eta(U),\, V\right]_{[\cdot,\cdot]_{SN}} \to -\left[X_\eta(U),\, V\right]_{[\cdot,\cdot]_{SN}} \quad \text{[[(\ensuremath{-}a), b]\_SN \ensuremath{\to} \ensuremath{-}[a, b]\_SN  /  [a, (\ensuremath{-}b)]\_SN \ensuremath{\to} \ensuremath{-}[a, b]\_SN]\,(axiom)} \\
+\left[X_\eta(U),\, V\right]_{[\cdot,\cdot]_{SN}} \to [X_{\eta(U),V]_{VF}} \quad \text{[[U, V]\_SN \ensuremath{\to} [U, V]\_VF  [both 1-vectors]]\,(axiom)} \\
+[X_{\eta(U),V]_{VF}} \to -[V,X_{\eta(U)]_{VF}} \quad \text{[[Y, X]\_VF \ensuremath{\to} \ensuremath{-}[X, Y]\_VF  [repr-canonical]]\,(axiom)} \\
+\left(-\left(-\left(-[V,X_{\eta(U)]_{VF}}\right)\right)\right)\!\left(\xi\right) \to -\left(-\left(-[V,X_{\eta(U)]_{VF}}\right)\right)\!\left(\xi\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(-\left(-[V,X_{\eta(U)]_{VF}}\right)\right)\!\left(\xi\right) \to -\left(-[V,X_{\eta(U)]_{VF}}\right)\!\left(\xi\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+\left(-[V,X_{\eta(U)]_{VF}}\right)\!\left(\xi\right) \to -[V,X_{\eta(U)]_{VF}}\!\left(\xi\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+[V,X_{\eta(U)]_{VF}}\!\left(\xi\right) \to \xi\!\left([V,X_{\eta(U)]_{VF}}\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\left(-\left(-\left(\pi\sharp\!\left(\xi\right)\right)\!\left(V\!\left(\eta\!\left(U\right)\right)\right)\right) - \left(\pi\sharp\!\left(\xi\right)\right)\!\left(V\!\left(\eta\!\left(U\right)\right)\right) - \xi\!\left([V,X_{\eta(U)]_{VF}}\right)\right) - \left(-\left(-\left(-\xi\!\left([V,X_{\eta(U)]_{VF}}\right)\right)\right)\right) \to 0 \quad \text{[simplify]}\;\text{--- canonical-form pipeline (intra-loop)}
+\end{gather*}
+}
+
+    
+
+    \subsubsection{\texorpdfstring{(3')
+\(0 = \tilde{d}\,\tilde{\iota}_{\mathcal{L}_U \eta}\,V - \tilde{d}\,\tilde{\iota}_{d\,\iota_V \eta}\,U + \tilde{d}\,\tilde{\iota}_\eta\,[U, V]_{\mathrm{SN}}\)}{(3') 0 = \textbackslash tilde\{d\}\textbackslash,\textbackslash tilde\{\textbackslash iota\}\_\{\textbackslash mathcal\{L\}\_U \textbackslash eta\}\textbackslash,V - \textbackslash tilde\{d\}\textbackslash,\textbackslash tilde\{\textbackslash iota\}\_\{d\textbackslash,\textbackslash iota\_V \textbackslash eta\}\textbackslash,U + \textbackslash tilde\{d\}\textbackslash,\textbackslash tilde\{\textbackslash iota\}\_\textbackslash eta\textbackslash,{[}U, V{]}\_\{\textbackslash mathrm\{SN\}\}}}\label{tildedtildeiota_mathcall_u-etav---tildedtildeiota_diota_v-etau-tildedtildeiota_etau-v_mathrmsn}
+
+(3)'ün doğrudan duali: aynı şekilde sıfır-toplam, ilk iki terim
+\(\mathrm{lhs}_{\mathrm{pair}}\), üçüncü (pozitif) terim
+\(\mathrm{rhs}_{\mathrm{third}}\) olarak.
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{8}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{v1p} \PY{o}{=} \PY{n}{Act}\PY{p}{(}\PY{n}{lie\PYZus{}derivative}\PY{p}{(}\PY{n}{U}\PY{p}{)}\PY{p}{,} \PY{n}{eta}\PY{p}{)}
+\PY{n}{v2p} \PY{o}{=} \PY{n}{Act}\PY{p}{(}\PY{n}{default\PYZus{}d}\PY{p}{,} \PY{n}{Act}\PY{p}{(}\PY{n}{interior}\PY{p}{(}\PY{n}{V}\PY{p}{)}\PY{p}{,} \PY{n}{eta}\PY{p}{)}\PY{p}{)}
+\PY{n}{bracket\PYZus{}uv} \PY{o}{=} \PY{n}{BracketApply}\PY{p}{(}\PY{n}{default\PYZus{}sn}\PY{p}{,} \PY{n}{U}\PY{p}{,} \PY{n}{V}\PY{p}{)}
+
+\PY{n}{lhs\PYZus{}pair} \PY{o}{=} \PY{n}{Sum}\PY{p}{(}
+    \PY{n}{Act}\PY{p}{(}\PY{n}{tilde\PYZus{}d}\PY{p}{(}\PY{n}{pi}\PY{p}{)}\PY{p}{,} \PY{n}{Act}\PY{p}{(}\PY{n}{tilde\PYZus{}interior}\PY{p}{(}\PY{n}{v1p}\PY{p}{)}\PY{p}{,} \PY{n}{V}\PY{p}{)}\PY{p}{)}\PY{p}{,}
+    \PY{n}{Act}\PY{p}{(}\PY{n}{tilde\PYZus{}d}\PY{p}{(}\PY{n}{pi}\PY{p}{)}\PY{p}{,} \PY{n}{Act}\PY{p}{(}\PY{n}{tilde\PYZus{}interior}\PY{p}{(}\PY{n}{eta}\PY{p}{)}\PY{p}{,} \PY{n}{bracket\PYZus{}uv}\PY{p}{)}\PY{p}{)}\PY{p}{,}
+\PY{p}{)}
+\PY{n}{rhs\PYZus{}third} \PY{o}{=} \PY{n}{Act}\PY{p}{(}\PY{n}{tilde\PYZus{}d}\PY{p}{(}\PY{n}{pi}\PY{p}{)}\PY{p}{,} \PY{n}{Act}\PY{p}{(}\PY{n}{tilde\PYZus{}interior}\PY{p}{(}\PY{n}{v2p}\PY{p}{)}\PY{p}{,} \PY{n}{U}\PY{p}{)}\PY{p}{)}
+\PY{n}{chain} \PY{o}{=} \PY{n}{prob}\PY{o}{.}\PY{n}{prove\PYZus{}derivator}\PY{p}{(}\PY{n}{lhs\PYZus{}pair}\PY{p}{,} \PY{n}{rhs\PYZus{}third}\PY{p}{,} \PY{n}{eval\PYZus{}args}\PY{o}{=}\PY{p}{(}\PY{n}{xi}\PY{p}{,}\PY{p}{)}\PY{p}{,} \PY{n}{side}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{multivector}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{(3}\PY{l+s+s2}{\PYZsq{}}\PY{l+s+s2}{) multivec, zero\PYZhy{}sum reformulated lhs\PYZus{}pair = rhs\PYZus{}third  \PYZhy{}\PYZhy{}\PYZgt{}  }\PY{l+s+si}{\PYZob{}}\PY{n+nb}{len}\PY{p}{(}\PY{n}{chain}\PY{p}{)}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{ adimda kapandi}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n}{display\PYZus{}chain}\PY{p}{(}\PY{n}{chain}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+(3') multivec, zero-sum reformulated lhs\_pair = rhs\_third  -->  23 adimda
+kapandi
+    \end{Verbatim}
+ 
+            
+\prompt{Out}{outcolor}{8}{}
+    
+    {\allowdisplaybreaks\scriptsize
+\begin{gather*}
+\tilde{d}\!\left(\tilde{\iota}_{L_U\!\left(\eta\right)}\!\left(V\right)\right) \to \tilde{d}\!\left(V\!\left(L_U\!\left(\eta\right)\right)\right) \quad \text{[bare \ensuremath{\tilde{\ensuremath{\iota}}}\_\ensuremath{\omega}(V) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(V, \ensuremath{\omega}))  (V deg 1)]\,(axiom)} \\
+V\!\left(L_U\!\left(\eta\right)\right) \to \left(L_U\!\left(\eta\right)\right)\!\left(V\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\left(L_U\!\left(\eta\right)\right)\!\left(V\right) \to U\!\left(\eta\!\left(V\right)\right) - \eta\!\left([U,V]_{VF}\right) \quad \text{[L\_X intrinsic: (L\_X \ensuremath{\omega})(Y\_1, \ensuremath{\dots}) = X(\ensuremath{\omega}(Y\_1, \ensuremath{\dots})) \ensuremath{-} \ensuremath{\Sigma} \ensuremath{\omega}(\ensuremath{\dots}, [X, Y\_i]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+\tilde{d}\!\left(U\!\left(\eta\!\left(V\right)\right) - \eta\!\left([U,V]_{VF}\right)\right) \to -X_{(U(\eta(V)) + (-\eta([U,V]_{VF})))} \quad \text{[Act(\ensuremath{\tilde{d}}\_\ensuremath{\pi}, f) \ensuremath{\to} \ensuremath{-}X\_f  [geometer sign]]\,(axiom)} \\
+\left[U,\, V\right]_{[\cdot,\cdot]_{SN}} \to [U,V]_{VF} \quad \text{[[U, V]\_SN \ensuremath{\to} [U, V]\_VF  [both 1-vectors]]\,(axiom)} \\
+\tilde{d}\!\left(\tilde{\iota}_{\eta}\!\left([U,V]_{VF}\right)\right) \to \tilde{d}\!\left([U,V]_{VF}\!\left(\eta\right)\right) \quad \text{[Act(D, \ensuremath{\tilde{\ensuremath{\iota}}}\_\ensuremath{\alpha}([U,V]\_VF)) \ensuremath{\to} Act(D, MultiEval([U,V]\_VF, \ensuremath{\alpha}, covector))]\,(axiom)} \\
+[U,V]_{VF}\!\left(\eta\right) \to \eta\!\left([U,V]_{VF}\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\tilde{d}\!\left(\eta\!\left([U,V]_{VF}\right)\right) \to -X_{\eta([U,V]_{VF})} \quad \text{[Act(\ensuremath{\tilde{d}}\_\ensuremath{\pi}, f) \ensuremath{\to} \ensuremath{-}X\_f  [geometer sign]]\,(axiom)} \\
+\left(-X_{(U(\eta(V)) + (-\eta([U,V]_{VF})))} - X_{\eta([U,V]_{VF})}\right)\!\left(\xi\right) \to -X_{(U(\eta(V)) + (-\eta([U,V]_{VF})))}\!\left(\xi\right) - X_{\eta([U,V]_{VF})}\!\left(\xi\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+X_{(U(\eta(V)) + (-\eta([U,V]_{VF})))}\!\left(\xi\right) \to \xi\!\left(X_{(U(\eta(V)) + (-\eta([U,V]_{VF})))}\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\xi\!\left(X_{(U(\eta(V)) + (-\eta([U,V]_{VF})))}\right) \to -\left(\pi\sharp\!\left(\xi\right)\right)\!\left(U\!\left(\eta\!\left(V\right)\right) - \eta\!\left([U,V]_{VF}\right)\right) \quad \text{[\ensuremath{\alpha}(X\_f) = \ensuremath{-}\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\alpha})(f) [\ensuremath{\pi}]]\,(axiom)} \\
+X_{\eta([U,V]_{VF})}\!\left(\xi\right) \to \xi\!\left(X_{\eta([U,V]_{VF})}\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\xi\!\left(X_{\eta([U,V]_{VF})}\right) \to -\left(\pi\sharp\!\left(\xi\right)\right)\!\left(\eta\!\left([U,V]_{VF}\right)\right) \quad \text{[\ensuremath{\alpha}(X\_f) = \ensuremath{-}\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\alpha})(f) [\ensuremath{\pi}]]\,(axiom)} \\
+\tilde{d}\!\left(\tilde{\iota}_{d\!\left(\iota_V\!\left(\eta\right)\right)}\!\left(U\right)\right) \to \tilde{d}\!\left(U\!\left(d\!\left(\iota_V\!\left(\eta\right)\right)\right)\right) \quad \text{[bare \ensuremath{\tilde{\ensuremath{\iota}}}\_\ensuremath{\omega}(V) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(V, \ensuremath{\omega}))  (V deg 1)]\,(axiom)} \\
+U\!\left(d\!\left(\iota_V\!\left(\eta\right)\right)\right) \to \left(d\!\left(\iota_V\!\left(\eta\right)\right)\right)\!\left(U\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\left(d\!\left(\iota_V\!\left(\eta\right)\right)\right)\!\left(U\right) \to U\!\left(\iota_V\!\left(\eta\right)\right) \quad \text{[d intrinsic (Koszul): (d\ensuremath{\omega})(X\_0, \ensuremath{\dots}, X\_p) = \ensuremath{\Sigma} \ensuremath{\pm}X\_i(\ensuremath{\omega}(\ensuremath{\dots},hat\_i,\ensuremath{\dots})) + \ensuremath{\Sigma} \ensuremath{\pm}\ensuremath{\omega}([X\_i,X\_j]\_VF, \ensuremath{\dots})]\,(axiom)} \\
+U\!\left(\iota_V\!\left(\eta\right)\right) \to U\!\left(\eta\!\left(V\right)\right) \quad \text{[bare \ensuremath{\iota}\_X(\ensuremath{\omega}) inside Act(D, \_) \ensuremath{\to} Act(D, MultiEval(\ensuremath{\omega}, X))  [permissive]]\,(axiom)} \\
+\tilde{d}\!\left(U\!\left(\eta\!\left(V\right)\right)\right) \to -X_U(\eta(V)) \quad \text{[Act(\ensuremath{\tilde{d}}\_\ensuremath{\pi}, f) \ensuremath{\to} \ensuremath{-}X\_f  [geometer sign]]\,(axiom)} \\
+\left(-X_U(\eta(V))\right)\!\left(\xi\right) \to -X_U(\eta(V))\!\left(\xi\right) \quad \text{[MultiEval head linearity]\,(axiom)} \\
+X_U(\eta(V))\!\left(\xi\right) \to \xi\!\left(X_U(\eta(V))\right) \quad \text{[X(\ensuremath{\omega}) \ensuremath{\to} \ensuremath{\omega}(X)  [arity-1 covector pairing flip]]\,(axiom)} \\
+\xi\!\left(X_U(\eta(V))\right) \to -\left(\pi\sharp\!\left(\xi\right)\right)\!\left(U\!\left(\eta\!\left(V\right)\right)\right) \quad \text{[\ensuremath{\alpha}(X\_f) = \ensuremath{-}\ensuremath{\pi}\ensuremath{\sharp}(\ensuremath{\alpha})(f) [\ensuremath{\pi}]]\,(axiom)} \\
+\left(-\left(-\left(\pi\sharp\!\left(\xi\right)\right)\!\left(U\!\left(\eta\!\left(V\right)\right) - \eta\!\left([U,V]_{VF}\right)\right)\right) - \left(-\left(\pi\sharp\!\left(\xi\right)\right)\!\left(\eta\!\left([U,V]_{VF}\right)\right)\right)\right) - \left(-\left(-\left(\pi\sharp\!\left(\xi\right)\right)\!\left(U\!\left(\eta\!\left(V\right)\right)\right)\right)\right) \to \left(-\left(-\left(\left(\pi\sharp\!\left(\xi\right)\right)\!\left(U\!\left(\eta\!\left(V\right)\right)\right) - \left(\pi\sharp\!\left(\xi\right)\right)\!\left(\eta\!\left([U,V]_{VF}\right)\right)\right)\right) - \left(-\left(\pi\sharp\!\left(\xi\right)\right)\!\left(\eta\!\left([U,V]_{VF}\right)\right)\right)\right) - \left(-\left(-\left(\pi\sharp\!\left(\xi\right)\right)\!\left(U\!\left(\eta\!\left(V\right)\right)\right)\right)\right) \quad \text{[product-rule]}\;\text{--- graded Leibniz + linearity} \\
+\left(-\left(-\left(\left(\pi\sharp\!\left(\xi\right)\right)\!\left(U\!\left(\eta\!\left(V\right)\right)\right) - \left(\pi\sharp\!\left(\xi\right)\right)\!\left(\eta\!\left([U,V]_{VF}\right)\right)\right)\right) - \left(-\left(\pi\sharp\!\left(\xi\right)\right)\!\left(\eta\!\left([U,V]_{VF}\right)\right)\right)\right) - \left(-\left(-\left(\pi\sharp\!\left(\xi\right)\right)\!\left(U\!\left(\eta\!\left(V\right)\right)\right)\right)\right) \to 0 \quad \text{[simplify]}\;\text{--- canonical-form pipeline (intra-loop)}
+\end{gather*}
+}
+
+    
+
+    \subsection{Sonuç}\label{sonuuxe7}
+
+Altı §3.1.5 özdeşliği --- form (1)/(2)/(3) ve dual (1')/(2')/(3') ---
+tek \texttt{prob.prove\_derivator(...)} çağrısıyla syntactic olarak
+kapandı. Adım sayıları: 109 / 21 / 30 (form) ve 117 / 25 / 23
+(multivector).
+
+\textbf{Form taraf:}
+
+\begin{itemize}
+\tightlist
+\item
+  (1):
+  \(D^{T^{*}M}_{\mathcal{L}_U}(\eta, \mu) = \mathcal{L}_{\tilde{K}_\eta U}\mu + K_{\tilde{K}_\mu U}\eta\)
+  --- eval \((Y)\)
+\item
+  (2):
+  \(\mathcal{L}_{\tilde{d}\tilde{\iota}_\eta U}\mu = -[d\iota_U\eta, \mu]_K\)
+  --- eval \((Y)\)
+\item
+  (3): \(\sum d\iota_\bullet \cdot = 0\) --- eval \((Y)\)
+\end{itemize}
+
+\textbf{Multivektör taraf:}
+
+\begin{itemize}
+\tightlist
+\item
+  (1'):
+  \(\tilde{D}^{\mathrm{SN}}_{\tilde{\mathcal{L}}_\eta}(U, V) = \tilde{\mathcal{L}}_{K_U\eta}V + \tilde{K}_{K_V\eta}U\)
+  --- eval \((\xi)\)
+\item
+  (2'):
+  \(\tilde{\mathcal{L}}_{d\iota_U\eta}V = -[\tilde{d}\tilde{\iota}_\eta U, V]_{\mathrm{SN}}\)
+  --- eval \((\xi)\)
+\item
+  (3'): \(\sum \tilde{d}\tilde{\iota}_\bullet \cdot = 0\) --- eval
+  \((\xi)\)
+\end{itemize}
+
+Faz 15.C şu üç adımı sahneye getirmek zorunda kaldı: form-side
+Cartan-magic + tilde Lichnerowicz açılımı (vektör alanı için),
+\(\pi^\sharp\) Neg-doğrusallığı, ve \texttt{LieBracketVF} gibi opak
+operator atomlarının slot-lift'i. Bu üçü olmaksızın özellikle (1') 117
+adımlık kapanışına ulaşamıyor --- \texttt{display\_chain(chain)} ile her
+adım \texttt{Definition} etiketiyle birlikte LaTeX olarak okunabilir.
+
+
+    % Add a bibliography block to the postdoc
+    
+    
+    
+\end{document}

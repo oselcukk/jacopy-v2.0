@@ -1,13 +1,13 @@
-"""Tests for gradalg.algorithms.canonicalize."""
+"""Tests for jacopy.algorithms.canonicalize."""
 
 import pytest
 
-from gradalg.algorithms.canonicalize import (
+from jacopy.algorithms.canonicalize import (
     canonical_hash,
     canonicalize,
     semantically_equal,
 )
-from gradalg.core.expr import (
+from jacopy.core.expr import (
     Integer,
     Neg,
     One,

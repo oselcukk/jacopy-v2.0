@@ -1,24 +1,24 @@
-"""Tests for ``gradalg.library.dirac``."""
+"""Tests for ``jacopy.library.dirac``."""
 
 from __future__ import annotations
 
 import pytest
 
-from gradalg.brackets.derived import VanishingCondition
-from gradalg.brackets.dorfman import SectionPair
-from gradalg.core.expr import Expr, Integer, Symbol
-from gradalg.core.properties import Graded
-from gradalg.core.registry import PropertyRegistry
-from gradalg.library import theorem_book
-from gradalg.library.courant_algebroid import CourantAlgebroid
-from gradalg.library.dirac import (
+from jacopy.brackets.derived import VanishingCondition
+from jacopy.brackets.dorfman import SectionPair
+from jacopy.core.expr import Expr, Integer, Symbol
+from jacopy.core.properties import Graded
+from jacopy.core.registry import PropertyRegistry
+from jacopy.library import theorem_book
+from jacopy.library.courant_algebroid import CourantAlgebroid
+from jacopy.library.dirac import (
     THEOREM_DIRAC_INVOLUTIVITY,
     THEOREM_DIRAC_ISOTROPY,
     DiracStructure,
     poisson_dirac,
     presymplectic_dirac,
 )
-from gradalg.proof.chain import ProofChain
+from jacopy.proof.chain import ProofChain
 
 
 # --------------------------------------------------------------------- #

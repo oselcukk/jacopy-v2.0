@@ -9,7 +9,7 @@ Demo 1 — *Cartan's magic formula, element-level*, efficient mode::
 
     L_X(ω) == (d ∘ ι_X + ι_X ∘ d)(ω)
 
-Closed by :func:`gradalg.proof.show_equal`: definition-level unfold of
+Closed by :func:`jacopy.proof.show_equal`: definition-level unfold of
 ``L_X`` (classified as an axiom by default), graded-Leibniz product
 rule, canonicalize. Three steps. Fast, but circular: the rule that
 fires *is* the formula being proved.
@@ -44,19 +44,19 @@ the ASCII fallback is used (text is identical in structure).
 
 from __future__ import annotations
 
-from gradalg.algebra.derivation import Act, Derivation, compose
-from gradalg.calculus.exterior_d import d
-from gradalg.calculus.interior import interior
-from gradalg.calculus.lie_derivative import lie_derivative
-from gradalg.core.expr import Sum, Symbol
-from gradalg.display import (
+from jacopy.algebra.derivation import Act, Derivation, compose
+from jacopy.calculus.exterior_d import d
+from jacopy.calculus.interior import interior
+from jacopy.calculus.lie_derivative import lie_derivative
+from jacopy.core.expr import Sum, Symbol
+from jacopy.display import (
     HAS_RICH,
     chain_to_ascii,
     chain_to_latex,
     render_chain,
 )
-from gradalg.proof import show_equal
-from gradalg.proof.expansion import default_engine
+from jacopy.proof import show_equal
+from jacopy.proof.expansion import default_engine
 
 
 def _section(title: str) -> None:
@@ -109,7 +109,7 @@ def demo_d_squared_zero() -> None:
     # children. The terminal tree shows the nested structure directly.
     engine = default_engine(mode="foundational", d_squared_mode="theorem")
 
-    from gradalg.core.expr import Integer
+    from jacopy.core.expr import Integer
 
     chain = show_equal(lhs, Integer(0), engine=engine)
 
@@ -151,11 +151,11 @@ def demo_cartan_magic_operator_level() -> None:
     # Build a concrete Cartan-calculus bundle and a minimal
     # exterior algebra with one 0-form generator f (and its
     # differential df, which ExteriorAlgebra derives automatically).
-    from gradalg.brackets.lie import LieBracket
-    from gradalg.calculus.cartan import CartanCalculus
-    from gradalg.calculus.exterior_algebra import ExteriorAlgebra
-    from gradalg.core.properties import Graded
-    from gradalg.core.registry import PropertyRegistry
+    from jacopy.brackets.lie import LieBracket
+    from jacopy.calculus.cartan import CartanCalculus
+    from jacopy.calculus.exterior_algebra import ExteriorAlgebra
+    from jacopy.core.properties import Graded
+    from jacopy.core.registry import PropertyRegistry
 
     reg = PropertyRegistry()
     f = Symbol("f")

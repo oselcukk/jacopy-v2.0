@@ -4,7 +4,7 @@ Bu tutorial bir symplectic manifold üstüne Poisson bracket'i yerleştirir
 ve `{f, g}_π` bracket'inin üç eşdeğer görüşünü — derived, Hamiltonian,
 Koszul — tek bir `PoissonBracket` objesi üstünden dolaşır. Amaç, hem
 elemen-seviyesi hesapları hem de `[π, π]_SN = 0` universal koşuluna
-indirgenmiş Jacobi ispatını `gradalg` içinde ayağa kaldırmak.
+indirgenmiş Jacobi ispatını `jacopy` içinde ayağa kaldırmak.
 
 [İlk adımlar](01_first_steps.md) ve [Jacobi özdeşliği](02_jacobi_identity.md)
 tutorial'larına aşinalık varsayılır.
@@ -18,9 +18,9 @@ Sarıcı matematiksel açıdan yeni bir şey eklemez; değeri, tüm
 `(ω, π, ♭, ♯, compat)` beşlisini inşa anında tutarlı tutmasıdır.
 
 ```python
-from gradalg import Bivector, Forms, Functions
-from gradalg.core.registry import PropertyRegistry
-from gradalg.library.symplectic import SymplecticManifold
+from jacopy import Bivector, Forms, Functions
+from jacopy.core.registry import PropertyRegistry
+from jacopy.library.symplectic import SymplecticManifold
 
 reg = PropertyRegistry()
 (omega,) = Forms("ω", degree=2, registry=reg)
@@ -44,7 +44,7 @@ derecesi `−1` olmalı (bir 0-formu SN'de `−1` taşır) — `Functions`
 yardımcısının `degree=-1` kwarg'ı tam bu bağlam için.
 
 ```python
-from gradalg.library.poisson import PoissonBracket
+from jacopy.library.poisson import PoissonBracket
 
 f, g, h = Functions("f g h", degree=-1, registry=reg)
 poisson = PoissonBracket.from_bivector(pi)
@@ -75,7 +75,7 @@ manifold'daki `ι_{X_f} ω + df = 0` eşitliği yeterli — `prove_hamiltonian_e
 `MusicalCompatibility` aksiyomunu kullanarak bunu adım adım kapatır:
 
 ```python
-from gradalg.display import chain_to_ascii
+from jacopy.display import chain_to_ascii
 
 chain = M.prove_hamiltonian_equivalence(f, registry=reg)
 print(chain_to_ascii(chain))
@@ -141,7 +141,7 @@ her çağrılırken zincir yeniden inşa edilmez; downstream kod tek bir
 citation ile sonuca bağlanır.
 
 ```python
-from gradalg.library import theorem_book
+from jacopy.library import theorem_book
 
 thm = theorem_book.get("poisson_jacobi")
 thm.statement     # "{f, g, h}_π cyclic sum = 0 when [π, π]_SN = 0"

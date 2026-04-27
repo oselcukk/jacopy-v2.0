@@ -1,6 +1,6 @@
 # 01 — İlk Adımlar
 
-Bu tutorial `gradalg`'de bir sembolik ifade kurmayı, özellik (property)
+Bu tutorial `jacopy`'de bir sembolik ifade kurmayı, özellik (property)
 atamayı ve sadeleştirmeyi gösterir. Bitirdiğinizde `Expr`, `Symbol`,
 `Sum`, `Product`, `Neg` ile küçük cebirsel ifadeler yazabilecek,
 `PropertyRegistry` üzerinden semboller arasına derece/commutativity gibi
@@ -15,7 +15,7 @@ Arka planda `Sum`, `Product`, `Neg` inşa edilir — yani `x + y` ile
 `Sum(x, y)` birebir aynı nesneyi üretir.
 
 ```python
-from gradalg.core.expr import Symbol, Integer, Sum, Product, Neg
+from jacopy.core.expr import Symbol, Integer, Sum, Product, Neg
 
 x, y, z = Symbol("x"), Symbol("y"), Symbol("z")
 
@@ -40,8 +40,8 @@ Derece için `Graded(degree=k)`, çarpımda yer-değiştirmeye izin veren
 skalerler için `Scalar()` kullanılır:
 
 ```python
-from gradalg.core.properties import Graded, Scalar
-from gradalg.core.registry import PropertyRegistry
+from jacopy.core.properties import Graded, Scalar
+from jacopy.core.registry import PropertyRegistry
 
 reg = PropertyRegistry()
 reg.declare(x, Scalar())
@@ -55,12 +55,12 @@ graded semboller arasındaki değişim `(−1)^{|a||b|}` işaretini taşır.
 ### Role-driven kısayollar
 
 Sık tekrarlanan desenler (fonksiyon, vektör alanı, form, bivector)
-için `gradalg.library.declarations` altında role-driven yardımcılar
+için `jacopy.library.declarations` altında role-driven yardımcılar
 var. Her biri `Symbol(...)` + uygun `reg.declare(...)` çağrısını tek
 satıra indirir:
 
 ```python
-from gradalg import Functions, VectorFields, Forms, Bivector
+from jacopy import Functions, VectorFields, Forms, Bivector
 
 reg2 = PropertyRegistry()
 f, g = Functions("f g", registry=reg2)         # Graded(degree=0)
@@ -83,7 +83,7 @@ Tek isim verildiğinde bile dönen değer bir demet (`(f,) = Functions("f", ...)
 5. `collect_terms` — aynı terimleri birleştirir (`x + x → 2x` vb.).
 
 ```python
-from gradalg.algorithms.simplify import simplify
+from jacopy.algorithms.simplify import simplify
 
 assert simplify(x + x - x) == x
 assert simplify(Product(Integer(2), x, Integer(3)), reg) == Product(Integer(6), x)
@@ -106,7 +106,7 @@ sabit aritmetiği).
   fallback.
 
 ```python
-from gradalg.display import to_ascii, to_latex
+from jacopy.display import to_ascii, to_latex
 
 to_ascii(x + y - z)       # 'x + y - z'
 to_latex(x + y - z)       # 'x + y - z'

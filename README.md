@@ -1,4 +1,4 @@
-# gradalg
+# jacopy
 
 Symbolic computation for graded algebra, brackets, and Cartan calculus
 with step-by-step proofs.

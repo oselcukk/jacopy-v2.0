@@ -1,25 +1,25 @@
-"""Tests for ``gradalg.library.courant_algebroid``."""
+"""Tests for ``jacopy.library.courant_algebroid``."""
 
 from __future__ import annotations
 
 import pytest
 
-from gradalg.brackets.base import GradedBracket
-from gradalg.brackets.courant import CourantBracket
-from gradalg.brackets.derived import VanishingCondition
-from gradalg.brackets.dorfman import DorfmanBracket, SectionPair
-from gradalg.brackets.lie import LieBracket
-from gradalg.core.expr import Expr, Integer, Symbol
-from gradalg.core.properties import Graded
-from gradalg.core.registry import PropertyRegistry
-from gradalg.library import theorem_book
-from gradalg.library.courant_algebroid import (
+from jacopy.brackets.base import GradedBracket
+from jacopy.brackets.courant import CourantBracket
+from jacopy.brackets.derived import VanishingCondition
+from jacopy.brackets.dorfman import DorfmanBracket, SectionPair
+from jacopy.brackets.lie import LieBracket
+from jacopy.core.expr import Expr, Integer, Symbol
+from jacopy.core.properties import Graded
+from jacopy.core.registry import PropertyRegistry
+from jacopy.library import theorem_book
+from jacopy.library.courant_algebroid import (
     THEOREM_COURANT_DORFMAN_BRIDGE,
     THEOREM_COURANT_JACOBI_TWIST,
     CourantAlgebroid,
     courant_algebroid,
 )
-from gradalg.proof.chain import ProofChain
+from jacopy.proof.chain import ProofChain
 
 
 # --------------------------------------------------------------------- #

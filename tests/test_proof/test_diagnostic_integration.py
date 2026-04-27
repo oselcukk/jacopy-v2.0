@@ -6,12 +6,12 @@ from __future__ import annotations
 
 import pytest
 
-from gradalg.algebra.derivation import Act
-from gradalg.calculus.exterior_d import d
-from gradalg.core.expr import Integer, Symbol
-from gradalg.core.properties import Graded
-from gradalg.core.registry import PropertyRegistry
-from gradalg.proof import (
+from jacopy.algebra.derivation import Act
+from jacopy.calculus.exterior_d import d
+from jacopy.core.expr import Integer, Symbol
+from jacopy.core.properties import Graded
+from jacopy.core.registry import PropertyRegistry
+from jacopy.proof import (
     ActOverSumOpDefinition,
     DiagnosticReport,
     ExpandAndSimplify,

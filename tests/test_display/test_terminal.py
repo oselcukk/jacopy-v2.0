@@ -1,13 +1,13 @@
-"""Tests for ``gradalg.display.terminal``."""
+"""Tests for ``jacopy.display.terminal``."""
 
 from __future__ import annotations
 
 import pytest
 
-from gradalg.core.expr import Symbol
-from gradalg.display import terminal as term_mod
-from gradalg.display.ascii import chain_to_ascii, step_to_ascii, to_ascii
-from gradalg.display.terminal import (
+from jacopy.core.expr import Symbol
+from jacopy.display import terminal as term_mod
+from jacopy.display.ascii import chain_to_ascii, step_to_ascii, to_ascii
+from jacopy.display.terminal import (
     HAS_RICH,
     print_chain,
     print_expr,
@@ -16,8 +16,8 @@ from gradalg.display.terminal import (
     render_expr,
     render_step,
 )
-from gradalg.proof.chain import ProofChain
-from gradalg.proof.step import ProofStep
+from jacopy.proof.chain import ProofChain
+from jacopy.proof.step import ProofStep
 
 
 # --------------------------------------------------------------------- #

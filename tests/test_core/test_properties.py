@@ -1,8 +1,8 @@
-"""Tests for gradalg.core.properties."""
+"""Tests for jacopy.core.properties."""
 
 import pytest
 
-from gradalg.core.properties import (
+from jacopy.core.properties import (
     AntiCommuting,
     Antisymmetric,
     Graded,
@@ -15,7 +15,7 @@ from gradalg.core.properties import (
     Scalar,
     Symmetric,
 )
-from gradalg.core.symbolic_degree import Degree
+from jacopy.core.symbolic_degree import Degree
 
 
 class TestProvenance:

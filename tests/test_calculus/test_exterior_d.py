@@ -1,19 +1,19 @@
-"""Tests for gradalg.calculus.exterior_d."""
+"""Tests for jacopy.calculus.exterior_d."""
 
 import pytest
 
-from gradalg.algebra.derivation import Act, Derivation, compose, degree_of
-from gradalg.algorithms.product_rule import product_rule
-from gradalg.algorithms.simplify import simplify
-from gradalg.calculus.exterior_d import (
+from jacopy.algebra.derivation import Act, Derivation, compose, degree_of
+from jacopy.algorithms.product_rule import product_rule
+from jacopy.algorithms.simplify import simplify
+from jacopy.calculus.exterior_d import (
     ExteriorDerivative,
     apply_d_squared_zero,
     d,
 )
-from gradalg.core.expr import Integer, Neg, Product, Sum, Symbol
-from gradalg.core.properties import Graded
-from gradalg.core.registry import PropertyRegistry
-from gradalg.core.symbolic_degree import Degree
+from jacopy.core.expr import Integer, Neg, Product, Sum, Symbol
+from jacopy.core.properties import Graded
+from jacopy.core.registry import PropertyRegistry
+from jacopy.core.symbolic_degree import Degree
 
 
 class TestConstruction:

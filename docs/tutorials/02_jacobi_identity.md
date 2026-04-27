@@ -1,12 +1,12 @@
 # 02 — Jacobi Özdeşliği
 
-Bu tutorial, Lie bracket üzerinde Jacobi özdeşliğinin `gradalg` içinde
+Bu tutorial, Lie bracket üzerinde Jacobi özdeşliğinin `jacopy` içinde
 nasıl bir `ProofChain` olarak kapatıldığını gösteriyor. [İlk adımlar
 tutorial'ına](01_first_steps.md) aşinalık önerilir.
 
 ## Lie bracket
 
-Modül `gradalg.brackets.lie` iki şey sağlar:
+Modül `jacopy.brackets.lie` iki şey sağlar:
 
 - `LieBracket` — isim alabilen `GradedBracket` alt sınıfı.
 - `lie` — standart ("TM") Lie bracket'in process-wide singleton'ı.
@@ -16,7 +16,7 @@ cebroid üstündeyken kendi `LieBracket(name="[·,·]_E")` instance'ınızı
 yaratırsınız.
 
 ```python
-from gradalg.brackets.lie import lie
+from jacopy.brackets.lie import lie
 ```
 
 ## Üç vector field
@@ -26,8 +26,8 @@ Jacobi için üç sembol gerekli. `VectorFields` yardımcısı her sembole
 sırasında işaret kurallarını bu dereceden türetiyor.
 
 ```python
-from gradalg import VectorFields
-from gradalg.core.registry import PropertyRegistry
+from jacopy import VectorFields
+from jacopy.core.registry import PropertyRegistry
 
 reg = PropertyRegistry()
 X, Y, Z = VectorFields("X Y Z", registry=reg)
@@ -52,7 +52,7 @@ $$[X,[Y,Z]] + [Y,[Z,X]] + [Z,[X,Y]] = 0.$$
 döndürür:
 
 ```python
-from gradalg.proof import prove_jacobi
+from jacopy.proof import prove_jacobi
 
 chain = prove_jacobi(lie, X, Y, Z, registry=reg)
 assert chain.steps[-1].after  # final state; 0 olmalı
@@ -67,14 +67,14 @@ bracket'i açıp canonical forma alır, ikincisi kalıntıyı sıfıra indirir.
 ASCII:
 
 ```python
-from gradalg.display import chain_to_ascii
+from jacopy.display import chain_to_ascii
 print(chain_to_ascii(chain))
 ```
 
 Jupyter içinde LaTeX (`align*` blokları olarak):
 
 ```python
-from gradalg.display import display_chain
+from jacopy.display import display_chain
 display_chain(chain)
 ```
 

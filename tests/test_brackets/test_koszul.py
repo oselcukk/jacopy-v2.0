@@ -2,19 +2,19 @@
 
 import pytest
 
-from gradalg.algebra.derivation import Act
-from gradalg.brackets.derived import DerivedBracket, VanishingCondition
-from gradalg.brackets.koszul import KoszulBracket
-from gradalg.brackets.schouten import sn
-from gradalg.calculus.anchor import Anchor
-from gradalg.calculus.exterior_d import d
-from gradalg.calculus.lie_derivative import lie_derivative
-from gradalg.calculus.pairing import Pairing, pairing
-from gradalg.core.expr import Neg, Sum, Symbol
-from gradalg.core.properties import Graded
-from gradalg.core.registry import PropertyRegistry
-from gradalg.core.symbolic_degree import Degree
-from gradalg.proof.verifier import prove_equivalence
+from jacopy.algebra.derivation import Act
+from jacopy.brackets.derived import DerivedBracket, VanishingCondition
+from jacopy.brackets.koszul import KoszulBracket
+from jacopy.brackets.schouten import sn
+from jacopy.calculus.anchor import Anchor
+from jacopy.calculus.exterior_d import d
+from jacopy.calculus.lie_derivative import lie_derivative
+from jacopy.calculus.pairing import Pairing, pairing
+from jacopy.core.expr import Neg, Sum, Symbol
+from jacopy.core.properties import Graded
+from jacopy.core.registry import PropertyRegistry
+from jacopy.core.symbolic_degree import Degree
+from jacopy.proof.verifier import prove_equivalence
 
 
 class TestConstruction:
@@ -27,8 +27,8 @@ class TestConstruction:
         """Any :class:`Derivation` is a valid anchor — the relaxed check
         lets the musical map ``π^♯`` stand in as the anchor on a
         Poisson manifold, which is what
-        :class:`gradalg.library.poisson.PoissonBracket` relies on."""
-        from gradalg.calculus.musical import Sharp
+        :class:`jacopy.library.poisson.PoissonBracket` relies on."""
+        from jacopy.calculus.musical import Sharp
         pi = Symbol("π")
         sh = Sharp(pi)
         K = KoszulBracket(sh)
@@ -208,7 +208,7 @@ class TestKoszulDerivedEquivalence:
         """Two brackets with distinct anchors emit distinct expansions;
         reflexive closure is not enough, so the chain's single step is
         non-reflexive (or the proof fails outright)."""
-        from gradalg.proof.verifier import ProofFailure
+        from jacopy.proof.verifier import ProofFailure
         rho1, rho2 = Anchor("ρ1"), Anchor("ρ2")
         pi = Symbol("π")
         alpha, beta = Symbol("α"), Symbol("β")
@@ -262,3 +262,63 @@ class TestJacobiCondition:
         c1 = KoszulBracket(Anchor("ρ1")).jacobi_condition(pi)
         c2 = KoszulBracket(Anchor("ρ2")).jacobi_condition(pi)
         assert c1.obstruction == c2.obstruction
+
+
+class TestProveJacobiReduction:
+    def _setup(self):
+        from jacopy.calculus.musical import Sharp
+        reg = PropertyRegistry()
+        pi = Symbol("π"); reg.declare(pi, Graded(degree=1))
+        alpha = Symbol("α"); reg.declare(alpha, Graded(degree=1))
+        beta = Symbol("β"); reg.declare(beta, Graded(degree=1))
+        gamma = Symbol("γ"); reg.declare(gamma, Graded(degree=1))
+        K = KoszulBracket(Sharp(pi))
+        return K, pi, alpha, beta, gamma, reg
+
+    def test_returns_proof_chain(self):
+        from jacopy.proof.chain import ProofChain
+        K, pi, a, b, g, reg = self._setup()
+        chain = K.prove_jacobi_reduction(a, b, g, bivector=pi, registry=reg)
+        assert isinstance(chain, ProofChain)
+
+    def test_chain_is_non_empty(self):
+        K, pi, a, b, g, reg = self._setup()
+        chain = K.prove_jacobi_reduction(a, b, g, bivector=pi, registry=reg)
+        assert len(chain) >= 1
+
+    def test_first_step_cites_derived_bracket_theorem(self):
+        K, pi, a, b, g, reg = self._setup()
+        chain = K.prove_jacobi_reduction(a, b, g, bivector=pi, registry=reg)
+        first = chain.steps[0]
+        assert first.rule == "DerivedBracketTheorem"
+        assert first.provenance_tag == "theorem"
+
+    def test_terminal_obstruction_is_sn_self_bracket(self):
+        """Final expression in the chain is ``[π, π]_SN`` — the same
+        universal obstruction the typed condition wraps."""
+        K, pi, a, b, g, reg = self._setup()
+        chain = K.prove_jacobi_reduction(a, b, g, bivector=pi, registry=reg)
+        expected = K.jacobi_condition(pi, registry=reg).obstruction
+        assert chain.final == expected
+
+    def test_matches_poisson_bracket_view(self):
+        """KoszulBracket.prove_jacobi_reduction with anchor=Sharp(π)
+        produces the same terminal obstruction as PoissonBracket's
+        Koszul-view reduction — one Poisson hypothesis closes both."""
+        from jacopy.library.poisson import PoissonBracket
+        K, pi, a, b, g, reg = self._setup()
+        chain_K = K.prove_jacobi_reduction(a, b, g, bivector=pi, registry=reg)
+        chain_P = PoissonBracket.from_bivector(pi).prove_koszul_jacobi_reduction(
+            a, b, g, registry=reg,
+        )
+        assert chain_K.final == chain_P.final
+
+    def test_rejects_non_expr_operands(self):
+        K, pi, _, b, g, reg = self._setup()
+        with pytest.raises(TypeError):
+            K.prove_jacobi_reduction("α", b, g, bivector=pi, registry=reg)  # type: ignore[arg-type]
+
+    def test_rejects_non_expr_bivector(self):
+        K, _, a, b, g, reg = self._setup()
+        with pytest.raises(TypeError):
+            K.prove_jacobi_reduction(a, b, g, bivector="π", registry=reg)  # type: ignore[arg-type]

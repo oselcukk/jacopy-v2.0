@@ -2,16 +2,16 @@
 
 import pytest
 
-from gradalg.algebra.derivation import Act
-from gradalg.brackets.courant import CourantBracket
-from gradalg.brackets.derived import VanishingCondition
-from gradalg.brackets.dorfman import SectionPair
-from gradalg.brackets.lie import LieBracket
-from gradalg.calculus.exterior_d import d
-from gradalg.calculus.interior import interior
-from gradalg.calculus.lie_derivative import lie_derivative
-from gradalg.core.expr import Integer, Neg, Product, Rational, Sum, Symbol, Zero
-from gradalg.core.symbolic_degree import Degree
+from jacopy.algebra.derivation import Act
+from jacopy.brackets.courant import CourantBracket
+from jacopy.brackets.derived import VanishingCondition
+from jacopy.brackets.dorfman import SectionPair
+from jacopy.brackets.lie import LieBracket
+from jacopy.calculus.exterior_d import d
+from jacopy.calculus.interior import interior
+from jacopy.calculus.lie_derivative import lie_derivative
+from jacopy.core.expr import Integer, Neg, Product, Rational, Sum, Symbol, Zero
+from jacopy.core.symbolic_degree import Degree
 
 
 # --------------------------------------------------------------------- #

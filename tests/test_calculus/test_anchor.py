@@ -1,15 +1,15 @@
-"""Tests for gradalg.calculus.anchor."""
+"""Tests for jacopy.calculus.anchor."""
 
 import pytest
 
-from gradalg.algebra.derivation import Act, Derivation, degree_of
-from gradalg.algorithms.simplify import simplify
-from gradalg.brackets.lie import LieBracket, lie
-from gradalg.calculus.anchor import Anchor, bracket_compatibility_obstruction
-from gradalg.core.expr import Integer, Neg, Product, Sum, Symbol
-from gradalg.core.properties import Graded
-from gradalg.core.registry import PropertyRegistry
-from gradalg.core.symbolic_degree import Degree
+from jacopy.algebra.derivation import Act, Derivation, degree_of
+from jacopy.algorithms.simplify import simplify
+from jacopy.brackets.lie import LieBracket, lie
+from jacopy.calculus.anchor import Anchor, bracket_compatibility_obstruction
+from jacopy.core.expr import Integer, Neg, Product, Sum, Symbol
+from jacopy.core.properties import Graded
+from jacopy.core.registry import PropertyRegistry
+from jacopy.core.symbolic_degree import Degree
 
 
 class TestConstruction:

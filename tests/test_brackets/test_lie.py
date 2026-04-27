@@ -1,14 +1,14 @@
-"""Tests for gradalg.brackets.lie."""
+"""Tests for jacopy.brackets.lie."""
 
 import pytest
 
-from gradalg.algorithms.collect_terms import collect_terms
-from gradalg.algorithms.simplify import simplify
-from gradalg.brackets.base import BracketApply
-from gradalg.brackets.lie import LieBracket, lie
-from gradalg.core.expr import Integer, Neg, Product, Sum, Symbol
-from gradalg.core.properties import Graded
-from gradalg.core.registry import PropertyRegistry
+from jacopy.algorithms.collect_terms import collect_terms
+from jacopy.algorithms.simplify import simplify
+from jacopy.brackets.base import BracketApply
+from jacopy.brackets.lie import LieBracket, lie
+from jacopy.core.expr import Integer, Neg, Product, Sum, Symbol
+from jacopy.core.properties import Graded
+from jacopy.core.registry import PropertyRegistry
 
 
 def _expand_all_brackets(e, registry):

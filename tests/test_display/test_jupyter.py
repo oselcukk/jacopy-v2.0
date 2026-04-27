@@ -1,12 +1,12 @@
-"""Tests for ``gradalg.display.jupyter``."""
+"""Tests for ``jacopy.display.jupyter``."""
 
 from __future__ import annotations
 
 import pytest
 
-from gradalg.algebra.derivation import Derivation
-from gradalg.core.expr import Symbol
-from gradalg.display.jupyter import (
+from jacopy.algebra.derivation import Derivation
+from jacopy.core.expr import Symbol
+from jacopy.display.jupyter import (
     HtmlProofDisplay,
     LatexDisplay,
     display_chain,
@@ -16,8 +16,8 @@ from gradalg.display.jupyter import (
     display_step,
     display_step_collapsible,
 )
-from gradalg.proof.chain import ProofChain
-from gradalg.proof.step import ProofStep
+from jacopy.proof.chain import ProofChain
+from jacopy.proof.step import ProofStep
 
 
 # --------------------------------------------------------------------- #
@@ -43,7 +43,7 @@ class TestLatexDisplay:
     def test_html_uses_mathjax_delimiters(self):
         ld = LatexDisplay("X + Y")
         html = ld._repr_html_()
-        assert "gradalg-latex" in html
+        assert "jacopy-latex" in html
         assert "\\(X + Y\\)" in html
 
     def test_html_environment_passes_raw(self):
@@ -122,14 +122,14 @@ class TestDisplayExpr:
 
 
 class TestDisplayStep:
-    def test_wraps_in_align_environment(self):
+    def test_wraps_in_gather_environment(self):
         step = ProofStep(Symbol("X"), Symbol("Y"), rule="demo")
         out = display_step(step)
         assert isinstance(out, LatexDisplay)
         assert out.environment is True
-        assert out.latex.startswith(r"\begin{align*}")
-        assert out.latex.endswith(r"\end{align*}")
-        assert r"X &\to Y" in out.latex
+        assert out.latex.startswith(r"\begin{gather*}")
+        assert out.latex.endswith(r"\end{gather*}")
+        assert r"X \to Y" in out.latex
 
     def test_repr_latex_is_raw_environment(self):
         step = ProofStep(Symbol("X"), Symbol("Y"), rule="demo")
@@ -159,9 +159,9 @@ class TestDisplayChain:
         s1 = ProofStep(Symbol("X"), Symbol("Y"), rule="r1")
         s2 = ProofStep(Symbol("Y"), Symbol("Z"), rule="r2")
         out = display_chain(ProofChain([s1, s2]))
-        assert out.latex.startswith(r"\begin{align*}")
-        assert r"X &\to Y" in out.latex
-        assert r"Y &\to Z" in out.latex
+        assert r"\begin{gather*}" in out.latex
+        assert r"X \to Y" in out.latex
+        assert r"Y \to Z" in out.latex
 
     def test_display_proof_is_alias(self):
         assert display_proof is display_chain
@@ -195,9 +195,9 @@ class TestIntegration:
         s = ProofStep(Symbol("X"), Symbol("Y"), rule="r")
         out = display_chain(ProofChain([s]))
         bundle = out._repr_mimebundle_()
-        assert r"\begin{align*}" in bundle["text/latex"]
-        assert r"\begin{align*}" in bundle["text/html"]
-        assert r"\begin{align*}" in bundle["text/plain"]
+        assert r"\begin{gather*}" in bundle["text/latex"]
+        assert r"\begin{gather*}" in bundle["text/html"]
+        assert r"\begin{gather*}" in bundle["text/plain"]
 
 
 # --------------------------------------------------------------------- #
@@ -249,7 +249,7 @@ class TestDisplayStepCollapsible:
         out = display_step_collapsible(step)
         assert isinstance(out, HtmlProofDisplay)
         html = out.html
-        assert '<div class="gradalg-step">' in html
+        assert '<div class="jacopy-step">' in html
         assert "<details" not in html
         assert "[demo]" in html
 
@@ -259,7 +259,7 @@ class TestDisplayStepCollapsible:
             Symbol("X"), Symbol("Y"), rule="outer", children=[child]
         )
         html = display_step_collapsible(parent).html
-        assert '<details open class="gradalg-step">' in html
+        assert '<details open class="jacopy-step">' in html
         assert "<summary>" in html
         assert "[outer]" in html
         assert "[sub]" in html
@@ -333,7 +333,7 @@ class TestDisplayChainCollapsible:
         s1 = ProofStep(Symbol("X"), Symbol("Y"), rule="r1")
         s2 = ProofStep(Symbol("Y"), Symbol("Z"), rule="r2")
         html = display_chain_collapsible(ProofChain([s1, s2])).html
-        assert 'class="gradalg-proof-header"' in html
+        assert 'class="jacopy-proof-header"' in html
         assert "Proof (2 steps)" in html
         assert "[r1]" in html
         assert "[r2]" in html
@@ -343,7 +343,7 @@ class TestDisplayChainCollapsible:
         html = display_chain_collapsible(
             ProofChain([s1]), title=False
         ).html
-        assert "gradalg-proof-header" not in html
+        assert "jacopy-proof-header" not in html
         assert "[r1]" in html
 
     def test_nested_children_are_expandable(self):
@@ -352,8 +352,8 @@ class TestDisplayChainCollapsible:
             Symbol("X"), Symbol("Y"), rule="outer", children=[child]
         )
         html = display_chain_collapsible(ProofChain([parent])).html
-        assert '<details open class="gradalg-step">' in html
-        assert '<div class="gradalg-children">' in html
+        assert '<details open class="jacopy-step">' in html
+        assert '<div class="jacopy-children">' in html
         assert "[outer]" in html
         assert "[sub]" in html
 

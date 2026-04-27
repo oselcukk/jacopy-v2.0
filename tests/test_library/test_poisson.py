@@ -1,29 +1,29 @@
-"""Tests for ``gradalg.library.poisson``."""
+"""Tests for ``jacopy.library.poisson``."""
 
 from __future__ import annotations
 
 import pytest
 
-from gradalg.algebra.derivation import Act
-from gradalg.brackets.base import BracketApply
-from gradalg.brackets.derived import DerivedBracket, VanishingCondition
-from gradalg.brackets.koszul import KoszulBracket
-from gradalg.brackets.schouten import sn
-from gradalg.calculus.hamiltonian_vf import HamiltonianVectorField
-from gradalg.calculus.musical import Sharp
-from gradalg.core.expr import Sum, Symbol
-from gradalg.core.properties import Graded
-from gradalg.core.registry import PropertyRegistry
-from gradalg.core.symbolic_degree import Degree
-from gradalg.library import theorem_book
-from gradalg.library.poisson import (
+from jacopy.algebra.derivation import Act
+from jacopy.brackets.base import BracketApply
+from jacopy.brackets.derived import DerivedBracket, VanishingCondition
+from jacopy.brackets.koszul import KoszulBracket
+from jacopy.brackets.schouten import sn
+from jacopy.calculus.hamiltonian_vf import HamiltonianVectorField
+from jacopy.calculus.musical import Sharp
+from jacopy.core.expr import Sum, Symbol
+from jacopy.core.properties import Graded
+from jacopy.core.registry import PropertyRegistry
+from jacopy.core.symbolic_degree import Degree
+from jacopy.library import theorem_book
+from jacopy.library.poisson import (
     THEOREM_POISSON_JACOBI,
     THEOREM_POISSON_KOSZUL_EQUIVALENCE,
     THEOREM_POISSON_KOSZUL_JACOBI,
     PoissonBracket,
     poisson_bracket,
 )
-from gradalg.proof.chain import ProofChain
+from jacopy.proof.chain import ProofChain
 
 
 # --------------------------------------------------------------------- #
@@ -131,6 +131,70 @@ class TestViews:
         with pytest.raises(TypeError, match="Expr"):
             P.via_hamiltonian("f", Symbol("g"))  # type: ignore[arg-type]
 
+    def test_bivector_eval_shape(self):
+        """``{f, g}_π = π(df, dg)`` — alternating covector MultiEval."""
+        from jacopy.calculus.exterior_d import d as default_d
+        from jacopy.core.multi_eval import MultiEval
+
+        pi = Symbol("π")
+        f, g = Symbol("f"), Symbol("g")
+        P = PoissonBracket(pi)
+        out = P.bivector_eval(f, g)
+        assert isinstance(out, MultiEval)
+        assert out.head is pi
+        assert out.alternating is True
+        assert out.slot_kind == "covector"
+        assert out.args == (Act(default_d, f), Act(default_d, g))
+
+    def test_bivector_eval_repeat_collapses_under_engine(self):
+        """``π(df, df) → 0`` via the alternating repeat-arg rule."""
+        from jacopy.calculus.multi_eval_axioms import (
+            MultiEvalRepeatArgZeroDefinition,
+        )
+        from jacopy.core.expr import Integer
+        from jacopy.proof.expansion import ExpansionEngine
+
+        pi = Symbol("π")
+        f = Symbol("f")
+        P = PoissonBracket(pi)
+        engine = ExpansionEngine([MultiEvalRepeatArgZeroDefinition()])
+        out, _ = engine.expand(P.bivector_eval(f, f))
+        assert out == Integer(0)
+
+    def test_bivector_eval_swap_introduces_sign(self):
+        """``π(dg, df) → -π(df, dg)`` via the alternating canonicaliser."""
+        from jacopy.calculus.multi_eval_axioms import (
+            MultiEvalAlternatingNormalDefinition,
+        )
+        from jacopy.core.expr import Neg
+        from jacopy.proof.expansion import ExpansionEngine
+
+        pi = Symbol("π")
+        f, g = Symbol("f"), Symbol("g")
+        P = PoissonBracket(pi)
+        engine = ExpansionEngine([MultiEvalAlternatingNormalDefinition()])
+        # repr("d(g)") > repr("d(f)") so {g, f} is out-of-order and
+        # the rule swaps it.
+        out, _ = engine.expand(P.bivector_eval(g, f))
+        assert out == Neg(P.bivector_eval(f, g))
+
+    def test_bivector_eval_uses_d_override(self):
+        from jacopy.calculus.exterior_d import ExteriorDerivative
+        from jacopy.core.multi_eval import MultiEval
+
+        pi = Symbol("π")
+        f, g = Symbol("f"), Symbol("g")
+        d_E = ExteriorDerivative(name="d_E")
+        P = PoissonBracket(pi)
+        out = P.bivector_eval(f, g, d=d_E)
+        assert isinstance(out, MultiEval)
+        assert out.args == (Act(d_E, f), Act(d_E, g))
+
+    def test_bivector_eval_rejects_non_expr(self):
+        P = PoissonBracket(Symbol("π"))
+        with pytest.raises(TypeError, match="Expr"):
+            P.bivector_eval("f", Symbol("g"))  # type: ignore[arg-type]
+
 
 # --------------------------------------------------------------------- #
 # Jacobi                                                                 #
@@ -186,7 +250,7 @@ class TestJacobi:
 
 class TestSeededTheorem:
     def test_theorem_registered(self):
-        """Importing :mod:`gradalg.library.poisson` seeds
+        """Importing :mod:`jacopy.library.poisson` seeds
         ``poisson_jacobi`` into the package-wide theorem book."""
         assert "poisson_jacobi" in theorem_book
         assert theorem_book.get("poisson_jacobi") is THEOREM_POISSON_JACOBI

@@ -1,22 +1,22 @@
-"""Tests for ``gradalg.library.twisted_cartan``."""
+"""Tests for ``jacopy.library.twisted_cartan``."""
 
 from __future__ import annotations
 
 import pytest
 
-from gradalg.algebra.derivation import Derivation
-from gradalg.brackets.base import GradedBracket
-from gradalg.brackets.lie import LieBracket, lie
-from gradalg.calculus.cartan import RELATIONS, CartanCalculus
-from gradalg.calculus.exterior_algebra import ExteriorAlgebra
-from gradalg.calculus.exterior_d import ExteriorDerivative
-from gradalg.calculus.interior import InteriorProduct
-from gradalg.calculus.lie_derivative import LieDerivative
-from gradalg.core.expr import Symbol
-from gradalg.core.properties import Graded
-from gradalg.core.registry import PropertyRegistry
-from gradalg.library import TwistedCartanBundle, twisted_cartan_bundle
-from gradalg.proof.chain import ProofChain
+from jacopy.algebra.derivation import Derivation
+from jacopy.brackets.base import GradedBracket
+from jacopy.brackets.lie import LieBracket, lie
+from jacopy.calculus.cartan import RELATIONS, CartanCalculus
+from jacopy.calculus.exterior_algebra import ExteriorAlgebra
+from jacopy.calculus.exterior_d import ExteriorDerivative
+from jacopy.calculus.interior import InteriorProduct
+from jacopy.calculus.lie_derivative import LieDerivative
+from jacopy.core.expr import Symbol
+from jacopy.core.properties import Graded
+from jacopy.core.registry import PropertyRegistry
+from jacopy.library import TwistedCartanBundle, twisted_cartan_bundle
+from jacopy.proof.chain import ProofChain
 
 
 # --------------------------------------------------------------------- #
@@ -213,10 +213,10 @@ class TestIsolation:
         """A twisted ``d_H`` is a separate instance from the TM default,
         so the TM-pinned ``DSquaredZeroDefinition(target=d)`` does not fire
         on ``d_H²`` — the twisted bundle brings its own pin."""
-        from gradalg.algebra.derivation import Act
-        from gradalg.core.expr import Symbol as S
-        from gradalg.proof.expansion import DSquaredZeroDefinition
-        from gradalg.calculus.exterior_d import d as default_d
+        from jacopy.algebra.derivation import Act
+        from jacopy.core.expr import Symbol as S
+        from jacopy.proof.expansion import DSquaredZeroDefinition
+        from jacopy.calculus.exterior_d import d as default_d
 
         f = S("f")
         tm_rule = DSquaredZeroDefinition(target=default_d)

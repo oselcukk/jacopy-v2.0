@@ -1,19 +1,19 @@
-"""Tests for gradalg.calculus.lie_derivative."""
+"""Tests for jacopy.calculus.lie_derivative."""
 
 import pytest
 
-from gradalg.algebra.derivation import Act, Derivation, compose, degree_of
-from gradalg.calculus.exterior_d import ExteriorDerivative, d
-from gradalg.calculus.interior import InteriorProduct, interior
-from gradalg.calculus.lie_derivative import (
+from jacopy.algebra.derivation import Act, Derivation, compose, degree_of
+from jacopy.calculus.exterior_d import ExteriorDerivative, d
+from jacopy.calculus.interior import InteriorProduct, interior
+from jacopy.calculus.lie_derivative import (
     DEFINITIONS,
     LieDerivative,
     cartan_expansion,
     cartan_obstruction,
     lie_derivative,
 )
-from gradalg.core.expr import Neg, Product, Sum, Symbol
-from gradalg.core.symbolic_degree import Degree
+from jacopy.core.expr import Neg, Product, Sum, Symbol
+from jacopy.core.symbolic_degree import Degree
 
 
 class TestConstruction:

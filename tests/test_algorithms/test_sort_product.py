@@ -1,18 +1,18 @@
-"""Tests for gradalg.algorithms.sort_product."""
+"""Tests for jacopy.algorithms.sort_product."""
 
 import pytest
 
-from gradalg.algorithms.sort_product import apply_sign, sort_product
-from gradalg.core.expr import Neg, Product, Symbol
-from gradalg.core.properties import (
+from jacopy.algorithms.sort_product import apply_sign, sort_product
+from jacopy.core.expr import Neg, Product, Symbol
+from jacopy.core.properties import (
     AntiCommuting,
     Graded,
     GradedCommutative,
     NonCommuting,
     Scalar,
 )
-from gradalg.core.registry import PropertyRegistry
-from gradalg.core.symbolic_degree import Degree
+from jacopy.core.registry import PropertyRegistry
+from jacopy.core.symbolic_degree import Degree
 
 
 # --------------------------------------------------------------------- #

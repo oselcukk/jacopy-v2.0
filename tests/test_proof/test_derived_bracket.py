@@ -1,13 +1,13 @@
-"""Tests for gradalg.proof.strategies.DerivedBracketStrategy."""
+"""Tests for jacopy.proof.strategies.DerivedBracketStrategy."""
 
 import pytest
 
-from gradalg.brackets.derived import DerivedBracket
-from gradalg.brackets.lie import LieBracket
-from gradalg.core.expr import Integer, Symbol
-from gradalg.core.properties import Graded
-from gradalg.core.registry import PropertyRegistry
-from gradalg.proof.strategies import (
+from jacopy.brackets.derived import DerivedBracket
+from jacopy.brackets.lie import LieBracket
+from jacopy.core.expr import Integer, Symbol
+from jacopy.core.properties import Graded
+from jacopy.core.registry import PropertyRegistry
+from jacopy.proof.strategies import (
     DerivedBracketStrategy,
     ProofFailure,
 )

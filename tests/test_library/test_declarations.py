@@ -1,12 +1,12 @@
-"""Tests for :mod:`gradalg.library.declarations` tutorial helpers."""
+"""Tests for :mod:`jacopy.library.declarations` tutorial helpers."""
 
 from __future__ import annotations
 
 import pytest
 
-from gradalg.core.properties import Graded
-from gradalg.core.registry import PropertyRegistry
-from gradalg.library.declarations import (
+from jacopy.core.properties import Graded
+from jacopy.core.registry import PropertyRegistry
+from jacopy.library.declarations import (
     Bivector,
     Forms,
     Functions,
@@ -65,9 +65,9 @@ class TestVectorFields:
 
     def test_integrates_with_prove_jacobi(self) -> None:
         """Jacobi proof should close on symbols declared via the helper."""
-        from gradalg.brackets.lie import lie
-        from gradalg.core.expr import Integer
-        from gradalg.proof import prove_jacobi
+        from jacopy.brackets.lie import lie
+        from jacopy.core.expr import Integer
+        from jacopy.proof import prove_jacobi
 
         reg = PropertyRegistry()
         X, Y, Z = VectorFields("X Y Z", registry=reg)

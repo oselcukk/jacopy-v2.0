@@ -2,20 +2,23 @@
 
 import pytest
 
-from gradalg.algebra.derivation import Act, Derivation
-from gradalg.calculus.interior import interior
-from gradalg.calculus.musical import (
+from jacopy.algebra.derivation import Act, Derivation
+from jacopy.calculus.interior import interior
+from jacopy.calculus.musical import (
     ArgNegLinearityDefinition,
     Flat,
     IotaFlatDefinition,
     MusicalCompatibility,
+    MusicalCompatibilityBilinearDefinition,
     MusicalCompatibilityDefinition,
     Sharp,
     flat,
     sharp,
 )
-from gradalg.core.expr import Integer, Neg, Symbol
-from gradalg.core.symbolic_degree import Degree
+from jacopy.core.expr import Integer, Neg, Symbol
+from jacopy.core.multi_eval import multi_eval
+from jacopy.core.symbolic_degree import Degree
+from jacopy.proof.expansion import ExpansionEngine
 
 
 # --------------------------------------------------------------------- #
@@ -110,15 +113,16 @@ class TestMusicalCompatibility:
         with pytest.raises(Exception):
             compat.omega = Symbol("ω2")  # type: ignore[misc]
 
-    def test_musical_definitions_triplet(self):
+    def test_musical_definitions_quartet(self):
         compat = MusicalCompatibility.between(Symbol("ω"), Symbol("π"))
         defs = compat.musical_definitions()
-        assert len(defs) == 3
+        assert len(defs) == 4
         kinds = {type(d).__name__ for d in defs}
         assert kinds == {
             "IotaFlatDefinition",
             "ArgNegLinearityDefinition",
             "MusicalCompatibilityDefinition",
+            "MusicalCompatibilityBilinearDefinition",
         }
 
     def test_as_definition_returns_singleton_rule(self):
@@ -216,3 +220,136 @@ class TestArgNegLinearityDefinition:
         rule = ArgNegLinearityDefinition()
         expr = Act(Symbol("op"), Neg(Symbol("x")))
         assert not rule.matches(expr)
+
+
+# --------------------------------------------------------------------- #
+# Musical bilinear — ω(π♯α, π♯β) = π(α, β)                                #
+# --------------------------------------------------------------------- #
+
+
+class TestMusicalCompatibilityBilinear:
+    def _compat(self):
+        omega = Symbol("ω")
+        pi = Symbol("π")
+        return MusicalCompatibility.between(omega, pi)
+
+    def test_matches_paired_sharp_args(self):
+        compat = self._compat()
+        rule = MusicalCompatibilityBilinearDefinition(compat)
+        alpha, beta = Symbol("α"), Symbol("β")
+        expr = multi_eval(
+            compat.omega,
+            Act(compat.sharp, alpha),
+            Act(compat.sharp, beta),
+        )
+        assert rule.matches(expr)
+
+    def test_no_match_wrong_outer_form(self):
+        compat = self._compat()
+        rule = MusicalCompatibilityBilinearDefinition(compat)
+        other = Symbol("ω₂")
+        alpha, beta = Symbol("α"), Symbol("β")
+        expr = multi_eval(
+            other,
+            Act(compat.sharp, alpha),
+            Act(compat.sharp, beta),
+        )
+        assert not rule.matches(expr)
+
+    def test_no_match_wrong_sharp_op(self):
+        compat = self._compat()
+        rule = MusicalCompatibilityBilinearDefinition(compat)
+        other_sharp = Sharp(Symbol("π'"))
+        alpha, beta = Symbol("α"), Symbol("β")
+        expr = multi_eval(
+            compat.omega,
+            Act(compat.sharp, alpha),
+            Act(other_sharp, beta),
+        )
+        assert not rule.matches(expr)
+
+    def test_no_match_arity_three(self):
+        compat = self._compat()
+        rule = MusicalCompatibilityBilinearDefinition(compat)
+        alpha, beta, gamma = Symbol("α"), Symbol("β"), Symbol("γ")
+        expr = multi_eval(
+            compat.omega,
+            Act(compat.sharp, alpha),
+            Act(compat.sharp, beta),
+            Act(compat.sharp, gamma),
+        )
+        assert not rule.matches(expr)
+
+    def test_no_match_when_arg_is_not_act(self):
+        compat = self._compat()
+        rule = MusicalCompatibilityBilinearDefinition(compat)
+        alpha = Symbol("α")
+        X = Symbol("X")  # bare VF — not Act(sharp, _)
+        expr = multi_eval(compat.omega, Act(compat.sharp, alpha), X)
+        assert not rule.matches(expr)
+
+    def test_no_match_covector_slot_kind(self):
+        # The bilinear identity is a vector-slot statement; covector-
+        # slot arguments would mean a different evaluation contract.
+        compat = self._compat()
+        rule = MusicalCompatibilityBilinearDefinition(compat)
+        alpha, beta = Symbol("α"), Symbol("β")
+        expr = multi_eval(
+            compat.omega,
+            Act(compat.sharp, alpha),
+            Act(compat.sharp, beta),
+            slot_kind="covector",
+        )
+        assert not rule.matches(expr)
+
+    def test_rewrite_to_pi_on_covectors(self):
+        compat = self._compat()
+        rule = MusicalCompatibilityBilinearDefinition(compat)
+        alpha, beta = Symbol("α"), Symbol("β")
+        expr = multi_eval(
+            compat.omega,
+            Act(compat.sharp, alpha),
+            Act(compat.sharp, beta),
+        )
+        out = rule.rewrite(expr)
+        assert out == multi_eval(
+            compat.pi, alpha, beta, slot_kind="covector"
+        )
+
+    def test_rewrite_preserves_alternating_flag(self):
+        compat = self._compat()
+        rule = MusicalCompatibilityBilinearDefinition(compat)
+        alpha, beta = Symbol("α"), Symbol("β")
+        expr = multi_eval(
+            compat.omega,
+            Act(compat.sharp, alpha),
+            Act(compat.sharp, beta),
+            alternating=False,
+        )
+        out = rule.rewrite(expr)
+        assert out.alternating is False
+        assert out.slot_kind == "covector"
+
+    def test_engine_rewrites(self):
+        compat = self._compat()
+        engine = ExpansionEngine(
+            [MusicalCompatibilityBilinearDefinition(compat)]
+        )
+        alpha, beta = Symbol("α"), Symbol("β")
+        expr = multi_eval(
+            compat.omega,
+            Act(compat.sharp, alpha),
+            Act(compat.sharp, beta),
+        )
+        out, steps = engine.expand(expr)
+        assert out == multi_eval(
+            compat.pi, alpha, beta, slot_kind="covector"
+        )
+        assert len(steps) == 1
+
+    def test_compatibility_bundles_bilinear_in_definitions(self):
+        compat = self._compat()
+        defs = compat.musical_definitions()
+        assert any(
+            isinstance(d, MusicalCompatibilityBilinearDefinition) for d in defs
+        )

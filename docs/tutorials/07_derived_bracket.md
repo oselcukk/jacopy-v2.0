@@ -15,11 +15,11 @@ otomatik inşa ediliyor — siz yalnızca `(base, Q)`'yu seçiyorsunuz.
 ## İnşa — `{a, b}_Q := [[a, Q]_base, b]_base`
 
 ```python
-from gradalg.brackets.derived import DerivedBracket, derived_bracket
-from gradalg.brackets.lie import LieBracket
-from gradalg.core.expr import Symbol
-from gradalg.core.properties import Graded
-from gradalg.core.registry import PropertyRegistry
+from jacopy.brackets.derived import DerivedBracket, derived_bracket
+from jacopy.brackets.lie import LieBracket
+from jacopy.core.expr import Symbol
+from jacopy.core.properties import Graded
+from jacopy.core.registry import PropertyRegistry
 
 reg = PropertyRegistry()
 Q = Symbol("Q")
@@ -99,7 +99,7 @@ d.jacobi_condition(reg).holds(reg)   # True
 
 ## `prove_jacobi` — DerivedBracketStrategy dispatch'i
 
-`gradalg.proof.verifier.prove_jacobi` bracket'in tipine göre yol
+`jacopy.proof.verifier.prove_jacobi` bracket'in tipine göre yol
 seçer. Bir `DerivedBracket` için otomatik olarak
 `DerivedBracketStrategy`'ye gider — üç adımlık zincir:
 
@@ -110,7 +110,7 @@ seçer. Bir `DerivedBracket` için otomatik olarak
 3. `simplify`: canonical formda sıfıra iner.
 
 ```python
-from gradalg.proof.verifier import prove_jacobi
+from jacopy.proof.verifier import prove_jacobi
 
 a, b, c = Symbol("a"), Symbol("b"), Symbol("c")
 for s in (a, b, c):
@@ -138,10 +138,10 @@ bir anchor `ρ`) ile ele alınmasıyla — bire bir çıkar.
 formunu emit eder:
 
 ```python
-from gradalg.brackets.derived import DerivedBracket
-from gradalg.brackets.koszul import KoszulBracket
-from gradalg.brackets.schouten import sn
-from gradalg.calculus.anchor import Anchor
+from jacopy.brackets.derived import DerivedBracket
+from jacopy.brackets.koszul import KoszulBracket
+from jacopy.brackets.schouten import sn
+from jacopy.calculus.anchor import Anchor
 
 reg = PropertyRegistry()
 pi = Symbol("π")
@@ -178,14 +178,14 @@ bracket'in derived inşasıdır. Generic dispatcher üstünden
 `ProofFailure` olarak yüzeyleşir — bu dürüst matematiksel teşhistir:
 Poisson hipotezi `[π, π]_SN = 0` generic bir simplify kuralı değildir,
 explicit varsayım olarak taşınmalıdır. Üretim kullanımı için
-`gradalg.library.poisson.PoissonBracket` wrapper'ı tercih edilir —
+`jacopy.library.poisson.PoissonBracket` wrapper'ı tercih edilir —
 seeded theorem `poisson_jacobi`'yi tek adımlık citation olarak
 verir:
 
 ```python
-from gradalg.library import theorem_book
-from gradalg.library.declarations import Bivector, Functions
-from gradalg.library.poisson import PoissonBracket
+from jacopy.library import theorem_book
+from jacopy.library.declarations import Bivector, Functions
+from jacopy.library.poisson import PoissonBracket
 
 reg = PropertyRegistry()
 pi = Bivector("π", registry=reg)
@@ -214,7 +214,7 @@ ancak `dH = 0`'sa tutar. `CourantBracket(background_H=H)`
 `jacobi_condition` üstünden bu koşulu doğrudan verir:
 
 ```python
-from gradalg.brackets.courant import CourantBracket
+from jacopy.brackets.courant import CourantBracket
 
 reg = PropertyRegistry()
 H = Symbol("H")

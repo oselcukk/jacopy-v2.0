@@ -1,13 +1,13 @@
-"""Tests for gradalg.proof.strategies."""
+"""Tests for jacopy.proof.strategies."""
 
 import pytest
 
-from gradalg.algebra.derivation import Act, compose
-from gradalg.calculus.exterior_d import d
-from gradalg.calculus.interior import interior
-from gradalg.calculus.lie_derivative import lie_derivative
-from gradalg.core.expr import Integer, Sum, Symbol
-from gradalg.proof.strategies import (
+from jacopy.algebra.derivation import Act, compose
+from jacopy.calculus.exterior_d import d
+from jacopy.calculus.interior import interior
+from jacopy.calculus.lie_derivative import lie_derivative
+from jacopy.core.expr import Integer, Sum, Symbol
+from jacopy.proof.strategies import (
     ExpandAndSimplify,
     ProofFailure,
 )

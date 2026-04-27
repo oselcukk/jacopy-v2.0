@@ -2,21 +2,21 @@
 
 import pytest
 
-from gradalg.algebra.derivation import Act, Derivation
-from gradalg.brackets.base import GradedBracket
-from gradalg.brackets.lie import LieBracket, lie
-from gradalg.calculus.exterior_d import ExteriorDerivative, d as default_d
-from gradalg.calculus.interior import InteriorProduct, interior
-from gradalg.calculus.invariant_d import (
+from jacopy.algebra.derivation import Act, Derivation
+from jacopy.brackets.base import GradedBracket
+from jacopy.brackets.lie import LieBracket, lie
+from jacopy.calculus.exterior_d import ExteriorDerivative, d as default_d
+from jacopy.calculus.interior import InteriorProduct, interior
+from jacopy.calculus.invariant_d import (
     INVARIANT_D_CLASSIFICATIONS,
     InvariantDOneFormDefinition,
     invariant_d_one_form,
 )
-from gradalg.core.expr import Expr, Neg, Sum, Symbol
-from gradalg.core.properties import Graded
-from gradalg.core.registry import PropertyRegistry
-from gradalg.proof.chain import ProofChain
-from gradalg.proof.expansion import ExpansionEngine
+from jacopy.core.expr import Expr, Neg, Sum, Symbol
+from jacopy.core.properties import Graded
+from jacopy.core.registry import PropertyRegistry
+from jacopy.proof.chain import ProofChain
+from jacopy.proof.expansion import ExpansionEngine
 
 
 # --------------------------------------------------------------------- #

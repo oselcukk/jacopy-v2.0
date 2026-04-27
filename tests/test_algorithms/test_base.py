@@ -1,9 +1,9 @@
-"""Tests for gradalg.algorithms.base."""
+"""Tests for jacopy.algorithms.base."""
 
 import pytest
 
-from gradalg.algorithms.base import Algorithm, StepResult
-from gradalg.core.expr import Expr, Integer, Neg, Symbol
+from jacopy.algorithms.base import Algorithm, StepResult
+from jacopy.core.expr import Expr, Integer, Neg, Symbol
 
 
 class TestStepResult:

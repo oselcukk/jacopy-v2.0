@@ -1,13 +1,13 @@
-"""Tests for ``gradalg.library.theorem_book``."""
+"""Tests for ``jacopy.library.theorem_book``."""
 
 from __future__ import annotations
 
 import pytest
 
-from gradalg.core.expr import Symbol
-from gradalg.library import Theorem, TheoremBook, theorem_book
-from gradalg.proof.chain import ProofChain
-from gradalg.proof.step import ProofStep
+from jacopy.core.expr import Symbol
+from jacopy.library import Theorem, TheoremBook, theorem_book
+from jacopy.proof.chain import ProofChain
+from jacopy.proof.step import ProofStep
 
 
 # --------------------------------------------------------------------- #

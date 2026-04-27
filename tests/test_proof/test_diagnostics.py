@@ -9,8 +9,8 @@ from __future__ import annotations
 
 import pytest
 
-from gradalg.core.expr import Integer, Symbol
-from gradalg.proof.diagnostics import (
+from jacopy.core.expr import Integer, Symbol
+from jacopy.proof.diagnostics import (
     DiagnosticHint,
     DiagnosticReport,
     _RULES,
@@ -135,7 +135,7 @@ class TestRuleRegistry:
 
 class TestPublicAPI:
     def test_exports_on_package(self):
-        from gradalg.proof import (
+        from jacopy.proof import (
             DiagnosticHint as H,
             DiagnosticReport as R,
             diagnose as d,

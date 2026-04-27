@@ -1,18 +1,18 @@
-"""Tests for gradalg.algorithms.rewrite."""
+"""Tests for jacopy.algorithms.rewrite."""
 
 import pytest
 
-from gradalg.algorithms.rewrite import (
+from jacopy.algorithms.rewrite import (
     Rule,
     apply_bottomup,
     apply_once_at_root,
     apply_topdown,
     normalize,
 )
-from gradalg.core.expr import Integer, Neg, Product, Sum, Symbol
-from gradalg.core.properties import Scalar
-from gradalg.core.registry import PropertyRegistry
-from gradalg.core.wildcards import SeqWildcard, Wildcard
+from jacopy.core.expr import Integer, Neg, Product, Sum, Symbol
+from jacopy.core.properties import Scalar
+from jacopy.core.registry import PropertyRegistry
+from jacopy.core.wildcards import SeqWildcard, Wildcard
 
 
 # --------------------------------------------------------------------- #

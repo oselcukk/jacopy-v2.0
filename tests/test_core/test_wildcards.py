@@ -1,11 +1,11 @@
-"""Tests for gradalg.core.wildcards."""
+"""Tests for jacopy.core.wildcards."""
 
 import pytest
 
-from gradalg.core.expr import Integer, Neg, Product, Sum, Symbol, Zero
-from gradalg.core.properties import Graded, Scalar
-from gradalg.core.registry import PropertyRegistry
-from gradalg.core.wildcards import (
+from jacopy.core.expr import Integer, Neg, Product, Sum, Symbol, Zero
+from jacopy.core.properties import Graded, Scalar
+from jacopy.core.registry import PropertyRegistry
+from jacopy.core.wildcards import (
     SeqWildcard,
     Wildcard,
     match,

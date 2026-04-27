@@ -2,24 +2,28 @@
 
 import pytest
 
-from gradalg.algebra.derivation import Act, Derivation
-from gradalg.brackets.base import BracketApply
-from gradalg.brackets.derived import VanishingCondition
-from gradalg.brackets.schouten import sn
-from gradalg.calculus.exterior_d import ExteriorDerivative, d as default_d
-from gradalg.calculus.hamiltonian_vf import (
+from jacopy.algebra.derivation import Act, Derivation
+from jacopy.brackets.base import BracketApply
+from jacopy.brackets.derived import VanishingCondition
+from jacopy.brackets.schouten import sn
+from jacopy.calculus.exterior_d import ExteriorDerivative, d as default_d
+from jacopy.calculus.hamiltonian_vf import (
+    HamiltonianDefiningRelationDefinition,
     HamiltonianVectorField,
     HamiltonianVfDerivedDefinition,
     equivalence_condition,
     hamiltonian_vf,
+    register_hamiltonian_defining_relation,
 )
-from gradalg.calculus.interior import InteriorProduct
-from gradalg.calculus.musical import MusicalCompatibility
-from gradalg.core.expr import Expr, Integer, Neg, Sum, Symbol
-from gradalg.core.properties import Graded
-from gradalg.core.registry import PropertyRegistry
-from gradalg.core.symbolic_degree import Degree
-from gradalg.proof.chain import ProofChain
+from jacopy.calculus.interior import interior
+from jacopy.proof.expansion import ExpansionEngine
+from jacopy.calculus.interior import InteriorProduct
+from jacopy.calculus.musical import MusicalCompatibility
+from jacopy.core.expr import Expr, Integer, Neg, Sum, Symbol
+from jacopy.core.properties import Graded
+from jacopy.core.registry import PropertyRegistry
+from jacopy.core.symbolic_degree import Degree
+from jacopy.proof.chain import ProofChain
 
 
 # --------------------------------------------------------------------- #
@@ -359,3 +363,194 @@ class TestHamiltonianVfDerivedDefinition:
         compat = MusicalCompatibility.between(omega, pi)
         rule = HamiltonianVfDerivedDefinition(Xf, compat)
         assert not rule.matches(Xg)
+
+
+# --------------------------------------------------------------------- #
+# Sign convention flag (Faz 12.C(b))                                     #
+# --------------------------------------------------------------------- #
+
+
+class TestSignConvention:
+    def test_default_sign_minus(self):
+        Xf = hamiltonian_vf(Symbol("f"), symplectic_form=Symbol("ω"))
+        assert Xf.sign == "-"
+
+    def test_explicit_plus(self):
+        Xf = hamiltonian_vf(
+            Symbol("f"), symplectic_form=Symbol("ω"), sign="+"
+        )
+        assert Xf.sign == "+"
+
+    def test_invalid_sign_rejected(self):
+        with pytest.raises(ValueError, match="sign"):
+            hamiltonian_vf(
+                Symbol("f"), symplectic_form=Symbol("ω"), sign="?"
+            )
+
+    def test_obstruction_minus_keeps_plus_df(self):
+        f, omega = Symbol("f"), Symbol("ω")
+        Xf = hamiltonian_vf(f, symplectic_form=omega, sign="-")
+        out = Xf.symplectic_obstruction()
+        assert isinstance(out, Sum)
+        right = out.children[1]
+        assert isinstance(right, Act)
+        assert isinstance(right.op, ExteriorDerivative)
+        assert right.arg is f
+
+    def test_obstruction_plus_uses_neg_df(self):
+        f, omega = Symbol("f"), Symbol("ω")
+        Xf = hamiltonian_vf(f, symplectic_form=omega, sign="+")
+        out = Xf.symplectic_obstruction()
+        assert isinstance(out, Sum)
+        right = out.children[1]
+        assert isinstance(right, Neg)
+        inner = right.arg
+        assert isinstance(inner, Act)
+        assert isinstance(inner.op, ExteriorDerivative)
+        assert inner.arg is f
+
+    def test_derived_rule_minus_emits_neg(self):
+        f, pi, omega = Symbol("f"), Symbol("π"), Symbol("ω")
+        Xf = hamiltonian_vf(
+            f, bivector=pi, symplectic_form=omega, sign="-"
+        )
+        compat = MusicalCompatibility.between(omega, pi)
+        rule = HamiltonianVfDerivedDefinition(Xf, compat)
+        out = rule.rewrite(Xf)
+        assert isinstance(out, Neg)
+
+    def test_derived_rule_plus_omits_neg(self):
+        f, pi, omega = Symbol("f"), Symbol("π"), Symbol("ω")
+        Xf = hamiltonian_vf(
+            f, bivector=pi, symplectic_form=omega, sign="+"
+        )
+        compat = MusicalCompatibility.between(omega, pi)
+        rule = HamiltonianVfDerivedDefinition(Xf, compat)
+        out = rule.rewrite(Xf)
+        assert not isinstance(out, Neg)
+        assert isinstance(out, Act)
+
+
+# --------------------------------------------------------------------- #
+# HamiltonianDefiningRelationDefinition + register helper (Faz 12.C(c)) #
+# --------------------------------------------------------------------- #
+
+
+class TestHamiltonianDefiningRelation:
+    def test_match_default_minus_sign(self):
+        X = Derivation("X_f", degree=0)
+        f, omega = Symbol("f"), Symbol("ω")
+        rule = HamiltonianDefiningRelationDefinition(X, f, omega)
+        target = Act(interior(X), omega)
+        assert rule.matches(target)
+
+    def test_rewrite_default_minus_emits_neg_df(self):
+        X = Derivation("X_f", degree=0)
+        f, omega = Symbol("f"), Symbol("ω")
+        rule = HamiltonianDefiningRelationDefinition(X, f, omega)
+        out = rule.rewrite(Act(interior(X), omega))
+        assert isinstance(out, Neg)
+        inner = out.arg
+        assert isinstance(inner, Act)
+        assert isinstance(inner.op, ExteriorDerivative)
+        assert inner.arg is f
+
+    def test_rewrite_plus_emits_bare_df(self):
+        X = Derivation("X_f", degree=0)
+        f, omega = Symbol("f"), Symbol("ω")
+        rule = HamiltonianDefiningRelationDefinition(
+            X, f, omega, sign="+"
+        )
+        out = rule.rewrite(Act(interior(X), omega))
+        assert isinstance(out, Act)
+        assert isinstance(out.op, ExteriorDerivative)
+        assert out.arg is f
+
+    def test_match_skips_other_vf(self):
+        X = Derivation("X_f", degree=0)
+        Y = Derivation("X_g", degree=0)
+        f, omega = Symbol("f"), Symbol("ω")
+        rule = HamiltonianDefiningRelationDefinition(X, f, omega)
+        assert not rule.matches(Act(interior(Y), omega))
+
+    def test_match_skips_other_form(self):
+        X = Derivation("X_f", degree=0)
+        f, omega, eta = Symbol("f"), Symbol("ω"), Symbol("η")
+        rule = HamiltonianDefiningRelationDefinition(X, f, omega)
+        assert not rule.matches(Act(interior(X), eta))
+
+    def test_match_skips_non_act(self):
+        X = Derivation("X_f", degree=0)
+        f, omega = Symbol("f"), Symbol("ω")
+        rule = HamiltonianDefiningRelationDefinition(X, f, omega)
+        assert not rule.matches(omega)
+
+    def test_match_skips_non_iota_op(self):
+        X = Derivation("X_f", degree=0)
+        f, omega = Symbol("f"), Symbol("ω")
+        rule = HamiltonianDefiningRelationDefinition(X, f, omega)
+        # outer is d, not iota
+        assert not rule.matches(Act(default_d, omega))
+
+    def test_invalid_sign_rejected(self):
+        X = Derivation("X_f", degree=0)
+        f, omega = Symbol("f"), Symbol("ω")
+        with pytest.raises(ValueError, match="sign"):
+            HamiltonianDefiningRelationDefinition(
+                X, f, omega, sign="?"
+            )
+
+    def test_non_expr_inputs_rejected(self):
+        f, omega = Symbol("f"), Symbol("ω")
+        X = Derivation("X_f", degree=0)
+        with pytest.raises(TypeError, match="X"):
+            HamiltonianDefiningRelationDefinition("X", f, omega)  # type: ignore[arg-type]
+        with pytest.raises(TypeError, match="f"):
+            HamiltonianDefiningRelationDefinition(X, "f", omega)  # type: ignore[arg-type]
+        with pytest.raises(TypeError, match="omega"):
+            HamiltonianDefiningRelationDefinition(X, f, "ω")  # type: ignore[arg-type]
+
+    def test_register_helper_appends_rule(self):
+        X = Derivation("X_f", degree=0)
+        f, omega = Symbol("f"), Symbol("ω")
+        engine = ExpansionEngine([])
+        rule = register_hamiltonian_defining_relation(X, f, omega, engine)
+        assert rule in engine.definitions
+        assert isinstance(rule, HamiltonianDefiningRelationDefinition)
+
+    def test_register_helper_threads_sign(self):
+        X = Derivation("X_f", degree=0)
+        f, omega = Symbol("f"), Symbol("ω")
+        engine = ExpansionEngine([])
+        rule = register_hamiltonian_defining_relation(
+            X, f, omega, engine, sign="+"
+        )
+        out = rule.rewrite(Act(interior(X), omega))
+        assert not isinstance(out, Neg)
+
+    def test_engine_fires_via_default_engine(self):
+        """End-to-end: notebook 2a-style proof that L_X ω = 0."""
+        from jacopy.calculus.closed_axioms import ClosedFormDefinition
+        from jacopy.calculus.lie_derivative import lie_derivative
+        from jacopy.core.properties import Closed
+        from jacopy.proof.expansion import default_engine
+        from jacopy.proof.strategies import ExpandAndSimplify
+
+        reg = PropertyRegistry()
+        f = Symbol("f")
+        omega = Symbol("ω")
+        X = Derivation("X_f", degree=0)
+        reg.declare(f, Graded(degree=0))
+        reg.declare(omega, Graded(degree=2))
+        reg.declare(omega, Closed())
+        engine = default_engine(registry=reg, d_squared_mode="axiom")
+        engine.register(ClosedFormDefinition(registry=reg))
+        register_hamiltonian_defining_relation(
+            X, f, omega, engine, sign="+"
+        )
+        L_X = lie_derivative(X)
+        chain = ExpandAndSimplify().prove(
+            Act(L_X, omega), Integer(0), registry=reg, engine=engine
+        )
+        assert chain.final == Integer(0)
+        assert len(chain) > 0

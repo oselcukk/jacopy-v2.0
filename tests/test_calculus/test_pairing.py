@@ -2,10 +2,10 @@
 
 import pytest
 
-from gradalg.algebra.derivation import degree_of
-from gradalg.calculus.pairing import Pairing, pairing
-from gradalg.core.expr import Expr, Symbol
-from gradalg.core.symbolic_degree import Degree
+from jacopy.algebra.derivation import degree_of
+from jacopy.calculus.pairing import Pairing, pairing
+from jacopy.core.expr import Expr, Symbol
+from jacopy.core.symbolic_degree import Degree
 
 
 class TestConstruction:

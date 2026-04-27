@@ -1,12 +1,12 @@
-"""Tests for gradalg.algebra.derivation."""
+"""Tests for jacopy.algebra.derivation."""
 
 import pytest
 
-from gradalg.algebra.derivation import Act, Derivation, compose, degree_of
-from gradalg.core.expr import Integer, Neg, Product, Rational, Sum, Symbol
-from gradalg.core.properties import Graded, Scalar
-from gradalg.core.registry import PropertyRegistry
-from gradalg.core.symbolic_degree import Degree
+from jacopy.algebra.derivation import Act, Derivation, compose, degree_of
+from jacopy.core.expr import Integer, Neg, Product, Rational, Sum, Symbol
+from jacopy.core.properties import Graded, Scalar
+from jacopy.core.registry import PropertyRegistry
+from jacopy.core.symbolic_degree import Degree
 
 
 # --------------------------------------------------------------------- #
@@ -198,7 +198,7 @@ class TestDegreeOf:
         """|[a, b]| = |a| + |b| + bracket.degree."""
         # Bracket of degree −1 (e.g. derived bracket from a deg-1
         # generator: |Q| − 2 = −1) over two degree-1 operands.
-        from gradalg.brackets.custom import CustomBracket
+        from jacopy.brackets.custom import CustomBracket
         reg = PropertyRegistry()
         a = Symbol("a")
         b = Symbol("b")
@@ -213,7 +213,7 @@ class TestDegreeOf:
 
     def test_bracketapply_symbolic_degree(self):
         """Bracket degree propagates symbolically."""
-        from gradalg.brackets.custom import CustomBracket
+        from jacopy.brackets.custom import CustomBracket
         reg = PropertyRegistry()
         a, b = Symbol("a"), Symbol("b")
         reg.declare(a, Graded(degree=Degree.var("|a|")))

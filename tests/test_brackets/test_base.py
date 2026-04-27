@@ -1,13 +1,13 @@
-"""Tests for gradalg.brackets.base."""
+"""Tests for jacopy.brackets.base."""
 
 import pytest
 
-from gradalg.brackets.base import BracketApply, GradedBracket, expand_bracket
-from gradalg.brackets.lie import LieBracket
-from gradalg.core.expr import Integer, Neg, Product, Sum, Symbol
-from gradalg.core.properties import Graded
-from gradalg.core.registry import PropertyRegistry
-from gradalg.core.symbolic_degree import Degree
+from jacopy.brackets.base import BracketApply, GradedBracket, expand_bracket
+from jacopy.brackets.lie import LieBracket
+from jacopy.core.expr import Integer, Neg, Product, Sum, Symbol
+from jacopy.core.properties import Graded
+from jacopy.core.registry import PropertyRegistry
+from jacopy.core.symbolic_degree import Degree
 
 
 # --------------------------------------------------------------------- #
@@ -260,7 +260,7 @@ class TestRebuildHook:
         """Regression: flatten was crashing with ``BracketApply.__init__
         missing 'b'`` when a BracketApply sat below a nested Sum/Product
         because its constructor signature diverges from children."""
-        from gradalg.algorithms.flatten import flatten
+        from jacopy.algorithms.flatten import flatten
 
         lie = LieBracket()
         X, Y = Symbol("X"), Symbol("Y")
@@ -280,10 +280,10 @@ class TestRebuildHook:
         mathematical diagnostic — the obstruction needs the Poisson
         hypothesis ``[π, π]_SN = 0`` which the generic dispatcher cannot
         assume."""
-        from gradalg.brackets.derived import DerivedBracket
-        from gradalg.brackets.schouten import sn
-        from gradalg.proof.strategies import ProofFailure
-        from gradalg.proof.verifier import prove_jacobi
+        from jacopy.brackets.derived import DerivedBracket
+        from jacopy.brackets.schouten import sn
+        from jacopy.proof.strategies import ProofFailure
+        from jacopy.proof.verifier import prove_jacobi
 
         pi = Symbol("π")
         reg.declare(pi, Graded(degree=1))

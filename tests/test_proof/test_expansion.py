@@ -1,16 +1,16 @@
-"""Tests for gradalg.proof.expansion."""
+"""Tests for jacopy.proof.expansion."""
 
 import pytest
 
-from gradalg.algebra.derivation import Act, Derivation, compose
-from gradalg.calculus.exterior_d import ExteriorDerivative, d
-from gradalg.calculus.interior import interior
-from gradalg.calculus.lie_derivative import lie_derivative
-from gradalg.core.expr import Expr, Integer, Product, Sum, Symbol
-from gradalg.core.properties import Graded
-from gradalg.core.registry import PropertyRegistry
-from gradalg.proof.chain import ProofChain
-from gradalg.proof.expansion import (
+from jacopy.algebra.derivation import Act, Derivation, compose
+from jacopy.calculus.exterior_d import ExteriorDerivative, d
+from jacopy.calculus.interior import interior
+from jacopy.calculus.lie_derivative import lie_derivative
+from jacopy.core.expr import Expr, Integer, Product, Sum, Symbol
+from jacopy.core.properties import Graded
+from jacopy.core.registry import PropertyRegistry
+from jacopy.proof.chain import ProofChain
+from jacopy.proof.expansion import (
     MODES,
     ActOverSumOpDefinition,
     DSquaredZeroDefinition,
@@ -24,7 +24,7 @@ from gradalg.proof.expansion import (
     LieDerivativeOnZeroFormDefinition,
     default_engine,
 )
-from gradalg.proof.step import ProofStep
+from jacopy.proof.step import ProofStep
 
 
 # --------------------------------------------------------------------- #

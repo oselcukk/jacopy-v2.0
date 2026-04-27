@@ -1,7 +1,7 @@
-"""Tests for gradalg.algorithms.distribute."""
+"""Tests for jacopy.algorithms.distribute."""
 
-from gradalg.algorithms.distribute import Distribute, distribute
-from gradalg.core.expr import (
+from jacopy.algorithms.distribute import Distribute, distribute
+from jacopy.core.expr import (
     Integer,
     Neg,
     Product,

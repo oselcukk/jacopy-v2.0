@@ -1,15 +1,15 @@
-"""Tests for ``gradalg.display.latex``."""
+"""Tests for ``jacopy.display.latex``."""
 
 from __future__ import annotations
 
 import pytest
 
-from gradalg.algebra.commutator import Commutator
-from gradalg.algebra.derivation import Act, Derivation
-from gradalg.brackets.dorfman import SectionPair
-from gradalg.brackets.lie import LieBracket
-from gradalg.calculus.pairing import Pairing
-from gradalg.core.expr import (
+from jacopy.algebra.commutator import Commutator
+from jacopy.algebra.derivation import Act, Derivation
+from jacopy.brackets.dorfman import SectionPair
+from jacopy.brackets.lie import LieBracket
+from jacopy.calculus.pairing import Pairing
+from jacopy.core.expr import (
     Integer,
     Neg,
     Power,
@@ -18,7 +18,7 @@ from gradalg.core.expr import (
     Sum,
     Symbol,
 )
-from gradalg.display.latex import (
+from jacopy.display.latex import (
     chain_to_latex,
     chain_to_latex_document,
     chain_to_tikz,
@@ -27,8 +27,8 @@ from gradalg.display.latex import (
     step_to_latex,
     to_latex,
 )
-from gradalg.proof.chain import ProofChain
-from gradalg.proof.step import ProofStep
+from jacopy.proof.chain import ProofChain
+from jacopy.proof.step import ProofStep
 
 
 # --------------------------------------------------------------------- #
@@ -202,7 +202,7 @@ class TestProofTranscript:
     def test_step_basic_shape(self):
         step = ProofStep(Symbol("X"), Symbol("Y"), rule="demo")
         out = step_to_latex(step)
-        assert r"X &\to Y" in out
+        assert r"X \to Y" in out
         assert r"\text{[demo]}" in out
 
     def test_step_with_provenance_tag(self):
@@ -260,16 +260,23 @@ class TestProofTranscript:
 
     def test_chain_empty_produces_placeholder(self):
         out = chain_to_latex(ProofChain())
-        assert r"\begin{align*}" in out
-        assert r"\end{align*}" in out
+        assert r"\begin{gather*}" in out
+        assert r"\end{gather*}" in out
         assert "empty proof chain" in out
 
     def test_chain_multiple_steps_joined_with_double_backslash(self):
         s1 = ProofStep(Symbol("X"), Symbol("Y"), rule="r1")
         s2 = ProofStep(Symbol("Y"), Symbol("Z"), rule="r2")
         out = chain_to_latex(ProofChain([s1, s2]))
-        assert out.startswith(r"\begin{align*}")
-        assert out.endswith(r"\end{align*}")
+        # ``gather*`` (no shared alignment column) so chain rows with
+        # very wide intermediate expressions don't shove every other
+        # row off the right margin.
+        assert r"\begin{gather*}" in out
+        assert r"\end{gather*}" in out
+        # \allowdisplaybreaks + \scriptsize wrapper lets long chains
+        # page-break and fit on the page width.
+        assert r"\allowdisplaybreaks" in out
+        assert r"\scriptsize" in out
         # Two rendered lines separated by "\\".
         assert r" \\" in out
 
@@ -319,9 +326,9 @@ class TestChainToLatexDocument:
         assert r"\usepackage{amssymb}" in out
         assert r"\begin{document}" in out
         assert r"\end{document}" in out
-        # Body: the align* block from chain_to_latex should be present.
-        assert r"\begin{align*}" in out
-        assert r"\end{align*}" in out
+        # Body: the gather* block from chain_to_latex should be present.
+        assert r"\begin{gather*}" in out
+        assert r"\end{gather*}" in out
 
     def test_no_maketitle_without_title_or_author(self, chain):
         out = chain_to_latex_document(chain)

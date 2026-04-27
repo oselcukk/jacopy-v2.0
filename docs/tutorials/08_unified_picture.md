@@ -19,13 +19,13 @@ ispatları açtı. Burada bu parçaları birbirine bağlıyoruz.
 
 Bir `π` bivector'ünün "Poisson bivector" olması, Schouten-Nijenhuis
 bracket'i altında kendisiyle anti-commutation yapması demektir:
-`[π, π]_SN = 0`. `gradalg` bu denklemi evrensel bir
+`[π, π]_SN = 0`. `jacopy` bu denklemi evrensel bir
 `VanishingCondition` olarak üretir:
 
 ```python
-from gradalg.library.declarations import Bivector, Forms, Functions
-from gradalg.library.poisson import PoissonBracket
-from gradalg.core.registry import PropertyRegistry
+from jacopy.library.declarations import Bivector, Forms, Functions
+from jacopy.library.poisson import PoissonBracket
+from jacopy.core.registry import PropertyRegistry
 
 reg = PropertyRegistry()
 pi = Bivector("π", registry=reg)
@@ -98,7 +98,7 @@ Jacobi'siyle aynı obstruction'a düşmesinin sebebi.
 *property provenance* felsefesinin teorem-seviyesi karşılığı:
 
 ```python
-from gradalg.library import theorem_book
+from jacopy.library import theorem_book
 
 theorem_book.get("poisson_jacobi").from_axioms
 # ('Derived Bracket Theorem', '[π, π]_SN = 0 (Poisson hypothesis)')
@@ -134,9 +134,9 @@ hipotezle tekrar ediyor. H-twisted Courant bracket'in graded
 Jacobi'si ancak ve ancak twist 3-formu kapalıysa (`dH = 0`) tutar:
 
 ```python
-from gradalg.brackets.courant import CourantBracket
-from gradalg.core.expr import Symbol
-from gradalg.core.properties import Graded
+from jacopy.brackets.courant import CourantBracket
+from jacopy.core.expr import Symbol
+from jacopy.core.properties import Graded
 
 reg_h = PropertyRegistry()
 H = Symbol("H")

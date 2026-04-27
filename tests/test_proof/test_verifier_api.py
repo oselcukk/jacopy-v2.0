@@ -2,22 +2,22 @@
 
 import pytest
 
-from gradalg.algebra.derivation import Act, Derivation, compose
-from gradalg.brackets.derived import DerivedBracket
-from gradalg.brackets.lie import LieBracket
-from gradalg.calculus.exterior_algebra import ExteriorAlgebra
-from gradalg.calculus.exterior_d import d
-from gradalg.calculus.interior import interior
-from gradalg.calculus.lie_derivative import lie_derivative
-from gradalg.core.expr import Integer, Sum, Symbol
-from gradalg.core.properties import (
+from jacopy.algebra.derivation import Act, Derivation, compose
+from jacopy.brackets.derived import DerivedBracket
+from jacopy.brackets.lie import LieBracket
+from jacopy.calculus.exterior_algebra import ExteriorAlgebra
+from jacopy.calculus.exterior_d import d
+from jacopy.calculus.interior import interior
+from jacopy.calculus.lie_derivative import lie_derivative
+from jacopy.core.expr import Integer, Sum, Symbol
+from jacopy.core.properties import (
     Graded,
     ProofRef,
     Provenance,
 )
-from gradalg.core.registry import PropertyRegistry
-from gradalg.brackets.derived import VanishingCondition
-from gradalg.proof import (
+from jacopy.core.registry import PropertyRegistry
+from jacopy.brackets.derived import VanishingCondition
+from jacopy.proof import (
     ProofChain,
     ProofFailure,
     prove_equivalence,
@@ -25,7 +25,7 @@ from gradalg.proof import (
     prove_operator_equation,
     unroll_property,
 )
-from gradalg.proof.expansion import default_engine
+from jacopy.proof.expansion import default_engine
 
 
 # --------------------------------------------------------------------- #

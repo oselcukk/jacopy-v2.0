@@ -1,10 +1,10 @@
-"""Tests for gradalg.proof.chain."""
+"""Tests for jacopy.proof.chain."""
 
 import pytest
 
-from gradalg.core.expr import Symbol
-from gradalg.proof.chain import ProofChain
-from gradalg.proof.step import ProofStep
+from jacopy.core.expr import Symbol
+from jacopy.proof.chain import ProofChain
+from jacopy.proof.step import ProofStep
 
 
 def _step(before_name, after_name, rule="r"):

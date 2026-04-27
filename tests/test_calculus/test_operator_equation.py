@@ -2,17 +2,17 @@
 
 import pytest
 
-from gradalg.algebra.derivation import Derivation, compose
-from gradalg.calculus.exterior_algebra import ExteriorAlgebra
-from gradalg.calculus.exterior_d import d
-from gradalg.calculus.interior import interior
-from gradalg.calculus.lie_derivative import lie_derivative
-from gradalg.calculus.operator_equation import OperatorEquation
-from gradalg.core.expr import Sum, Symbol
-from gradalg.core.properties import Graded
-from gradalg.core.registry import PropertyRegistry
-from gradalg.proof import ProofChain, ProofFailure
-from gradalg.proof.expansion import default_engine
+from jacopy.algebra.derivation import Derivation, compose
+from jacopy.calculus.exterior_algebra import ExteriorAlgebra
+from jacopy.calculus.exterior_d import d
+from jacopy.calculus.interior import interior
+from jacopy.calculus.lie_derivative import lie_derivative
+from jacopy.calculus.operator_equation import OperatorEquation
+from jacopy.core.expr import Sum, Symbol
+from jacopy.core.properties import Graded
+from jacopy.core.registry import PropertyRegistry
+from jacopy.proof import ProofChain, ProofFailure
+from jacopy.proof.expansion import default_engine
 
 
 def _make_algebra():

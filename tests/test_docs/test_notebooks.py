@@ -10,7 +10,7 @@ they're optional extras under ``[project.optional-dependencies.docs]``
 so contributors who don't touch docs don't need to install them.
 
 The test harness prepends the repo root to ``PYTHONPATH`` for the
-spawned kernel so the notebooks can ``import gradalg`` without
+spawned kernel so the notebooks can ``import jacopy`` without
 requiring the package to be installed into the kernel's site-packages.
 """
 
@@ -39,7 +39,7 @@ NOTEBOOKS = _discover_notebooks()
 
 @pytest.fixture
 def kernel_env(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Ensure the spawned kernel can ``import gradalg``.
+    """Ensure the spawned kernel can ``import jacopy``.
 
     The system ``python3`` kernel has no knowledge of this repo's
     checkout; prepending the repo root to ``PYTHONPATH`` is the

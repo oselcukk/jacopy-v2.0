@@ -1,10 +1,10 @@
-"""Tests for gradalg.core.expr — the foundational expression tree."""
+"""Tests for jacopy.core.expr — the foundational expression tree."""
 
 from fractions import Fraction
 
 import pytest
 
-from gradalg.core.expr import (
+from jacopy.core.expr import (
     Expr,
     Integer,
     Neg,

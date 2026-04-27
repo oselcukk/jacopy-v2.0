@@ -1,7 +1,7 @@
-"""Tests for gradalg.algorithms.flatten."""
+"""Tests for jacopy.algorithms.flatten."""
 
-from gradalg.algorithms.flatten import Flatten, flatten
-from gradalg.core.expr import (
+from jacopy.algorithms.flatten import Flatten, flatten
+from jacopy.core.expr import (
     Integer,
     Neg,
     Power,

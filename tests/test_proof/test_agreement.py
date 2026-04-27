@@ -1,17 +1,17 @@
-"""Tests for gradalg.proof.strategies.AgreementOnGenerators."""
+"""Tests for jacopy.proof.strategies.AgreementOnGenerators."""
 
 import pytest
 
-from gradalg.algebra.derivation import Act, Derivation, compose
-from gradalg.calculus.exterior_algebra import ExteriorAlgebra
-from gradalg.calculus.exterior_d import d
-from gradalg.calculus.interior import interior
-from gradalg.calculus.lie_derivative import lie_derivative
-from gradalg.core.expr import Sum, Symbol
-from gradalg.core.properties import Graded
-from gradalg.core.registry import PropertyRegistry
-from gradalg.proof.expansion import default_engine
-from gradalg.proof.strategies import (
+from jacopy.algebra.derivation import Act, Derivation, compose
+from jacopy.calculus.exterior_algebra import ExteriorAlgebra
+from jacopy.calculus.exterior_d import d
+from jacopy.calculus.interior import interior
+from jacopy.calculus.lie_derivative import lie_derivative
+from jacopy.core.expr import Sum, Symbol
+from jacopy.core.properties import Graded
+from jacopy.core.registry import PropertyRegistry
+from jacopy.proof.expansion import default_engine
+from jacopy.proof.strategies import (
     AgreementOnGenerators,
     ExpandAndSimplify,
     ProofFailure,
@@ -180,8 +180,8 @@ class _AlwaysCloseStrategy(Strategy):
     name = "always-close"
 
     def prove(self, lhs, rhs, *, registry=None, engine=None):
-        from gradalg.proof.chain import ProofChain
-        from gradalg.proof.step import ProofStep
+        from jacopy.proof.chain import ProofChain
+        from jacopy.proof.step import ProofStep
 
         chain = ProofChain()
         chain.append(ProofStep(lhs, rhs, rule=self.name, justification="stub"))

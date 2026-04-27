@@ -1,9 +1,9 @@
-"""Tests for gradalg.proof.recognizers."""
+"""Tests for jacopy.proof.recognizers."""
 
-from gradalg.algebra.commutator import Commutator
-from gradalg.algebra.derivation import Act, Derivation
-from gradalg.core.expr import Product, Sum, Symbol
-from gradalg.proof.recognizers import (
+from jacopy.algebra.commutator import Commutator
+from jacopy.algebra.derivation import Act, Derivation
+from jacopy.core.expr import Product, Sum, Symbol
+from jacopy.proof.recognizers import (
     AntisymmetryMatch,
     AntisymmetryRecognizer,
     CommutatorMatch,

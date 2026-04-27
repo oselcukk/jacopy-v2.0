@@ -2,11 +2,11 @@
 
 import pytest
 
-from gradalg.algebra.derivation import Act
-from gradalg.brackets.dorfman import DorfmanBracket, SectionPair
-from gradalg.brackets.lie import LieBracket
-from gradalg.calculus.exterior_d import d
-from gradalg.core.expr import Neg, Sum, Symbol
+from jacopy.algebra.derivation import Act
+from jacopy.brackets.dorfman import DorfmanBracket, SectionPair
+from jacopy.brackets.lie import LieBracket
+from jacopy.calculus.exterior_d import d
+from jacopy.core.expr import Neg, Sum, Symbol
 
 
 class TestSectionPair:
@@ -32,7 +32,7 @@ class TestSectionPair:
 
 class TestDorfmanBracketAxioms:
     def test_degree_zero(self):
-        from gradalg.core.symbolic_degree import Degree
+        from jacopy.core.symbolic_degree import Degree
         db = DorfmanBracket()
         assert db.degree == Degree.const(0)
 
