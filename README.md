@@ -1,7 +1,12 @@
 # jacopy
 
-> Symbolic engine for graded algebra, brackets, and Cartan calculus —
-> with **step-by-step proofs** the engine generates and the user can read.
+[![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Status: Pre-Alpha](https://img.shields.io/badge/status-pre--alpha-orange)](https://pypi.org/classifiers/)
+[![Tests: 2792](https://img.shields.io/badge/tests-2792%20passing-brightgreen)](#testing)
+
+> **Symbolic engine for graded algebra, brackets, and Cartan calculus —
+> with step-by-step proofs the engine generates and the user can read.**
 
 The mathematical core: the *Derived Bracket Theorem* unifies
 Poisson, Koszul, and Courant brackets under a single hypothesis
@@ -10,20 +15,35 @@ consequences as a working symbolic system: brackets are objects,
 identities are `ProofChain`s, axioms are tagged, and every claim
 carries provenance back to a primitive.
 
-## What you can do with it
+---
 
-- Prove the Jacobi identity for a Lie / SN / Koszul / Courant
-  bracket and read the proof transcript step by step.
-- Verify Cartan structure equations (`T^a = de^a + ω^a_b ∧ e^b`)
-  on a connection + frame — both Bianchi identities close
-  mechanically.
-- Discharge the §3.1.5 derivator identities (form-side and dual
-  multivector-side) on a Poisson manifold via
-  `KoszulProblem.prove_derivator`.
-- Write your own bracket / connection / Cartan-style problem and
-  plug it into the same machinery.
+## 📑 Table of contents
 
-## Five-line "hello"
+- [What you can do](#-what-you-can-do)
+- [Quick start](#-quick-start)
+- [Installation](#-installation)
+- [Library landmarks](#-library-landmarks)
+- [Documentation](#-documentation)
+- [Testing](#-testing)
+- [Contributing](#-contributing)
+- [Citation](#-citation)
+- [License](#-license)
+
+---
+
+## ✨ What you can do
+
+| Capability | Tutorial |
+|---|---|
+| 🔁 Prove the Jacobi identity for a Lie / SN / Koszul / Courant bracket and read the proof transcript | [02](docs/tutorials/02_jacobi_identity.md) |
+| 🌀 Verify Cartan structure equations on a connection + frame | [23](docs/tutorials/23_cartan_structure_equations.md) |
+| ⚙️ Close both Bianchi identities mechanically | [20](docs/tutorials/20_connection_curvature.md) |
+| 📐 Discharge the §3.1.5 derivator identities (form-side and dual) | [18](docs/tutorials/18_derivator_identities.md) |
+| 🪞 Work with the tilde calculus on a Poisson manifold | [17](docs/tutorials/17_tilde_calculus.md) |
+| 🧩 Plug your own bracket / connection / Problem wrapper into the engine | [24](docs/tutorials/24_custom_problem_wrapper.md) |
+| 📜 Render proofs as LaTeX `align*` blocks or TikZ trees | [11](docs/tutorials/11_publication_output.md) |
+
+## 🚀 Quick start
 
 ```python
 from jacopy import VectorFields
@@ -33,36 +53,47 @@ from jacopy.proof import prove_jacobi
 
 reg = PropertyRegistry()
 X, Y, Z = VectorFields("X Y Z", registry=reg)
+
 chain = prove_jacobi(lie, X, Y, Z, registry=reg)
 print(f"Jacobi closes in {len(chain)} steps; final = {chain.steps[-1].after}")
 # Jacobi closes in 2 steps; final = 0
 ```
 
-## Install
+## 📦 Installation
+
+`jacopy` is **pre-alpha** and not yet published to PyPI. Install
+from source until then.
+
+### From source
 
 ```bash
-pip install -e ".[dev]"
-pytest
+git clone https://github.com/oselcukk/jacopy-v2.0.git
+cd jacopy-v2.0
+pip install .                  # standard install
 ```
 
-Python ≥ 3.10. No required runtime dependencies; `rich` (optional)
-gives coloured tree rendering, `nbformat` + `nbclient` + `ipykernel`
-are needed for the notebook tutorial test suite.
+### Editable (for development / hacking on the package)
 
-## Where to learn
+```bash
+git clone https://github.com/oselcukk/jacopy-v2.0.git
+cd jacopy-v2.0
+pip install -e ".[dev]"        # editable + dev tools (pytest, rich, nbformat, ...)
+```
 
-- **[`docs/README.md`](docs/README.md)** — three reading paths
-  (practitioner / depth-first / topical) through the 24 tutorials.
-- **[`docs/tutorials/`](docs/tutorials/)** — paired `.md` + `.ipynb`
-  for each tutorial. Start at
-  [01_first_steps.md](docs/tutorials/01_first_steps.md).
-- **[`CONTRIBUTING.md`](CONTRIBUTING.md)** — recipes for adding a
-  bracket, a `Theorem` to `theorem_book`, a new axiom rule, or a
-  Problem wrapper.
-- **[`examples/`](examples/)** — the textbook problems the package
-  was first calibrated against (Math 595 Question sheets).
+### Optional dependency groups
 
-## Library landmarks
+| Extras | Adds |
+|---|---|
+| `[rich]` | `rich` — coloured terminal tree rendering |
+| `[test]` | `pytest` |
+| `[docs]` | `nbformat`, `nbclient`, `ipykernel` — needed for tutorial notebooks |
+| `[dev]` | All of the above (single one-liner for contributors) |
+
+**Requirements:** Python ≥ 3.10. **Zero required runtime dependencies** —
+the package works out of the box with the standard library alone;
+extras only enhance display, testing, and notebook execution.
+
+## 📚 Library landmarks
 
 The four high-level **Problem wrappers** are the user-facing
 entry points for textbook calculations:
@@ -78,14 +109,75 @@ Lower-level primitives — `Expr` algebra, `PropertyRegistry`,
 `ExpansionEngine`, `prove_jacobi`, `prove_intrinsic_equivalence`,
 `theorem_book`, `ProofChain` — are documented in the tutorials.
 
-## Status
+## 📖 Documentation
 
-Pre-alpha. ~2700 unit tests + 24 notebook smoke tests; the
-mathematical surface (bracket families, Cartan calculus, derived
-identities, Bianchi, Cartan structure equations) is closed for the
-calibration set. The user-facing API is stable enough to write
-papers against, but not yet pinned by SemVer.
+`jacopy` ships with **24 paired tutorials** (`.md` for reading,
+`.ipynb` for running). All tutorials are smoke-tested in CI.
 
-## License
+- **[`docs/README.md`](docs/README.md)** — three reading paths
+  (practitioner / depth-first / topical).
+- **[`docs/tutorials/`](docs/tutorials/)** — start at
+  [`01_first_steps.md`](docs/tutorials/01_first_steps.md).
+- **[`docs/tutorials/README.md`](docs/tutorials/README.md)** —
+  full index of all 24 tutorials with one-line descriptions
+  and dependency arrows.
+- **[`examples/`](examples/)** — the textbook problems the package
+  was first calibrated against (Math 595 question sheets).
 
-MIT.
+> **Note:** A generated API reference (Sphinx + autodoc) is
+> deferred until the surface stabilises. The tutorials cover every
+> public class in narrative form.
+
+## 🧪 Testing
+
+```bash
+pytest                                          # full suite — 2792 tests
+pytest tests/test_docs/test_notebooks.py -q     # 24 notebook smoke tests
+```
+
+| Suite | Count | Time |
+|---|---|---|
+| Unit tests | 2792 | ~20 s |
+| Notebook smoke | 24 | ~18 s |
+
+The mathematical surface (bracket families, Cartan calculus,
+derived identities, Bianchi, Cartan structure equations) is
+**closed** for the calibration set.
+
+## 🤝 Contributing
+
+See **[`CONTRIBUTING.md`](CONTRIBUTING.md)** for math-flavoured
+recipes:
+
+- 📜 Seeding a new `Theorem` in `theorem_book`
+- 🔗 Defining a new bracket (`CustomBracket` vs `GradedBracket` subclass)
+- 📐 Adding a new identity / axiom rule (`Definition`)
+- 🎁 Writing your own Problem wrapper
+
+Each recipe links to the closest reference template in `library/`.
+
+## 📑 Citation
+
+If you use `jacopy` in academic work, please cite:
+
+```bibtex
+@software{jacopy,
+  title  = {jacopy: Symbolic computation for graded algebra,
+            brackets, and Cartan calculus with step-by-step proofs},
+  author = {Selçuk, Oğuzhan},
+  year   = {2026},
+  url    = {https://github.com/oselcukk/jacopy-v2.0},
+  note   = {Pre-alpha}
+}
+```
+
+## 📄 License
+
+[MIT](LICENSE).
+
+---
+
+> 💡 **Pre-alpha note.** The user-facing API is stable enough to
+> write papers against, but not yet pinned by SemVer. Breaking
+> changes between `0.0.x` releases are possible — pin a specific
+> commit if you depend on it for reproducible work.
