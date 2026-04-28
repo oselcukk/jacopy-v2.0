@@ -61,18 +61,15 @@ print(f"Jacobi closes in {len(chain)} steps; final = {chain.steps[-1].after}")
 
 ## 📦 Installation
 
-`jacopy` is **pre-alpha** and not yet published to PyPI. Install
-from source until then.
+Install directly from GitHub.
 
-### From source
+### As a user
 
 ```bash
-git clone https://github.com/oselcukk/jacopy-v2.0.git
-cd jacopy-v2.0
-pip install .                  # standard install
+pip install git+https://github.com/oselcukk/jacopy-v2.0.git
 ```
 
-### Editable (for development / hacking on the package)
+### For development
 
 ```bash
 git clone https://github.com/oselcukk/jacopy-v2.0.git
