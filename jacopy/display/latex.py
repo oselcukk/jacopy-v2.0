@@ -37,6 +37,7 @@ from jacopy.calculus.tilde.operators import (
     TildeLieDerivative,
 )
 from jacopy.core.multi_eval import MultiEval
+from jacopy.core.wedge import Wedge
 from jacopy.core.expr import (
     Expr,
     Integer,
@@ -166,6 +167,7 @@ _P_ATOM = 100
 _P_CALL = 90
 _P_POWER = 80
 _P_PRODUCT = 60
+_P_WEDGE = 55
 _P_NEG = 50
 _P_SUM = 40
 
@@ -253,6 +255,13 @@ def _prod(expr: Product, ctx: int) -> str:
     parts = [to_latex(c, _P_PRODUCT + 1) for c in expr.children]
     text = " \\, ".join(parts) if parts else "1"
     return _wrap(text, _P_PRODUCT, ctx)
+
+
+@_register(Wedge)
+def _wedge(expr: Wedge, ctx: int) -> str:
+    parts = [to_latex(c, _P_WEDGE + 1) for c in expr.children]
+    text = " \\wedge ".join(parts)
+    return _wrap(text, _P_WEDGE, ctx)
 
 
 @_register(Power)

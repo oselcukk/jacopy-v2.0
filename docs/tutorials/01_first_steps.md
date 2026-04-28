@@ -1,18 +1,18 @@
-# 01 — İlk Adımlar
+# 01 — First steps
 
-Bu tutorial `jacopy`'de bir sembolik ifade kurmayı, özellik (property)
-atamayı ve sadeleştirmeyi gösterir. Bitirdiğinizde `Expr`, `Symbol`,
-`Sum`, `Product`, `Neg` ile küçük cebirsel ifadeler yazabilecek,
-`PropertyRegistry` üzerinden semboller arasına derece/commutativity gibi
-ilişkiler kurabilecek ve `simplify` ile bunları canonical hale
-getirebileceksiniz.
+This tutorial walks through building a symbolic expression in
+`jacopy`, declaring properties, and simplifying. By the end you'll
+be able to write small algebraic expressions with `Expr`, `Symbol`,
+`Sum`, `Product`, `Neg`, declare relationships between symbols (such
+as degree or commutativity) through a `PropertyRegistry`, and
+canonicalise them with `simplify`.
 
-## Semboller ve temel inşa
+## Symbols and basic construction
 
-Bir sembol `Symbol(name)` ile; literal tamsayılar `Integer(n)` ile;
-ikisini toplayıp çarpmak Python'un `+`, `*`, `-` operatörleriyle olur.
-Arka planda `Sum`, `Product`, `Neg` inşa edilir — yani `x + y` ile
-`Sum(x, y)` birebir aynı nesneyi üretir.
+A symbol is built with `Symbol(name)`; integer literals via
+`Integer(n)`; the standard Python operators `+`, `*`, `-` produce
+`Sum`, `Product`, `Neg` under the hood — so `x + y` returns the
+exact same object as `Sum(x, y)`.
 
 ```python
 from jacopy.core.expr import Symbol, Integer, Sum, Product, Neg
@@ -26,18 +26,19 @@ mult = 2 * x
 assert mult == Product(Integer(2), x)
 ```
 
-`Expr` bir değer nesnesidir: hash'lenebilir, eşittirlenebilir,
-değiştirilemez. İki aynı-şekilli ifade `==` ile eşit çıkar.
+`Expr` is a value object: hashable, comparable for equality,
+immutable. Two structurally identical expressions compare equal via
+`==`.
 
-## Özellik atama (PropertyRegistry)
+## Declaring properties (`PropertyRegistry`)
 
-Semboller öntanımlı olarak hiçbir cebirsel özellik taşımaz. İlişkileri
-`PropertyRegistry` üzerinden *dışsal* olarak ilan ediyoruz — bu, aynı
-sembolün farklı bağlamlarda (örneğin farklı derecelerde) yeniden
-kullanılmasına izin veriyor.
+By default symbols carry no algebraic content. Relationships are
+declared **externally** through a `PropertyRegistry` — that's what
+lets the same symbol be reused in different contexts (with
+different degrees, for example).
 
-Derece için `Graded(degree=k)`, çarpımda yer-değiştirmeye izin veren
-skalerler için `Scalar()` kullanılır:
+`Graded(degree=k)` records a degree; `Scalar()` marks a symbol as a
+commuting scalar:
 
 ```python
 from jacopy.core.properties import Graded, Scalar
@@ -46,18 +47,18 @@ from jacopy.core.registry import PropertyRegistry
 reg = PropertyRegistry()
 reg.declare(x, Scalar())
 reg.declare(y, Scalar())
-reg.declare(z, Graded(degree=1))  # z bir 1-form gibi davranır
+reg.declare(z, Graded(degree=1))  # z behaves like a 1-form
 ```
 
-Scalar olarak ilan edilmiş iki sembol çarpımda takas edilebilir;
-graded semboller arasındaki değişim `(−1)^{|a||b|}` işaretini taşır.
+Two symbols declared `Scalar` commute under `Product`; graded
+symbols pick up the sign ``(−1)^{|a||b|}`` when swapped.
 
-### Role-driven kısayollar
+### Role-driven shortcuts
 
-Sık tekrarlanan desenler (fonksiyon, vektör alanı, form, bivector)
-için `jacopy.library.declarations` altında role-driven yardımcılar
-var. Her biri `Symbol(...)` + uygun `reg.declare(...)` çağrısını tek
-satıra indirir:
+For common patterns (functions, vector fields, forms, bivectors)
+the `jacopy.library.declarations` module provides role-driven
+helpers. Each collapses `Symbol(...)` plus the matching
+`reg.declare(...)` into a single call:
 
 ```python
 from jacopy import Functions, VectorFields, Forms, Bivector
@@ -66,44 +67,43 @@ reg2 = PropertyRegistry()
 f, g = Functions("f g", registry=reg2)         # Graded(degree=0)
 X, Y = VectorFields("X Y", registry=reg2)      # Graded(degree=0)
 alpha, beta = Forms("α β", degree=1, registry=reg2)  # Graded(degree=1)
-pi = Bivector("π", registry=reg2)              # Graded(degree=1), SN-derecesi
+pi = Bivector("π", registry=reg2)              # Graded(degree=1), SN-grading
 ```
 
-Tek isim verildiğinde bile dönen değer bir demet (`(f,) = Functions("f", ...)`);
-`Bivector` tek istisna — doğrudan sembolü döner.
+Even a single name returns a tuple — `(f,) = Functions("f", ...)`;
+`Bivector` is the lone exception, returning the symbol directly.
 
-## simplify: canonical forma indirme
+## `simplify` — canonical form
 
-`simplify(expr, registry)` pipeline'ı:
+The `simplify(expr, registry)` pipeline runs:
 
-1. `flatten` — iç içe `Sum`/`Product`'ları düzleştirir.
-2. `canonicalize` — `Neg`'leri toplamlara dağıtır, işaretleri toplar.
-3. `distribute` — `Product` içindeki `Sum`'ları açar (gerekliyse).
-4. `sort_product` — kayıtlı özelliklere göre çarpanları sıralar.
-5. `collect_terms` — aynı terimleri birleştirir (`x + x → 2x` vb.).
+1. `flatten` — merges nested `Sum` / `Product` nodes.
+2. `canonicalize` — pushes `Neg` through sums, collects signs.
+3. `distribute` — opens `Sum`s inside `Product`s when needed.
+4. `sort_product` — orders factors by registered properties.
+5. `collect_terms` — combines like terms (`x + x → 2x`, etc.).
 
 ```python
 from jacopy.algorithms.simplify import simplify
 
 assert simplify(x + x - x) == x
 assert simplify(Product(Integer(2), x, Integer(3)), reg) == Product(Integer(6), x)
-assert simplify(Product(y, x), reg) == Product(x, y)  # alfabetik sıralama
+assert simplify(Product(y, x), reg) == Product(x, y)  # alphabetic order
 ```
 
-Sadeleştirme belirli bir `registry` ile çağrıldığında ilan edilmiş
-özellikleri dikkate alır; `registry=None` verildiğinde yalnızca
-sembollerden bağımsız olan adımlar çalışır (flatten + canonicalize +
-sabit aritmetiği).
+When called with a `registry`, simplify consults the declared
+properties; with `registry=None` only the symbol-independent
+passes run (flatten + canonicalize + constant arithmetic).
 
-## Görselleştirme
+## Display
 
-`display` katmanı üç ayrı render verir:
+The `display` layer offers three rendering paths:
 
-- `to_ascii(expr)` — düz metin, monospace terminaller için.
-- `to_latex(expr)` — LaTeX string; Jupyter'da doğrudan `LatexDisplay`
-  ile render edilir.
-- `print_expr(expr)` — `rich` yüklüyse renkli ağaç, değilse ASCII
-  fallback.
+- `to_ascii(expr)` — plain text, suitable for monospace terminals.
+- `to_latex(expr)` — LaTeX string; renders directly via
+  `LatexDisplay` in Jupyter.
+- `print_expr(expr)` — coloured tree if `rich` is installed,
+  ASCII fallback otherwise.
 
 ```python
 from jacopy.display import to_ascii, to_latex
@@ -112,9 +112,9 @@ to_ascii(x + y - z)       # 'x + y - z'
 to_latex(x + y - z)       # 'x + y - z'
 ```
 
-## Sonraki adım
+## Next step
 
-Aynı `PropertyRegistry` üzerine bir Lie bracket oturttuğumuzda
-`simplify`'ın üzerine `prove_jacobi` gibi ispat yardımcıları yükseliyor.
-[`02_jacobi_identity.md`](02_jacobi_identity.md) Jacobi özdeşliğinin
-nasıl tek satırda kapatıldığını gösteriyor.
+Once a Lie bracket is layered onto the same `PropertyRegistry`,
+proof helpers like `prove_jacobi` build directly on `simplify`.
+[`02_jacobi_identity.md`](02_jacobi_identity.md) shows how the
+Jacobi identity closes in a single call.

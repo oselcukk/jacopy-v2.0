@@ -57,6 +57,12 @@ from jacopy.core.multi_eval import (
     multi_eval,
     validate_arity,
 )
+from jacopy.core.indexed_sum import (
+    IndexedSum,
+    dummy_in,
+    indexed_sum,
+)
+from jacopy.core.wedge import Wedge
 
 __all__ = [
     # expr
@@ -109,4 +115,10 @@ __all__ = [
     "multi_eval",
     "has_repeated_arg",
     "validate_arity",
+    # indexed sum (Faz 17.E)
+    "IndexedSum",
+    "indexed_sum",
+    "dummy_in",
+    # wedge product (Faz 17.F.1.5)
+    "Wedge",
 ]

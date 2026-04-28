@@ -1,26 +1,26 @@
-# 08 — Birleşik Tablo
+# 08 — The unified picture
 
-Bu paketin pedagojik iddiası: Poisson geometri + Lie algebroid +
-Cartan calculus + Courant geometri tek bir matematiksel mekanizmanın
-yüzleri. Merkezde *Derived Bracket Teoremi* duruyor — üstüne oturan
-bracket'in bracket-aksiyomları (antisymmetry + graded Jacobi)
-`[Q, Q]_base = 0` tek denklemiyle kontrol ediliyor. Bu tutorial aynı
-hipotezin iki farklı yüzde nasıl hem fonksiyon-Jacobi hem
-form-Jacobi'yi kapattığını, theorem_book'un bu hiyerarşiyi nasıl
-tek citation zinciriyle servis ettiğini, ve "tek varsayım, çok
-sonuç" pedagojisinin neden bu mimarinin doğal bir yan ürünü olduğunu
-gösteriyor.
+The pedagogical claim of this package: Poisson geometry + Lie
+algebroid + Cartan calculus + Courant geometry are all faces of a
+single mathematical mechanism. At the centre stands the *Derived
+Bracket Theorem* — a bracket's two structural axioms (antisymmetry
++ graded Jacobi) reduce to a single equation, `[Q, Q]_base = 0`.
+This tutorial shows how the same hypothesis closes both the
+function-side and form-side Jacobi identities, how `theorem_book`
+serves the hierarchy through a single citation chain, and why
+"one assumption, many consequences" falls out naturally from the
+architecture.
 
-[07 — Derived bracket](07_derived_bracket.md) mekanizmayı tanıttı;
-[05 — Cartan calculus](05_cartan_calculus.md) operatör-seviyesi
-ispatları açtı. Burada bu parçaları birbirine bağlıyoruz.
+[07 — Derived bracket](07_derived_bracket.md) introduced the
+mechanism; [05 — Cartan calculus](05_cartan_calculus.md) opened
+operator-level proofs. Here we tie those pieces together.
 
-## Tek hipotez: `[π, π]_SN = 0`
+## A single hypothesis: `[π, π]_SN = 0`
 
-Bir `π` bivector'ünün "Poisson bivector" olması, Schouten-Nijenhuis
-bracket'i altında kendisiyle anti-commutation yapması demektir:
-`[π, π]_SN = 0`. `jacopy` bu denklemi evrensel bir
-`VanishingCondition` olarak üretir:
+Calling a bivector `π` a "Poisson bivector" is the same as
+asserting it anti-commutes with itself under the
+Schouten–Nijenhuis bracket: `[π, π]_SN = 0`. `jacopy` produces
+this equation as a universal `VanishingCondition`:
 
 ```python
 from jacopy.library.declarations import Bivector, Forms, Functions
@@ -32,19 +32,20 @@ pi = Bivector("π", registry=reg)
 poisson = PoissonBracket.from_bivector(pi)
 
 poisson.jacobi_condition(reg).obstruction     # [·,·]_SN(π, π)
-poisson.koszul_jacobi_condition(reg).obstruction  # aynısı
+poisson.koszul_jacobi_condition(reg).obstruction  # the same
 ```
 
-İki koşul aynı `Expr`'e işaret eder — sadece display ismi farklı.
-Bu bir tesadüf değil: derived bracket'in obstruction'ı yalnız
-`(base, Q)` ikilisine bağlı; `acting_on=π^♯` yeniden yazımını
-eklemek Jacobi obstruction'ını değiştirmez.
+The two conditions point to the *same* `Expr` — only the display
+name differs. Not a coincidence: the derived bracket's
+obstruction depends only on `(base, Q)`; layering
+`acting_on=π^♯` on top doesn't change the Jacobi obstruction.
 
-## Aynı koşul, iki ispat yüzü
+## The same condition, two proof faces
 
-**Fonksiyon seviyesi.** Klasik Poisson Jacobi özdeşliği üç fonksiyon
-üstünde cyclic sum'ı sıfır kılar. `prove_jacobi_reduction` bunu tek
-adımlık *DerivedBracketTheorem* step'iyle obstruction'a indirger:
+**Function level.** The classical Poisson Jacobi identity
+vanishes the cyclic sum on three functions.
+`prove_jacobi_reduction` reduces that to the obstruction in a
+single *DerivedBracketTheorem* step:
 
 ```python
 f, g, h = Functions("f g h", degree=-1, registry=reg)
@@ -53,10 +54,11 @@ func_chain.steps[0].rule    # 'DerivedBracketTheorem'
 func_chain.steps[0].after   # [·,·]_SN(π, π)
 ```
 
-**Form seviyesi.** Aynı mekanizma 1-formlar üstünde Koszul
-Jacobi'sini verir. `prove_koszul_jacobi_reduction` aynı teorem
-citation'ını üretir ve *aynı* `[π, π]_SN` obstruction'ına varır —
-`π^♯` anchor'ı sadece operand-lift için devrede:
+**Form level.** The same mechanism gives the Koszul Jacobi
+identity on 1-forms. `prove_koszul_jacobi_reduction` produces
+the same theorem citation and lands on the *same*
+`[π, π]_SN` obstruction — the `π^♯` anchor is in play only for
+operand lifting:
 
 ```python
 alpha, beta, gamma = Forms("α β γ", degree=1, registry=reg)
@@ -66,36 +68,38 @@ form_chain = poisson.prove_koszul_jacobi_reduction(
 form_chain.steps[0].rule    # 'DerivedBracketTheorem'
 form_chain.steps[0].after   # [·,·]_SN(π, π)
 
-# Aynı obstruction'da kesişiyorlar:
+# They intersect at the same obstruction:
 func_chain.steps[0].after == form_chain.steps[0].after   # True
 ```
 
-Matematiksel içerik: "klasik Poisson Jacobi" ve "klasik Koszul
-Jacobi" iki farklı teorem *değil* — her ikisi de Derived Bracket
-Teoremi'nin aynı universal obstruction'a indirdiği iki görüntü.
+The mathematical content: "classical Poisson Jacobi" and
+"classical Koszul Jacobi" are *not* two separate theorems —
+both are the Derived Bracket Theorem reducing to the same
+universal obstruction.
 
-## Klasik–derived köprü
+## The classical–derived bridge
 
-Aynı hipotez, ek olarak "klasik Koszul bracket = SN-derived bracket
-(π^♯ ile)" teoremini de verir. `PoissonBracket` onu tek satırda
-doğrular:
+The same hypothesis additionally gives the theorem "classical
+Koszul bracket = SN-derived bracket (with `π^♯`)".
+`PoissonBracket` verifies it in a single step:
 
 ```python
 chain = poisson.prove_koszul_equivalence(alpha, beta, registry=reg)
 len(chain)                # 1
-chain.steps[0].rule       # 'reflexive' — iki tarafın canonical form'ı eşit
+chain.steps[0].rule       # 'reflexive' — both sides land on the same canonical form
 ```
 
-`reflexive` step'inin anlamı: paketin expand kuralları her iki
-tarafı da aynı `Expr` ağacına getirdi; eşitlik "yapısal" olarak
-sağlandı. İşte tam bu yapısal kimlik, Koszul Jacobi'nin fonksiyon
-Jacobi'siyle aynı obstruction'a düşmesinin sebebi.
+The meaning of the `reflexive` step: the package's expand rules
+brought both sides to the same `Expr` tree; equality holds
+*structurally*. That structural identity is *exactly why* Koszul
+Jacobi reduces to the same obstruction as function Jacobi.
 
-## Seeded teoremlerle citation zinciri
+## Citation chain via seeded theorems
 
-Üç seeded teorem `theorem_book` içinde bekliyor. Her biri `from_axioms`
-üstünden hangi aksiyomlara dayandığını beyan ediyor — bu paketin
-*property provenance* felsefesinin teorem-seviyesi karşılığı:
+Three seeded theorems wait inside `theorem_book`. Each declares
+its dependence on atomic axioms via `from_axioms` — the
+theorem-level counterpart of the package's *property provenance*
+philosophy:
 
 ```python
 from jacopy.library import theorem_book
@@ -112,9 +116,9 @@ theorem_book.get("poisson_koszul_jacobi").from_axioms
 #  '[π, π]_SN = 0 (Poisson hypothesis)')
 ```
 
-Her citation'ın arkasında bir `ProofChain` duruyor — teorem'in
-kanonik ispatı. Downstream kod `theorem_book.get(...)` ile bu
-chain'i olduğu gibi alıp daha büyük bir ispata gömebilir:
+Each citation has a `ProofChain` behind it — the theorem's
+canonical proof. Downstream code can take that chain via
+`theorem_book.get(...)` and embed it directly into a larger proof:
 
 ```python
 thm = theorem_book.get("poisson_jacobi")
@@ -122,16 +126,18 @@ thm.proof                 # ProofChain(1 steps)
 thm.proof.steps[0].rule   # 'DerivedBracketTheorem'
 ```
 
-Aynı pattern Lie algebroid (`lie_algebroid_anchor_compat`) ve Courant
-geometri (`courant_jacobi_twist`, `courant_dorfman_bridge`,
-`dirac_isotropy`, `dirac_involutivity`) için de var — paket şu an 8
-seeded teorem taşıyor.
+The same pattern shows up for the Lie algebroid
+(`lie_algebroid_anchor_compat`) and Courant geometry
+(`courant_jacobi_twist`, `courant_dorfman_bridge`,
+`dirac_isotropy`, `dirac_involutivity`) — the package currently
+carries 8 seeded theorems.
 
-## Paralel bir örnek: `dH = 0`
+## A parallel example: `dH = 0`
 
-Aynı "tek denklem, çok sonuç" deseni Courant tarafında farklı bir
-hipotezle tekrar ediyor. H-twisted Courant bracket'in graded
-Jacobi'si ancak ve ancak twist 3-formu kapalıysa (`dH = 0`) tutar:
+The same "single equation, many consequences" pattern repeats on
+the Courant side with a different hypothesis. The H-twisted
+Courant bracket's graded Jacobi holds if and only if the twist
+3-form is closed (`dH = 0`):
 
 ```python
 from jacopy.brackets.courant import CourantBracket
@@ -150,38 +156,38 @@ theorem_book.get("courant_jacobi_twist").from_axioms
 # ('Courant algebroid Jacobi axiom', 'dH = 0 (closed-3-form hypothesis)')
 ```
 
-Yapısal analoji: Poisson tarafında `[π, π]_SN = 0` tek denklemi,
-Courant tarafında `dH = 0` tek denklemi — her iki durumda da
-bracket'in iki aksiyomu (antisymmetry + Jacobi) tek bir koşula
-indirgeniyor ve teorem kitabı bu indirgemeyi tek citation olarak
-dışarı veriyor.
+The structural analogy: a single equation `[π, π]_SN = 0` on the
+Poisson side, a single equation `dH = 0` on the Courant side —
+both reduce a bracket's two structural axioms (antisymmetry +
+Jacobi) to one condition, and the theorem book serves the
+reduction as a single citation.
 
-## Pedagojik özet
+## Pedagogical takeaways
 
-Paket tasarımının gözlemlenebilir sonuçları:
+Observable consequences of the package design:
 
-1. **Tek teorem, çok sonuç.** Derived Bracket Teoremi bir kez
-   ispatlanır; Poisson function Jacobi, Poisson form Jacobi,
-   Koszul Jacobi, Courant Jacobi — hepsi onun instantiate edilmiş
-   halleri.
-2. **Obstruction paylaşımı.** İki farklı ispat yolu (fonksiyon vs
-   form) aynı `Expr`'e inanıyorsa, arkalarında aynı teorem
-   yatıyordur. Paket bunu mekanik olarak yakalar — display isimleri
-   farklı olsa bile.
-3. **Citation zinciri izlenebilir.** `theorem_book.get(name).from_axioms`
-   teorem'in hangi atomik varsayımlara dayandığını gösterir; bir
-   makalenin ispat akışını `from_axioms` listeleriyle birlikte
-   çizmek mümkün.
-4. **Yeni bracket, eski teorem.** Yeni bir derived bracket tanımlayan
-   kullanıcı Jacobi ispatını sıfırdan yapmaz — `prove_jacobi`
-   otomatik olarak `DerivedBracketStrategy`'ye gider ve aynı teorem
-   citation'ı'nı yeniden kullanır.
+1. **One theorem, many consequences.** The Derived Bracket
+   Theorem is proved once; Poisson function Jacobi, Poisson
+   form Jacobi, Koszul Jacobi, Courant Jacobi are all
+   instantiations.
+2. **Shared obstruction.** Two distinct proof paths (function
+   vs form) that land on the same `Expr` are backed by the same
+   theorem. The package catches this mechanically — even when
+   display names differ.
+3. **Traceable citation chain.**
+   `theorem_book.get(name).from_axioms` exposes which atomic
+   axioms a theorem rests on; one can trace a paper's proof
+   flow alongside the corresponding `from_axioms` lists.
+4. **New bracket, old theorem.** A user defining a fresh
+   derived bracket doesn't redo the Jacobi proof from scratch —
+   `prove_jacobi` auto-dispatches to `DerivedBracketStrategy`
+   and reuses the same theorem citation.
 
-## Sonraki adım
+## Next step
 
-Bu tutorial "hangi teoremi nereye bağlarım?" sorusunu yanıtladı.
-Son tutorial — [09 — Temeller](09_foundations.md) — "bir aksiyom
-nereden geliyor?" sorusuna iniyor. `d² = 0` neden bir aksiyom;
-foundational mode'da bunu generator seviyesinden üreten sub-proof
-nedir; özel bir aksiyom seti ile çalışırken ispat katmanı kendini
-nasıl yeniden kurar.
+This tutorial answered "which theorem connects to where?". The
+final tutorial — [09 — Foundations](09_foundations.md) — drops
+to "where does an axiom come from?". Why is `d² = 0` an axiom;
+what sub-proof generates it from the generator level in
+foundational mode; how the proof layer reconfigures itself when
+working with a custom axiom set.

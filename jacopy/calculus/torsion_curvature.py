@@ -39,7 +39,7 @@ from typing import Any, Tuple
 
 from jacopy.algebra.lie_bracket_vf import LieBracketVF
 from jacopy.calculus.connection import AffineConnection, ConnectionEvalExpr
-from jacopy.core.expr import Expr, Neg, Sum
+from jacopy.core.expr import Expr, Neg, Product, Sum
 from jacopy.proof.expansion import Definition
 
 
@@ -210,7 +210,7 @@ class TorsionDefinitionDefinition(Definition):
         return Sum.make(
             ConnectionEvalExpr(self._conn, X, Y),
             Neg(ConnectionEvalExpr(self._conn, Y, X)),
-            Neg(LieBracketVF(X, Y)),
+            Neg(self._conn.vector_bracket(X, Y)),
         )
 
 
@@ -251,7 +251,7 @@ class CurvatureDefinitionDefinition(Definition):
             )
         )
         third = Neg(
-            ConnectionEvalExpr(self._conn, LieBracketVF(X, Y), Z)
+            ConnectionEvalExpr(self._conn, self._conn.vector_bracket(X, Y), Z)
         )
         return Sum.make(first, second, third)
 
@@ -506,3 +506,326 @@ class CurvatureCovariantDerivativeDefinition(Definition):
             )
         )
         return Sum.make(first, second, third, fourth)
+
+
+# --------------------------------------------------------------------- #
+# Torsion / Curvature C∞-bilinearity + antisymmetry — Faz 17.D           #
+# --------------------------------------------------------------------- #
+#
+# These rules state the textbook fact that ``T`` and ``R`` are tensors:
+# C∞-linear in each of their vector-field slots (Sum / Neg / Product
+# pull) and antisymmetric in the (X, Y) pair. Mathematically each is a
+# *consequence* of the defining commutator + Lie-bracket axioms, but
+# because the defining axioms unfold the tensors completely, a
+# form-degree proof of "T^a is a 2-form" running through the unfolded
+# definition would have to drag the full LBVF C∞-linearity machinery
+# along with it. Adopting these as primitive Definitions keeps the
+# form-degree proof short — Pairing(e^a, T(∇, fU, V)) closes in two
+# rewrites (TorsionXScalarPull → PairingScalarPull) — exactly as the
+# Faz 12.B Pairing C∞-linearity rule does for its enclosing pairing.
+#
+# All rules are scoped to a specific :class:`AffineConnection` so two
+# connections cohabiting in the same proof don't cross-fire. The
+# antisymmetry rules use a ``repr``-canonicalize guard to avoid looping
+# (X, Y) ↔ (Y, X), the same termination story as
+# :class:`~jacopy.calculus.metric.MetricEvalSymmetryDefinition` and
+# :class:`~jacopy.calculus.non_metricity.NonMetricityXYSymmetryDefinition`.
+
+
+class TorsionXLinearityDefinition(Definition):
+    r"""``T(∇)(A + B + …, Y) → T(A, Y) + T(B, Y) + …`` and ``T(−A, Y) → −T(A, Y)``.
+
+    Distributes :class:`Sum` and :class:`Neg` in the X-slot. Scoped to a
+    specific connection.
+    """
+
+    def __init__(self, conn: AffineConnection) -> None:
+        if not isinstance(conn, AffineConnection):
+            raise TypeError(
+                "TorsionXLinearityDefinition requires an AffineConnection"
+            )
+        self._conn = conn
+        self.name = f"T X-linearity [{conn._repr_inner()}]"
+
+    def matches(self, expr: Expr) -> bool:
+        return (
+            isinstance(expr, Torsion)
+            and expr.connection == self._conn
+            and isinstance(expr.X, (Sum, Neg))
+        )
+
+    def rewrite(self, expr: Expr) -> Expr:
+        Y = expr.Y
+        x_slot = expr.X
+        if isinstance(x_slot, Neg):
+            return Neg(Torsion(self._conn, x_slot.arg, Y))
+        terms = []
+        for c in x_slot.children:
+            if isinstance(c, Neg):
+                terms.append(Neg(Torsion(self._conn, c.arg, Y)))
+            else:
+                terms.append(Torsion(self._conn, c, Y))
+        return Sum.make(*terms)
+
+
+class TorsionYLinearityDefinition(Definition):
+    r"""``T(∇)(X, A + B + …) → T(X, A) + T(X, B) + …`` and ``T(X, −A) → −T(X, A)``."""
+
+    def __init__(self, conn: AffineConnection) -> None:
+        if not isinstance(conn, AffineConnection):
+            raise TypeError(
+                "TorsionYLinearityDefinition requires an AffineConnection"
+            )
+        self._conn = conn
+        self.name = f"T Y-linearity [{conn._repr_inner()}]"
+
+    def matches(self, expr: Expr) -> bool:
+        return (
+            isinstance(expr, Torsion)
+            and expr.connection == self._conn
+            and isinstance(expr.Y, (Sum, Neg))
+        )
+
+    def rewrite(self, expr: Expr) -> Expr:
+        X = expr.X
+        y_slot = expr.Y
+        if isinstance(y_slot, Neg):
+            return Neg(Torsion(self._conn, X, y_slot.arg))
+        terms = []
+        for c in y_slot.children:
+            if isinstance(c, Neg):
+                terms.append(Neg(Torsion(self._conn, X, c.arg)))
+            else:
+                terms.append(Torsion(self._conn, X, c))
+        return Sum.make(*terms)
+
+
+class TorsionXScalarPullDefinition(Definition):
+    r"""``T(∇)(f · X, Y) → f · T(∇)(X, Y)`` — :math:`C^\infty`-linearity in X."""
+
+    def __init__(self, conn: AffineConnection) -> None:
+        if not isinstance(conn, AffineConnection):
+            raise TypeError(
+                "TorsionXScalarPullDefinition requires an AffineConnection"
+            )
+        self._conn = conn
+        self.name = f"T X-scalar pull [{conn._repr_inner()}]"
+
+    def matches(self, expr: Expr) -> bool:
+        return (
+            isinstance(expr, Torsion)
+            and expr.connection == self._conn
+            and isinstance(expr.X, Product)
+            and len(expr.X.children) >= 2
+        )
+
+    def rewrite(self, expr: Expr) -> Expr:
+        prod = expr.X
+        assert isinstance(prod, Product)
+        *scalars, head = prod.children
+        f = Product.make(*scalars)
+        return Product(f, Torsion(self._conn, head, expr.Y))
+
+
+class TorsionYScalarPullDefinition(Definition):
+    r"""``T(∇)(X, f · Y) → f · T(∇)(X, Y)`` — :math:`C^\infty`-linearity in Y."""
+
+    def __init__(self, conn: AffineConnection) -> None:
+        if not isinstance(conn, AffineConnection):
+            raise TypeError(
+                "TorsionYScalarPullDefinition requires an AffineConnection"
+            )
+        self._conn = conn
+        self.name = f"T Y-scalar pull [{conn._repr_inner()}]"
+
+    def matches(self, expr: Expr) -> bool:
+        return (
+            isinstance(expr, Torsion)
+            and expr.connection == self._conn
+            and isinstance(expr.Y, Product)
+            and len(expr.Y.children) >= 2
+        )
+
+    def rewrite(self, expr: Expr) -> Expr:
+        prod = expr.Y
+        assert isinstance(prod, Product)
+        *scalars, head = prod.children
+        f = Product.make(*scalars)
+        return Product(f, Torsion(self._conn, expr.X, head))
+
+
+class TorsionAntiSymmetryDefinition(Definition):
+    r"""``T(∇)(X, Y) → −T(∇)(Y, X)`` — canonical-order swap on the antisymmetric pair.
+
+    Fires on a :class:`Torsion` whose ``(X, Y)`` are out of ``repr``-order.
+    After the rewrite the pair is sorted so the rule applies at most once
+    per node. Scoped to a specific connection.
+
+    Mathematically antisymmetry follows from the defining axiom
+    ``T(X, Y) = ∇_X Y − ∇_Y X − [X, Y]_VF`` plus LBVF-antisymmetry, but
+    taking it primitive avoids dragging the full unfolding through every
+    form-degree proof on the local-frame side.
+    """
+
+    def __init__(self, conn: AffineConnection) -> None:
+        if not isinstance(conn, AffineConnection):
+            raise TypeError(
+                "TorsionAntiSymmetryDefinition requires an AffineConnection"
+            )
+        self._conn = conn
+        self.name = f"T antisymmetry [{conn._repr_inner()}]"
+
+    def matches(self, expr: Expr) -> bool:
+        return (
+            isinstance(expr, Torsion)
+            and expr.connection == self._conn
+            and repr(expr.X) > repr(expr.Y)
+        )
+
+    def rewrite(self, expr: Expr) -> Expr:
+        return Neg(Torsion(self._conn, expr.Y, expr.X))
+
+
+class CurvatureXLinearityDefinition(Definition):
+    r"""``R(∇)(A + B + …, Y) Z → R(A, Y) Z + R(B, Y) Z + …`` and ``R(−A, Y) Z → −R(A, Y) Z``."""
+
+    def __init__(self, conn: AffineConnection) -> None:
+        if not isinstance(conn, AffineConnection):
+            raise TypeError(
+                "CurvatureXLinearityDefinition requires an AffineConnection"
+            )
+        self._conn = conn
+        self.name = f"R X-linearity [{conn._repr_inner()}]"
+
+    def matches(self, expr: Expr) -> bool:
+        return (
+            isinstance(expr, Curvature)
+            and expr.connection == self._conn
+            and isinstance(expr.X, (Sum, Neg))
+        )
+
+    def rewrite(self, expr: Expr) -> Expr:
+        Y, Z = expr.Y, expr.Z
+        x_slot = expr.X
+        if isinstance(x_slot, Neg):
+            return Neg(Curvature(self._conn, x_slot.arg, Y, Z))
+        terms = []
+        for c in x_slot.children:
+            if isinstance(c, Neg):
+                terms.append(Neg(Curvature(self._conn, c.arg, Y, Z)))
+            else:
+                terms.append(Curvature(self._conn, c, Y, Z))
+        return Sum.make(*terms)
+
+
+class CurvatureYLinearityDefinition(Definition):
+    r"""``R(∇)(X, A + B + …) Z → R(X, A) Z + R(X, B) Z + …`` and ``R(X, −A) Z → −R(X, A) Z``."""
+
+    def __init__(self, conn: AffineConnection) -> None:
+        if not isinstance(conn, AffineConnection):
+            raise TypeError(
+                "CurvatureYLinearityDefinition requires an AffineConnection"
+            )
+        self._conn = conn
+        self.name = f"R Y-linearity [{conn._repr_inner()}]"
+
+    def matches(self, expr: Expr) -> bool:
+        return (
+            isinstance(expr, Curvature)
+            and expr.connection == self._conn
+            and isinstance(expr.Y, (Sum, Neg))
+        )
+
+    def rewrite(self, expr: Expr) -> Expr:
+        X, Z = expr.X, expr.Z
+        y_slot = expr.Y
+        if isinstance(y_slot, Neg):
+            return Neg(Curvature(self._conn, X, y_slot.arg, Z))
+        terms = []
+        for c in y_slot.children:
+            if isinstance(c, Neg):
+                terms.append(Neg(Curvature(self._conn, X, c.arg, Z)))
+            else:
+                terms.append(Curvature(self._conn, X, c, Z))
+        return Sum.make(*terms)
+
+
+class CurvatureXScalarPullDefinition(Definition):
+    r"""``R(∇)(f · X, Y) Z → f · R(∇)(X, Y) Z`` — :math:`C^\infty`-linearity in X."""
+
+    def __init__(self, conn: AffineConnection) -> None:
+        if not isinstance(conn, AffineConnection):
+            raise TypeError(
+                "CurvatureXScalarPullDefinition requires an AffineConnection"
+            )
+        self._conn = conn
+        self.name = f"R X-scalar pull [{conn._repr_inner()}]"
+
+    def matches(self, expr: Expr) -> bool:
+        return (
+            isinstance(expr, Curvature)
+            and expr.connection == self._conn
+            and isinstance(expr.X, Product)
+            and len(expr.X.children) >= 2
+        )
+
+    def rewrite(self, expr: Expr) -> Expr:
+        prod = expr.X
+        assert isinstance(prod, Product)
+        *scalars, head = prod.children
+        f = Product.make(*scalars)
+        return Product(f, Curvature(self._conn, head, expr.Y, expr.Z))
+
+
+class CurvatureYScalarPullDefinition(Definition):
+    r"""``R(∇)(X, f · Y) Z → f · R(∇)(X, Y) Z`` — :math:`C^\infty`-linearity in Y."""
+
+    def __init__(self, conn: AffineConnection) -> None:
+        if not isinstance(conn, AffineConnection):
+            raise TypeError(
+                "CurvatureYScalarPullDefinition requires an AffineConnection"
+            )
+        self._conn = conn
+        self.name = f"R Y-scalar pull [{conn._repr_inner()}]"
+
+    def matches(self, expr: Expr) -> bool:
+        return (
+            isinstance(expr, Curvature)
+            and expr.connection == self._conn
+            and isinstance(expr.Y, Product)
+            and len(expr.Y.children) >= 2
+        )
+
+    def rewrite(self, expr: Expr) -> Expr:
+        prod = expr.Y
+        assert isinstance(prod, Product)
+        *scalars, head = prod.children
+        f = Product.make(*scalars)
+        return Product(f, Curvature(self._conn, expr.X, head, expr.Z))
+
+
+class CurvatureXYAntiSymmetryDefinition(Definition):
+    r"""``R(∇)(X, Y) Z → −R(∇)(Y, X) Z`` — canonical-order swap on the antisymmetric pair.
+
+    Fires when ``(X, Y)`` of a :class:`Curvature` are out of
+    ``repr``-order. ``Z`` slot is left untouched. Scoped to a specific
+    connection.
+    """
+
+    def __init__(self, conn: AffineConnection) -> None:
+        if not isinstance(conn, AffineConnection):
+            raise TypeError(
+                "CurvatureXYAntiSymmetryDefinition requires an AffineConnection"
+            )
+        self._conn = conn
+        self.name = f"R XY-antisymmetry [{conn._repr_inner()}]"
+
+    def matches(self, expr: Expr) -> bool:
+        return (
+            isinstance(expr, Curvature)
+            and expr.connection == self._conn
+            and repr(expr.X) > repr(expr.Y)
+        )
+
+    def rewrite(self, expr: Expr) -> Expr:
+        return Neg(Curvature(self._conn, expr.Y, expr.X, expr.Z))

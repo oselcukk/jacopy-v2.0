@@ -122,6 +122,31 @@ class Expr(ABC):
         """
         return self
 
+    # ---- bound-variable substitution -------------------------------- #
+
+    def substitute_atom(self, dummy: "Expr", target: "Expr") -> "Expr":
+        """Return ``self`` with every occurrence of ``dummy`` replaced by ``target``.
+
+        ``dummy`` must be an :class:`Atom`. The default implementation
+        does the obvious top-level match, then recurses through
+        :meth:`children`. Atoms that hide a sub-atom inside a private
+        slot (e.g. a frame vector field carrying a ``FrameIndex``)
+        override this method to expose that hidden state for
+        substitution. Binders that introduce their own dummy (notably
+        :class:`~jacopy.core.indexed_sum.IndexedSum`) override to
+        respect shadowing.
+        """
+        if self == dummy:
+            return target
+        if self.is_atom:
+            return self
+        new_children = tuple(
+            c.substitute_atom(dummy, target) for c in self.children
+        )
+        if all(a is b for a, b in zip(new_children, self.children)):
+            return self
+        return self._rebuild(new_children)
+
     # ---- operator overloading --------------------------------------- #
 
     def __add__(self, other):

@@ -154,6 +154,15 @@ def degree_of(
         for c in expr.children:
             total = total + degree_of(c, registry)
         return total
+    # Wedge: degree law ``|α ∧ β| = |α| + |β|``. Late import to avoid
+    # forcing the wedge module on every algebra import; the algebra
+    # layer otherwise has no wedge dependency.
+    from jacopy.core.wedge import Wedge  # noqa: WPS433
+    if isinstance(expr, Wedge):
+        total = Degree.const(0)
+        for c in expr.children:
+            total = total + degree_of(c, registry)
+        return total
     if isinstance(expr, Neg):
         return degree_of(expr.arg, registry)
     if isinstance(expr, Act):

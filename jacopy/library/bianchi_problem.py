@@ -43,6 +43,13 @@ from typing import Callable, List, Optional, Tuple
 
 from jacopy.algorithms.canonicalize import canonicalize
 from jacopy.algorithms.collect_terms import collect_terms
+from jacopy.calculus.bracket_apply_axioms import (
+    BracketApplyAntiSymmetryDefinition,
+    BracketApplyArgAntisymmetryDefinition,
+    BracketApplyJacobiDefinition,
+    BracketApplyNegLinearityDefinition,
+    BracketApplySumLinearityDefinition,
+)
 from jacopy.calculus.closure_axioms import (
     LieBracketVfAntiSymmetryDefinition,
     LieBracketVfJacobiDefinition,
@@ -195,7 +202,8 @@ class BianchiProblem:
     def _build_engine(self) -> ExpansionEngine:
         rules = [
             # Definition unfolds first — turns Torsion/Curvature into
-            # ∇-commutator + LBVF terms.
+            # ∇-commutator + bracket terms (LBVF or BracketApply
+            # depending on whether the connection has a custom bracket).
             TorsionCovariantDerivativeDefinition(self._conn),
             CurvatureCovariantDerivativeDefinition(self._conn),
             TorsionDefinitionDefinition(self._conn),
@@ -205,24 +213,43 @@ class BianchiProblem:
             ConnectionXLinearityDefinition(self._conn),
             ConnectionYAdditivityDefinition(self._conn),
             ConnectionYLeibnizDefinition(self._conn, registry=self._registry),
-            # LBVF arg distribution — Sum / Neg slot push so the
-            # cyclic Bianchi residue's ``[T(U,V), W]_VF`` shape opens
-            # into per-summand brackets that line up with the negative
-            # ``[∇_U V, W]_VF`` siblings emitted from torsion-Leibniz.
-            LieBracketVfSumLinearityDefinition(),
-            LieBracketVfNegLinearityDefinition(),
-            # Atom-level antisym canonicalization: line up arg order so
-            # ``[X, ∇_U Y]`` and ``[∇_U Y, X]`` end up in the same
-            # canonical orientation — only then does collect_terms fold
-            # the pair into ``2·[…]`` (or, with opposite signs, 0).
-            LieBracketVfArgAntisymmetryDefinition(),
-            # LBVF closures — the Sum-level antisym + cyclic-Jacobi
-            # rules cancel the residue triples that show up after the
-            # cyclic Bianchi sum is fully expanded.
-            LieBracketVfAntiSymmetryDefinition(),
-            LieBracketVfJacobiDefinition(),
         ]
+        rules.extend(self._bracket_axioms())
         return ExpansionEngine(rules)
+
+    def _bracket_axioms(self) -> List:
+        """Bracket-side axioms: LBVF rules or BracketApply rules.
+
+        When the connection has no custom bracket (``connection.bracket
+        is None``), the Torsion/Curvature definitions emit
+        :class:`~jacopy.algebra.lie_bracket_vf.LieBracketVF` and the
+        engine bundles the LBVF closure family. With a custom bracket
+        (Q9 ``koszul_connection``) the same definitions emit
+        :class:`~jacopy.brackets.base.BracketApply` headed by that
+        bracket, and the engine swaps in the
+        :mod:`jacopy.calculus.bracket_apply_axioms` parallel — same
+        five rule shapes (Sum/Neg-linearity, atom-antisym,
+        Sum-antisym, cyclic Jacobi) but matching the opaque bracket
+        node instead of the LBVF atom. The two rule sets are mutually
+        exclusive: only one bracket flavor surfaces in any given
+        connection's residues.
+        """
+        bracket = self._conn.bracket
+        if bracket is None:
+            return [
+                LieBracketVfSumLinearityDefinition(),
+                LieBracketVfNegLinearityDefinition(),
+                LieBracketVfArgAntisymmetryDefinition(),
+                LieBracketVfAntiSymmetryDefinition(),
+                LieBracketVfJacobiDefinition(),
+            ]
+        return [
+            BracketApplySumLinearityDefinition(bracket),
+            BracketApplyNegLinearityDefinition(bracket),
+            BracketApplyArgAntisymmetryDefinition(bracket),
+            BracketApplyAntiSymmetryDefinition(bracket),
+            BracketApplyJacobiDefinition(bracket),
+        ]
 
     # ---- accessors ------------------------------------------------- #
 

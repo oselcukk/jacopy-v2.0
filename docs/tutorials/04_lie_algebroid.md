@@ -1,29 +1,29 @@
-# 04 — Lie Algebroid
+# 04 — Lie algebroid
 
-Bir Lie algebroid, bir `M` manifoldu üstündeki vector bundle `E`
-üzerinde yaşayan bir bracket ve anchor morfizmi `ρ: E → TM`'den ibaret
-üç parçalı yapıdır: `(E, [·,·]_E, ρ)`. Bu tutorial, `jacopy`'in
-bu üçlüyü tek bir `LieAlgebroid` objesi etrafında nasıl topladığını,
-*anchor compatibility* aksiyomunun neden ayrıca ele alındığını, ve
-algebroid üstünde yaşayan Cartan calculus'un (d_E, L_{E,X}, ι_{E,X})
-neye benzediğini gösterir.
+A Lie algebroid is a three-piece structure: a vector bundle ``E``
+on a manifold ``M``, a bracket living on the sections of ``E``,
+and an anchor morphism ``ρ: E → TM``. This tutorial shows how
+`jacopy` collects ``(E, [·,·]_E, ρ)`` into a single `LieAlgebroid`
+object, why the **anchor compatibility** axiom is treated
+separately, and what the algebroid Cartan calculus
+(`d_E`, `L_{E,X}`, `ι_{E,X}`) looks like.
 
-[03 — Poisson geometri](03_poisson_geometry.md) sonrası okunmak üzere
-yazıldı; orada derived bracket'lerin ne işe yaradığını gördük.
+It's intended to be read after [03 — Poisson geometry](03_poisson_geometry.md),
+where derived brackets first showed up.
 
-## Üçlü: (E, [·,·]_E, ρ)
+## The triple `(E, [·,·]_E, ρ)`
 
-`LieAlgebroid(bundle, bracket=..., anchor=..., vector_bracket=...)` bu
-dörtlüyü tek objede tutar:
+`LieAlgebroid(bundle, bracket=..., anchor=..., vector_bracket=...)`
+holds the four-tuple in one object:
 
-- `bundle` — `E`'nin sembolik adı (display için).
-- `bracket` — `E`'nin section'ları üstündeki `GradedBracket`;
-  graded-antisymmetric, Jacobi ve Leibniz aksiyomları bu bracket'in
-  *kendi* flag'lerinde taşınır.
-- `anchor` — `Anchor(name="ρ")`: `E → TM` linear bir morphism
-  (Derivation sınıfının 0-derecesi altında oturur; Leibniz'i trivial).
-- `vector_bracket` — uyum hedefi olan `TM` bracket'i. Varsayılan
-  `jacopy.brackets.lie.lie` singleton'ı.
+- `bundle` — the symbolic name of ``E`` (display only).
+- `bracket` — the `GradedBracket` on sections of ``E``;
+  graded antisymmetry, Jacobi, and Leibniz axioms ride on the
+  bracket's *own* flags.
+- `anchor` — `Anchor(name="ρ")`: an ``E → TM`` linear morphism
+  (sits as a degree-0 `Derivation`, with trivial Leibniz).
+- `vector_bracket` — the ``TM`` bracket the compatibility targets.
+  Defaults to the `jacopy.brackets.lie.lie` singleton.
 
 ```python
 from jacopy import VectorFields
@@ -41,18 +41,20 @@ rho = Anchor(name="ρ")
 A = LieAlgebroid(E, bracket=bracket_E, anchor=rho, name="E-algebroid")
 ```
 
-## Anchor compatibility — ayrı aksiyom
+## Anchor compatibility — a separate axiom
 
-Bracket'in kendi üç aksiyomu (antisymmetry, Jacobi, Leibniz) anchor
-compatibility'yi *içermez*. Yani `ρ([X, Y]_E) = [ρ(X), ρ(Y)]_{TM}`
-klasik Lie bracket aksiyomlarından türetilmez; Lie algebroid
-*tanımının* bir parçasıdır. `jacopy` bunu üç farklı şekilde sunar:
+The bracket's three axioms (antisymmetry, Jacobi, Leibniz) do
+**not** entail anchor compatibility. The identity
+``ρ([X, Y]_E) = [ρ(X), ρ(Y)]_{TM}`` is *not* derivable from the
+classical Lie bracket axioms; it's part of the Lie algebroid
+**definition**. `jacopy` exposes it three different ways:
 
-1. **Ham obstruction (Expr):** farkı eşit olması gereken sıfır olarak
-   verir — simplify ile indirgemek kullanıcının seçimi.
-2. **VanishingCondition:** ham obstruction + isimlendirilmiş koşul.
-3. **ProofChain:** tek adımlık `axiom` etiketli zincir — aksiyomu
-   "var kabul edip" obstruction'ı sıfıra düşürür.
+1. **Raw obstruction (Expr):** the difference that should be zero
+   — reducing it via simplify is the user's choice.
+2. **VanishingCondition:** the raw obstruction plus a named
+   condition.
+3. **ProofChain:** a single `axiom`-tagged step — accepts the
+   axiom and drives the obstruction to zero.
 
 ```python
 X, Y = VectorFields("X Y", registry=reg)
@@ -68,24 +70,25 @@ chain.steps[0].rule              # 'LieAlgebroidAnchorCompat'
 chain.steps[0].provenance_tag    # 'axiom'
 ```
 
-Obstruction'ı `simplify` ile sıfıra indirmek istesek başarısız olur —
-`TM` bracket'i atomik olduğundan iki tarafı birleştiren yeniden-yazım
-kuralı yoktur. Bu, tasarımın amacı: compatibility'nin bir *aksiyom
-seçimi* olduğunu saklamak yerine açıkça işaretler.
+Asking `simplify` to drive the obstruction to zero will not work —
+since the ``TM`` bracket is atomic, no rewrite rule connects the
+two sides. That's by design: it surfaces compatibility as a
+deliberate **axiom choice** instead of hiding it.
 
-## Algebroid Cartan bundle
+## The algebroid Cartan bundle
 
-`E` üstündeki exterior algebra `Λ*E*`'de yaşayan bir Cartan calculus'u
-`A.cartan` verir:
+A Cartan calculus living on the exterior algebra ``Λ*E*`` over
+``E`` is exposed via `A.cartan`:
 
-- `d_E` — algebroid exterior türev (derece +1). `LieAlgebroid`
-  inşasında `ExteriorDerivative(name=f"d_{E}")` olarak dökülür ve
-  `A.d` erişilir.
-- `L_{E,X}` — algebroid Lie türev factory'si: `cart.lie_derivative(X)`.
-  İsmine bundle tag gömülür (`L_E,X`), böylece aynı ifade içinde
-  manifold Lie türevlerinden ayrışabilir.
-- `ι_{E,X}` — algebroid interior product factory'si: `cart.interior(X)`.
-  Benzer şekilde `ι_E,X` olarak işaretlenir.
+- `d_E` — the algebroid exterior derivative (degree +1). Built
+  inside `LieAlgebroid` as `ExteriorDerivative(name=f"d_{E}")`,
+  reachable via `A.d`.
+- `L_{E,X}` — algebroid Lie-derivative factory:
+  `cart.lie_derivative(X)`. The bundle tag is woven into the
+  display name (`L_E,X`) so it stays distinguishable from the
+  manifold Lie derivative inside the same expression.
+- `ι_{E,X}` — algebroid interior-product factory:
+  `cart.interior(X)`. Tagged similarly as `ι_E,X`.
 
 ```python
 cart = A.cartan
@@ -94,26 +97,28 @@ cart.lie_derivative(X)   # L_E,X
 cart.interior(X)         # ι_E,X
 ```
 
-Beş Cartan bağıntısı (`d_E² = 0`, magic, `[d_E, L]`, `[L, L]`,
-`[L, ι]`) ayni API üstünden çağrılır — `cart.relation(name, X=..., Y=...)`
-bir `OperatorEquation` döner:
+The five Cartan relations (`d_E² = 0`, magic, `[d_E, L]`,
+`[L, L]`, `[L, ι]`) are exposed through the same API —
+`cart.relation(name, X=..., Y=...)` returns an `OperatorEquation`:
 
 ```python
 eq = cart.relation("cartan_magic", X=X)
-# [d_E, ι_E,X] = L_E,X biçiminde OperatorEquation
+# OperatorEquation of the form [d_E, ι_E,X] = L_E,X
 ```
 
-**Not.** Algebroid Cartan üstünde `cart.verify(...)` mevcut expansion
-engine'in "Cartan magic formülünün tanım rewrite'ı"nı default `d/ι_X`
-TM operatörleriyle eşleştirmesi sebebiyle özel-adlı `d_E / ι_E,X`
-ile otomatik kapanmıyor — bu biliniyor ve
-`engine_cartan_definition_deferral` olarak kayıtlı. Beş bağıntının
-canlı doğrulanmış örneklerini [05 — Cartan calculus](05_cartan_calculus.md)
-TM üstünde yürütür; algebroid'de yapısal simetri aynıdır.
+**Note.** On the algebroid Cartan layer, `cart.verify(...)` does
+not auto-close because the current expansion engine pattern-matches
+the "definition rewrite" of Cartan magic against the default
+``d / ι_X`` ``TM`` operators rather than the algebroid-named
+``d_E / ι_E,X``. This is known and recorded under
+`engine_cartan_definition_deferral`. Live verified examples of the
+five relations live on ``TM`` in
+[05 — Cartan calculus](05_cartan_calculus.md); the structural
+symmetry is identical on the algebroid side.
 
-## Seeded teorem
+## Seeded theorem
 
-Compatibility aksiyomu `theorem_book` içine kaydedildi:
+The compatibility axiom is registered in `theorem_book`:
 
 ```python
 from jacopy.library import theorem_book
@@ -123,11 +128,11 @@ thm.statement    # "ρ([X, Y]_E) = [ρ(X), ρ(Y)]_{TM}"
 thm.from_axioms  # ('Lie algebroid anchor compatibility axiom',)
 ```
 
-Kayıt, aşağı yöndeki teoremlerin (algebroid Cartan, Courant–Dorfman
-köprüsü) tek citation ile bu aksiyomu kullanmasını sağlar.
+The registration lets downstream theorems (algebroid Cartan,
+Courant–Dorfman bridge) cite this axiom in a single step.
 
-## Sonraki adım
+## Next step
 
-Cartan calculus'un beş bağıntısını — `d² = 0`, magic, `[d, L]`,
-`[L, L]`, `[L, ι]` — `TM` üstünde iki ayrı modda (efficient vs
-foundational) canlı ispatlayan tur: [05_cartan_calculus.md](05_cartan_calculus.md).
+A live walk-through of the five Cartan relations — `d² = 0`,
+magic, `[d, L]`, `[L, L]`, `[L, ι]` — on ``TM`` in two modes
+(efficient vs foundational): [05_cartan_calculus.md](05_cartan_calculus.md).

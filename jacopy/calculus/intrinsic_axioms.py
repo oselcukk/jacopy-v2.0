@@ -25,14 +25,20 @@ covector one or vice versa.
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from jacopy.algebra.derivation import Act
 from jacopy.algebra.lie_bracket_vf import lie_bracket_vf
+from jacopy.brackets.base import BracketApply
 from jacopy.calculus.exterior_d import ExteriorDerivative
 from jacopy.calculus.interior import InteriorProduct
 from jacopy.calculus.lie_derivative import LieDerivative
 from jacopy.core.expr import Expr, Neg, Sum
 from jacopy.core.multi_eval import MultiEval
 from jacopy.proof.expansion import Definition
+
+if TYPE_CHECKING:
+    from jacopy.calculus.connection import AffineConnection
 
 
 # --------------------------------------------------------------------- #
@@ -253,6 +259,111 @@ class ExteriorDIntrinsicDefinition(Definition):
                     a for k, a in enumerate(args) if k != i and k != j
                 )
                 inner_args = (bracket,) + rest
+                inner_term: Expr = MultiEval(
+                    omega,
+                    *inner_args,
+                    alternating=expr.alternating,
+                    slot_kind=expr.slot_kind,
+                )
+                if (i + j) % 2 == 1:
+                    inner_term = Neg(inner_term)
+                terms.append(inner_term)
+
+        return Sum.make(*terms)
+
+
+class KoszulExteriorDIntrinsicDefinition(Definition):
+    r"""Anchored ``d̃`` intrinsic formula for a Koszul-bracket connection.
+
+    Connection-parametric variant of :class:`ExteriorDIntrinsicDefinition`
+    for an affine connection ``∇̃`` whose vector bracket is Koszul (or any
+    other graded bracket carried by the connection) and whose function
+    action is anchor-routed:
+
+    .. math::
+
+       (d̃ω)(α_0, \dots, α_p)
+           &= \sum_{i=0}^{p} (-1)^i\,
+                 ρ(α_i)\bigl(ω(α_0, \dots, \widehat{α_i}, \dots, α_p)\bigr)\\
+           &\quad + \sum_{0 \le i < j \le p} (-1)^{i+j}\,
+                 ω\bigl([α_i, α_j]_K,
+                        α_0, \dots, \widehat{α_i}, \dots,
+                        \widehat{α_j}, \dots, α_p\bigr).
+
+    The function-action lift is sourced from
+    :meth:`AffineConnection.function_action` (so a Koszul connection
+    emits ``Act(AnchoredVectorField(ρ, α_i), …)`` exactly as the
+    Y-Leibniz rule does), and the bracket lift is sourced from the
+    connection's ``bracket`` slot. Both choices are bypassed in the
+    standard rule, which uses raw ``Act(X_i, …)`` and ``LieBracketVF``.
+
+    Wiring this rule (in place of :class:`ExteriorDIntrinsicDefinition`)
+    is what closes Cartan I/II on a Koszul connection: without the
+    anchor pull, the LHS's ``ρ(U)(…)`` shapes (sourced from Y-Leibniz)
+    don't cancel against the RHS's ``U(…)``; without the connection
+    bracket, the ``[U, V]_K`` from the torsion / curvature definition
+    doesn't cancel against the ``[U, V]_VF`` the standard rule emits.
+    """
+
+    def __init__(self, connection: "AffineConnection") -> None:
+        from jacopy.calculus.connection import AffineConnection
+
+        if not isinstance(connection, AffineConnection):
+            raise TypeError(
+                "KoszulExteriorDIntrinsicDefinition requires an AffineConnection"
+            )
+        if connection.bracket is None:
+            raise ValueError(
+                "KoszulExteriorDIntrinsicDefinition requires the connection "
+                "to carry a bracket — pass a koszul_connection(...) or "
+                "another bracket-equipped AffineConnection"
+            )
+        self._conn = connection
+        self.name = (
+            f"d̃ intrinsic ({connection._repr_inner()}-anchored): "
+            f"(d̃ω)(…) = Σ ±ρ(α_i)(ω(…)) + Σ ±ω([α_i,α_j]_{connection.bracket.name}, …)"
+        )
+
+    def matches(self, expr: Expr) -> bool:
+        return (
+            isinstance(expr, MultiEval)
+            and expr.slot_kind == "vector"
+            and isinstance(expr.head, Act)
+            and isinstance(expr.head.op, ExteriorDerivative)
+            and len(expr.args) >= 1
+        )
+
+    def rewrite(self, expr: Expr) -> Expr:
+        head_act = expr.head
+        omega = head_act.arg
+        args = expr.args
+        bracket = self._conn.bracket
+        terms: list[Expr] = []
+
+        for i, X_i in enumerate(args):
+            remaining = args[:i] + args[i + 1 :]
+            inner: Expr
+            if remaining:
+                inner = MultiEval(
+                    omega,
+                    *remaining,
+                    alternating=expr.alternating,
+                    slot_kind=expr.slot_kind,
+                )
+            else:
+                inner = omega
+            term: Expr = self._conn.function_action(X_i, inner)
+            if i % 2 == 1:
+                term = Neg(term)
+            terms.append(term)
+
+        for i in range(len(args)):
+            for j in range(i + 1, len(args)):
+                pair = BracketApply(bracket, args[i], args[j])
+                rest = tuple(
+                    a for k, a in enumerate(args) if k != i and k != j
+                )
+                inner_args = (pair,) + rest
                 inner_term: Expr = MultiEval(
                     omega,
                     *inner_args,

@@ -28,7 +28,7 @@ hiding it in the type.
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import Any, Optional
 
 from jacopy.algebra.derivation import Act, Derivation
 from jacopy.brackets.base import GradedBracket
@@ -56,6 +56,56 @@ class Anchor(Derivation):
 
     def __init__(self, name: str = "ρ") -> None:
         super().__init__(name, degree=0)
+
+
+class AnchoredVectorField(Derivation):
+    """The vector field ``ρ(σ)`` produced by applying anchor ``ρ`` to section ``σ``.
+
+    For a Lie algebroid ``(E, [·,·]_E, ρ)`` the anchor maps each section
+    ``σ ∈ Γ(E)`` to a smooth vector field on the base. On functions
+
+        ρ(σ)(f)  ∈  C∞(M).
+
+    Wrapping ``(ρ, σ)`` as a single degree-0 derivation lets it sit
+    naturally in the operator slot of :class:`Act` — i.e. ``Act(ρ(σ), f)``
+    represents the directional derivative of ``f`` along ``ρ(σ)``. The
+    section ``σ`` is held in a private slot rather than as a child so
+    that the engine's bottom-up walk does not accidentally peer inside
+    a vector-field operator atom (same opacity convention as
+    :class:`~jacopy.calculus.lie_derivative.LieDerivative` and
+    :class:`~jacopy.calculus.interior.Interior`).
+
+    Used by Q9 (Math 595): the connection ``∇̃`` on ``T*M`` acts on
+    functions through the Poisson anchor, ``∇̃_ω f := π^♯(ω)(f)``. Here
+    the operator ``π^♯(ω)`` is exactly an :class:`AnchoredVectorField`.
+    """
+
+    __slots__ = ("_anchor", "_section")
+
+    def __init__(self, anchor: "Anchor", section: Expr) -> None:
+        if not isinstance(anchor, Anchor):
+            raise TypeError(
+                "AnchoredVectorField anchor must be an Anchor"
+            )
+        if not isinstance(section, Expr):
+            raise TypeError(
+                "AnchoredVectorField section must be an Expr"
+            )
+        display = f"{anchor.name}({section._repr_inner()})"
+        super().__init__(display, degree=0)
+        self._anchor = anchor
+        self._section = section
+
+    @property
+    def anchor(self) -> "Anchor":
+        return self._anchor
+
+    @property
+    def section(self) -> Expr:
+        return self._section
+
+    def _key(self) -> Any:
+        return ("AnchoredVectorField", self._anchor, self._section)
 
 
 def bracket_compatibility_obstruction(

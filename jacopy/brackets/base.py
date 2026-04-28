@@ -173,6 +173,54 @@ class GradedBracket(ABC):
     def __call__(self, a: Expr, b: Expr) -> BracketApply:
         return BracketApply(self, a, b)
 
+    # ---- sign-convention hooks ------------------------------------- #
+    #
+    # The closure-axiom rules in :mod:`jacopy.calculus.bracket_apply_axioms`
+    # consult these hooks instead of hardcoding signs, so subclasses with
+    # genuine graded-sign behavior on their operands (e.g. a future
+    # Schouten-Nijenhuis rule layer) can override without rewriting the
+    # rules. Defaults preserve the *literal-antisym* convention used by
+    # the existing degree-0 brackets (Koszul, Lie bracket on TM, …):
+    # ``[a, b] = −[b, a]`` and the cyclic Jacobi ``Σ_cyclic [A, [B, C]] = 0``
+    # carries no per-term sign factor.
+
+    def pair_swap_sign(
+        self,
+        a: Expr,
+        b: Expr,
+        registry: Optional[PropertyRegistry] = None,
+    ) -> Optional[int]:
+        """Sign such that ``[a, b] = pair_swap_sign · [b, a]``.
+
+        Returns ``±1`` for a decidable swap, ``None`` when undecidable
+        (the rule should then decline). Default: ``−1`` for a
+        graded-antisymmetric bracket (literal antisym), ``None``
+        otherwise. Subclasses implementing the full graded convention
+        ``[a, b] = −(−1)^{|a||b|}[b, a]`` should override to compute
+        ``-1 if (degree_of(a) * degree_of(b)).parity() == 0 else +1``.
+        """
+        if not self._is_graded_antisymmetric:
+            return None
+        return -1
+
+    def jacobi_term_sign(
+        self,
+        A: Expr,
+        B: Expr,
+        C: Expr,
+        registry: Optional[PropertyRegistry] = None,
+    ) -> Optional[int]:
+        """Per-term sign for the ``[A, [B, C]]`` summand in cyclic Jacobi.
+
+        Cyclic Jacobi reads
+        ``Σ_cyclic jacobi_term_sign(A, B, C) · [A, [B, C]] = 0``.
+        Default: ``+1`` (literal Jacobi, no per-term Koszul factor).
+        Subclasses with full graded behavior override to return
+        ``+1 if (degree_of(A) * degree_of(C)).parity() == 0 else −1``.
+        Returns ``None`` for undecidable parity.
+        """
+        return 1
+
     @abstractmethod
     def expand(
         self,

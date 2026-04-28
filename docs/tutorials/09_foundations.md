@@ -1,28 +1,33 @@
-# 09 — Temeller
+# 09 — Foundations
 
-Bu son tutorial bir soruya iniyor: "`d² = 0` *neden* bir aksiyom?" Yanıt
-paketin pedagojik omurgasını açıklar — property provenance, efficient vs
-foundational mode, axiom vs theorem sınıflandırması, özel aksiyom setleri
-ile çalışma. Daha önceki tutorial'lar bracket ve teoremleri verdi; burada
-o teoremlerin altında hangi zeminin olduğunu ve paketin bu zemini nasıl
-açıkça tuttuğunu görüyoruz.
+This final tutorial drops to one question: "*why* is `d² = 0` an
+axiom?" The answer reveals the package's pedagogical backbone —
+property provenance, efficient vs foundational mode, the
+axiom-vs-theorem classification, and working with custom axiom
+sets. Earlier tutorials gave the brackets and theorems; here we
+look at what ground sits underneath them and how the package
+keeps that ground explicit.
 
-[08 — Birleşik tablo](08_unified_picture.md) teoremleri birleştirdi;
-burada teoremlerin *ardındaki* aksiyom katmanına iniyoruz.
+[08 — The unified picture](08_unified_picture.md) tied the
+theorems together; here we drop into the axiom layer that sits
+*beneath* those theorems.
 
-## İki hipotez seviyesi
+## Two layers of claim
 
-Paket iki katman iddia taşır:
+The package carries assertions on two layers:
 
-- **Axiom.** Primitive kabul edilen eşitlik. Örnek: `d(df) = 0` 0-form'lar
-  üstünde jenerik aksiyom — Ω*(M) generator'larına empoze edilmiş.
-- **Theorem.** Aksiyomlardan çıkan sonuç. Örnek: `d² = 0` operatör
-  özdeşliği — genel derece formlar için `d(df) = 0` + Leibniz ile
-  agreement-on-generators argümanıyla türer.
+- **Axiom.** A primitive equation. Example: `d(df) = 0` on
+  0-forms — a generic axiom imposed on the generators of
+  Ω*(M).
+- **Theorem.** A consequence of axioms. Example: `d² = 0` as
+  an operator identity — derived for general-degree forms from
+  `d(df) = 0` + Leibniz via the agreement-on-generators
+  argument.
 
-`ExpansionEngine` bu ayrımı `Definition.is_theorem` üstünden taşır. Her
-kural ya aksiyom (`is_theorem=False`) ya da theorem (`is_theorem=True`);
-theorem olanlar `theorem_proof_builder()`'ından bir sub-proof çıkarabilir.
+`ExpansionEngine` carries this distinction through
+`Definition.is_theorem`. Every rule is either an axiom
+(`is_theorem=False`) or a theorem (`is_theorem=True`); theorems
+can produce a sub-proof through `theorem_proof_builder()`.
 
 ```python
 from jacopy.proof.expansion import default_engine
@@ -39,14 +44,14 @@ for d in eng.definitions:
 # axiom    | ι_X(df) = X(f)
 ```
 
-Default engine konservatiftir: her şeyi axiom sayar. Hiçbir kural daha
-derinden türetilmez. Bu "efficient" mode'un davranışı — kısa, hızlı,
-ispat-altyapısı yok.
+The default engine is conservative — it treats everything as an
+axiom. No rule is derived from anything deeper. That's the
+"efficient" mode: short, fast, no proof-substrate behind it.
 
-## `d_squared_mode="theorem"` — d² = 0'ı türet
+## `d_squared_mode="theorem"` — derive `d² = 0`
 
-`d² = 0`'ı *theorem* olarak işaretlemek için engine'i özel konfigüre
-edin:
+Mark `d² = 0` as a *theorem* by configuring the engine
+explicitly:
 
 ```python
 eng_th = default_engine(d_squared_mode="theorem")
@@ -54,18 +59,18 @@ eng_th = default_engine(d_squared_mode="theorem")
 # True
 ```
 
-Bu bayrak tek başına ispat katmanını değiştirmez; sadece "bu kural
-aksiyom değil, daha derin bir türevdir" der. Türemeyi *görmek* için
-foundational mode gerekli.
+The flag alone doesn't change the proof layer; it just says
+"this rule is not an axiom, it's a deeper derivation". To
+*see* the derivation you need foundational mode.
 
 ## Efficient vs foundational mode
 
-`mode="efficient"` (default): hızlı tag-only ispatlar. Her kural tek
-adımda atar, arkasında sub-proof yok.
+`mode="efficient"` (default): fast tag-only proofs. Each rule
+fires in a single step with no sub-proof attached.
 
-`mode="foundational"`: theorem-sınıfı kurallar tetiklendiğinde
-`ProofStep.children` alanına sub-proof iliştirir — kuralın hangi daha
-primitive aksiyom(lar)a dayandığını gösterir.
+`mode="foundational"`: when a theorem-class rule fires, a
+sub-proof is attached on `ProofStep.children` — showing which
+more primitive axiom(s) the rule rests on.
 
 ```python
 from jacopy.calculus.invariant_d import default_d
@@ -100,33 +105,36 @@ fnd.steps[0].children[0].justification
 #  d(df) = 0 by agreement on the generators of Ω*(M) ...'
 ```
 
-Aynı `d² = 0` adımı iki mode'da aynı `after` değerine (`0`) iner — ama
-foundational mode "peki nereden?" sorusuna cevap taşıyor. Generator-level
-axiom (`d(df) = 0`) mevcut argümanın *tek* primitive girdisidir; geri
-kalan her şey "generator üstünde eşitse Ω*(M)'nin tamamında eşittir"
-prensibiyle extend edilmiş.
+The same `d² = 0` step lands on the same `after` value (`0`) in
+both modes — but foundational mode also carries the answer to
+"so where does it come from?". The generator-level axiom
+(`d(df) = 0`) is the *only* primitive input to the argument;
+everything else is the "if it agrees on generators it agrees on
+all of Ω*(M)" extension principle.
 
-## Custom aksiyom setleri
+## Custom axiom sets
 
-`default_engine` bir kolaylık — asıl veri `ExpansionEngine.definitions`
-listesi. Bu listeyi kendiniz inşa ederek paketin aksiyomatik tabanını
-değiştirebilirsiniz:
+`default_engine` is a convenience — the actual data is the
+`ExpansionEngine.definitions` list. By assembling the list
+yourself you can change the package's axiomatic basis:
 
-- `d² = 0` yerine sadece generator-level `d(df) = 0`'ı tutup
-  `DSquaredZeroDefinition`'ı tamamen dışarı bırakmak.
-- `LieDerivativeCartanDefinition`'ı *aksiyom* yerine *tanım* olarak
-  kullanıp Cartan magic formula üstünden türetilmiş varsaymak.
-- Kendi cebirsel teorinizin aksiyomlarını `Definition` alt-sınıfı
-  yazarak enjekte etmek.
+- Drop `DSquaredZeroDefinition` entirely and keep only the
+  generator-level `d(df) = 0`.
+- Use `LieDerivativeCartanDefinition` as a *definition* rather
+  than an axiom and assume it derived from Cartan's magic
+  formula.
+- Inject your own algebraic theory's axioms by writing a
+  `Definition` subclass.
 
-`Definition` API minimal — `matches(expr)`, `rewrite(expr)`, ve opsiyonel
-`theorem_proof_builder()` (foundational mode'da sub-proof veren).
+The `Definition` API is minimal — `matches(expr)`,
+`rewrite(expr)`, plus the optional `theorem_proof_builder()`
+that supplies the sub-proof in foundational mode.
 
-### Axiom sınıfı — en kısa yol
+### Axiom class — the shortest path
 
-Aşağıda `c_zero` sembolünü sıfıra indiren bir kural. Kendi engine'ini
-`ExpansionEngine([...])` ile kuruyorsun; default kuralları devre dışı
-bırakıp sadece bu kuralı çalıştırıyorsun:
+A rule that reduces a `c_zero` symbol to zero. You build your
+own engine with `ExpansionEngine([...])`, disabling default
+rules and running just this one:
 
 ```python
 from jacopy.proof.expansion import Definition, ExpansionEngine
@@ -147,13 +155,13 @@ expanded, steps = engine.expand(Sum(Symbol("c_zero"), Symbol("x")))
 # steps:     [ProofStep(rule='c_zero := 0 (axiom)', provenance_tag='axiom')]
 ```
 
-`theorem_proof_builder` override etmediği için `is_theorem=False` —
-foundational mode'da bile çocuk adım yok.
+Without overriding `theorem_proof_builder`, `is_theorem=False` —
+no child step even in foundational mode.
 
-### Theorem sınıfı — sub-proof iliştir
+### Theorem class — attach a sub-proof
 
-Aynı kuralı theorem olarak sunmak için `theorem_proof_builder` bir
-`ProofChain` builder'ı döndürür:
+To present the same rule as a theorem, `theorem_proof_builder`
+returns a `ProofChain` builder:
 
 ```python
 from jacopy.proof.chain import ProofChain
@@ -193,16 +201,17 @@ fnd_steps[0].children[0].rule
 # 'c_zero = c_zero − c_zero (axiom)'
 ```
 
-Aynı `Definition`; efficient mode'da atomik olarak atıyor, foundational
-mode'da altına tek adımlık sub-proof iliştiriyor. Paket'in kendi
-`DSquaredZeroDefinition`'ı da aynen böyle çalışıyor — sadece sub-proof
-builder'ı `d(df) = 0` generator axiom'una atıf yapıyor.
+Same `Definition`; in efficient mode it fires atomically, in
+foundational mode it attaches a one-step sub-proof. The
+package's own `DSquaredZeroDefinition` works the same way —
+its sub-proof builder cites the `d(df) = 0` generator axiom.
 
-## Theorem Book yapısı
+## Theorem Book structure
 
-Expansion kuralları operatör-seviyesi provenance taşır; teorem-seviyesi
-provenance ise [`jacopy.library.theorem_book`](../../jacopy/library/theorem_book.py)
-altında. Veri yapısı:
+Expansion rules carry operator-level provenance; theorem-level
+provenance lives in
+[`jacopy.library.theorem_book`](../../jacopy/library/theorem_book.py).
+The data structure:
 
 ```python
 from jacopy.library.theorem_book import Theorem
@@ -212,15 +221,15 @@ import dataclasses
 # ['name', 'statement', 'from_axioms', 'proof', 'notes']
 ```
 
-Beş alan:
+Five fields:
 
-- `name` — registry key (ör. `"poisson_jacobi"`).
-- `statement` — insan-okunur teorem iddiası.
-- `from_axioms` — atomic dayandığı aksiyomların `Tuple[str, ...]`'u.
-- `proof` — teoremin kanonik `ProofChain`'i.
-- `notes` — ek bağlam (opsiyonel).
+- `name` — the registry key (e.g. `"poisson_jacobi"`).
+- `statement` — a human-readable claim.
+- `from_axioms` — `Tuple[str, ...]` of atomic axioms it depends on.
+- `proof` — the theorem's canonical `ProofChain`.
+- `notes` — extra context (optional).
 
-Singleton registry `theorem_book`'a sorgu atmak:
+Querying the singleton registry `theorem_book`:
 
 ```python
 from jacopy.library import theorem_book
@@ -240,73 +249,75 @@ thm.proof.steps[0].rule
 # 'DerivedBracketTheorem'
 ```
 
-Seeded teoremler paket initialization sırasında register edilir
-(`jacopy/library/__init__.py` submodule yüklemeleri). Downstream kod
-bir teoremi *yeniden ispatlamaz*; `theorem_book.get(name).proof`
-chain'ini alıp daha büyük bir `ProofChain`'in içine gömer. Bu paketin
-"tek citation, çok kullanım" stratejisinin omurgası — her yeni library
-modülü kendi teoremlerini register eder, Theorem Book büyür.
+Seeded theorems are registered at package init time
+(`jacopy/library/__init__.py` submodule loads). Downstream code
+does *not* re-prove a theorem; it pulls
+`theorem_book.get(name).proof` and embeds that chain inside a
+larger `ProofChain`. That's the spine of the "single citation,
+many uses" strategy — every new library module registers its
+theorems and the Theorem Book grows.
 
-## Property provenance tekrar
+## Property provenance — once more
 
-[02 — Property provenance](02_property_provenance.md) property'lerin
-`axiom` ve `theorem` olarak etiketlenmesini göstermişti. Aynı ayrım
-burada `Definition.is_theorem` üstünden karşımıza çıkıyor — aslında
-paketin tek omurgası: "bir iddia primitive mi, yoksa başka
-primitive'lerden mi türüyor?" sorusu hem sembol seviyesinde
-(property'ler) hem operatör seviyesinde (expansion kuralları)
-takibe alınır.
+Property tags label themselves as `axiom` or `theorem`. The
+same distinction shows up here on `Definition.is_theorem` —
+they're really one backbone: "is this claim primitive, or
+derived from other primitives?", tracked at both the symbol
+level (properties) and the operator level (expansion rules).
 
-Birleştirme:
+Putting it together:
 
-| katman | taşıyıcı | primitive | türeyen |
-|--------|----------|-----------|---------|
-| sembol | `Property.provenance` | `"axiom"` | `"theorem"` |
+| layer | carrier | primitive | derived |
+|-------|---------|-----------|---------|
+| symbol | `Property.provenance` | `"axiom"` | `"theorem"` |
 | expansion | `Definition.is_theorem` | `False` | `True` |
-| teorem | `Theorem.from_axioms` | atomic string | — |
+| theorem | `Theorem.from_axioms` | atomic strings | — |
 
-Üç katmanda da aynı felsefe: **her iddianın kaynağı takip edilir**.
-Kullanıcı "bu sonuç hangi aksiyoma dayanıyor?" diye sorduğunda paket
-mekanik yolla cevap verebilir.
+Same philosophy on all three layers: **every claim's source is
+tracked**. When a user asks "which axiom does this rest on?"
+the package can answer mechanically.
 
-## Pedagojik kapanış
+## Pedagogical close
 
-Bütün paket tek bir mimari kararın etrafında örülü: *provenance'ı
-asla kaybetme*. Bu karar:
+The whole package is built around one architectural decision:
+*never lose provenance*. The decision shows up as:
 
-1. **Property-level.** Her `Property` (graded-antisymmetry, Leibniz,
-   Jacobi, …) hangi aksiyomdan türediğini taşır.
-2. **Expansion-level.** Her `Definition` axiom mu theorem mi deklare
-   eder; foundational mode kişisel ispat altında ne var sorusuna
-   mekanik cevap verir.
-3. **Theorem-level.** Her `Theorem.from_axioms` hangi atomic
-   varsayımlara dayandığını beyan eder; her `theorem_book.get(name)`
-   kullanımı citation zinciri üretir.
-4. **Bracket-level.** Derived Bracket Teoremi gibi yapı teoremleri
-   "tek hipotez, çok sonuç" çerçevesinde aynı obstruction'ı paylaşır —
-   paket bunu otomatik tespit eder.
+1. **Property-level.** Every `Property` (graded antisymmetry,
+   Leibniz, Jacobi, …) carries the axiom it derives from.
+2. **Expansion-level.** Every `Definition` declares whether it
+   is an axiom or a theorem; foundational mode answers "what
+   sits under this proof?" mechanically.
+3. **Theorem-level.** Every `Theorem.from_axioms` declares the
+   atomic axioms it depends on; every `theorem_book.get(name)`
+   call generates a citation chain.
+4. **Bracket-level.** Structural theorems like the Derived
+   Bracket Theorem share an obstruction inside a "single
+   hypothesis, many consequences" frame — and the package
+   detects that automatically.
 
-Paket *nereden biliyorsun?* sorusunu sembol'den teorem'e kadar her
-seviyede cevaplanabilir tutmak için inşa edildi. Her `ProofChain` bir
-argüman ağacı — kökleri axiom, yaprakları `Integer(0)`. Pedagojik
-değer buradan geliyor: kullanıcı bir teoremi kara-kutu olarak değil,
-altındaki yapı ile birlikte kavrıyor.
+The package was built so that *how do you know?* stays
+answerable from symbol all the way up to theorem. Every
+`ProofChain` is an argument tree — roots in axioms, leaves at
+`Integer(0)`. The pedagogical value follows: a user grasps a
+theorem together with the structure beneath it, not as a
+black box.
 
-## Tutorial serisinin sonu
+## End of the tutorial series
 
-Dokuz bölüm:
+Nine chapters:
 
-1. [01 — Expression agacı](01_expressions.md)
-2. [02 — Property provenance](02_property_provenance.md)
-3. [03 — Poisson geometri](03_poisson_geometry.md)
+1. [01 — First steps](01_first_steps.md)
+2. [02 — The Jacobi identity](02_jacobi_identity.md)
+3. [03 — Poisson geometry](03_poisson_geometry.md)
 4. [04 — Lie algebroid](04_lie_algebroid.md)
 5. [05 — Cartan calculus](05_cartan_calculus.md)
 6. [06 — Custom bracket](06_custom_bracket.md)
 7. [07 — Derived bracket](07_derived_bracket.md)
-8. [08 — Birleşik tablo](08_unified_picture.md)
-9. **09 — Temeller** ← buradasınız
+8. [08 — The unified picture](08_unified_picture.md)
+9. **09 — Foundations** ← you are here
 
-Sembolden teoreme, aksiyomdan birleşik tabloya — her adımda paketin
-gerçekten sunabildiğini canlı API örnekleriyle gördük. Buradan sonra
-paket bir araç: kendi bracket'inizi, kendi teoreminizi, kendi aksiyom
-setinizi ekleyip üstüne çalıştırabilirsiniz.
+From symbol to theorem, axiom to unified picture — at every
+step we saw what the package can actually deliver, with live
+API examples. From here on the package is a tool: add your own
+brackets, your own theorems, your own axiom sets, and run on
+top of it.

@@ -1,29 +1,30 @@
-# 02 — Jacobi Özdeşliği
+# 02 — The Jacobi identity
 
-Bu tutorial, Lie bracket üzerinde Jacobi özdeşliğinin `jacopy` içinde
-nasıl bir `ProofChain` olarak kapatıldığını gösteriyor. [İlk adımlar
-tutorial'ına](01_first_steps.md) aşinalık önerilir.
+This tutorial shows how the Jacobi identity for a Lie bracket
+closes as a `ProofChain` in `jacopy`. Familiarity with the
+[first-steps tutorial](01_first_steps.md) is assumed.
 
-## Lie bracket
+## The Lie bracket
 
-Modül `jacopy.brackets.lie` iki şey sağlar:
+`jacopy.brackets.lie` exposes two things:
 
-- `LieBracket` — isim alabilen `GradedBracket` alt sınıfı.
-- `lie` — standart ("TM") Lie bracket'in process-wide singleton'ı.
+- `LieBracket` — a `GradedBracket` subclass with an optional name.
+- `lie` — the process-wide singleton for the standard ("TM") Lie
+  bracket.
 
-Tutorial'larda hep bu singleton'ı kullanıyoruz. Özel bir manifold veya
-cebroid üstündeyken kendi `LieBracket(name="[·,·]_E")` instance'ınızı
-yaratırsınız.
+Tutorials use the singleton throughout. On a specific manifold or
+algebroid, build your own `LieBracket(name="[·,·]_E")` instance
+instead.
 
 ```python
 from jacopy.brackets.lie import lie
 ```
 
-## Üç vector field
+## Three vector fields
 
-Jacobi için üç sembol gerekli. `VectorFields` yardımcısı her sembole
-`Graded(degree=0)` declare eder — `PropertyRegistry` Jacobi expansion
-sırasında işaret kurallarını bu dereceden türetiyor.
+Jacobi needs three symbols. The `VectorFields` helper declares
+each as `Graded(degree=0)` — the `PropertyRegistry` derives the
+sign rules in the Jacobi expansion from that degree.
 
 ```python
 from jacopy import VectorFields
@@ -33,36 +34,36 @@ reg = PropertyRegistry()
 X, Y, Z = VectorFields("X Y Z", registry=reg)
 ```
 
-Alternatif (primitive) yol için [01_first_steps.md](01_first_steps.md)
-altındaki "Özellik atama" bölümüne bakın — yardımcı yalnızca
-`Symbol(...) + reg.declare(sym, Graded(degree=0))` deseninin bir
-sargısı.
+For the primitive path, see the *Declaring properties* section of
+[01_first_steps.md](01_first_steps.md) — the helper is just a
+wrapper around `Symbol(...) + reg.declare(sym, Graded(degree=0))`.
 
 ## `prove_jacobi`
 
-Graded Jacobi özdeşliği
+The graded Jacobi identity:
 
 $$[X,[Y,Z]] + (-1)^{|X||Y|+|X||Z|}\,[Y,[Z,X]] + (-1)^{|Y||Z|+|X||Z|}\,[Z,[X,Y]] = 0$$
 
-Derece-0 durumunda tüm işaretler `+1`; sonuç standart Jacobi:
+In degree 0 every sign is `+1`, recovering the standard Jacobi:
 
 $$[X,[Y,Z]] + [Y,[Z,X]] + [Z,[X,Y]] = 0.$$
 
-`prove_jacobi`, bracket + üç operand + registry alır ve bir `ProofChain`
-döndürür:
+`prove_jacobi` takes a bracket + three operands + a registry and
+returns a `ProofChain`:
 
 ```python
 from jacopy.proof import prove_jacobi
 
 chain = prove_jacobi(lie, X, Y, Z, registry=reg)
-assert chain.steps[-1].after  # final state; 0 olmalı
+assert chain.steps[-1].after  # final state — should be 0
 ```
 
-Zincirin uzunluğu bracket'in iç rewrite kuralı sayısına bağlı. `lie`
-üzerinde iki adımlık bir zincir üretiliyor; ilk adım Jacobi obstruction'ı
-bracket'i açıp canonical forma alır, ikincisi kalıntıyı sıfıra indirir.
+The chain length depends on the bracket's internal rewrite rules.
+On `lie` the chain has two steps: the first opens the Jacobi
+obstruction's bracket into canonical form, the second collapses
+the residue to zero.
 
-## Görselleştirme
+## Display
 
 ASCII:
 
@@ -71,23 +72,24 @@ from jacopy.display import chain_to_ascii
 print(chain_to_ascii(chain))
 ```
 
-Jupyter içinde LaTeX (`align*` blokları olarak):
+LaTeX (`align*` blocks) inside Jupyter:
 
 ```python
 from jacopy.display import display_chain
 display_chain(chain)
 ```
 
-## Koşullu Jacobi
+## Conditional Jacobi
 
-Tüm bracket'ler Jacobi'yi unconditional sağlamaz. Örneğin
-`CourantBracket`: `satisfies_graded_jacobi=None`; H-twist var ise
-obstruction `dH`'ye eşit olur, yoksa `0`. `prove_jacobi` aynı sinyali
-taşıyan bir `ProofChain` döndürmez — bunun yerine `bracket.jacobi_condition()`
-üzerinden bir `VanishingCondition` alır, `ProofChain` ise kütüphane
-seviyesindeki helper'lar (örn. `CourantAlgebroid.prove_jacobi_reduction`)
-aracılığıyla kurulur.
+Not every bracket satisfies Jacobi unconditionally. The
+`CourantBracket`, for example, sets
+`satisfies_graded_jacobi=None`: with an H-twist the obstruction
+equals `dH`, without it the obstruction is `0`. `prove_jacobi`
+does **not** carry that signal — instead, reach for
+`bracket.jacobi_condition()` to obtain a `VanishingCondition`. A
+`ProofChain` is then built through library-level helpers such as
+`CourantAlgebroid.prove_jacobi_reduction`.
 
-Sonraki tutorial ([03_poisson_geometry.md](03_poisson_geometry.md))
-Poisson bracket'in derived-bracket teoreminden Jacobi'yi nasıl
-türettiğini gösteriyor.
+The next tutorial ([03_poisson_geometry.md](03_poisson_geometry.md))
+shows how the Poisson bracket derives Jacobi via the derived-bracket
+theorem.

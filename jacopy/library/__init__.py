@@ -72,6 +72,22 @@ from jacopy.library.bianchi_problem import (
     cyclic_sum_3_fixed_last,
 )
 
+# Form-degree (form-property) proofs for ω, Q, T, R on a local frame.
+from jacopy.library.cartan_form_property import (
+    CartanFormPropertyProblem,
+    CartanFormPropertyProofResult,
+)
+
+# Cartan structure equations on a local frame.
+from jacopy.library.cartan_structure import (
+    CartanStructureProblem,
+    CartanStructureProofResult,
+)
+
+# Q9 Stage 9.F — Koszul-connection capstone wrapper bundling
+# Bianchi + form-property + Cartan-structure facets for ∇̃ on T*M.
+from jacopy.library.koszul_connection_problem import KoszulConnectionProblem
+
 __all__ = [
     "Theorem",
     "TheoremBook",
@@ -99,6 +115,11 @@ __all__ = [
     "BianchiProofResult",
     "cyclic_sum_3",
     "cyclic_sum_3_fixed_last",
+    "CartanFormPropertyProblem",
+    "CartanFormPropertyProofResult",
+    "CartanStructureProblem",
+    "CartanStructureProofResult",
+    "KoszulConnectionProblem",
     "THEOREM_POISSON_JACOBI",
     "THEOREM_POISSON_KOSZUL_EQUIVALENCE",
     "THEOREM_POISSON_KOSZUL_JACOBI",

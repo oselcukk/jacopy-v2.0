@@ -1,30 +1,30 @@
-# 06 — Custom Bracket
+# 06 — Custom bracket
 
-Daha önceki tutorial'lar paketin içinde hazır gelen bracket'lerle
-çalıştı: `LieBracket`, `sn`, `KoszulBracket`, `CourantBracket`…
-Kullanıcı kendi tanım-kuralını (expansion function) bir bracket
-olarak sokmak istediğinde — sınıf yazıp `GradedBracket`'ten türemeden —
-`jacopy.brackets.custom.CustomBracket` devreye girer. Bu tutorial
-(a) `CustomBracket`'in minimum veri profilini, (b) flag'ler aracılığıyla
-aksiyom profilini nasıl deklare ettiğini, (c) `prove_jacobi`'nin bu
-bracket üstünde hangi yolu takip ettiğini, ve (d) ne zaman
-`CustomBracket`'ten çıkıp `GradedBracket` alt-sınıfına geçilmesi
-gerektiğini gösteriyor.
+Earlier tutorials worked with the brackets shipped in the package:
+`LieBracket`, `sn`, `KoszulBracket`, `CourantBracket`… When the
+user wants to insert their own definition rule (an expansion
+function) as a bracket — without writing a full `GradedBracket`
+subclass — `jacopy.brackets.custom.CustomBracket` is the entry
+point. This tutorial covers (a) the minimum data profile of
+`CustomBracket`, (b) declaring its axiom profile through flags,
+(c) the path `prove_jacobi` follows on this kind of bracket, and
+(d) when to graduate from `CustomBracket` to a `GradedBracket`
+subclass.
 
-[05 — Cartan calculus](05_cartan_calculus.md) hazır bracket'lerin
-operatör-seviyesi bağıntılarını inceledi; burada bir adım geri
-çıkıp kendi bracket'imizi sembol-seviyesinde tanımlıyoruz.
+[05 — Cartan calculus](05_cartan_calculus.md) covered the
+operator-level relations of stock brackets; here we step back and
+define a bracket of our own at the symbol level.
 
-## Minimum profil — iki argüman
+## The minimum profile — two arguments
 
 `CustomBracket(name, expand_fn, *, degree, is_graded_antisymmetric,
-satisfies_leibniz, satisfies_graded_jacobi)`. Zorunlu alanlar sadece
-isim ve expand çağrısı — geri kalanı makul default'larla geliyor
-(derece 0, antisymmetric, Leibniz var, Jacobi var).
+satisfies_leibniz, satisfies_graded_jacobi)`. Required fields are
+just the name and the expand callable — everything else has
+sensible defaults (degree 0, antisymmetric, Leibniz, Jacobi).
 
-`expand_fn` imzası sabit: `(a, b, registry) → Expr`. Registry rule'un
-işine yaramasa bile her çağrıda geçilir — diğer bracket'lerle
-çağrı-uyumluluğu için.
+`expand_fn` has a fixed signature: `(a, b, registry) → Expr`. The
+registry is passed on every call even when the rule doesn't need
+it — so the call shape stays uniform across brackets.
 
 ```python
 from jacopy.brackets.custom import CustomBracket
@@ -40,27 +40,27 @@ B(Symbol("X"), Symbol("Y")).expand()
 # ((X * Y) + (-(Y * X)))
 ```
 
-`B(X, Y)` bir `BracketApply` düğümü verir; üstünde `.expand()` ya da
-paket seviyesinde `expand_bracket(...)` çağrılınca `commutator` rule'u
-tetiklenir.
+`B(X, Y)` returns a `BracketApply` node; calling `.expand()` on it
+(or `expand_bracket(...)` at the package level) fires the
+`commutator` rule.
 
-## Aksiyom profili flag'leri
+## Axiom-profile flags
 
-Dört flag bracket'in aksiyomatik iddialarını sembolik olarak tutar.
-Engine'in hangi kısayolları seçebileceğini ve `prove_jacobi`
-dispatch'inin beklenti seviyesini bunlar belirler:
+Four flags carry the bracket's axiomatic claims symbolically. They
+control which shortcuts the engine takes and what `prove_jacobi`
+expects:
 
-| flag | anlam | default |
-|------|-------|---------|
-| `degree` | `[·,·]`'nin derece kayması (`|[a,b]| = |a|+|b|+degree`) | 0 |
+| flag | meaning | default |
+|------|---------|---------|
+| `degree` | the bracket's degree shift (`|[a,b]| = |a|+|b|+degree`) | `0` |
 | `is_graded_antisymmetric` | `[a,b] = −(−1)^{|a||b|}[b,a]` | `True` |
-| `satisfies_leibniz` | Leibniz kuralı 2. slot'ta | `True` |
-| `satisfies_graded_jacobi` | Graded Jacobi | `True` / `False` / `None` |
+| `satisfies_leibniz` | Leibniz on the second slot | `True` |
+| `satisfies_graded_jacobi` | graded Jacobi | `True` / `False` / `None` |
 
-`None` bir üçüncü seçenek — *koşullu Jacobi*. `DerivedBracket` buna
-kanonik örnek; kendi CustomBracket'inin Jacobi'si ayrı bir koşula
-bağlıysa (örneğin `[Q,Q]_base = 0`), flag'ı `None` ver, ispat katmanı
-uygun stratejiyi seçsin.
+`None` is a third option — *conditional Jacobi*. `DerivedBracket`
+is the canonical example; if your custom bracket's Jacobi depends
+on a separate condition (e.g. `[Q,Q]_base = 0`), set the flag to
+`None` and let the proof layer pick the right strategy.
 
 ```python
 B_asym = CustomBracket(
@@ -74,18 +74,18 @@ B_asym.is_graded_antisymmetric, B_asym.satisfies_graded_jacobi
 # (False, False)
 ```
 
-## `prove_jacobi` — generic dispatch yolu
+## `prove_jacobi` — the generic dispatch path
 
-`CustomBracket` bir `DerivedBracket` değil; `prove_jacobi` dispatch
-tablosunda `GradedBracket` generic yoluna düşer. Bu yol:
+A `CustomBracket` is not a `DerivedBracket`; `prove_jacobi`
+dispatches it onto the generic `GradedBracket` path. That path:
 
-1. `graded_jacobi_obstruction(a, b, c, registry)` — triple cyclic sum
-   `(−1)^{|a||c|}[a,[b,c]] + …`.
-2. Bracket düğümlerini `expand_fn` ile tamamen açar (`bracket-expand`
-   adımı).
-3. `ExpandAndSimplify` stratejisini `Integer(0)`'a karşı koşar.
+1. `graded_jacobi_obstruction(a, b, c, registry)` — the triple
+   cyclic sum `(−1)^{|a||c|}[a,[b,c]] + …`.
+2. Expands every bracket node through `expand_fn` (the
+   `bracket-expand` step).
+3. Runs `ExpandAndSimplify` against `Integer(0)`.
 
-Commutator rule'u için tüm bu zincir sıfıra kapanır:
+For the commutator rule the whole chain closes to zero:
 
 ```python
 from jacopy.core.properties import Graded
@@ -103,8 +103,8 @@ chain.steps[1].rule               # 'simplify'
 chain.steps[1].after              # 0
 ```
 
-Yanlış bir kural seçerseniz aynı pipeline residual bırakır ve
-`ProofFailure` fırlatır:
+If you supply a wrong rule, the same pipeline leaves a residual
+and raises `ProofFailure`:
 
 ```python
 from jacopy.proof.strategies import ProofFailure
@@ -116,14 +116,14 @@ except ProofFailure as exc:
 # "ExpandAndSimplify left residual (3 * X * Y * Z) when proving ... == 0"
 ```
 
-Mesajdaki residual — `3 * X * Y * Z` — `asym` kuralının Jacobi
-özdeşliğini çözmediğinin doğrudan sembolik kanıtı.
+The residual `3 * X * Y * Z` in the message is the direct symbolic
+proof that the `asym` rule does *not* satisfy Jacobi.
 
-## Axiom obstruction helper'ları
+## Axiom-obstruction helpers
 
-`GradedBracket`'ten miras gelen üç yardımcı, aksiyomun iddiası olan
-ifadeyi açıkça verir. İspata gitmeden önce rule'u bir sembolik
-üçlü/ikili üstünde probe etmek için pratik:
+Three helpers inherited from `GradedBracket` give you the explicit
+expression of each axiom claim. Useful for probing a rule on a
+symbolic triple / pair before going into a full proof:
 
 ```python
 a, b, c = Symbol("a"), Symbol("b"), Symbol("c")
@@ -140,17 +140,18 @@ B.leibniz_obstruction(a, b, c, reg)
 # ([·,·](a, (b * c)) + (-([·,·](a, b) * c)) + (-(b * [·,·](a, c))))
 ```
 
-Her biri bir `Expr` — `simplify(..., reg)` ile sıfıra indirmek rule'un
-o aksiyomu sağladığı iddiasının testidir. Parite karar-dışıysa
-(`None`), `ValueError` fırlatır ve operand derecelerini daraltmanız
-gerekir. Bu, hatanın erken sembolik düzeyde yakalanması için
-tasarlandı — ispat katmanı yerine burada yakalamak daha ucuz.
+Each is an `Expr` — running `simplify(..., reg)` on it tests
+whether the rule satisfies that axiom. If parity is undecidable
+(`None`), it raises `ValueError` and you need to narrow the
+operand degrees. The early failure at the symbolic level is by
+design — catching it here is cheaper than at proof-layer time.
 
-## `_identity_key` ve eşitlik
+## `_identity_key` and equality
 
-İki `CustomBracket` ancak *aynı* expand callable'ını paylaşırsa eşit
-sayılır. Python fonksiyon kimliği kullanılır — isim ve derece aynı
-olsa bile iki farklı `lambda` farklı bracket'tir:
+Two `CustomBracket`s compare equal only when they share the
+*same* expand callable. Python function identity is used — two
+different `lambda`s with identical names and degrees are still
+distinct brackets:
 
 ```python
 rule_a = lambda a, b, reg: Sum(Product(a, b), Neg(Product(b, a)))
@@ -158,28 +159,30 @@ rule_b = lambda a, b, reg: Sum(Product(a, b), Product(b, a))
 CustomBracket("B", rule_a) == CustomBracket("B", rule_b)   # False
 ```
 
-Bu tasarım kasıtlı: aksi halde `DerivedBracket(base=B_a, ...)`'nın
-hash table anahtarı yanlış eş-çakılırdı.
+The design is intentional: otherwise the hash-table key for
+`DerivedBracket(base=B_a, ...)` would collide with another
+derived bracket built on a different base.
 
-## Ne zaman CustomBracket'ten çıkılmalı
+## When to graduate from `CustomBracket`
 
-`CustomBracket` iki durumda doğru araç:
+`CustomBracket` is the right tool in two situations:
 
-- Tutorial / keşif: hızlıca bir rule yazıp üstünde Jacobi / Leibniz
-  testleri koşmak.
-- Aksiyomları henüz netleşmemiş bir bracket'in çalışma tezgâhı.
+- Tutorial / exploration: quickly write a rule and run Jacobi /
+  Leibniz tests on it.
+- The workbench for a bracket whose axioms haven't crystallised
+  yet.
 
-Ama `expand_definition`, obstruction hook'ları, anchor lift'i,
-özel kimlik alanı (`_identity_key` extension'ı), veya theorem_book
-tarafından başvurulacak bir `Theorem` kaydı istiyorsan `GradedBracket`'e
-alt-sınıf yazmak gerekir. Paketin kendi bracket'leri
-(`KoszulBracket`, `CourantBracket`, `DerivedBracket`, `SchoutenBracket`)
-bu ikincisine örnek.
+But once you need `expand_definition`, obstruction hooks, an
+anchor lift, a custom identity key (`_identity_key` extension),
+or a `Theorem` registered against `theorem_book`, subclass
+`GradedBracket` directly. The package's own brackets
+(`KoszulBracket`, `CourantBracket`, `DerivedBracket`,
+`SchoutenBracket`) are the latter.
 
-## Sonraki adım
+## Next step
 
-`CustomBracket` bir rule gösterir ama bir *yapı* çıkarmaz. Derived
-bracket ise tek bir "generator" `Q` seçerek üstteki bracket
-aksiyomlarını otomatik inşa eder — Poisson, Koszul, Courant
-bracket'lerinin hepsi bu inşanın ayrı örnekleri.
-[07 — Derived bracket](07_derived_bracket.md).
+`CustomBracket` exposes a rule but does not extract a *structure*.
+A derived bracket, by contrast, picks a single "generator" `Q`
+and builds the upstairs bracket axioms automatically — Poisson,
+Koszul, and Courant brackets are all instances of this
+construction. [07 — Derived bracket](07_derived_bracket.md).

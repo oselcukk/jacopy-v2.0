@@ -260,3 +260,128 @@ def test_proof_result_is_frozen():
     result = prob.prove_first_bianchi(U, V, W)
     with pytest.raises(Exception):
         result.ok = False  # type: ignore[misc]
+
+
+# --------------------------------------------------------------------- #
+# Q9 Stage 9.C — Koszul-bracket-mode closures                            #
+# --------------------------------------------------------------------- #
+
+
+class TestKoszulBracketBianchi:
+    """BianchiProblem on a Koszul-bracket-equipped connection.
+
+    The connection's vector_bracket emits ``BracketApply(koszul, …)``
+    instead of ``LieBracketVF`` from Torsion/Curvature unfolds; the
+    engine swaps in the BracketApply closure family
+    (jacopy.calculus.bracket_apply_axioms) and the same Bianchi I/II
+    sums close to zero.
+    """
+
+    @staticmethod
+    def _setup():
+        from jacopy.brackets.koszul import KoszulBracket
+        from jacopy.calculus.anchor import Anchor
+        from jacopy.calculus.connection import koszul_connection
+        from jacopy.core.expr import Symbol
+        from jacopy.core.properties import Graded
+        from jacopy.core.registry import PropertyRegistry
+        from jacopy.core.symbolic_degree import Degree
+
+        rho = Anchor(name="ρ")
+        bracket = KoszulBracket(rho)
+        conn = koszul_connection("∇̃", anchor=rho, bracket=bracket)
+        reg = PropertyRegistry()
+        alpha, beta, gamma, delta = (
+            Symbol("α"), Symbol("β"), Symbol("γ"), Symbol("δ"),
+        )
+        for s in (alpha, beta, gamma, delta):
+            reg.declare(s, Graded(degree=Degree.const(1)))
+        return conn, reg, (alpha, beta, gamma, delta), bracket
+
+    def test_engine_picks_bracket_apply_rules(self):
+        from jacopy.calculus.bracket_apply_axioms import (
+            BracketApplyJacobiDefinition,
+            BracketApplySumLinearityDefinition,
+        )
+        from jacopy.calculus.closure_axioms import (
+            LieBracketVfJacobiDefinition,
+        )
+
+        conn, reg, _, _ = self._setup()
+        prob = BianchiProblem(conn, registry=reg)
+        rule_types = {type(r) for r in prob.engine.definitions}
+        assert BracketApplySumLinearityDefinition in rule_types
+        assert BracketApplyJacobiDefinition in rule_types
+        # LBVF rules must NOT be bundled (they'd be inert here, but the
+        # swap is the whole point of the Stage 9.C contract).
+        assert LieBracketVfJacobiDefinition not in rule_types
+
+    def test_first_bianchi_closes_for_koszul_connection(self):
+        conn, reg, (alpha, beta, gamma, _), _ = self._setup()
+        prob = BianchiProblem(conn, registry=reg)
+        result = prob.prove_first_bianchi(alpha, beta, gamma)
+        assert result.ok is True
+        assert result.lhs_final == Zero
+
+    def test_second_bianchi_closes_for_koszul_connection(self):
+        conn, reg, (alpha, beta, gamma, delta), _ = self._setup()
+        prob = BianchiProblem(conn, registry=reg)
+        result = prob.prove_second_bianchi(alpha, beta, gamma, delta)
+        assert result.ok is True
+        assert result.lhs_final == Zero
+
+    def test_koszul_engine_does_not_carry_lbvf_rules(self):
+        # Same content as ``test_engine_picks_bracket_apply_rules`` but
+        # checks every LBVF rule type is absent — guards against
+        # accidental double-bundling.
+        from jacopy.calculus.bracket_apply_axioms import (
+            BracketApplyAntiSymmetryDefinition,
+            BracketApplyArgAntisymmetryDefinition,
+            BracketApplyJacobiDefinition,
+            BracketApplyNegLinearityDefinition,
+            BracketApplySumLinearityDefinition,
+        )
+        from jacopy.calculus.closure_axioms import (
+            LieBracketVfAntiSymmetryDefinition,
+            LieBracketVfJacobiDefinition,
+        )
+        from jacopy.calculus.sn_function_axiom import (
+            LieBracketVfAntisymmetryDefinition as LbvfArgAntisym,
+            LieBracketVfNegLinearityDefinition,
+            LieBracketVfSumLinearityDefinition,
+        )
+
+        conn, reg, _, _ = self._setup()
+        prob = BianchiProblem(conn, registry=reg)
+        rule_types = {type(r) for r in prob.engine.definitions}
+        for cls in (
+            BracketApplySumLinearityDefinition,
+            BracketApplyNegLinearityDefinition,
+            BracketApplyArgAntisymmetryDefinition,
+            BracketApplyAntiSymmetryDefinition,
+            BracketApplyJacobiDefinition,
+        ):
+            assert cls in rule_types
+        for cls in (
+            LieBracketVfSumLinearityDefinition,
+            LieBracketVfNegLinearityDefinition,
+            LbvfArgAntisym,
+            LieBracketVfAntiSymmetryDefinition,
+            LieBracketVfJacobiDefinition,
+        ):
+            assert cls not in rule_types
+
+    def test_lbvf_engine_is_unchanged_for_default_connection(self):
+        """Default :func:`connection()` (no bracket) keeps the LBVF rule set."""
+        from jacopy.calculus.bracket_apply_axioms import (
+            BracketApplyJacobiDefinition,
+        )
+        from jacopy.calculus.closure_axioms import (
+            LieBracketVfJacobiDefinition,
+        )
+
+        nabla = connection()
+        prob = BianchiProblem(nabla)
+        rule_types = {type(r) for r in prob.engine.definitions}
+        assert LieBracketVfJacobiDefinition in rule_types
+        assert BracketApplyJacobiDefinition not in rule_types

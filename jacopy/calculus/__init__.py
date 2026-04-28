@@ -2,6 +2,7 @@
 
 from jacopy.calculus.anchor import (
     Anchor,
+    AnchoredVectorField,
     bracket_compatibility_obstruction,
 )
 from jacopy.calculus.exterior_algebra import ExteriorAlgebra
@@ -33,19 +34,80 @@ from jacopy.calculus.connection import (
     AffineConnection,
     ConnectionEvalExpr,
     ConnectionXLinearityDefinition,
+    ConnectionXScalarPullDefinition,
     ConnectionYAdditivityDefinition,
     ConnectionYLeibnizDefinition,
     connection,
+    koszul_connection,
+)
+from jacopy.calculus.local_frame import (
+    FrameCovector,
+    FrameIndex,
+    FramePairingDualityDefinition,
+    FrameVectorField,
+    KroneckerDelta,
+    LocalFrame,
+    local_frame,
+)
+from jacopy.calculus.metric import (
+    MetricEvalExpr,
+    MetricEvalLinearityDefinition,
+    MetricEvalScalarPullDefinition,
+    MetricEvalSymmetryDefinition,
+    MetricTensor,
+    metric,
+)
+from jacopy.calculus.non_metricity import (
+    NonMetricityCompatibilityDefinition,
+    NonMetricityEvalExpr,
+    NonMetricityVLinearityDefinition,
+    NonMetricityVScalarPullDefinition,
+    NonMetricityXYSymmetryDefinition,
+)
+from jacopy.calculus.cartan_forms import (
+    ConnectionForm,
+    ConnectionFormDefinition,
+    CurvatureForm,
+    CurvatureFormDefinition,
+    NonMetricityForm,
+    NonMetricityFormDefinition,
+    TorsionForm,
+    TorsionFormDefinition,
+)
+from jacopy.calculus.indexed_sum_axioms import (
+    ConnectionEvalIndexedSumPushInDefinition,
+    IndexedSumKroneckerContractDefinition,
+    IndexedSumNegPullDefinition,
+    IndexedSumPairingPushInLeftDefinition,
+    IndexedSumPairingPushInRightDefinition,
+    IndexedSumScalarPullDefinition,
+    IndexedSumSumDistributeDefinition,
+    MultiEvalIndexedSumPushInDefinition,
+)
+from jacopy.calculus.frame_decomposition import (
+    ConnectionEvalYFrameDecompositionDefinition,
+    ConnectionFormDecompositionDefinition,
+    FrameDecompositionDefinition,
 )
 from jacopy.calculus.torsion_curvature import (
     Curvature,
     CurvatureCovariantDerivative,
     CurvatureCovariantDerivativeDefinition,
     CurvatureDefinitionDefinition,
+    CurvatureXLinearityDefinition,
+    CurvatureXScalarPullDefinition,
+    CurvatureXYAntiSymmetryDefinition,
+    CurvatureYLinearityDefinition,
+    CurvatureYScalarPullDefinition,
     Torsion,
+    TorsionAntiSymmetryDefinition,
     TorsionCovariantDerivative,
     TorsionCovariantDerivativeDefinition,
     TorsionDefinitionDefinition,
+    TorsionXLinearityDefinition,
+    TorsionXScalarPullDefinition,
+    TorsionYLinearityDefinition,
+    TorsionYScalarPullDefinition,
 )
 from jacopy.calculus.derivator import derivator
 from jacopy.calculus.hamiltonian_vf import (
@@ -70,8 +132,12 @@ from jacopy.calculus.musical import (
 from jacopy.calculus.operator_equation import OperatorEquation
 from jacopy.calculus.pairing import Pairing, pairing
 from jacopy.calculus.pairing_axioms import (
+    MultiEvalOneFormPairingBridgeDefinition,
     PairingLieLeibnizDefinition,
     PairingLinearityDefinition,
+)
+from jacopy.calculus.wedge_axioms import (
+    WedgeMultiEvalAlternatingDefinition,
 )
 from jacopy.calculus.sharp_axioms import (
     SharpLinearityDefinition,
@@ -171,6 +237,7 @@ __all__ = [
     "DEFINITIONS",
     # anchor
     "Anchor",
+    "AnchoredVectorField",
     "bracket_compatibility_obstruction",
     # exterior algebra skeleton
     "ExteriorAlgebra",
@@ -209,6 +276,9 @@ __all__ = [
     # Pairing axioms (Faz 13.B)
     "PairingLinearityDefinition",
     "PairingLieLeibnizDefinition",
+    # Wedge alternating expansion + MultiEval→Pairing bridge (Faz 17.F.1.5/6)
+    "WedgeMultiEvalAlternatingDefinition",
+    "MultiEvalOneFormPairingBridgeDefinition",
     # Vector-field axioms (Faz 13.C)
     "OpCommutatorVfDefinition",
     "LieVfJacobiDefinition",
@@ -288,11 +358,13 @@ __all__ = [
     "TildeCartanRemainderDefinition",
     # Derivator helper (Faz 15.A)
     "derivator",
-    # Affine connection (Faz 16.A)
+    # Affine connection (Faz 16.A; algebroid extension Q9 / Math 595)
     "AffineConnection",
     "ConnectionEvalExpr",
     "connection",
+    "koszul_connection",
     "ConnectionXLinearityDefinition",
+    "ConnectionXScalarPullDefinition",
     "ConnectionYAdditivityDefinition",
     "ConnectionYLeibnizDefinition",
     # Torsion & curvature (Faz 16.B)
@@ -300,11 +372,66 @@ __all__ = [
     "Curvature",
     "TorsionDefinitionDefinition",
     "CurvatureDefinitionDefinition",
+    # T / R C∞-bilinearity + antisymmetry (Faz 17.D)
+    "TorsionXLinearityDefinition",
+    "TorsionYLinearityDefinition",
+    "TorsionXScalarPullDefinition",
+    "TorsionYScalarPullDefinition",
+    "TorsionAntiSymmetryDefinition",
+    "CurvatureXLinearityDefinition",
+    "CurvatureYLinearityDefinition",
+    "CurvatureXScalarPullDefinition",
+    "CurvatureYScalarPullDefinition",
+    "CurvatureXYAntiSymmetryDefinition",
     # ∇-on-tensor Leibniz (Faz 16.C)
     "TorsionCovariantDerivative",
     "CurvatureCovariantDerivative",
     "TorsionCovariantDerivativeDefinition",
     "CurvatureCovariantDerivativeDefinition",
+    # Local frame + duality (Faz 17.A)
+    "FrameIndex",
+    "KroneckerDelta",
+    "LocalFrame",
+    "local_frame",
+    "FrameVectorField",
+    "FrameCovector",
+    "FramePairingDualityDefinition",
+    # Metric + non-metricity Q (Faz 17.B)
+    "MetricTensor",
+    "metric",
+    "MetricEvalExpr",
+    "MetricEvalSymmetryDefinition",
+    "MetricEvalLinearityDefinition",
+    "MetricEvalScalarPullDefinition",
+    "NonMetricityEvalExpr",
+    "NonMetricityVLinearityDefinition",
+    "NonMetricityVScalarPullDefinition",
+    "NonMetricityXYSymmetryDefinition",
+    "NonMetricityCompatibilityDefinition",
+    # Cartan-form Expr nodes (Faz 17.C)
+    "ConnectionForm",
+    "ConnectionFormDefinition",
+    "NonMetricityForm",
+    "NonMetricityFormDefinition",
+    "TorsionForm",
+    "TorsionFormDefinition",
+    "CurvatureForm",
+    "CurvatureFormDefinition",
+    # IndexedSum engine axioms (Faz 17.E.3-E.6)
+    "IndexedSumSumDistributeDefinition",
+    "IndexedSumNegPullDefinition",
+    "IndexedSumScalarPullDefinition",
+    "IndexedSumPairingPushInLeftDefinition",
+    "IndexedSumPairingPushInRightDefinition",
+    "IndexedSumKroneckerContractDefinition",
+    # Connection-eval push-in over IndexedSum (Faz 17.F.1)
+    "ConnectionEvalIndexedSumPushInDefinition",
+    # MultiEval push-in over IndexedSum (Faz 17.F.2)
+    "MultiEvalIndexedSumPushInDefinition",
+    # Frame decomposition axioms (Faz 17.E.7 + 17.F.2)
+    "FrameDecompositionDefinition",
+    "ConnectionFormDecompositionDefinition",
+    "ConnectionEvalYFrameDecompositionDefinition",
 ]
 
 

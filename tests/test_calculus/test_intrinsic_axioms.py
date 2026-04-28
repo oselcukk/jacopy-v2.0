@@ -554,3 +554,83 @@ class TestExteriorDEngineIntegration:
             Neg(multi_eval(omega, lie_bracket_vf(Sum(X, Y), Z))),
         )
         assert result == expected
+
+
+# --------------------------------------------------------------------- #
+# Q9 Stage 9.E — Koszul intrinsic d̃                                     #
+# --------------------------------------------------------------------- #
+
+
+class TestKoszulExteriorDIntrinsic:
+    """Connection-parametric d̃ rule routes the function action through
+    ``connection.function_action`` and emits a ``BracketApply`` of the
+    connection's bracket — both essential to closing Cartan I/II on a
+    Koszul connection.
+    """
+
+    def _bracketed_connection(self):
+        from jacopy.calculus.anchor import Anchor
+        from jacopy.calculus.connection import koszul_connection
+        from jacopy.brackets.koszul import KoszulBracket
+
+        anchor = Anchor(name="ρ")
+        bracket = KoszulBracket(anchor)
+        return koszul_connection("∇̃", anchor=anchor, bracket=bracket), bracket
+
+    def test_arity_one_emits_anchored_act(self):
+        from jacopy.algebra.derivation import Derivation, Act
+        from jacopy.calculus.anchor import AnchoredVectorField
+        from jacopy.calculus.exterior_d import d
+        from jacopy.calculus.intrinsic_axioms import (
+            KoszulExteriorDIntrinsicDefinition,
+        )
+        from jacopy.core.expr import Symbol
+        from jacopy.core.multi_eval import MultiEval
+
+        conn, _ = self._bracketed_connection()
+        rule = KoszulExteriorDIntrinsicDefinition(conn)
+        omega = Symbol("ω")
+        X = Derivation("X", 0)
+        expr = MultiEval(Act(d, omega), X, slot_kind="vector")
+        out = rule.rewrite(expr)
+        # Σ over a single arg: term = function_action(X, ω) = Act(ρ(X), ω).
+        assert out == Act(AnchoredVectorField(conn.anchor, X), omega)
+
+    def test_arity_two_uses_connection_bracket(self):
+        from jacopy.algebra.derivation import Derivation, Act
+        from jacopy.brackets.base import BracketApply
+        from jacopy.calculus.exterior_d import d
+        from jacopy.calculus.intrinsic_axioms import (
+            KoszulExteriorDIntrinsicDefinition,
+        )
+        from jacopy.core.expr import Symbol
+        from jacopy.core.multi_eval import MultiEval
+
+        conn, bracket = self._bracketed_connection()
+        rule = KoszulExteriorDIntrinsicDefinition(conn)
+        omega = Symbol("ω")
+        X, Y = Derivation("X", 0), Derivation("Y", 0)
+        expr = MultiEval(Act(d, omega), X, Y, slot_kind="vector")
+        out = rule.rewrite(expr)
+        # Last summand carries ω([X, Y]_K) — the BracketApply uses the
+        # connection's bracket, not LieBracketVF.
+        bracket_summand = out.children[-1]
+        # bracket summand is Neg(MultiEval(ω, [X,Y]_K)) — sign (i+j)%2=1
+        # for (0, 1).
+        from jacopy.core.expr import Neg
+        assert isinstance(bracket_summand, Neg)
+        inner = bracket_summand.arg
+        assert isinstance(inner, MultiEval)
+        assert isinstance(inner.args[0], BracketApply)
+        assert inner.args[0].bracket is bracket
+
+    def test_rejects_connection_without_bracket(self):
+        from jacopy.calculus.connection import connection
+        from jacopy.calculus.intrinsic_axioms import (
+            KoszulExteriorDIntrinsicDefinition,
+        )
+        import pytest
+
+        nabla = connection("∇")  # no bracket
+        with pytest.raises(ValueError):
+            KoszulExteriorDIntrinsicDefinition(nabla)

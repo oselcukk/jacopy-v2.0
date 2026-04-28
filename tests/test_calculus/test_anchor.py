@@ -5,7 +5,11 @@ import pytest
 from jacopy.algebra.derivation import Act, Derivation, degree_of
 from jacopy.algorithms.simplify import simplify
 from jacopy.brackets.lie import LieBracket, lie
-from jacopy.calculus.anchor import Anchor, bracket_compatibility_obstruction
+from jacopy.calculus.anchor import (
+    Anchor,
+    AnchoredVectorField,
+    bracket_compatibility_obstruction,
+)
 from jacopy.core.expr import Integer, Neg, Product, Sum, Symbol
 from jacopy.core.properties import Graded
 from jacopy.core.registry import PropertyRegistry
@@ -50,3 +54,63 @@ class TestBracketCompatibility:
             )),
         )
         assert obs == expected
+
+
+class TestAnchoredVectorField:
+    def test_is_a_derivation(self):
+        rho = Anchor("π^♯")
+        omega = Symbol("ω")
+        avf = AnchoredVectorField(rho, omega)
+        assert isinstance(avf, Derivation)
+        assert avf.degree == Degree.const(0)
+
+    def test_carries_anchor_and_section(self):
+        rho = Anchor("π^♯")
+        omega = Symbol("ω")
+        avf = AnchoredVectorField(rho, omega)
+        assert avf.anchor is rho
+        assert avf.section is omega
+
+    def test_display_name(self):
+        rho = Anchor("π^♯")
+        omega = Symbol("ω")
+        avf = AnchoredVectorField(rho, omega)
+        assert avf._repr_inner() == "π^♯(ω)"
+
+    def test_structural_equality(self):
+        rho = Anchor("π^♯")
+        omega = Symbol("ω")
+        eta = Symbol("η")
+        a = AnchoredVectorField(rho, omega)
+        b = AnchoredVectorField(rho, omega)
+        c = AnchoredVectorField(rho, eta)
+        d = AnchoredVectorField(Anchor("ρ"), omega)
+        assert a == b
+        assert hash(a) == hash(b)
+        assert a != c
+        assert a != d
+
+    def test_act_on_function(self):
+        rho = Anchor("π^♯")
+        omega = Symbol("ω")
+        f = Symbol("f")
+        avf = AnchoredVectorField(rho, omega)
+        applied = Act(avf, f)
+        assert applied.op is avf
+        assert applied.arg is f
+
+    def test_section_is_opaque_slot_not_child(self):
+        """Section lives in a slot, not in ``children`` — atom semantics."""
+        rho = Anchor("π^♯")
+        omega = Symbol("ω")
+        avf = AnchoredVectorField(rho, omega)
+        # Atom subclass: no children, walks as a single node.
+        assert avf.children == ()
+
+    def test_rejects_non_anchor(self):
+        with pytest.raises(TypeError):
+            AnchoredVectorField("ρ", Symbol("ω"))  # type: ignore[arg-type]
+
+    def test_rejects_non_expr_section(self):
+        with pytest.raises(TypeError):
+            AnchoredVectorField(Anchor(), "ω")  # type: ignore[arg-type]

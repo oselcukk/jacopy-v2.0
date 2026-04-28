@@ -61,16 +61,17 @@ TUTORIAL_01: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 01 — İlk Adımlar\n\n"
-        "Bu notebook [01_first_steps.md](01_first_steps.md) markdown'ının "
-        "çalıştırılabilir sürümüdür. `jacopy`'de sembolik ifade kurma, "
-        "özellik atama ve sadeleştirmenin temelleri.",
+        "# 01 — First steps\n\n"
+        "Companion notebook to [01_first_steps.md](01_first_steps.md). "
+        "Building a symbolic expression in `jacopy`, declaring properties, "
+        "and simplifying — the basics.",
     ),
     (
         "markdown",
-        "## Semboller ve temel inşa\n\n"
-        "`Symbol(name)` atomik bir ifade üretir; `Integer(n)` literal sabit; "
-        "`+`, `*`, `-` arka planda `Sum`, `Product`, `Neg` inşa eder.",
+        "## Symbols and basic construction\n\n"
+        "`Symbol(name)` builds an atomic expression; `Integer(n)` is a "
+        "literal constant; `+`, `*`, `-` produce `Sum`, `Product`, `Neg` "
+        "under the hood.",
     ),
     (
         "code",
@@ -88,11 +89,11 @@ TUTORIAL_01: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Özellik atama (PropertyRegistry)\n\n"
-        "Özellikler — derece, skalerlik, graded antisymmetry, … — semboller "
-        "üzerine *dışsal* olarak ilan edilir. Bu, aynı sembolün farklı "
-        "bağlamlarda (farklı derecelerde, farklı cebirlerde) yeniden "
-        "kullanılmasına izin verir.",
+        "## Declaring properties (`PropertyRegistry`)\n\n"
+        "Properties — degree, scalarity, graded antisymmetry, … — are "
+        "declared **externally** on symbols. That's what lets the same "
+        "symbol be reused in different contexts (different degrees, "
+        "different algebras).",
     ),
     (
         "code",
@@ -101,16 +102,16 @@ TUTORIAL_01: list[tuple[str, str]] = [
         "reg = PropertyRegistry()\n"
         "reg.declare(x, Scalar())\n"
         "reg.declare(y, Scalar())\n"
-        "reg.declare(z, Graded(degree=1))  # z bir 1-form gibi davranır",
+        "reg.declare(z, Graded(degree=1))  # z behaves like a 1-form",
     ),
     (
         "markdown",
-        "### Role-driven kısayollar\n\n"
-        "Sık tekrarlanan desenler — fonksiyon, vektör alanı, form, "
-        "bivector — için `jacopy.library.declarations` altında "
-        "`Functions`, `VectorFields`, `Forms`, `Bivector` yardımcıları "
-        "var. Her biri `Symbol(...)` + uygun `reg.declare(...)` "
-        "çağrısını tek satıra indirir.",
+        "### Role-driven shortcuts\n\n"
+        "For common patterns — functions, vector fields, forms, bivectors "
+        "— `jacopy.library.declarations` exposes `Functions`, "
+        "`VectorFields`, `Forms`, `Bivector` helpers. Each collapses "
+        "`Symbol(...)` plus the matching `reg.declare(...)` into a single "
+        "call.",
     ),
     (
         "code",
@@ -124,11 +125,11 @@ TUTORIAL_01: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `simplify`: canonical forma indirme\n\n"
-        "`simplify(expr, registry)` pipeline'ı: flatten → canonicalize → "
-        "distribute → flatten → sort_product → collect_terms. "
-        "Registry verilirse kayıtlı özellikler (commutativity, derece) "
-        "işleme alınır.",
+        "## `simplify` — canonical form\n\n"
+        "The `simplify(expr, registry)` pipeline: flatten → canonicalize → "
+        "distribute → flatten → sort_product → collect_terms. With a "
+        "registry the registered properties (commutativity, degree) are "
+        "consulted.",
     ),
     (
         "code",
@@ -136,15 +137,15 @@ TUTORIAL_01: list[tuple[str, str]] = [
         "assert simplify(x + x - x) == x\n"
         "assert simplify(Product(Integer(2), x, Integer(3)), reg) \\\n"
         "    == Product(Integer(6), x)\n"
-        "# Scalar iki sembol alfabetik sıraya alınır:\n"
+        "# Two scalars sort alphabetically:\n"
         "assert simplify(Product(y, x), reg) == Product(x, y)\n"
         "print('simplify checks passed')",
     ),
     (
         "markdown",
-        "## Görselleştirme\n\n"
-        "`display` katmanı `to_ascii`, `to_latex` ve (rich yüklüyse) renkli "
-        "terminal ağacı verir.",
+        "## Display\n\n"
+        "The `display` layer gives `to_ascii`, `to_latex`, and "
+        "(if `rich` is installed) a coloured terminal tree.",
     ),
     (
         "code",
@@ -155,8 +156,8 @@ TUTORIAL_01: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Sonraki adım\n\n"
-        "Bir bracket üstüne Jacobi ispatı: "
+        "## Next step\n\n"
+        "Layering a bracket on top → Jacobi proof: "
         "[02_jacobi_identity.md](02_jacobi_identity.md).",
     ),
 ]
@@ -166,20 +167,19 @@ TUTORIAL_02: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 02 — Jacobi Özdeşliği\n\n"
-        "Bu notebook [02_jacobi_identity.md](02_jacobi_identity.md) "
-        "markdown'ının çalıştırılabilir sürümüdür. Lie bracket üzerinde "
-        "Jacobi özdeşliğinin `prove_jacobi` ile tek satırda nasıl "
-        "kapatıldığını gösterir.",
+        "# 02 — The Jacobi identity\n\n"
+        "Companion notebook to [02_jacobi_identity.md](02_jacobi_identity.md). "
+        "Closing the Jacobi identity for a Lie bracket in a single "
+        "`prove_jacobi` call.",
     ),
     (
         "markdown",
-        "## Lie bracket ve üç vector field\n\n"
-        "`jacopy.brackets.lie.lie` standart manifold Lie bracket'inin "
-        "modül-seviyesi singleton'ıdır. Üç vector field'ı `VectorFields` "
-        "yardımcısıyla tek satırda deklare ediyoruz — her birine "
-        "`Graded(degree=0)` iliştirilir, Jacobi expansion'ın işaret "
-        "kuralları için gereken budur.",
+        "## The Lie bracket and three vector fields\n\n"
+        "`jacopy.brackets.lie.lie` is the module-level singleton for the "
+        "standard manifold Lie bracket. The three vector fields are "
+        "declared with the `VectorFields` helper — each gets "
+        "`Graded(degree=0)` attached, which is what the Jacobi expansion "
+        "consults for sign rules.",
     ),
     (
         "code",
@@ -191,14 +191,14 @@ TUTORIAL_02: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `prove_jacobi`: Jacobi obstruction sıfır mı?\n\n"
-        "Graded Jacobi özdeşliği\n"
+        "## `prove_jacobi` — does the obstruction vanish?\n\n"
+        "The graded Jacobi identity:\n"
         "\n"
         "$$[X,[Y,Z]] + (-1)^{|X||Y|+|X||Z|}[Y,[Z,X]] + (-1)^{|Y||Z|+|X||Z|}[Z,[X,Y]] = 0$$\n"
         "\n"
-        "Lie bracket'te dereceler sıfır olduğu için tüm işaretler `+1`'dir. "
-        "`prove_jacobi(lie, X, Y, Z, registry=reg)` obstruction'ı sadeleştirip "
-        "sıfıra indirgeyen bir `ProofChain` döndürür.",
+        "On the Lie bracket every degree is zero, so every sign is `+1`. "
+        "`prove_jacobi(lie, X, Y, Z, registry=reg)` returns a `ProofChain` "
+        "that simplifies the obstruction down to zero.",
     ),
     (
         "code",
@@ -209,10 +209,10 @@ TUTORIAL_02: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Zincirin adım adım görselleştirilmesi\n\n"
-        "`display` katmanı `ProofChain`'leri ASCII veya LaTeX olarak "
-        "render eder. Jupyter içinde `display_chain` MathJax tarafından "
-        "render edilen bir LaTeX `align*` bloğu verir.",
+        "## Step-by-step rendering\n\n"
+        "The `display` layer renders `ProofChain`s as ASCII or LaTeX. "
+        "Inside Jupyter, `display_chain` produces a LaTeX `align*` block "
+        "that MathJax renders inline.",
     ),
     (
         "code",
@@ -221,27 +221,27 @@ TUTORIAL_02: list[tuple[str, str]] = [
     ),
     (
         "code",
-        "# Jupyter'da otomatik LaTeX render (align* blokları):\n"
+        "# Jupyter auto-renders the LaTeX (align* blocks):\n"
         "from jacopy.display import display_chain\n"
         "display_chain(chain)",
     ),
     (
         "markdown",
-        "## Neden bu çalışıyor?\n\n"
-        "Lie bracket'in sınıf tanımında `is_graded_antisymmetric=True` ve "
-        "`satisfies_graded_jacobi=True` bayrakları işaretlidir. "
-        "`prove_jacobi` ilk önce obstruction'ı kuruyor, sonra expansion "
-        "engine'in Jacobi tanıyıcısı ile sadeleştirip kalıntıyı sıfıra "
-        "indiriyor. Koşullu Jacobi taşıyan bracket'lerde "
-        "(`CourantBracket` gibi) aynı fonksiyon obstruction'ı sıfıra "
-        "indirmez; bu durumda dönen chain koşulun (ör. `dH = 0`) ne "
-        "olduğunu açıkça kayda alır.",
+        "## Why does this work?\n\n"
+        "The Lie bracket's class definition sets "
+        "`is_graded_antisymmetric=True` and "
+        "`satisfies_graded_jacobi=True`. `prove_jacobi` first builds the "
+        "obstruction, then simplifies it through the expansion engine's "
+        "Jacobi recogniser, collapsing the residue to zero. For brackets "
+        "with conditional Jacobi (such as `CourantBracket`) the same "
+        "function does **not** drive the obstruction to zero; instead the "
+        "returned chain records the condition (e.g. `dH = 0`) explicitly.",
     ),
     (
         "markdown",
-        "## Sonraki adım\n\n"
-        "Poisson geometriye geçiş: [03_poisson_geometry.md](03_poisson_geometry.md) "
-        "bir sonraki stage'de.",
+        "## Next step\n\n"
+        "Onwards to Poisson geometry: "
+        "[03_poisson_geometry.md](03_poisson_geometry.md).",
     ),
 ]
 
@@ -250,21 +250,20 @@ TUTORIAL_03: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 03 — Poisson Geometri\n\n"
-        "Bu notebook [03_poisson_geometry.md](03_poisson_geometry.md) "
-        "markdown'ının çalıştırılabilir sürümüdür. Symplectic manifold "
-        "üstünde Poisson bracket'inin üç eşdeğer görüşü (derived, "
-        "Hamiltonian, Koszul) ve `[π, π]_SN = 0` tek koşuluna indirgenmiş "
-        "Jacobi ispatı.",
+        "# 03 — Poisson geometry\n\n"
+        "Companion notebook to [03_poisson_geometry.md](03_poisson_geometry.md). "
+        "Three equivalent views of the Poisson bracket on a symplectic "
+        "manifold (derived, Hamiltonian, Koszul) plus the Jacobi proof "
+        "reduced to the single condition `[π, π]_SN = 0`.",
     ),
     (
         "markdown",
-        "## Symplectic manifold — (ω, π, ♭, ♯) demet\n\n"
-        "`SymplecticManifold(ω, bivector=π)` formu, ters-bivector'ı, "
-        "musical map'leri ve `MusicalCompatibility` aksiyomunu tek "
-        "objede tutar. Registry'de `ω` 2-form, `π` SN-derecesi 1'lik "
-        "2-vektör olarak deklare edilir — `Bivector` yardımcısı bunu "
-        "otomatik yapar.",
+        "## Symplectic manifold — `(ω, π, ♭, ♯)` bundle\n\n"
+        "`SymplecticManifold(ω, bivector=π)` keeps the form, the inverse "
+        "bivector, the musical maps, and the `MusicalCompatibility` "
+        "axiom together in one object. On the registry `ω` is a 2-form "
+        "and `π` is a 2-vector with SN-degree 1 — the `Bivector` helper "
+        "handles that automatically.",
     ),
     (
         "code",
@@ -282,9 +281,9 @@ TUTORIAL_03: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `PoissonBracket` — üç eşdeğer görüş\n\n"
-        "Fonksiyonlar SN-shifted grading'de degree `−1` taşır; "
-        "`Functions` yardımcısına `degree=-1` kwarg'ı verilir.",
+        "## `PoissonBracket` — three equivalent views\n\n"
+        "Functions live at SN-shifted degree `−1`; the `Functions` "
+        "helper takes the `degree=-1` kwarg for this context.",
     ),
     (
         "code",
@@ -295,7 +294,7 @@ TUTORIAL_03: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "### Görüş 1 — derived bracket\n\n"
+        "### View 1 — the derived bracket\n\n"
         "`{f, g}_π = [[f, π]_SN, g]_SN`.",
     ),
     (
@@ -304,10 +303,11 @@ TUTORIAL_03: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "### Görüş 2 — Hamiltonian vector field\n\n"
-        "`{f, g}_π = X_f(g)`. Symplectic manifold üstünde bu eşitlik "
-        "`ι_{X_f} ω + df = 0`'ya denktir; `prove_hamiltonian_equivalence` "
-        "musical kompatibiliteyi kullanarak beş adımda kapatır.",
+        "### View 2 — the Hamiltonian vector field\n\n"
+        "`{f, g}_π = X_f(g)`. On a symplectic manifold this is "
+        "equivalent to `ι_{X_f} ω + df = 0`; "
+        "`prove_hamiltonian_equivalence` closes that in five steps using "
+        "the musical compatibility.",
     ),
     (
         "code",
@@ -321,11 +321,12 @@ TUTORIAL_03: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "### Görüş 3 — Koszul üç-terim formülü\n\n"
-        "1-formlar üstünde `{α, β}_π = L_{π♯(α)} β − L_{π♯(β)} α − "
-        "d⟨π♯(α), β⟩`. Klasik Koszul bracket ile derived bracket'in "
-        "bu operand tipinde *yapısal eşitliği* `prove_koszul_equivalence` "
-        "ile tek reflexive adımda kayda geçer.",
+        "### View 3 — the Koszul three-term formula\n\n"
+        "On 1-forms `{α, β}_π = L_{π♯(α)} β − L_{π♯(β)} α − "
+        "d⟨π♯(α), β⟩`. The classical Koszul bracket and the derived "
+        "bracket are *structurally equal* on this operand type — "
+        "`prove_koszul_equivalence` records that in a single reflexive "
+        "step.",
     ),
     (
         "code",
@@ -337,12 +338,12 @@ TUTORIAL_03: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `[π, π]_SN = 0` — tek koşul\n\n"
-        "Derived Bracket Teoremi, `{·, ·}_π` üstündeki Jacobi'yi tek "
-        "koşula indirger: `[π, π]_SN = 0`. Üç-giriş reduction zinciri "
-        "`DerivedBracketTheorem` rule'u ile tek adımda obstruction'a "
-        "varır; atomik `π` için obstruction opak kalır — Poisson "
-        "hipotezi devreye girince Jacobi kapanır.",
+        "## `[π, π]_SN = 0` — the single condition\n\n"
+        "The Derived Bracket Theorem reduces Jacobi for `{·, ·}_π` to "
+        "one condition: `[π, π]_SN = 0`. The three-input reduction "
+        "chain reaches the obstruction in a single `DerivedBracketTheorem` "
+        "step; for atomic `π` the obstruction stays opaque — the Jacobi "
+        "identity closes once the Poisson hypothesis is supplied.",
     ),
     (
         "code",
@@ -355,10 +356,10 @@ TUTORIAL_03: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Theorem Book — seeded teorem\n\n"
-        "Kütüphane bu indirgemeyi `poisson_jacobi` altında hazır bir "
-        "`Theorem` kaydı olarak tutar — downstream kod tek citation ile "
-        "sonuca bağlanır.",
+        "## Theorem Book — the seeded theorem\n\n"
+        "The library carries this reduction as a ready `Theorem` entry "
+        "under `poisson_jacobi` — downstream code wires the result "
+        "through a single citation.",
     ),
     (
         "code",
@@ -369,9 +370,9 @@ TUTORIAL_03: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Sonraki adım\n\n"
-        "Lie algebroid çerçevesi aynı derivation stratejisini bir vector "
-        "bundle'ın üstünde yaşayan bir bracket'e uygular — "
+        "## Next step\n\n"
+        "The Lie algebroid framework applies the same derivation "
+        "strategy to a bracket living on a vector bundle — "
         "[04_lie_algebroid.md](04_lie_algebroid.md).",
     ),
 ]
@@ -381,18 +382,17 @@ TUTORIAL_04: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 04 — Lie Algebroid\n\n"
-        "Bu notebook [04_lie_algebroid.md](04_lie_algebroid.md) "
-        "markdown'ının çalıştırılabilir sürümüdür. `(E, [·,·]_E, ρ)` "
-        "üçlüsünün `jacopy` içindeki nesneleşmesi, anchor "
-        "compatibility'nin ayrı aksiyom olarak ele alınışı, ve "
-        "algebroid Cartan bundle'ına giriş.",
+        "# 04 — Lie algebroid\n\n"
+        "Companion notebook to [04_lie_algebroid.md](04_lie_algebroid.md). "
+        "The `(E, [·,·]_E, ρ)` triple as a single object, anchor "
+        "compatibility as a separate axiom, and the algebroid Cartan "
+        "bundle.",
     ),
     (
         "markdown",
-        "## Üçlü: (E, [·,·]_E, ρ)\n\n"
-        "`LieAlgebroid` bundle adı, section bracket'i, anchor'u ve "
-        "uyum hedefi olan TM bracket'ini tek objede tutar.",
+        "## The triple `(E, [·,·]_E, ρ)`\n\n"
+        "`LieAlgebroid` keeps the bundle name, the section bracket, the "
+        "anchor, and the target `TM` bracket together in one object.",
     ),
     (
         "code",
@@ -411,12 +411,12 @@ TUTORIAL_04: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Anchor compatibility — ayrı aksiyom\n\n"
-        "`ρ([X, Y]_E) = [ρ(X), ρ(Y)]_{TM}` Lie algebroid *tanımı*nın "
-        "bir parçasıdır; bracket'in kendi aksiyomları içermez. Üç "
-        "sunumu vardır: obstruction (Expr), koşul "
-        "(VanishingCondition), ve aksiyom etiketli tek adımlık "
-        "ProofChain.",
+        "## Anchor compatibility — a separate axiom\n\n"
+        "`ρ([X, Y]_E) = [ρ(X), ρ(Y)]_{TM}` is part of the Lie algebroid "
+        "**definition**; the bracket's own axioms do not entail it. "
+        "Three presentations: an obstruction (Expr), a condition "
+        "(VanishingCondition), and a single-step `axiom`-tagged "
+        "`ProofChain`.",
     ),
     (
         "code",
@@ -434,13 +434,13 @@ TUTORIAL_04: list[tuple[str, str]] = [
     (
         "markdown",
         "## Algebroid Cartan bundle\n\n"
-        "Aynı `CartanCalculus` API'si ama `E`-etiketli operatörler ile: "
-        "`d_E`, `L_{E,X}`, `ι_{E,X}`. Operator-seviyesi `relation()` "
-        "çağrısı `OperatorEquation` döner. Not: algebroid Cartan "
-        "magic'i otomatik `verify` ile kapanmıyor (engine cartan-def "
-        "rewrite'ı TM'ye bağlı); bu beklenen ve kayıtlı. Beş Cartan "
-        "bağıntısının canlı ispatı için [05_cartan_calculus.md](05_cartan_calculus.md) "
-        "TM üstünde çalışır.",
+        "Same `CartanCalculus` API but with `E`-tagged operators: "
+        "`d_E`, `L_{E,X}`, `ι_{E,X}`. The operator-level `relation()` "
+        "call returns an `OperatorEquation`. Note: algebroid Cartan "
+        "magic does not auto-close under `verify` (the engine's "
+        "Cartan-definition rewrite is bound to TM); this is expected "
+        "and recorded. Live proofs of the five Cartan relations on TM "
+        "live in [05_cartan_calculus.md](05_cartan_calculus.md).",
     ),
     (
         "code",
@@ -453,10 +453,10 @@ TUTORIAL_04: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Seeded teorem\n\n"
-        "Compatibility aksiyomu `theorem_book`'ta kayıtlı — downstream "
-        "teoremler (algebroid Cartan, Courant–Dorfman köprüsü) tek "
-        "citation ile bu aksiyomu kullanır.",
+        "## Seeded theorem\n\n"
+        "The compatibility axiom is registered in `theorem_book` — "
+        "downstream theorems (algebroid Cartan, Courant–Dorfman bridge) "
+        "cite it in a single step.",
     ),
     (
         "code",
@@ -467,8 +467,8 @@ TUTORIAL_04: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Sonraki adım\n\n"
-        "Beş Cartan bağıntısının TM üstünde iki modda canlı ispatı: "
+        "## Next step\n\n"
+        "Live proofs of the five Cartan relations on TM, in two modes: "
         "[05_cartan_calculus.md](05_cartan_calculus.md).",
     ),
 ]
@@ -478,17 +478,17 @@ TUTORIAL_05: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 05 — Cartan Calculus\n\n"
-        "Bu notebook [05_cartan_calculus.md](05_cartan_calculus.md) "
-        "markdown'ının çalıştırılabilir sürümüdür. Beş Cartan "
-        "bağıntısının `OperatorEquation` olarak inşası, `d² = 0` için "
-        "axiom/theorem mod farkı, magic formülünün iki modda canlı "
-        "ispatı, ve invariant-d helper'ı.",
+        "# 05 — Cartan calculus\n\n"
+        "Companion notebook to [05_cartan_calculus.md](05_cartan_calculus.md). "
+        "The five Cartan relations as `OperatorEquation`s, the "
+        "axiom/theorem split for `d² = 0`, live verification of the "
+        "magic formula in both modes, and the invariant-d helper.",
     ),
     (
         "markdown",
-        "## Bundle\n\n"
-        "`CartanCalculus(d, L, ι, [·,·])` — dört ingredient tek objede.",
+        "## The bundle\n\n"
+        "`CartanCalculus(d, L, ι, [·,·])` — four ingredients in one "
+        "object.",
     ),
     (
         "code",
@@ -510,7 +510,7 @@ TUTORIAL_05: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Beş bağıntı, beş `OperatorEquation`",
+        "## Five relations, five `OperatorEquation`s",
     ),
     (
         "code",
@@ -533,9 +533,10 @@ TUTORIAL_05: list[tuple[str, str]] = [
     (
         "markdown",
         "## `d² = 0` — axiom mode vs theorem mode\n\n"
-        "Sade helper `apply_d_squared_zero` her zaman 0'a çevirir. "
-        "Default engine `d_squared_mode=\"theorem\"` + foundational "
-        "modda d(d(x)) → 0 rewrite'ını ProofStep olarak kaydeder.",
+        "The plain helper `apply_d_squared_zero` always rewrites to "
+        "`0`. The default engine with "
+        "`d_squared_mode=\"theorem\"` and foundational mode records "
+        "`d(d(x)) → 0` as a `ProofStep`.",
     ),
     (
         "code",
@@ -553,10 +554,11 @@ TUTORIAL_05: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Tüm beş bağıntı — `verify` üzerinden canlı ispat\n\n"
-        "`cartan_magic` iki modda da `ExteriorAlgebra((f,))` üstünde "
-        "tek adımda kapanıyor; diğer dördü `AgreementOnGenerators` + "
-        "`ExpandAndSimplify` zinciriyle generator seviyesinde kapanıyor.",
+        "## All five relations — live proof via `verify`\n\n"
+        "`cartan_magic` closes in a single step in both modes on "
+        "`ExteriorAlgebra((f,))`; the other four close at the "
+        "generator level via `AgreementOnGenerators` + "
+        "`ExpandAndSimplify`.",
     ),
     (
         "code",
@@ -573,11 +575,12 @@ TUTORIAL_05: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `invariant_d` — magic + lie_iota türevi teorem\n\n"
-        "`dω(X, Y) = X(ω(Y)) − Y(ω(X)) − ω([X, Y])` — 1-formlar için "
-        "Koszul-Cartan invariant formülü. `InvariantDOneFormDefinition`'ın "
-        "default classification'ı `\"theorem\"` (d²=0'ın tersine) — "
-        "çünkü formül doğal olarak magic + lie_iota'dan türüyor.",
+        "## `invariant_d` — theorem derived from magic + lie_iota\n\n"
+        "`dω(X, Y) = X(ω(Y)) − Y(ω(X)) − ω([X, Y])` — the Koszul-Cartan "
+        "invariant formula for 1-forms. `InvariantDOneFormDefinition`'s "
+        "default classification is `\"theorem\"` (in contrast to "
+        "`d²=0`'s `\"axiom\"`) — the formula falls out naturally from "
+        "magic + lie_iota.",
     ),
     (
         "code",
@@ -590,12 +593,12 @@ TUTORIAL_05: list[tuple[str, str]] = [
     (
         "markdown",
         "## Twisted Cartan bundle — `d_H = d + H∧`\n\n"
-        "Kapalı bir 3-form `H` ile H-twisted exterior derivative `d_H` "
-        "Cartan calculus'ünü aynı beş bağıntıyla taşır. "
-        "`TwistedCartanBundle(H)` wrapper'ı, `d_H`'yi taze bir "
-        "`ExteriorDerivative` olarak inşa edip Lie-türevi factory'sini "
-        "`d_H`'yi bundle slot'una geçecek şekilde kurar. Bundle inşa "
-        "etmek `dH = 0` varsayımını yapmaktır.",
+        "For a closed 3-form `H`, the H-twisted exterior derivative "
+        "`d_H` carries the Cartan calculus through the same five "
+        "relations. The `TwistedCartanBundle(H)` wrapper builds `d_H` "
+        "as a fresh `ExteriorDerivative` and rewires the Lie-derivative "
+        "factory so `d_H` slots into the bundle. Constructing the "
+        "bundle is making the assumption `dH = 0`.",
     ),
     (
         "code",
@@ -614,8 +617,8 @@ TUTORIAL_05: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Sonraki adım\n\n"
-        "Kendi bracket'iniz + Jacobi testi — "
+        "## Next step\n\n"
+        "Building your own bracket + the Jacobi test — "
         "[06_custom_bracket.md](06_custom_bracket.md) (Stage C).",
     ),
 ]
@@ -625,18 +628,18 @@ TUTORIAL_06: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 06 — Custom Bracket\n\n"
-        "Bu notebook [06_custom_bracket.md](06_custom_bracket.md) "
-        "markdown'ının çalıştırılabilir sürümüdür. `CustomBracket` "
-        "ile kendi rule'unu tanımla, flag'lerle aksiyom profilini "
-        "beyan et, `prove_jacobi` ile generic yolda test et.",
+        "# 06 — Custom bracket\n\n"
+        "Companion notebook to [06_custom_bracket.md](06_custom_bracket.md). "
+        "Define your own rule with `CustomBracket`, declare an axiom "
+        "profile via flags, and test it through `prove_jacobi`'s "
+        "generic dispatch path.",
     ),
     (
         "markdown",
-        "## Minimum profil — commutator rule\n\n"
+        "## Minimum profile — the commutator rule\n\n"
         "`CustomBracket(name, expand_fn, *, degree=..., "
         "is_graded_antisymmetric=..., satisfies_leibniz=..., "
-        "satisfies_graded_jacobi=...)`. expand_fn imzası "
+        "satisfies_graded_jacobi=...)`. The `expand_fn` signature is "
         "`(a, b, registry) → Expr`.",
     ),
     (
@@ -652,10 +655,10 @@ TUTORIAL_06: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Aksiyom flag'leri\n\n"
-        "Default profili komşu bracket'lerden farklı bir şey kurmak "
-        "istersen flag'lerle beyan et. `satisfies_graded_jacobi=None` "
-        "— koşullu Jacobi (derived bracket'teki gibi).",
+        "## Axiom flags\n\n"
+        "Override the defaults with flags when your bracket has a "
+        "different axiom profile. `satisfies_graded_jacobi=None` is "
+        "**conditional** Jacobi (as on a derived bracket).",
     ),
     (
         "code",
@@ -673,9 +676,9 @@ TUTORIAL_06: list[tuple[str, str]] = [
     (
         "markdown",
         "## `prove_jacobi` — generic dispatch\n\n"
-        "Commutator rule için zincir: bracket-expand → simplify → 0. "
-        "Asimetrik kötü rule ise residual bırakır ve `ProofFailure` "
-        "fırlatır.",
+        "For the commutator rule the chain is bracket-expand → "
+        "simplify → 0. A wrong / asymmetric rule leaves a residual "
+        "and raises `ProofFailure`.",
     ),
     (
         "code",
@@ -699,9 +702,10 @@ TUTORIAL_06: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Axiom obstruction helper'ları\n\n"
-        "`GradedBracket`'ten miras: her aksiyomun iddia ettiği ifadeyi "
-        "açıkça döner. İspata girmeden rule'u probe etmek için.",
+        "## Axiom-obstruction helpers\n\n"
+        "Inherited from `GradedBracket`: each helper returns the "
+        "explicit Expr asserted by the axiom. Useful for probing a "
+        "rule without going into a full proof.",
     ),
     (
         "code",
@@ -714,9 +718,9 @@ TUTORIAL_06: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Eşitlik — callable kimliği\n\n"
-        "İki `CustomBracket` ancak aynı `expand_fn` callable'ını "
-        "paylaşırsa eşit.",
+        "## Equality — callable identity\n\n"
+        "Two `CustomBracket`s compare equal only if they share the "
+        "same `expand_fn` callable.",
     ),
     (
         "code",
@@ -727,8 +731,8 @@ TUTORIAL_06: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Sonraki adım\n\n"
-        "Generator tabanlı otomatik bracket inşası — "
+        "## Next step\n\n"
+        "Generator-based automatic bracket construction — "
         "[07_derived_bracket.md](07_derived_bracket.md).",
     ),
 ]
@@ -738,19 +742,18 @@ TUTORIAL_07: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 07 — Derived Bracket\n\n"
-        "Bu notebook [07_derived_bracket.md](07_derived_bracket.md) "
-        "markdown'ının çalıştırılabilir sürümüdür. `{a, b}_Q := "
-        "[[a, Q]_base, b]_base` inşası, Jacobi'nin tek bir "
-        "denkleme (`[Q, Q]_base = 0`) indirilmesi, Koszul "
-        "eşdeğerliği, Poisson ve H-twisted Courant köşeleri.",
+        "# 07 — Derived bracket\n\n"
+        "Companion notebook to [07_derived_bracket.md](07_derived_bracket.md). "
+        "The construction `{a, b}_Q := [[a, Q]_base, b]_base`, Jacobi "
+        "reduced to a single equation (`[Q, Q]_base = 0`), Koszul "
+        "equivalence, and the Poisson / H-twisted Courant corners.",
     ),
     (
         "markdown",
-        "## İnşa\n\n"
-        "`DerivedBracket(base, Q, degree_Q=...)` — Lie base üstünde "
-        "degree-1 `Q` seçelim. `|{·,·}_Q| = |Q| − 2 = −1`. Leibniz "
-        "evrensel, antisymmetry/Jacobi koşullu (flag=None).",
+        "## The construction\n\n"
+        "`DerivedBracket(base, Q, degree_Q=...)` — pick a degree-1 `Q` "
+        "on a Lie base. `|{·,·}_Q| = |Q| − 2 = −1`. Leibniz is "
+        "universal; antisymmetry / Jacobi are conditional (flag=None).",
     ),
     (
         "code",
@@ -772,9 +775,10 @@ TUTORIAL_07: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## İki yüzlü expansion\n\n"
-        "`expand` — iç/dış iki katman base açılmış; "
-        "`expand_definition` — iki katman base `BracketApply` inert.",
+        "## Two-faced expansion\n\n"
+        "`expand` — both inner and outer base layers resolved; "
+        "`expand_definition` — both layers kept as inert "
+        "`BracketApply` nodes.",
     ),
     (
         "code",
@@ -786,9 +790,9 @@ TUTORIAL_07: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Jacobi obstruction — üç yüz\n\n"
-        "Tek bir koşul: `[Q, Q]_base = 0`. Lie base için trivial "
-        "(`Q*Q − Q*Q`).",
+        "## Jacobi obstruction — three faces\n\n"
+        "A single condition: `[Q, Q]_base = 0`. On a Lie base it's "
+        "trivial (`Q*Q − Q*Q`).",
     ),
     (
         "code",
@@ -800,14 +804,14 @@ TUTORIAL_07: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `prove_jacobi` — DerivedBracketStrategy\n\n"
-        "Bracket tipinden otomatik dispatch. Üç adım: "
-        "DerivedBracketTheorem → base-bracket-expand → simplify.",
+        "## `prove_jacobi` — `DerivedBracketStrategy`\n\n"
+        "Auto-dispatched on bracket type. Three steps: "
+        "`DerivedBracketTheorem` → `base-bracket-expand` → `simplify`.",
     ),
     (
         "code",
         "from jacopy.proof.verifier import prove_jacobi\n\n"
-        "# a, b zaten yukarıda Graded(0) olarak kayıtlı — sadece c'yi ekle.\n"
+        "# a, b already declared Graded(0) above — add c.\n"
         "c = Symbol('c')\n"
         "reg.declare(c, Graded(degree=0))\n\n"
         "chain = prove_jacobi(d, a, b, c, registry=reg)\n"
@@ -818,10 +822,10 @@ TUTORIAL_07: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `acting_on` — Koszul eşdeğerliği\n\n"
-        "SN base + π generator + anchor ρ: `expand` otomatik olarak "
-        "Koszul 3-terim formunu emit eder. `KoszulBracket(ρ)` ile "
-        "structurally eşit.",
+        "## `acting_on` — Koszul equivalence\n\n"
+        "SN base + π generator + anchor ρ: `expand` auto-emits the "
+        "Koszul three-term form. Structurally equal to "
+        "`KoszulBracket(ρ).expand`.",
     ),
     (
         "code",
@@ -845,13 +849,14 @@ TUTORIAL_07: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Poisson-as-derived — library wrapper\n\n"
-        "Matematiksel olarak `DerivedBracket(sn, π, degree_Q=1)` "
-        "Poisson bracket. Generic `prove_jacobi` obstruction'ı "
-        "`[·,·]_SN(π, π)` formuna indirir ve dürüst bir `ProofFailure` "
-        "olarak yüzeyleşir — Poisson hipotezi `[π, π]_SN = 0` "
-        "explicit varsayımdır. `PoissonBracket.prove_jacobi_reduction` "
-        "seeded teorem citation'ı ile bir adımda kapatır.",
+        "## Poisson-as-derived — the library wrapper\n\n"
+        "Mathematically `DerivedBracket(sn, π, degree_Q=1)` is the "
+        "Poisson bracket. The generic `prove_jacobi` reduces the "
+        "obstruction to `[·,·]_SN(π, π)` and surfaces it as an "
+        "honest `ProofFailure` — the Poisson hypothesis "
+        "`[π, π]_SN = 0` must be carried as an explicit assumption. "
+        "`PoissonBracket.prove_jacobi_reduction` closes it in one "
+        "step via the seeded theorem citation.",
     ),
     (
         "code",
@@ -871,9 +876,9 @@ TUTORIAL_07: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## H-twist — Courant koşullu Jacobi\n\n"
-        "`CourantBracket(background_H=H)`: Jacobi ⟺ dH = 0. "
-        "Default (H=None) vacuous.",
+        "## H-twist — the Courant conditional Jacobi\n\n"
+        "`CourantBracket(background_H=H)`: Jacobi ⟺ `dH = 0`. The "
+        "untwisted default (`H=None`) is vacuous.",
     ),
     (
         "code",
@@ -890,8 +895,8 @@ TUTORIAL_07: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Sonraki adım\n\n"
-        "Stage D: birleşik tur + foundations — "
+        "## Next step\n\n"
+        "Stage D: the unified picture + foundations — "
         "[08_unified_picture.md](08_unified_picture.md).",
     ),
 ]
@@ -901,18 +906,17 @@ TUTORIAL_08: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 08 — Birleşik Tablo\n\n"
-        "Bu notebook [08_unified_picture.md](08_unified_picture.md) "
-        "markdown'ının çalıştırılabilir sürümüdür. Tek hipotez "
-        "`[π, π]_SN = 0` — fonksiyon ve form seviyelerinde aynı "
-        "obstruction. Theorem Book citation zinciri. Paralel örnek: "
-        "`dH = 0`.",
+        "# 08 — The unified picture\n\n"
+        "Companion notebook to [08_unified_picture.md](08_unified_picture.md). "
+        "A single hypothesis `[π, π]_SN = 0` — same obstruction at both "
+        "the function and form levels. Theorem Book citation chain. "
+        "A parallel: `dH = 0`.",
     ),
     (
         "markdown",
-        "## Tek hipotez, iki yüz\n\n"
-        "`jacobi_condition` ve `koszul_jacobi_condition` aynı `Expr`'e "
-        "işaret ediyor — sadece display ismi farklı.",
+        "## One hypothesis, two faces\n\n"
+        "`jacobi_condition` and `koszul_jacobi_condition` point to the "
+        "same `Expr` — only the display name differs.",
     ),
     (
         "code",
@@ -930,7 +934,7 @@ TUTORIAL_08: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Fonksiyon vs form — aynı obstruction'da kesişim",
+        "## Function vs form — meeting at the same obstruction",
     ),
     (
         "code",
@@ -948,9 +952,9 @@ TUTORIAL_08: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Klasik-derived köprü — `reflexive` step\n\n"
-        "Paketin expand kuralları her iki tarafı aynı `Expr` ağacına "
-        "getirir; Koszul eşdeğerliği yapısal olarak kapanır.",
+        "## The classical–derived bridge — the `reflexive` step\n\n"
+        "The package's expand rules bring both sides to the same Expr "
+        "tree; Koszul equivalence closes structurally.",
     ),
     (
         "code",
@@ -959,7 +963,7 @@ TUTORIAL_08: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Seeded teoremler — citation zinciri",
+        "## Seeded theorems — the citation chain",
     ),
     (
         "code",
@@ -976,7 +980,7 @@ TUTORIAL_08: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `dH = 0` — Courant tarafı aynı desen",
+        "## `dH = 0` — the same pattern on the Courant side",
     ),
     (
         "code",
@@ -995,8 +999,8 @@ TUTORIAL_08: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Sonraki adım\n\n"
-        "Aksiyomun *kendisi* nereden geliyor? "
+        "## Next step\n\n"
+        "Where does the axiom *itself* come from? "
         "[09_foundations.md](09_foundations.md).",
     ),
 ]
@@ -1006,15 +1010,14 @@ TUTORIAL_09: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 09 — Temeller\n\n"
-        "Bu notebook [09_foundations.md](09_foundations.md) markdown'ının "
-        "çalıştırılabilir sürümüdür. Axiom vs theorem sınıflandırması, "
-        "efficient vs foundational mode, `d² = 0`'ın generator-level "
-        "axiom'dan türetilişi.",
+        "# 09 — Foundations\n\n"
+        "Companion notebook to [09_foundations.md](09_foundations.md). "
+        "Axiom vs theorem classification, efficient vs foundational "
+        "mode, and `d² = 0` derived from the generator-level axiom.",
     ),
     (
         "markdown",
-        "## Default engine — her şey axiom",
+        "## Default engine — every rule is an axiom",
     ),
     (
         "code",
@@ -1026,7 +1029,7 @@ TUTORIAL_09: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `d_squared_mode=\"theorem\"` — yeniden sınıflandır",
+        "## `d_squared_mode=\"theorem\"` — reclassify",
     ),
     (
         "code",
@@ -1038,10 +1041,9 @@ TUTORIAL_09: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Efficient vs foundational — aynı adım, farklı sub-proof\n\n"
-        "Efficient mode child taşımaz; foundational mode theorem-sınıfı "
-        "bir kural tetiklendiğinde generator-level axiom'a atıf "
-        "iliştirir.",
+        "## Efficient vs foundational — same step, different sub-proof\n\n"
+        "Efficient mode carries no children; foundational mode attaches "
+        "a generator-level citation when a theorem-class rule fires.",
     ),
     (
         "code",
@@ -1071,10 +1073,10 @@ TUTORIAL_09: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Sub-proof ne söylüyor?\n\n"
-        "Foundational sub-proof'un tek girdisi `d(df) = 0` — bu "
-        "paketin primitive kabul ettiği jenerik aksiyom. `d² = 0` "
-        "tüm form derecelerinde ondan extend ediyor.",
+        "## What does the sub-proof say?\n\n"
+        "The foundational sub-proof's only input is `d(df) = 0` — "
+        "the generic axiom the package treats as primitive. `d² = 0` "
+        "extends from it at every form degree.",
     ),
     (
         "code",
@@ -1084,10 +1086,10 @@ TUTORIAL_09: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Custom Definition — axiom sınıfı\n\n"
-        "`ExpansionEngine([YourDef()])` ile kendi aksiyom setinizi "
-        "kurup engine'i çalıştırabilirsiniz. Aşağıda `c_zero` "
-        "sembolünü sıfıra indiren tek kural:",
+        "## Custom Definition — axiom class\n\n"
+        "`ExpansionEngine([YourDef()])` lets you assemble your own "
+        "axiom set and run the engine on it. Below: a single rule "
+        "that drives a `c_zero` symbol to zero.",
     ),
     (
         "code",
@@ -1108,10 +1110,9 @@ TUTORIAL_09: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Custom Definition — theorem sınıfı\n\n"
-        "`theorem_proof_builder`'ı override ettiğinde aynı kural "
-        "theorem olur; foundational mode'da altına sub-proof "
-        "iliştirilir.",
+        "## Custom Definition — theorem class\n\n"
+        "Override `theorem_proof_builder` and the same rule becomes a "
+        "theorem; foundational mode attaches the sub-proof.",
     ),
     (
         "code",
@@ -1145,11 +1146,12 @@ TUTORIAL_09: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Theorem Book yapısı\n\n"
-        "`Theorem` dataclass beş alan taşır: `name`, `statement`, "
-        "`from_axioms`, `proof`, `notes`. Singleton `theorem_book` "
-        "registry seeded teoremleri tutar; downstream kod `proof` "
-        "chain'ini alıp daha büyük bir ispata gömebilir.",
+        "## Theorem Book structure\n\n"
+        "The `Theorem` dataclass carries five fields: `name`, "
+        "`statement`, `from_axioms`, `proof`, `notes`. The singleton "
+        "`theorem_book` registry holds seeded theorems; downstream "
+        "code pulls `proof` and embeds the chain inside a larger "
+        "proof.",
     ),
     (
         "code",
@@ -1165,10 +1167,11 @@ TUTORIAL_09: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Üç provenance katmanı\n\n"
-        "Property (sembol), Definition (expansion), Theorem — üçü de "
-        "`axiom`/`theorem` ayrımı taşır. `Theorem.from_axioms` tek "
-        "citation olarak makale ispatına iner.",
+        "## Three provenance layers\n\n"
+        "Property (symbol), Definition (expansion), Theorem — all "
+        "three carry the `axiom`/`theorem` distinction. "
+        "`Theorem.from_axioms` lands a single citation inside a "
+        "paper-style proof.",
     ),
     (
         "code",
@@ -1178,10 +1181,2287 @@ TUTORIAL_09: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Tutorial serisinin sonu\n\n"
-        "Dokuz bölüm tamamlandı. Paket artık kendi bracket'iniz, kendi "
-        "teoreminiz, kendi aksiyom setinizle genişletilebilir bir araç "
-        "olarak kullanıma hazır.",
+        "## End of the tutorial series\n\n"
+        "Nine chapters complete. The package is now a tool ready to "
+        "be extended with your own brackets, your own theorems, and "
+        "your own axiom sets.",
+    ),
+]
+
+
+TUTORIAL_10: list[tuple[str, str]] = [
+    _BOOTSTRAP,
+    (
+        "markdown",
+        "# 10 — Diagnostics & proof debugging\n\n"
+        "Companion notebook to [10_diagnostics.md](10_diagnostics.md). "
+        "What to do when `prove_equivalence` raises `ProofFailure` — "
+        "read the residual, inspect the diagnostic report, extend the "
+        "rule catalogue.",
+    ),
+    (
+        "markdown",
+        "## A failing proof\n\n"
+        "Build an `ExpansionEngine` deliberately missing the d² = 0 "
+        "rule. Forming `d(d(ω)) == 0` should close trivially in the "
+        "default engine but stalls here, so we get a real failure to "
+        "look at.",
+    ),
+    (
+        "code",
+        "from jacopy.algebra.derivation import Act\n"
+        "from jacopy.calculus.exterior_d import d\n"
+        "from jacopy.core.expr import Symbol, Integer\n"
+        "from jacopy.core.properties import Graded\n"
+        "from jacopy.core.registry import PropertyRegistry\n"
+        "from jacopy.proof import prove_equivalence, ProofFailure\n"
+        "from jacopy.proof.expansion import (\n"
+        "    ExpansionEngine,\n"
+        "    LieDerivativeCartanDefinition,\n"
+        "    ActOverSumOpDefinition,\n"
+        "    IotaSquaredZeroDefinition,\n"
+        "    IotaOnZeroFormDefinition,\n"
+        "    IotaOnExactOneFormDefinition,\n"
+        ")\n\n"
+        "reg = PropertyRegistry()\n"
+        "omega = Symbol(\"ω\"); reg.declare(omega, Graded(degree=2))\n\n"
+        "engine_no_d2 = ExpansionEngine([\n"
+        "    LieDerivativeCartanDefinition(),\n"
+        "    ActOverSumOpDefinition(),\n"
+        "    IotaSquaredZeroDefinition(),\n"
+        "    IotaOnZeroFormDefinition(),\n"
+        "    IotaOnExactOneFormDefinition(d=d),\n"
+        "])\n\n"
+        "try:\n"
+        "    prove_equivalence(\n"
+        "        Act(d, Act(d, omega)),\n"
+        "        Integer(0),\n"
+        "        registry=reg,\n"
+        "        engine=engine_no_d2,\n"
+        "    )\n"
+        "except ProofFailure as exc:\n"
+        "    print(exc)",
+    ),
+    (
+        "markdown",
+        "The exception message is two-tier — a one-line summary "
+        "(`ExpandAndSimplify left residual ...`) followed by the "
+        "structured `DiagnosticReport` block. The summary tells you "
+        "*that* the proof stalled; the report tells you *why* the "
+        "engine couldn't reduce the residual further.",
+    ),
+    (
+        "markdown",
+        "## Reading the report\n\n"
+        "`ProofFailure.report` is a `DiagnosticReport` (or `None`). It "
+        "carries `report.residual` (the surviving `Expr`) and a list of "
+        "`DiagnosticHint`s — each with `category`, `message`, "
+        "`location`, and `suggestion` fields.",
+    ),
+    (
+        "code",
+        "try:\n"
+        "    prove_equivalence(\n"
+        "        Act(d, Act(d, omega)), Integer(0),\n"
+        "        registry=reg, engine=engine_no_d2,\n"
+        "    )\n"
+        "except ProofFailure as exc:\n"
+        "    report = exc.report\n"
+        "    print(f\"residual : {report.residual}\")\n"
+        "    print(f\"hints    : {len(report)}\")\n"
+        "    for hint in report:\n"
+        "        print(f\"  [{hint.category}] {hint.message}\")\n"
+        "        if hint.suggestion is not None:\n"
+        "            print(f\"    fix: {hint.suggestion}\")",
+    ),
+    (
+        "markdown",
+        "## Calling `diagnose()` directly\n\n"
+        "You don't need a `ProofFailure` to use the diagnostic layer. "
+        "`diagnose(expr, registry=...)` runs the full rule catalogue "
+        "against any expression — useful for inspecting intermediate "
+        "terms.",
+    ),
+    (
+        "code",
+        "from jacopy.core.expr import Product\n"
+        "from jacopy.proof import diagnose\n\n"
+        "mystery = Symbol(\"M\")  # never registered\n"
+        "report = diagnose(Product(mystery, omega), registry=reg)\n"
+        "print(report.format())",
+    ),
+    (
+        "markdown",
+        "## Built-in rule catalogue\n\n"
+        "Rules in `jacopy.proof.diagnostic_rules` register themselves "
+        "on import. Each fires on a specific *stalled shape*:\n\n"
+        "| Category | Trigger |\n|---|---|\n"
+        "| `stalled-d-squared` | `Act(d, Act(d, x))` survived |\n"
+        "| `stalled-iota-squared` | `Act(ι_X, Act(ι_X, x))` survived |\n"
+        "| `stalled-act-over-zero` | `Act(op, 0)` reached the residual |\n"
+        "| `stalled-act-over-neg-op` | `Act(Neg(op), x)` failed to peel |\n"
+        "| `unreduced-iota-on-df` | `ι_V(d(f))` with V a sum/product of derivations |\n"
+        "| `unclassified-factor` | a `Product` factor has no grading evidence |\n"
+        "| `symbol-vector-field` | a bare `Symbol` plays a vector-field role |\n\n"
+        "Filter to a single category with `report.by_category(...)`.",
+    ),
+    (
+        "code",
+        "# Trigger several categories side by side, just by passing\n"
+        "# different residual shapes through diagnose().\n"
+        "from jacopy.core.expr import Sum, Neg\n\n"
+        "shapes = [\n"
+        "    (\"d² stall\",     Act(d, Act(d, omega))),\n"
+        "    (\"Act on 0\",     Act(d, Integer(0))),\n"
+        "    (\"unclassified\", Product(Symbol(\"M\"), omega)),\n"
+        "]\n"
+        "for label, expr in shapes:\n"
+        "    rep = diagnose(expr, registry=reg)\n"
+        "    cats = sorted({h.category for h in rep})\n"
+        "    print(f\"{label:14s} → categories: {cats}\")",
+    ),
+    (
+        "markdown",
+        "## Adding your own rule\n\n"
+        "A rule is `(expr, registry, engine) → Iterable[DiagnosticHint]`. "
+        "Register it with `@register_rule` — it joins the catalogue "
+        "immediately, no engine wiring needed because diagnostics are "
+        "read-only on the residual tree.",
+    ),
+    (
+        "code",
+        "from jacopy.proof import DiagnosticHint, register_rule\n\n"
+        "@register_rule\n"
+        "def warn_on_unregistered_omega(expr, registry, engine):\n"
+        "    \"\"\"Toy rule: flag bare 'ω' that lost its Graded declaration.\"\"\"\n"
+        "    if registry is None:\n"
+        "        return\n"
+        "    stack = [expr]\n"
+        "    while stack:\n"
+        "        cur = stack.pop()\n"
+        "        if isinstance(cur, Symbol) and cur.name == \"ω\":\n"
+        "            if not registry.has(cur, Graded):\n"
+        "                yield DiagnosticHint(\n"
+        "                    category=\"omega-unregistered\",\n"
+        "                    message=\"ω appears without a registered grading\",\n"
+        "                    location=cur,\n"
+        "                    suggestion=\"reg.declare(ω, Graded(degree=...))\",\n"
+        "                )\n"
+        "        stack.extend(getattr(cur, \"children\", ()))\n\n"
+        "# Exercise the new rule on an empty registry\n"
+        "empty = PropertyRegistry()\n"
+        "report = diagnose(omega, registry=empty)\n"
+        "for h in report:\n"
+        "    if h.category == \"omega-unregistered\":\n"
+        "        print(h)",
+    ),
+    (
+        "markdown",
+        "## Summary\n\n"
+        "* `prove_equivalence` raises `ProofFailure`; `exc.report` "
+        "is a `DiagnosticReport`.\n"
+        "* The report bundles `residual` + a list of `DiagnosticHint`s "
+        "with `category` / `message` / `location` / `suggestion`.\n"
+        "* `diagnose(expr, registry=...)` runs the same pipeline "
+        "directly on any `Expr`.\n"
+        "* Built-in catalogue covers d² / ι² stalls, `Act` linearity "
+        "gaps, unreduced iota-on-df, and unclassified factors.\n"
+        "* Extend the catalogue with `@register_rule` — pure tree-walk "
+        "function, no engine plumbing.",
+    ),
+]
+
+
+TUTORIAL_11: list[tuple[str, str]] = [
+    _BOOTSTRAP,
+    (
+        "markdown",
+        "# 11 — Publication-ready output\n\n"
+        "Companion notebook to "
+        "[11_publication_output.md](11_publication_output.md). "
+        "`chain_to_latex` / `chain_to_tikz` and their `_document` "
+        "wrappers turn a `ProofChain` into LaTeX you can paste into a "
+        "paper or compile into a standalone PDF.",
+    ),
+    (
+        "markdown",
+        "## A worked chain\n\n"
+        "Tiny but real proof: `d(d(ω)) == 0`. Two steps — enough to "
+        "exercise the renderers without flooding the output.",
+    ),
+    (
+        "code",
+        "from jacopy.algebra.derivation import Act\n"
+        "from jacopy.calculus.exterior_d import d\n"
+        "from jacopy.core.expr import Symbol, Integer\n"
+        "from jacopy.core.properties import Graded\n"
+        "from jacopy.core.registry import PropertyRegistry\n"
+        "from jacopy.proof import prove_equivalence\n\n"
+        "reg = PropertyRegistry()\n"
+        "omega = Symbol(\"ω\"); reg.declare(omega, Graded(degree=2))\n\n"
+        "chain = prove_equivalence(\n"
+        "    Act(d, Act(d, omega)),\n"
+        "    Integer(0),\n"
+        "    registry=reg,\n"
+        ")\n"
+        "print(f\"steps: {len(chain)}\")\n"
+        "for s in chain.steps:\n"
+        "    print(f\"  [{s.rule}] {s.before} → {s.after}\")",
+    ),
+    (
+        "markdown",
+        "## Inline LaTeX\n\n"
+        "`chain_to_latex(chain)` returns a `gather*` block — one math "
+        "row per step, wrapped in `\\allowdisplaybreaks\\scriptsize` "
+        "so long chains page-break properly. Paste straight into any "
+        "`.tex` source that loads `amsmath`.",
+    ),
+    (
+        "code",
+        "from jacopy.display import chain_to_latex\n\n"
+        "body = chain_to_latex(chain)\n"
+        "print(body)",
+    ),
+    (
+        "markdown",
+        "Each row uses `\\to` (not `=`) — explicit rewriting direction. "
+        "The `\\quad \\text{[rule] (provenance)}` annotation reads as the "
+        "step's justification.",
+    ),
+    (
+        "markdown",
+        "## Standalone document\n\n"
+        "`chain_to_latex_document` adds a full `\\documentclass{article}` "
+        "preamble plus optional `\\title`/`\\author`/`\\maketitle`. Write "
+        "to disk and `pdflatex out.tex` compiles directly.",
+    ),
+    (
+        "code",
+        "from jacopy.display import chain_to_latex_document\n\n"
+        "doc = chain_to_latex_document(\n"
+        "    chain,\n"
+        "    title=\"d² = 0\",\n"
+        "    author=\"jacopy\",\n"
+        ")\n"
+        "print(doc[:400])\n"
+        "print(\"...\")\n"
+        "print(doc[-80:])",
+    ),
+    (
+        "markdown",
+        "`preamble_extras=\"...\"` splices project-specific macros "
+        "(e.g. `\\input{macros.tex}`) between the default preamble and "
+        "`\\begin{document}`.",
+    ),
+    (
+        "markdown",
+        "## TikZ diagram\n\n"
+        "`chain_to_tikz` renders the same chain as a vertical "
+        "`tikzpicture`. Each `before`/`after` becomes a boxed node — "
+        "`n + 1` nodes for `n` steps — with arrows labelled by rule "
+        "name and provenance tag.",
+    ),
+    (
+        "code",
+        "from jacopy.display import chain_to_tikz\n\n"
+        "diagram = chain_to_tikz(chain)\n"
+        "print(diagram)",
+    ),
+    (
+        "markdown",
+        "## Standalone TikZ document\n\n"
+        "`chain_to_tikz_document` wraps the diagram in a full document "
+        "with the `tikz` + `positioning` preamble.",
+    ),
+    (
+        "code",
+        "from jacopy.display import chain_to_tikz_document\n\n"
+        "doc = chain_to_tikz_document(\n"
+        "    chain,\n"
+        "    title=\"d² = 0 (diagram)\",\n"
+        "    node_distance=\"1.4cm\",\n"
+        ")\n"
+        "print(doc[:400])",
+    ),
+    (
+        "markdown",
+        "`node_distance` tunes vertical spacing — bump it up when "
+        "expression labels crowd each other.",
+    ),
+    (
+        "markdown",
+        "## Round-trip to PDF (optional)\n\n"
+        "Both `_document` outputs compile with any LaTeX engine. The "
+        "cell below is illustrative — skip executing it unless "
+        "`pdflatex` is on your PATH.",
+    ),
+    (
+        "code",
+        "import shutil\n\n"
+        "if shutil.which(\"pdflatex\") is None:\n"
+        "    print(\"pdflatex not found on PATH — skipping the round-trip demo.\")\n"
+        "else:\n"
+        "    import subprocess, tempfile\n"
+        "    from pathlib import Path\n"
+        "    with tempfile.TemporaryDirectory() as tmp:\n"
+        "        src = Path(tmp) / \"proof.tex\"\n"
+        "        src.write_text(doc, encoding=\"utf-8\")\n"
+        "        subprocess.run([\n"
+        "            \"pdflatex\", \"-interaction=nonstopmode\", str(src),\n"
+        "        ], cwd=tmp, check=True, capture_output=True)\n"
+        "        print(sorted(p.name for p in Path(tmp).iterdir()))",
+    ),
+    (
+        "markdown",
+        "## Summary\n\n"
+        "* Four helpers — two inline (`chain_to_latex`, "
+        "`chain_to_tikz`), two standalone (`chain_to_latex_document`, "
+        "`chain_to_tikz_document`).\n"
+        "* Inline: paste into existing `.tex`. Standalone: write + "
+        "`pdflatex`.\n"
+        "* `title` / `author` / `preamble_extras` are kwargs on the "
+        "`_document` variants — empty strings produce a body-only "
+        "document.\n"
+        "* Nested sub-proofs flatten in both renderers; compose by hand "
+        "if you want a tree.",
+    ),
+]
+
+
+TUTORIAL_14: list[tuple[str, str]] = [
+    _BOOTSTRAP,
+    (
+        "markdown",
+        "# 14 — Solving textbook problems with Problem wrappers\n\n"
+        "Companion notebook to "
+        "[14_problem_wrappers.md](14_problem_wrappers.md). The wrapper "
+        "layer (`SymplecticProblem`, `KoszulProblem`, `BianchiProblem`, "
+        "...) bundles `(structure, designated operands, registry, "
+        "engine)` so you don't re-wire the same axioms for every "
+        "related question.",
+    ),
+    (
+        "markdown",
+        "## Setting up a `SymplecticProblem`\n\n"
+        "Three inputs: the symplectic form `ω`, the functions you want "
+        "as Hamiltonians, and a registry. Everything else is auto-wired "
+        "— `Closed(ω)` and `NonDegenerate(ω)` are declared on the "
+        "registry, `X_f`/`X_g` are built with their defining relation "
+        "`ι_{X_f} ω = ±df` registered on the engine.",
+    ),
+    (
+        "code",
+        "from jacopy.core.expr import Symbol\n"
+        "from jacopy.core.properties import Graded, Scalar\n"
+        "from jacopy.core.registry import PropertyRegistry\n"
+        "from jacopy.library.symplectic_problem import SymplecticProblem\n\n"
+        "reg = PropertyRegistry()\n"
+        "omega = Symbol(\"ω\"); reg.declare(omega, Graded(degree=2))\n"
+        "f = Symbol(\"f\"); reg.declare(f, Scalar())\n"
+        "g = Symbol(\"g\"); reg.declare(g, Scalar())\n\n"
+        "prob = SymplecticProblem(omega, [f, g], registry=reg)\n"
+        "print(prob)",
+    ),
+    (
+        "markdown",
+        "## Question 2a — Hamiltonian invariance\n\n"
+        "The canonical first question on a symplectic form: "
+        "`L_{X_f} ω = 0`. Cartan magic + closed form + d² = 0 close "
+        "this in eight named steps.",
+    ),
+    (
+        "code",
+        "chain = prob.prove_hamiltonian_invariance(f)\n"
+        "print(f\"closure: {chain.initial} → {chain.final}\")\n"
+        "print(f\"steps  : {len(chain)}\")\n"
+        "for i, step in enumerate(chain.steps):\n"
+        "    print(f\"  [{i:02d}] {step.rule:35s} {step.before} → {step.after}\")",
+    ),
+    (
+        "markdown",
+        "Every step has a named rule — `L_X := d∘ι_X + ι_X∘d`, "
+        "`Closed: d(ω) = 0`, `d² = 0`, ... — so the chain reads end-to-"
+        "end as the textbook computation.",
+    ),
+    (
+        "markdown",
+        "## Question 2c — Hamiltonian equality\n\n"
+        "Two helpers close the family: `prove_vector_field_equality` "
+        "(reduces `Y = Z` via non-degeneracy) and "
+        "`prove_hamiltonian_equality` (closes `ι_Y ω = ±dh`). The "
+        "simplest demonstration is the reflexive case — each Hamiltonian "
+        "equals itself.",
+    ),
+    (
+        "code",
+        "Xf = prob.hamiltonian(f)\n"
+        "chain = prob.prove_vector_field_equality(Xf, Xf)\n"
+        "print(f\"steps: {len(chain)}, final: {chain.final}\")",
+    ),
+    (
+        "markdown",
+        "Three steps: the obstruction `ι_{X_f} ω − ι_{X_f} ω` peels "
+        "through the `NonDegenerate` rule to `X_f − X_f`, which "
+        "`simplify` collapses to `0`. The non-trivial use is when `Y` "
+        "is a Lie bracket of two Hamiltonians and you want it "
+        "recognised as a third Hamiltonian — same call, different "
+        "operands.",
+    ),
+    (
+        "markdown",
+        "## Setting up a `KoszulProblem`\n\n"
+        "Form-side counterpart: a Poisson bivector `π` with a list of "
+        "forms. The wrapper auto-declares `Antisymmetric(π)` and "
+        "exposes the Koszul bracket plus the tilde calculus rules "
+        "(L̃ / ι̃ / d̃) on its engine.",
+    ),
+    (
+        "code",
+        "from jacopy.library.koszul_problem import KoszulProblem\n\n"
+        "reg2 = PropertyRegistry()\n"
+        "pi    = Symbol(\"π\"); reg2.declare(pi,    Graded(degree=2))\n"
+        "alpha = Symbol(\"α\"); reg2.declare(alpha, Graded(degree=1))\n"
+        "beta  = Symbol(\"β\"); reg2.declare(beta,  Graded(degree=1))\n\n"
+        "kprob = KoszulProblem(pi, [alpha, beta], registry=reg2)\n"
+        "print(kprob)\n"
+        "print(f\"bracket: {kprob.koszul_bracket}\")\n"
+        "print(f\"sharp  : {kprob.sharp}\")",
+    ),
+    (
+        "markdown",
+        "The bracket-expansion rule is exposed directly — useful when "
+        "you want to reduce a `[α,β]_K` expression by hand without "
+        "running a full proof closure.",
+    ),
+    (
+        "code",
+        "from jacopy.brackets.base import BracketApply\n\n"
+        "raw = BracketApply(kprob.koszul_bracket, alpha, beta)\n"
+        "print(\"input :\", raw)\n"
+        "print(\"output:\", kprob.bracket_expansion_rule.rewrite(raw))",
+    ),
+    (
+        "markdown",
+        "The rewrite recovers the classical Koszul formula\n"
+        "`L_{π^♯α} β − L_{π^♯β} α − d⟨π^♯α, β⟩` term by term.",
+    ),
+    (
+        "markdown",
+        "## When to step outside the wrapper\n\n"
+        "The wrapper is a convenience, not a wall.\n\n"
+        "1. **`prob.engine` is the pre-wired engine** — feed it to "
+        "`prove_equivalence(..., engine=prob.engine)` to drive any "
+        "equality under the wrapper's axiom set.\n"
+        "2. **`prob.hamiltonian(f)` returns the registered "
+        "Hamiltonian** — build expressions with it directly.\n"
+        "3. **The wrapper never overrides existing declarations** — "
+        "pre-declaring is the way to opt out of a default convention.",
+    ),
+    (
+        "code",
+        "# Demo: drive an arbitrary equality through prob.engine.\n"
+        "from jacopy.algebra.derivation import Act\n"
+        "from jacopy.calculus.exterior_d import d\n"
+        "from jacopy.core.expr import Integer\n"
+        "from jacopy.proof import prove_equivalence\n\n"
+        "# d(d(f)) = 0 — the engine knows d² = 0 because the wrapper\n"
+        "# inherited it from default_engine.\n"
+        "chain = prove_equivalence(\n"
+        "    Act(d, Act(d, f)), Integer(0),\n"
+        "    registry=prob._registry, engine=prob._engine,\n"
+        ")\n"
+        "print(f\"closure: {chain.initial} → {chain.final} ({len(chain)} steps)\")",
+    ),
+    (
+        "markdown",
+        "## Anatomy of the wrapper family\n\n"
+        "| Wrapper | Bundles |\n"
+        "|---|---|\n"
+        "| `SymplecticProblem` | `(M, ω, π?, {f_i}, registry, engine)` |\n"
+        "| `KoszulProblem` | `(π, ρ = π^♯, K, {α_i})` + tilde calculus |\n"
+        "| `BianchiProblem` | `(connection, registry)` — T̃-Bianchi I/II |\n"
+        "| `CartanFormPropertyProblem` | `(connection, frame)` — §3.1.6 |\n"
+        "| `CartanStructureProblem` | `(connection, frame)` — Cartan I/II |\n"
+        "| `KoszulConnectionProblem` | facade over the three above |\n\n"
+        "Each `__init__` validates inputs + declares structural axioms; "
+        "properties expose the underlying objects; `prove_*` methods "
+        "drive closures via a pre-built engine.",
+    ),
+    (
+        "markdown",
+        "## Summary\n\n"
+        "* Problem wrappers bundle `(structure, designated operands, "
+        "registry, engine)` so you don't re-wire axioms every "
+        "question.\n"
+        "* `SymplecticProblem` covers form-side problems — Hamiltonian "
+        "invariance, vector-field equality, Hamiltonian equality.\n"
+        "* `KoszulProblem` covers Poisson form-bracket problems — "
+        "`[α, β]_K` expansion, tilde calculus, derivator engines.\n"
+        "* The pre-built engine (`prob.engine`) is exposed for "
+        "closures outside the named helpers.\n"
+        "* Wrappers never override existing registry declarations — "
+        "pre-declaring is the override mechanism.",
+    ),
+]
+
+
+TUTORIAL_12: list[tuple[str, str]] = [
+    _BOOTSTRAP,
+    (
+        "markdown",
+        "# 12 — The Schouten–Nijenhuis bracket\n\n"
+        "Companion notebook to "
+        "[12_schouten_nijenhuis.md](12_schouten_nijenhuis.md). "
+        "`[·,·]_SN` extends the Lie bracket to multivector fields with "
+        "the shifted grading `|X| = k − 1`, and supplies the universal "
+        "Poisson obstruction `[π, π]_SN`.",
+    ),
+    (
+        "markdown",
+        "## Shifted grading\n\n"
+        "Functions are SN-degree `−1`, vector fields are SN-degree `0`, "
+        "bivectors are SN-degree `1`. Use `Graded(degree=...)` to "
+        "declare these — **not `Scalar()`**, which the SN engine reads "
+        "as `degree=0` (i.e. a 1-vector).",
+    ),
+    (
+        "code",
+        "from jacopy.core.expr import Symbol\n"
+        "from jacopy.core.properties import Graded\n"
+        "from jacopy.core.registry import PropertyRegistry\n\n"
+        "reg = PropertyRegistry()\n"
+        "X = Symbol(\"X\"); reg.declare(X, Graded(degree=0))\n"
+        "Y = Symbol(\"Y\"); reg.declare(Y, Graded(degree=0))\n"
+        "f = Symbol(\"f\"); reg.declare(f, Graded(degree=-1))\n"
+        "g = Symbol(\"g\"); reg.declare(g, Graded(degree=-1))",
+    ),
+    (
+        "markdown",
+        "## Four base cases\n\n"
+        "`sn.expand(a, b, registry)` returns the closed form when both "
+        "operands are atomic and SN-degrees are concrete integers in "
+        "{−1, 0}. These are the characterising rules:\n\n"
+        "* `[X, Y]_SN = X*Y − Y*X` — the Lie bracket on 1-vectors.\n"
+        "* `[f, g]_SN = 0` — `C^∞` is commutative.\n"
+        "* `[f, X]_SN = −X(f)` — graded antisymmetric of the next.\n"
+        "* `[X, f]_SN = X(f)` — vectors act as derivations on functions.",
+    ),
+    (
+        "code",
+        "from jacopy.brackets.schouten import sn\n\n"
+        "print(\"[X, Y]_SN =\", sn.expand(X, Y, reg))\n"
+        "print(\"[f, g]_SN =\", sn.expand(f, g, reg))\n"
+        "print(\"[f, X]_SN =\", sn.expand(f, X, reg))\n"
+        "print(\"[X, f]_SN =\", sn.expand(X, f, reg))",
+    ),
+    (
+        "markdown",
+        "## Wedge Leibniz\n\n"
+        "On `Product(X, Y)` (= `X ∧ Y`) the bracket descends via\n\n"
+        "```\n"
+        "[X ∧ Y, Z]_SN = X ∧ [Y, Z]_SN + (−1)^{|Y||Z|} [X, Z]_SN ∧ Y\n"
+        "```\n\n"
+        "so a 2-vector against a function reads as `X ∧ Y(f) + X(f) ∧ Y` "
+        "(both signs `+1` because `|Y|·|f| = 0·(−1) = 0` is even).",
+    ),
+    (
+        "code",
+        "from jacopy.core.expr import Product\n\n"
+        "bivec = Product(X, Y)              # X ∧ Y\n"
+        "print(\"[X ∧ Y, f]_SN =\", sn.expand(bivec, f, reg))",
+    ),
+    (
+        "markdown",
+        "## Atomic higher-order multivectors stay opaque\n\n"
+        "A bare `Symbol` declared `Graded(degree=1)` plays the role of "
+        "an atomic bivector — there's no wedge to peel, so SN can't "
+        "descend. Rather than raise, `expand` returns the inert "
+        "`BracketApply` node. That handle is exactly what makes "
+        "`[π, π]_SN = 0` a usable hypothesis.",
+    ),
+    (
+        "code",
+        "pi = Symbol(\"π\"); reg.declare(pi, Graded(degree=1))\n"
+        "obstr = sn.self_bracket(pi, reg)\n"
+        "print(\"[π, π]_SN =\", obstr)\n"
+        "print(\"type      :\", type(obstr).__name__)",
+    ),
+    (
+        "markdown",
+        "## Bridge to `PoissonBracket`\n\n"
+        "`PoissonBracket(π)` exposes the same obstruction via "
+        "`jacobi_obstruction()` and the textbook statement via "
+        "`jacobi_condition()`. The killer move is "
+        "`prove_jacobi_reduction(f, g, h)` — the cyclic Jacobi sum "
+        "collapses to `[·,·]_SN(π, π)` in **one** proof step (the "
+        "Derived Bracket Theorem).",
+    ),
+    (
+        "code",
+        "from jacopy.library.poisson import PoissonBracket\n\n"
+        "h = Symbol(\"h\"); reg.declare(h, Graded(degree=-1))\n\n"
+        "P = PoissonBracket(pi)\n"
+        "print(\"obstruction:\", P.jacobi_obstruction())\n"
+        "print(\"condition  :\", P.jacobi_condition())\n\n"
+        "chain = P.prove_jacobi_reduction(f, g, h, registry=reg)\n"
+        "print(f\"initial: {chain.initial}\")\n"
+        "print(f\"final  : {chain.final}\")\n"
+        "print(f\"steps  : {len(chain)}  rule: {chain.steps[0].rule}\")",
+    ),
+    (
+        "markdown",
+        "## When SN stays inert\n\n"
+        "Three situations:\n\n"
+        "1. **Atomic higher-order multivector** — useful opacity, the "
+        "handle drives the proof.\n"
+        "2. **Symbolic SN-degree** — if any operand has a non-integer "
+        "`Graded` degree, the wedge-Leibniz parity can't be decided.\n"
+        "3. **Forms** — `sn.expand(α, π)` for a form `α` is **not "
+        "defined**. SN is the multivector-only bracket; the form-level "
+        "operation is the Koszul bracket via "
+        "`DerivedBracket(sn, π, acting_on=Sharp(π))` (tutorial 7).",
+    ),
+    (
+        "markdown",
+        "## Summary\n\n"
+        "* `sn = SchoutenBracket()` — graded Lie bracket of degree 0 in "
+        "the shifted grading `|X| = k − 1`.\n"
+        "* Four base cases close on 1-vector / function pairs; wedge "
+        "Leibniz climbs into `Product`s.\n"
+        "* Atomic higher multivectors return an opaque `BracketApply` — "
+        "`sn.self_bracket(π)` is the universal Poisson obstruction.\n"
+        "* `PoissonBracket.prove_jacobi_reduction` collapses the "
+        "cyclic Jacobi sum to that obstruction in one step.",
+    ),
+]
+
+
+TUTORIAL_13: list[tuple[str, str]] = [
+    _BOOTSTRAP,
+    (
+        "markdown",
+        "# 13 — Closure properties & axiom flags\n\n"
+        "Companion notebook to "
+        "[13_closure_axioms.md](13_closure_axioms.md). The three "
+        "closure flags (`Closed`, `Antisymmetric`, `NonDegenerate`) "
+        "are declarative facts on the registry that paired engine "
+        "rules cash in as rewrite primitives — no per-form "
+        "`Definition` subclass needed.",
+    ),
+    (
+        "markdown",
+        "## `Closed` — `dω = 0` on demand\n\n"
+        "Declare the property; layer `ClosedFormDefinition` onto the "
+        "default engine; `Act(d, ω)` rewrites to `0` for every "
+        "registered form.",
+    ),
+    (
+        "code",
+        "from jacopy.algebra.derivation import Act\n"
+        "from jacopy.calculus.closed_axioms import ClosedFormDefinition\n"
+        "from jacopy.calculus.exterior_d import d\n"
+        "from jacopy.core.expr import Symbol, Integer\n"
+        "from jacopy.core.properties import Graded, Closed\n"
+        "from jacopy.core.registry import PropertyRegistry\n"
+        "from jacopy.proof import prove_equivalence\n"
+        "from jacopy.proof.expansion import ExpansionEngine, default_engine\n\n"
+        "reg = PropertyRegistry()\n"
+        "omega = Symbol(\"ω\")\n"
+        "reg.declare(omega, Graded(degree=2))\n"
+        "reg.declare(omega, Closed())\n\n"
+        "base = default_engine(registry=reg)\n"
+        "engine = ExpansionEngine(\n"
+        "    list(base.definitions) + [ClosedFormDefinition(registry=reg)]\n"
+        ")\n\n"
+        "chain = prove_equivalence(Act(d, omega), Integer(0),\n"
+        "                          registry=reg, engine=engine)\n"
+        "print(f\"d(ω) = 0 in {len(chain)} steps: {chain.steps[0].rule}\")",
+    ),
+    (
+        "markdown",
+        "The single named step *is* the proof artefact: the chain "
+        "transcript reads as \"because ω is closed\". With "
+        "`registry=None` the rule is dormant — a safety hatch, not a "
+        "default.",
+    ),
+    (
+        "markdown",
+        "## `Antisymmetric` — bivectors with a sign rule\n\n"
+        "`Antisymmetric()` flags a binary head whose `MultiEval(head, "
+        "α, β)` swap-pair canonicalises to `-head(β, α)`. Typical use: "
+        "a Schouten–Nijenhuis bivector `π` whose pairing should sort "
+        "args by `repr` order with a sign.",
+    ),
+    (
+        "code",
+        "from jacopy.calculus.antisym_axioms import RegistryAntiSymCanonicalDefinition\n"
+        "from jacopy.core.multi_eval import MultiEval\n"
+        "from jacopy.core.properties import Antisymmetric\n\n"
+        "reg2 = PropertyRegistry()\n"
+        "pi    = Symbol(\"π\"); reg2.declare(pi, Antisymmetric())\n"
+        "alpha = Symbol(\"α\"); reg2.declare(alpha, Graded(degree=1))\n"
+        "beta  = Symbol(\"β\"); reg2.declare(beta,  Graded(degree=1))\n\n"
+        "engine2 = ExpansionEngine([\n"
+        "    RegistryAntiSymCanonicalDefinition(registry=reg2)\n"
+        "])\n\n"
+        "raw = MultiEval(pi, beta, alpha)  # out of canonical order\n"
+        "expanded, steps = engine2.expand(raw)\n"
+        "print(f\"input    : {raw}\")\n"
+        "print(f\"expanded : {expanded}\")\n"
+        "print(f\"rule     : {steps[0].rule}\")",
+    ),
+    (
+        "markdown",
+        "Cancellation pattern: `π(α, β) + π(β, α)` collapses to zero "
+        "when this rule meets the simplify pipeline.",
+    ),
+    (
+        "code",
+        "from jacopy.algorithms.simplify import simplify\n\n"
+        "eq = MultiEval(pi, alpha, beta) + MultiEval(pi, beta, alpha)\n"
+        "expanded, _ = engine2.expand(eq)\n"
+        "print(f\"π(α,β) + π(β,α) → {simplify(expanded, reg2)}\")",
+    ),
+    (
+        "markdown",
+        "## `NonDegenerate` — peeling `ι_(·) ω` off both sides\n\n"
+        "`NonDegenerate()` encodes injectivity of the bundle map "
+        "`X ↦ ι_X ω`. The paired rule fires on a two-term `Sum` "
+        "whose children are interior products of the *same* form "
+        "against vector fields with opposite signs — exactly the "
+        "obstruction shape a vector-field equality produces.",
+    ),
+    (
+        "code",
+        "from jacopy.calculus.interior import interior\n"
+        "from jacopy.calculus.nondegenerate_axioms import (\n"
+        "    NonDegenerateInteriorEqualityDefinition,\n"
+        ")\n"
+        "from jacopy.core.properties import NonDegenerate\n\n"
+        "reg3 = PropertyRegistry()\n"
+        "omega = Symbol(\"ω\")\n"
+        "reg3.declare(omega, Graded(degree=2))\n"
+        "reg3.declare(omega, NonDegenerate())\n\n"
+        "Y = Symbol(\"Y\"); reg3.declare(Y, Graded(degree=1))\n"
+        "Z = Symbol(\"Z\"); reg3.declare(Z, Graded(degree=1))\n\n"
+        "engine3 = ExpansionEngine([\n"
+        "    NonDegenerateInteriorEqualityDefinition(registry=reg3)\n"
+        "])\n\n"
+        "obstruction = Act(interior(Y), omega) - Act(interior(Z), omega)\n"
+        "expanded, steps = engine3.expand(obstruction)\n"
+        "print(f\"input    : {obstruction}\")\n"
+        "print(f\"expanded : {expanded}\")\n"
+        "print(f\"rule     : {steps[0].rule}\")",
+    ),
+    (
+        "markdown",
+        "## Why declarative beats inline\n\n"
+        "Each closure rule is registry-aware: at construction it "
+        "stores a `PropertyRegistry`, at `matches` time it queries "
+        "that registry for the relevant flag. Practical consequences:\n\n"
+        "1. **One rule, every form.** A single `ClosedFormDefinition` "
+        "handles every form declared `Closed()` — no per-form "
+        "`Definition` subclass.\n"
+        "2. **Pre-declaring opts out.** Problem wrappers (tutorial 14) "
+        "see existing flags and don't re-declare.\n"
+        "3. **`registry=None` is a no-op.** Engines without a "
+        "registry keep these rules dormant.",
+    ),
+    (
+        "markdown",
+        "## When the wrapper does it for you\n\n"
+        "| Wrapper | Auto-declares | Wires |\n"
+        "|---|---|---|\n"
+        "| `SymplecticProblem` | `Closed(ω)`, `NonDegenerate(ω)` | both rules on `prob.engine` |\n"
+        "| `KoszulProblem` | `Antisymmetric(π)` | antisym rule + tilde calculus |\n\n"
+        "Tutorial 14 walks those wrappers. The point of *this* "
+        "tutorial is the layer underneath: when the wrapper isn't a "
+        "fit, declare the flag and layer the rule yourself.",
+    ),
+    (
+        "markdown",
+        "## Summary\n\n"
+        "* Three closure properties — `Closed`, `Antisymmetric`, "
+        "`NonDegenerate` — each paired with a single registry-aware "
+        "engine rule.\n"
+        "* Rules constructed with `registry=` keyword; `None` is a "
+        "no-op default.\n"
+        "* Pre-declaring on the registry is the opt-out mechanism "
+        "for the problem-wrapper layer.\n"
+        "* The same flag-plus-rule recipe scales to `Poisson`, the "
+        "Lie-bracket antisymmetry / Jacobi axioms, and any future "
+        "structural fact.",
+    ),
+]
+
+
+TUTORIAL_15: list[tuple[str, str]] = [
+    _BOOTSTRAP,
+    (
+        "markdown",
+        "# 15 — The intrinsic engine\n\n"
+        "Companion notebook to "
+        "[15_intrinsic_engine.md](15_intrinsic_engine.md). "
+        "`intrinsic_engine()` bundles the textbook expansions of "
+        "`ι_X`, `L_X`, `d` on a `MultiEval` plus the multi-eval "
+        "book-keeping helpers; `prove_intrinsic_equivalence` drives "
+        "them to fix-point.",
+    ),
+    (
+        "markdown",
+        "## The base bundle\n\n"
+        "Seven rules: three intrinsic operator expansions plus four "
+        "`MultiEval` helpers. Match order matters — operator-specific "
+        "rules fire before head-linearity scans the wrapper.",
+    ),
+    (
+        "code",
+        "from jacopy.calculus.intrinsic_engine import intrinsic_engine\n\n"
+        "eng = intrinsic_engine()\n"
+        "print(f\"rules : {len(eng.definitions)}\")\n"
+        "for r in eng.definitions:\n"
+        "    print(f\"  - {r.name}\")",
+    ),
+    (
+        "markdown",
+        "## `prove_intrinsic_equivalence` on `ι² = 0`\n\n"
+        "Vector fields are constructed via `Derivation(name, 0)` "
+        "(degree 0) — the intrinsic rules look for that shape rather "
+        "than a generic `Symbol` with a `Graded` declaration.",
+    ),
+    (
+        "code",
+        "from jacopy.algebra.derivation import Act, Derivation\n"
+        "from jacopy.calculus.interior import interior\n"
+        "from jacopy.calculus.intrinsic_engine import prove_intrinsic_equivalence\n"
+        "from jacopy.core.expr import Symbol, Integer\n"
+        "from jacopy.core.multi_eval import multi_eval\n\n"
+        "omega = Symbol(\"ω\")\n"
+        "X, Y = Derivation(\"X\", 0), Derivation(\"Y\", 0)\n\n"
+        "lhs = multi_eval(Act(interior(X), Act(interior(X), omega)), Y)\n"
+        "chain = prove_intrinsic_equivalence(lhs, Integer(0))\n"
+        "print(f\"ι_X ι_X ω = 0 closes in {len(chain)} steps\")\n"
+        "for s in chain.steps:\n"
+        "    print(f\"  - {s.rule}\")",
+    ),
+    (
+        "markdown",
+        "## Cartan magic on a 2-form\n\n"
+        "The flagship 12.A test: `(ι_X d + d ι_X) ω = L_X ω` on a "
+        "2-form, evaluated on `(Y, Z)`. The base bundle alone closes "
+        "this in twelve named steps.",
+    ),
+    (
+        "code",
+        "from jacopy.calculus.exterior_d import d as default_d\n"
+        "from jacopy.calculus.lie_derivative import lie_derivative\n"
+        "from jacopy.core.expr import Sum\n\n"
+        "X, Y, Z = (Derivation(s, 0) for s in (\"X\", \"Y\", \"Z\"))\n\n"
+        "lhs = Sum(\n"
+        "    multi_eval(Act(interior(X), Act(default_d, omega)), Y, Z),\n"
+        "    multi_eval(Act(default_d, Act(interior(X), omega)), Y, Z),\n"
+        ")\n"
+        "rhs = multi_eval(Act(lie_derivative(X), omega), Y, Z)\n\n"
+        "chain = prove_intrinsic_equivalence(lhs, rhs)\n"
+        "print(f\"Cartan magic closes in {len(chain)} steps\")",
+    ),
+    (
+        "markdown",
+        "## Closure-complete bundle\n\n"
+        "`intrinsic_engine_with_closure()` adds four 12.A.6 rules "
+        "that fold post-expansion residues — VF-commutator, bracket "
+        "antisymmetry / Jacobi, the iota-as-scalar 1-form bridge. "
+        "Together they close `[L_X, ι_Y] ω = ι_{[X,Y]_VF} ω` and "
+        "`d² = 0` on 1- / 2-forms.",
+    ),
+    (
+        "code",
+        "from jacopy.algebra.lie_bracket_vf import lie_bracket_vf\n"
+        "from jacopy.calculus.intrinsic_engine import intrinsic_engine_with_closure\n"
+        "from jacopy.core.expr import Neg\n\n"
+        "XY = lie_bracket_vf(X, Y)\n\n"
+        "lhs = Sum(\n"
+        "    multi_eval(Act(lie_derivative(X), Act(interior(Y), omega)), Z),\n"
+        "    Neg(multi_eval(Act(interior(Y), Act(lie_derivative(X), omega)), Z)),\n"
+        ")\n"
+        "rhs = multi_eval(Act(interior(XY), omega), Z)\n\n"
+        "chain = prove_intrinsic_equivalence(\n"
+        "    lhs, rhs, engine=intrinsic_engine_with_closure(),\n"
+        ")\n"
+        "print(f\"[L_X, ι_Y] ω closes in {len(chain)} steps\")",
+    ),
+    (
+        "markdown",
+        "## `IntrinsicFormulaRecognizer` — shape inspection\n\n"
+        "Pure-shape inspection of `MultiEval(Act(op, ω), Y_1, …)`: "
+        "given an expression, returns the operator label, the form, "
+        "the vector field (if any), and the eval slots — without "
+        "running any rewriting. Use it when you want to *dispatch* "
+        "on shape without committing to a closure.",
+    ),
+    (
+        "code",
+        "from jacopy.calculus.intrinsic_engine import IntrinsicFormulaRecognizer\n\n"
+        "expr = multi_eval(Act(lie_derivative(X), omega), Y, Z)\n"
+        "match = IntrinsicFormulaRecognizer().recognize(expr)\n"
+        "print(f\"operator     : {match.operator}\")\n"
+        "print(f\"vector_field : {match.vector_field}\")\n"
+        "print(f\"omega        : {match.omega}\")\n"
+        "print(f\"args         : {match.args}\")",
+    ),
+    (
+        "markdown",
+        "## When the intrinsic engine is the wrong choice\n\n"
+        "**Use it for:** equalities involving `MultiEval(Act(op, ω), "
+        "Y_1, …)` shapes, when you want the textbook intrinsic-"
+        "formula transcript.\n\n"
+        "**Don't use it for:** generic operator-equation work (raw "
+        "`L²`, `d²` without multi-eval) — that belongs to "
+        "`prove_equivalence` with `default_engine`. Problem-specific "
+        "axioms belong in the closure-axiom layer (tutorial 13) or a "
+        "problem wrapper (tutorial 14).\n\n"
+        "**Known failure mode:** `d²` and `[L_X, L_Y]` on a 3-form or "
+        "higher don't close — the 12.A.6 closure axioms are "
+        "calibrated for 1- / 2-forms. Tutorial 10 walks the "
+        "diagnostic surface for those residues.",
+    ),
+    (
+        "markdown",
+        "## Summary\n\n"
+        "* `intrinsic_engine()` — 7 base rules: 3 intrinsic operator "
+        "expansions + 4 multi-eval helpers.\n"
+        "* `intrinsic_engine_with_closure()` — adds 4 closure rules "
+        "to fold post-expansion residues; closes `[L_X, ι_Y] ω`, "
+        "`d² = 0`, `[L_X, L_Y] ω` on 1- / 2-forms.\n"
+        "* `prove_intrinsic_equivalence` — runs the engine to "
+        "fix-point, returns a `ProofChain`.\n"
+        "* `IntrinsicFormulaRecognizer` — pure-shape inspector for "
+        "intrinsic-operator multi-evals, no rewriting.",
+    ),
+]
+
+
+TUTORIAL_16: list[tuple[str, str]] = [
+    _BOOTSTRAP,
+    (
+        "markdown",
+        "# 16 — Phase 13 deep dive: the `[π, π]_SN` obstruction\n\n"
+        "Companion notebook to "
+        "[16_phase_13_deep_dive.md](16_phase_13_deep_dive.md). Phase "
+        "13 closes the cyclic Poisson Jacobi sum to `[·,·]_SN(π, π)` "
+        "*without* citing the seeded `poisson_jacobi` theorem — using "
+        "only engine-level rewrite axioms. This walks the machinery: "
+        "`LieBracketVF` atom + the four rewrite rules.",
+    ),
+    (
+        "markdown",
+        "## `LieBracketVF` — Lie bracket of vector fields as an atom\n\n"
+        "`[X, Y]_VF` is an opaque `Derivation` subclass with structural "
+        "identity over `(X, Y)`. Why opaque: after the operator-"
+        "commutator fold, downstream Cartan rules need a single "
+        "derivation, not a `X*Y − Y*X` expansion. Literal expansion "
+        "is still available through `LieBracket.expand` for callers "
+        "who need it.",
+    ),
+    (
+        "code",
+        "from jacopy.algebra.derivation import Derivation\n"
+        "from jacopy.algebra.lie_bracket_vf import lie_bracket_vf\n\n"
+        "X = Derivation(\"X\", 0)\n"
+        "Y = Derivation(\"Y\", 0)\n\n"
+        "bracket = lie_bracket_vf(X, Y)\n"
+        "print(f\"name      : {bracket}\")\n"
+        "print(f\"X         : {bracket.X}\")\n"
+        "print(f\"Y         : {bracket.Y}\")\n"
+        "print(f\"degree    : {bracket._degree}\")\n"
+        "print(f\"same atom : {bracket == lie_bracket_vf(X, Y)}\")",
+    ),
+    (
+        "markdown",
+        "## The vector-field axioms (Faz 13.C)\n\n"
+        "`OpCommutatorVfDefinition` folds the operator commutator: "
+        "`L_X(L_Y(ω)) − L_Y(L_X(ω)) → L_{[X,Y]_VF}(ω)`. Order-"
+        "permissive on the Sum's children — the upstream pipeline "
+        "doesn't have to canonicalise first.",
+    ),
+    (
+        "code",
+        "from jacopy.algebra.derivation import Act\n"
+        "from jacopy.calculus.lie_derivative import lie_derivative\n"
+        "from jacopy.calculus.vf_axioms import OpCommutatorVfDefinition\n"
+        "from jacopy.core.expr import Symbol, Sum, Neg\n"
+        "from jacopy.proof.expansion import ExpansionEngine\n\n"
+        "omega = Symbol(\"ω\")\n"
+        "LX, LY = lie_derivative(X), lie_derivative(Y)\n\n"
+        "expr = Sum(\n"
+        "    Act(LX, Act(LY, omega)),\n"
+        "    Neg(Act(LY, Act(LX, omega))),\n"
+        ")\n\n"
+        "engine = ExpansionEngine([OpCommutatorVfDefinition()])\n"
+        "out, steps = engine.expand(expr)\n"
+        "print(f\"input  : {expr}\")\n"
+        "print(f\"output : {out}\")\n"
+        "print(f\"rule   : {steps[0].rule}\")",
+    ),
+    (
+        "markdown",
+        "The match is structural — a positive `Act(L_X, Act(L_Y, ω))` "
+        "paired with its sign-flipped twin `Neg(Act(L_Y, Act(L_X, "
+        "ω)))`. `LieVfJacobiDefinition` is the same kind of matcher "
+        "one level up: three cyclically-permuted `Act(L_{[X,[Y,Z]_VF]"
+        "_VF}, ω)` terms collapse to `Integer(0)`.",
+    ),
+    (
+        "markdown",
+        "## Function-side closure (2g-deep, end-to-end)\n\n"
+        "Two axioms in `jacopy.calculus.poisson_axioms` — "
+        "`PoissonAsHamiltonianDefinition` (rewrites `{f, g}_π → "
+        "X_f(g)` for a *pinned* `DerivedBracket`) and "
+        "`HamiltonianCyclicSnFormulaDefinition` (collapses cyclic "
+        "`Act(X_a, Act(X_b, c))` to `[·,·]_SN(π, π)`) — close the "
+        "cyclic Poisson Jacobi sum end-to-end.",
+    ),
+    (
+        "code",
+        "from jacopy.brackets.derived import DerivedBracket\n"
+        "from jacopy.brackets.schouten import sn\n"
+        "from jacopy.calculus.poisson_axioms import (\n"
+        "    PoissonAsHamiltonianDefinition,\n"
+        "    HamiltonianCyclicSnFormulaDefinition,\n"
+        ")\n"
+        "from jacopy.core.properties import Graded\n"
+        "from jacopy.core.registry import PropertyRegistry\n\n"
+        "reg = PropertyRegistry()\n"
+        "pi = Symbol(\"π\"); reg.declare(pi, Graded(degree=1))\n"
+        "f = Symbol(\"f\"); reg.declare(f, Graded(degree=-1))\n"
+        "g = Symbol(\"g\"); reg.declare(g, Graded(degree=-1))\n"
+        "h = Symbol(\"h\"); reg.declare(h, Graded(degree=-1))\n\n"
+        "P = DerivedBracket(sn, pi, name=\"[·,·]_π\")\n"
+        "obs = P.graded_jacobi_obstruction(f, g, h, registry=reg)\n"
+        "print(f\"input : {obs}\")",
+    ),
+    (
+        "code",
+        "engine = ExpansionEngine([\n"
+        "    PoissonAsHamiltonianDefinition(bracket=P, bivector=pi),\n"
+        "    HamiltonianCyclicSnFormulaDefinition(bivector=pi),\n"
+        "])\n\n"
+        "result, steps = engine.expand(obs)\n"
+        "print(f\"steps : {len(steps)}\")\n"
+        "for i, s in enumerate(steps):\n"
+        "    print(f\"  [{i:02d}] {s.rule}\")\n"
+        "print(f\"final : {result}\")",
+    ),
+    (
+        "markdown",
+        "Seven steps: six `PoissonAsHamiltonian` rewrites (each cyclic "
+        "term `{f, {g, h}}` peels twice — outer then inner — into "
+        "`X_f(X_g(h))`) plus one `HamiltonianCyclicSn` collapse to "
+        "`−[·,·]_SN(π, π)`. The leading `Neg` is the sign carried in "
+        "from `graded_jacobi_obstruction`'s shape, not a sign error.",
+    ),
+    (
+        "markdown",
+        "## Form-side asymmetry (2f-deep)\n\n"
+        "The form-side chain — cyclic Koszul Jacobi on three 1-forms "
+        "— closes through `SnBivectorFormulaDefinition` (Faz 13.D), "
+        "but doesn't reach a clean `[·,·]_SN(π, π)` residue without "
+        "extra bookkeeping. After Cartan-layer expansion of "
+        "`{α, β}_K = L_{π^♯α}β − L_{π^♯β}α − d⟨π^♯α, β⟩` and operator-"
+        "commutator folding, three pieces remain:\n\n"
+        "1. **Named-bracket cyclic** `Σ_cyc L_{[π^♯·, π^♯·]_VF}(·)` — "
+        "what `SnBivectorFormulaDefinition` rewrites.\n"
+        "2. **Iterated Lie tails** `L_{π^♯·}(L_{π^♯·}(·))` — separate "
+        "cancellation pass.\n"
+        "3. **`d⟨·, ·⟩` residues** from the Koszul third term — "
+        "don't enter the SN handle directly.\n\n"
+        "(2) and (3) are the bookkeeping burden. They cancel "
+        "algebraically but need user-driven simplification or extra "
+        "rules. The function-side chain doesn't have this burden — "
+        "the `Act(X_f, X_g(h))` shape absorbs everything into a "
+        "single iterated derivation. The asymmetry is structural: "
+        "1-forms carry more Cartan-layer machinery than functions.",
+    ),
+    (
+        "markdown",
+        "## When to use the deep machinery\n\n"
+        "| Goal | Use |\n"
+        "|---|---|\n"
+        "| One-step Jacobi reduction citing a seeded theorem | `PoissonBracket.prove_jacobi_reduction` (tutorial 12) |\n"
+        "| Step-by-step `LieBracketVF` fold transcript | This tutorial's two-axiom engine, function-side |\n"
+        "| Custom derived bracket without a seeded theorem | Pin a `DerivedBracket`, layer the same axioms |\n"
+        "| Form-side cancellation with the 3-form pairing | Faz 13.D `SnBivectorFormulaDefinition` + manual residue work |\n\n"
+        "Default workflow stays at the seeded-theorem level — "
+        "`prove_jacobi_reduction` is shorter and reads as \"by the "
+        "Derived Bracket Theorem\". The deeper machinery sits "
+        "*underneath* that one-line citation, ready when the seed "
+        "doesn't apply.",
+    ),
+    (
+        "markdown",
+        "## Summary\n\n"
+        "* `LieBracketVF(X, Y)` — opaque `Derivation` atom, kept "
+        "unexpanded for downstream Cartan rule uniformity.\n"
+        "* `OpCommutatorVfDefinition` folds operator commutators into "
+        "`L_{[X,Y]_VF}`; `LieVfJacobiDefinition` zeros the cyclic "
+        "Lie-Jacobi triple.\n"
+        "* `PoissonAsHamiltonianDefinition` + "
+        "`HamiltonianCyclicSnFormulaDefinition` close the cyclic "
+        "Poisson Jacobi sum to `[·,·]_SN(π, π)` in 7 engine steps.\n"
+        "* Form-side (2f-deep) needs additional bookkeeping for "
+        "iterated Lie tails and `d⟨·, ·⟩` residues — a structural "
+        "consequence of 1-forms' deeper Cartan layer.",
+    ),
+]
+
+
+TUTORIAL_17: list[tuple[str, str]] = [
+    _BOOTSTRAP,
+    (
+        "markdown",
+        "# 17 — The tilde calculus\n\n"
+        "Companion notebook to "
+        "[17_tilde_calculus.md](17_tilde_calculus.md). The tilde "
+        "calculus dualises `ι_X`, `L_X`, `d` on a Poisson manifold "
+        "`(M, π)` to operators `ι̃_ω`, `L̃_ω`, `d̃` acting on "
+        "*multivector* fields, indexed by *forms* (and `π`). Six "
+        "Cartan-style identities mirror the form-side ones; this "
+        "notebook walks the operator atoms, the three defining "
+        "rewrites, and `prove_tilde_cartan_relation`.",
+    ),
+    (
+        "markdown",
+        "## The three operator atoms\n\n"
+        "`tilde_interior(ω)` lowers multivector degree by 1, "
+        "`tilde_d(π)` raises by 1, `tilde_lie(ω, π)` preserves it.",
+    ),
+    (
+        "code",
+        "from jacopy.calculus.tilde import tilde_interior, tilde_d, tilde_lie\n"
+        "from jacopy.core.expr import Symbol\n\n"
+        "omega = Symbol(\"ω\")\n"
+        "pi    = Symbol(\"π\")\n\n"
+        "i_til = tilde_interior(omega)\n"
+        "d_til = tilde_d(pi)\n"
+        "L_til = tilde_lie(omega, pi)\n\n"
+        "print(f\"{i_til}: degree {i_til._degree}\")\n"
+        "print(f\"{d_til}: degree {d_til._degree}\")\n"
+        "print(f\"{L_til}: degree {L_til._degree}\")",
+    ),
+    (
+        "markdown",
+        "## Defining-identity rewrites\n\n"
+        "Three rules in `jacopy.calculus.tilde.axioms` realise the "
+        "defining identities:\n\n"
+        "* `TildeIotaSwapDefinition` — `ι̃_ω V → ι_V ω` (notation swap)\n"
+        "* `TildeExteriorDLichnerowiczDefinition(π)` — `d̃ V → [π, V]_SN`\n"
+        "* `TildeLieMagicDefinition(π)` — `L̃_ω V → d̃ ι̃_ω V + ι̃_ω d̃ V`",
+    ),
+    (
+        "code",
+        "from jacopy.algebra.derivation import Act\n"
+        "from jacopy.calculus.tilde import (\n"
+        "    TildeIotaSwapDefinition,\n"
+        "    TildeExteriorDLichnerowiczDefinition,\n"
+        "    TildeLieMagicDefinition,\n"
+        ")\n"
+        "from jacopy.proof.expansion import ExpansionEngine\n\n"
+        "V = Symbol(\"V\")\n\n"
+        "engine = ExpansionEngine([\n"
+        "    TildeIotaSwapDefinition(),\n"
+        "    TildeExteriorDLichnerowiczDefinition(pi),\n"
+        "    TildeLieMagicDefinition(pi),\n"
+        "])\n"
+        "for inp in [Act(i_til, V), Act(d_til, V), Act(L_til, V)]:\n"
+        "    out, steps = engine.expand(inp)\n"
+        "    print(f\"{inp} → {out}  via {steps[0].rule}\")",
+    ),
+    (
+        "markdown",
+        "## Auxiliary axioms — `Poisson` flag unlocks `d̃² = 0`\n\n"
+        "Five auxiliary rules in `tilde.aux_axioms` cover the special "
+        "cases the three defining rules don't reach:\n\n"
+        "| Rule | Folds |\n"
+        "|---|---|\n"
+        "| `TildeIotaOnZeroVectorDefinition` | `ι̃_ω f → 0` (f deg 0) |\n"
+        "| `TildeIotaSquaredZeroDefinition` | `ι̃_ω(ι̃_ω V) → 0` |\n"
+        "| `TildeLieOnZeroVectorDefinition` | `L̃_ω f → π^♯(ω)(f)` |\n"
+        "| `TildeDOfFunctionDefinition` | `d̃ f → −π^♯(df)` |\n"
+        "| `TildeDSquaredPoissonDefinition` | `d̃² V → 0` (π Poisson) |",
+    ),
+    (
+        "code",
+        "from jacopy.calculus.tilde import TildeDSquaredPoissonDefinition\n"
+        "from jacopy.core.properties import Poisson\n"
+        "from jacopy.core.registry import PropertyRegistry\n\n"
+        "reg = PropertyRegistry()\n"
+        "reg.declare(pi, Poisson())\n\n"
+        "engine = ExpansionEngine([\n"
+        "    TildeDSquaredPoissonDefinition(pi, registry=reg),\n"
+        "])\n"
+        "expr = Act(d_til, Act(d_til, V))\n"
+        "out, steps = engine.expand(expr)\n"
+        "print(f\"{expr} → {out}\")\n"
+        "print(f\"rule  : {steps[0].rule}\")",
+    ),
+    (
+        "markdown",
+        "## `prove_tilde_cartan_relation` — Cartan magic on a 1-vector\n\n"
+        "`tilde_intrinsic_engine(pi, koszul, …)` bundles every rule "
+        "above plus standard MultiEval / Sharp / Pairing helpers. "
+        "Pair it with `prove_tilde_cartan_relation` and the magic "
+        "formula closes mechanically. The `slot_kind=\"covector\"` "
+        "discipline keeps the engine routed to *tilde* rules.",
+    ),
+    (
+        "code",
+        "from jacopy.brackets.koszul import KoszulBracket\n"
+        "from jacopy.calculus.musical import Sharp\n"
+        "from jacopy.calculus.tilde import (\n"
+        "    tilde_intrinsic_engine, prove_tilde_cartan_relation,\n"
+        ")\n"
+        "from jacopy.core.expr import Sum\n"
+        "from jacopy.core.properties import Graded\n\n"
+        "reg = PropertyRegistry()\n"
+        "reg.declare(pi,    Graded(degree=1)); reg.declare(pi, Poisson())\n"
+        "reg.declare(omega, Graded(degree=1))\n"
+        "reg.declare(V,     Graded(degree=1))\n"
+        "eta = Symbol(\"η\"); reg.declare(eta, Graded(degree=1))\n\n"
+        "sharp  = Sharp(pi)\n"
+        "koszul = KoszulBracket(sharp)\n"
+        "eng    = tilde_intrinsic_engine(pi, koszul, sharp=sharp, registry=reg)\n\n"
+        "lhs = Act(L_til, V)\n"
+        "rhs = Sum(Act(d_til, Act(i_til, V)), Act(i_til, Act(d_til, V)))\n\n"
+        "chain = prove_tilde_cartan_relation(\n"
+        "    lhs, rhs, etas=(eta,), engine=eng, registry=reg,\n"
+        ")\n"
+        "print(f\"L̃_ω = d̃ ι̃_ω + ι̃_ω d̃ closes in {len(chain)} steps\")",
+    ),
+    (
+        "markdown",
+        "The anti-commute relation `ι̃_ω(ι̃_μ V) + ι̃_μ(ι̃_ω V) = 0` "
+        "(relation 1 in §3.1.3) closes through the same machinery.",
+    ),
+    (
+        "code",
+        "from jacopy.core.expr import Integer\n\n"
+        "mu = Symbol(\"μ\");  reg.declare(mu, Graded(degree=1))\n"
+        "W  = Symbol(\"W\");  reg.declare(W,  Graded(degree=2))\n"
+        "i_mu = tilde_interior(mu)\n\n"
+        "lhs = Sum(Act(i_til, Act(i_mu, W)), Act(i_mu, Act(i_til, W)))\n"
+        "chain = prove_tilde_cartan_relation(\n"
+        "    lhs, Integer(0), etas=(eta,), engine=eng, registry=reg,\n"
+        ")\n"
+        "print(f\"ι̃ anti-commute closes in {len(chain)} steps\")",
+    ),
+    (
+        "markdown",
+        "## `K̃_η` — the tilde Cartan remainder\n\n"
+        "`K̃_η := −L̃_η + d̃ ∘ ι̃_η` is the polarity-flipped magic "
+        "formula. The atom is inert; "
+        "`TildeCartanRemainderDefinition` realises the defining "
+        "expansion. Two `K̃` operators on different bivectors stay "
+        "distinct — useful for deformation arguments.",
+    ),
+    (
+        "code",
+        "from jacopy.calculus.cartan_remainder_axioms import (\n"
+        "    TildeCartanRemainderDefinition,\n"
+        ")\n"
+        "from jacopy.calculus.tilde import K_tilde\n\n"
+        "K = K_tilde(eta, pi)\n"
+        "print(f\"{K}: degree {K._degree}, form {K.form}, bivector {K.bivector}\")\n\n"
+        "engine = ExpansionEngine([TildeCartanRemainderDefinition()])\n"
+        "expr = Act(K, V)\n"
+        "out, steps = engine.expand(expr)\n"
+        "print(f\"{expr} → {out}\")\n"
+        "print(f\"rule  : {steps[0].rule}\")",
+    ),
+    (
+        "markdown",
+        "## Summary\n\n"
+        "* `tilde_interior(ω)`, `tilde_d(π)`, `tilde_lie(ω, π)` — "
+        "opaque `Derivation` atoms acting on multivectors.\n"
+        "* Three defining rewrites (`TildeIotaSwap`, "
+        "`TildeExteriorDLichnerowicz`, `TildeLieMagic`) plus five "
+        "auxiliary rules close the engine machinery.\n"
+        "* `tilde_intrinsic_engine` + `prove_tilde_cartan_relation` "
+        "close magic in 7 steps and ι̃ anti-commute in 12. "
+        "`slot_kind=\"covector\"` keeps the tilde and form-side "
+        "engines from aliasing.\n"
+        "* The `Poisson` flag unlocks `d̃² V → 0` in 4 engine steps "
+        "— same flag drives the SN-bracket Jacobi chain (tutorial 12).\n"
+        "* `K̃_η` and `TildeCartanRemainderDefinition` are the "
+        "polarity-flipped shortcut for §3.1.4 derived identities; "
+        "the atom keys on `(form, bivector)` so multiple `K̃` "
+        "operators coexist without aliasing.",
+    ),
+]
+
+
+TUTORIAL_18: list[tuple[str, str]] = [
+    _BOOTSTRAP,
+    (
+        "markdown",
+        "# 18 — Derivator identities (§3.1.5)\n\n"
+        "Companion notebook to "
+        "[18_derivator_identities.md](18_derivator_identities.md). The "
+        "six §3.1.5 identities equate Cartan / SN derivators to sums "
+        "of Cartan-remainder corrections (`K_V` / `K̃_η`). All six "
+        "close mechanically through `KoszulProblem.prove_derivator`.",
+    ),
+    (
+        "markdown",
+        "## Setup — `KoszulProblem` as the entry point\n\n"
+        "`KoszulProblem` carries the bivector, form / multivector "
+        "inventories, and exposes pre-bundled `derivator_form_engine` "
+        "/ `derivator_multivector_engine` accessors. "
+        "`assume_poisson()` flags `π` as `Poisson` — that's what "
+        "unlocks `d̃² V → 0` and the SN-bracket Jacobi inside the "
+        "multivector engine.",
+    ),
+    (
+        "code",
+        "from jacopy.algebra.derivation import Act, Derivation\n"
+        "from jacopy.brackets.base import BracketApply\n"
+        "from jacopy.brackets.schouten import sn as default_sn\n"
+        "from jacopy.calculus.cartan_remainder import K\n"
+        "from jacopy.calculus.derivator import derivator\n"
+        "from jacopy.calculus.exterior_d import d as default_d\n"
+        "from jacopy.calculus.interior import interior\n"
+        "from jacopy.calculus.lie_derivative import lie_derivative\n"
+        "from jacopy.calculus.tilde import (\n"
+        "    K_tilde, tilde_d, tilde_interior, tilde_lie,\n"
+        ")\n"
+        "from jacopy.core.expr import Neg, Sum, Symbol\n"
+        "from jacopy.core.properties import Graded\n"
+        "from jacopy.core.registry import PropertyRegistry\n"
+        "from jacopy.library.koszul_problem import KoszulProblem\n\n"
+        "reg = PropertyRegistry()\n"
+        "pi = Symbol(\"π\")\n"
+        "omega, eta, mu = (Symbol(s) for s in (\"ω\", \"η\", \"μ\"))\n"
+        "U, V, W = (Symbol(s) for s in (\"U\", \"V\", \"W\"))\n"
+        "for f in (omega, eta, mu, U, V, W):\n"
+        "    reg.declare(f, Graded(degree=1))\n\n"
+        "Y = Derivation(\"Y\", 0)\n"
+        "xi = Symbol(\"ξ\"); reg.declare(xi, Graded(degree=1))\n\n"
+        "prob = KoszulProblem(\n"
+        "    pi, (omega, eta, mu),\n"
+        "    registry=reg,\n"
+        "    multivectors=((U, 1), (V, 1), (W, 1)),\n"
+        ")\n"
+        "prob.assume_poisson()\n"
+        "K_b = prob.koszul_bracket\n\n"
+        "print(f\"form engine        : {len(prob.derivator_form_engine().definitions)} rules\")\n"
+        "print(f\"multivector engine : {len(prob.derivator_multivector_engine().definitions)} rules\")",
+    ),
+    (
+        "markdown",
+        "## Form-side identity (1)\n\n"
+        "$$D^{T^*M}_{L_U}(\\eta, \\mu) = L_{\\tilde K_\\eta U} \\mu "
+        "+ K_{\\tilde K_\\mu U} \\eta$$\n\n"
+        "The cyclic identity — three nested Koszul-bracket expansions "
+        "feed into the obstruction. The 109 steps cover Cartan-magic "
+        "expansions, operator-commutator folds, and `K̃_η U → "
+        "−L̃_η U + d̃ ι̃_η U` polarity flips.",
+    ),
+    (
+        "code",
+        "lhs = derivator(lie_derivative(U), K_b, eta, mu)\n\n"
+        "K_tilde_eta_U = Act(K_tilde(eta, pi), U)\n"
+        "K_tilde_mu_U  = Act(K_tilde(mu, pi),  U)\n"
+        "rhs = Sum(\n"
+        "    Act(lie_derivative(K_tilde_eta_U), mu),\n"
+        "    Act(K(K_tilde_mu_U),               eta),\n"
+        ")\n\n"
+        "chain = prob.prove_derivator(lhs, rhs, eval_args=(Y,), side=\"form\")\n"
+        "print(f\"(1) form-side closes in {len(chain)} steps\")",
+    ),
+    (
+        "markdown",
+        "## Dual multivector-side identity (1')\n\n"
+        "$$\\tilde D^{SN}_{\\tilde L_\\eta}(U, V) = "
+        "\\tilde L_{K_U \\eta} V + \\tilde K_{K_V \\eta} U$$\n\n"
+        "`side=\"multivector\"` routes through "
+        "`derivator_multivector_engine` and uses "
+        "`slot_kind=\"covector\"` for the `MultiEval` wrap — same "
+        "discipline as `prove_tilde_cartan_relation` (tutorial 17).",
+    ),
+    (
+        "code",
+        "lhs = derivator(tilde_lie(eta, pi), default_sn, U, V)\n\n"
+        "K_U_eta = Act(K(U), eta)\n"
+        "K_V_eta = Act(K(V), eta)\n"
+        "rhs = Sum(\n"
+        "    Act(tilde_lie(K_U_eta, pi), V),\n"
+        "    Act(K_tilde(K_V_eta, pi),   U),\n"
+        ")\n\n"
+        "chain = prob.prove_derivator(\n"
+        "    lhs, rhs, eval_args=(xi,), side=\"multivector\",\n"
+        ")\n"
+        "print(f\"(1') multivector-side closes in {len(chain)} steps\")",
+    ),
+    (
+        "markdown",
+        "## The full table\n\n"
+        "All six identities close in one `prob.prove_derivator(...)` "
+        "call. Step counts:\n\n"
+        "| # | side | steps |\n"
+        "|---|---|---|\n"
+        "| (1) `D^{T*M}_{L_U}(η, μ) = L_{K̃_η U} μ + K_{K̃_μ U} η` | form | 109 |\n"
+        "| (2) `L_{d̃ ι̃_η U} μ = −[d ι_U η, μ]_K` | form | 21 |\n"
+        "| (3) `0 = d ι_{L̃_ω W} η − d ι_{d̃ ι̃_η W} ω + d ι_W [ω, η]_K` | form | 30 |\n"
+        "| (1') `D̃^{SN}_{L̃_η}(U, V) = L̃_{K_U η} V + K̃_{K_V η} U` | multivec | 117 |\n"
+        "| (2') `L̃_{d ι_U η} V = −[d̃ ι̃_η U, V]_SN` | multivec | 25 |\n"
+        "| (3') `0 = d̃ ι̃_{L_U η} V − d̃ ι̃_{d ι_V η} U + d̃ ι̃_η [U, V]_SN` | multivec | 23 |\n\n"
+        "The cyclic (1)/(1') are the heaviest because three nested "
+        "bracket expansions feed the obstruction. (2)/(2') and "
+        "(3)/(3') skip the cycle and run lean.",
+    ),
+    (
+        "markdown",
+        "## When you'd reach past the wrapper\n\n"
+        "Use `prove_derivator_identity` from "
+        "`jacopy.calculus.derivator` directly when:\n\n"
+        "* you need a custom rule layered on "
+        "(`derivator_form_engine()` returns a fresh engine to extend);\n"
+        "* the bracket isn't Koszul or SN (write your own engine "
+        "factory mirroring the `derivator_form_engine` pattern);\n"
+        "* you're proving an identity outside §3.1.5's derivator "
+        "shape (Cartan magic, `d² = 0` — those belong to "
+        "tutorial 15's `intrinsic_engine`).",
+    ),
+    (
+        "markdown",
+        "## Summary\n\n"
+        "* Derivator `D^E_φ(u, v) := φ[u,v]_E − [φu, v]_E − [u, φv]_E` "
+        "measures `φ`'s failure to be a graded derivation of "
+        "`[·, ·]_E`.\n"
+        "* Six §3.1.5 identities pin Cartan / SN derivators to sums "
+        "of `K_V` / `K̃_η` corrections — three form-side, three dual.\n"
+        "* `KoszulProblem.prove_derivator(lhs, rhs, *, eval_args, "
+        "side)` closes all six in one call: `side=\"form\"` for "
+        "(1)/(2)/(3), `side=\"multivector\"` for (1')/(2')/(3').\n"
+        "* Step counts 109/21/30 (form) and 117/25/23 (multivec) — "
+        "(1)/(1') are heaviest because three nested bracket "
+        "expansions feed the obstruction.\n"
+        "* `prove_derivator_identity` is the engine-level entry "
+        "point when you've assembled your own engine.",
+    ),
+]
+
+
+TUTORIAL_19: list[tuple[str, str]] = [
+    _BOOTSTRAP,
+    (
+        "markdown",
+        "# 19 — The Courant family: Dorfman, Courant, Dirac\n\n"
+        "Companion notebook to "
+        "[19_courant_family.md](19_courant_family.md). "
+        "`CourantAlgebroid` carries both Courant and Dorfman brackets "
+        "on shared Cartan operators; `DiracStructure` pins a "
+        "maximally-isotropic involutive subbundle. The bridge "
+        "identity, H-twisted Jacobi, and Dirac axioms all close as "
+        "single citation-tagged proof steps.",
+    ),
+    (
+        "markdown",
+        "## Section pairs\n\n"
+        "`SectionPair(vector, form)` wraps `(X, α) ∈ Γ(TM ⊕ T*M)`. "
+        "Both brackets consume `SectionPair`s and produce one.",
+    ),
+    (
+        "code",
+        "from jacopy.brackets.dorfman import SectionPair\n"
+        "from jacopy.core.expr import Symbol\n"
+        "from jacopy.core.properties import Graded\n"
+        "from jacopy.core.registry import PropertyRegistry\n\n"
+        "reg = PropertyRegistry()\n"
+        "X = Symbol(\"X\");  reg.declare(X, Graded(degree=0))\n"
+        "Y = Symbol(\"Y\");  reg.declare(Y, Graded(degree=0))\n"
+        "alpha = Symbol(\"α\"); reg.declare(alpha, Graded(degree=1))\n"
+        "beta  = Symbol(\"β\"); reg.declare(beta,  Graded(degree=1))\n\n"
+        "a = SectionPair(X, alpha)\n"
+        "b = SectionPair(Y, beta)\n"
+        "print(f\"a = ({a.vector}, {a.form})\")\n"
+        "print(f\"b = ({b.vector}, {b.form})\")",
+    ),
+    (
+        "markdown",
+        "## CourantAlgebroid — both brackets, shared operators\n\n"
+        "Construct with no arguments for untwisted; pass "
+        "`background_H=H` to twist by a closed 3-form. Both brackets "
+        "use the **same** Cartan operators — that sharing is what "
+        "makes the bridge identity exact.",
+    ),
+    (
+        "code",
+        "from jacopy.library.courant_algebroid import CourantAlgebroid\n\n"
+        "C = CourantAlgebroid()\n"
+        "print(f\"name           : {C.name}\")\n"
+        "print(f\"twisted        : {C.is_twisted}\")\n\n"
+        "dorf = C.expand_dorfman(a, b, registry=reg)\n"
+        "cour = C.expand(a, b,         registry=reg)\n"
+        "print(f\"Dorfman form half : {dorf.form}\")\n"
+        "print(f\"Courant form half : {cour.form}\")",
+    ),
+    (
+        "markdown",
+        "## The bridge identity\n\n"
+        "$$[a, b]_D - [a, b]_C = (0, \\tfrac12\\, d(\\iota_X \\beta "
+        "+ \\iota_Y \\alpha))$$\n\n"
+        "A single `theorem`-tagged step. Cartan's magic formula "
+        "`L_Y α = d(ι_Y α) + ι_Y(dα)` makes the cancellation work.",
+    ),
+    (
+        "code",
+        "chain = C.prove_courant_dorfman_bridge(a, b, registry=reg)\n"
+        "step = chain.steps[0]\n"
+        "print(f\"steps  : {len(chain)}\")\n"
+        "print(f\"rule   : {step.rule}\")\n"
+        "print(f\"tag    : {step.provenance_tag}\")\n\n"
+        "correction = C.bridge_correction(a, b)\n"
+        "print(f\"correction.vector : {correction.vector}\")\n"
+        "print(f\"correction.form   : {correction.form}\")",
+    ),
+    (
+        "markdown",
+        "## H-twisted Jacobi\n\n"
+        "Untwisted: Jacobi holds exactly (obstruction is `0`). "
+        "H-twisted: Jacobi closes iff `dH = 0` — the obstruction "
+        "lands on `dH`. Both produce single `axiom`-tagged steps.",
+    ),
+    (
+        "code",
+        "H = Symbol(\"H\"); reg.declare(H, Graded(degree=3))\n"
+        "C_H = CourantAlgebroid(background_H=H)\n"
+        "print(f\"name           : {C_H.name}\")\n"
+        "print(f\"twisted        : {C_H.is_twisted}\")\n\n"
+        "chain = C_H.prove_jacobi_reduction(registry=reg)\n"
+        "step = chain.steps[0]\n"
+        "print(f\"rule           : {step.rule}\")\n"
+        "print(f\"justification  : {step.justification}\")",
+    ),
+    (
+        "markdown",
+        "## DiracStructure — isotropy + involutivity\n\n"
+        "Pairing `⟨a, b⟩ = ½(ι_X β + ι_Y α)`; diagonal "
+        "`⟨a, a⟩ = ι_X α` is the isotropy obstruction. Involutivity "
+        "is `[a, b]_C ∈ Γ(L)` — surfaced as a placeholder symbol "
+        "since subbundle membership isn't an Expr-level predicate.",
+    ),
+    (
+        "code",
+        "from jacopy.library.dirac import DiracStructure\n\n"
+        "L_sym = Symbol(\"L\")\n"
+        "D     = DiracStructure(C, L_sym)\n"
+        "print(f\"Dirac          : {D.name}\")\n"
+        "print(f\"⟨a, b⟩         : {D.pairing(a, b)}\")\n"
+        "print(f\"⟨a, a⟩         : {D.isotropy_obstruction(a)}\")\n\n"
+        "chain_iso = D.prove_isotropy(a)\n"
+        "chain_inv = D.prove_involutivity(a, b)\n"
+        "print(f\"isotropy   : {len(chain_iso)} step, rule={chain_iso.steps[0].rule}\")\n"
+        "print(f\"involutivity: {len(chain_inv)} step, rule={chain_inv.steps[0].rule}\")",
+    ),
+    (
+        "markdown",
+        "## The two canonical Dirac structures\n\n"
+        "| Factory | Subbundle | Source |\n"
+        "|---|---|---|\n"
+        "| `poisson_dirac(π)` | `L_π = {(π^♯ α, α)}` | Poisson bivector |\n"
+        "| `presymplectic_dirac(ω)` | `L_ω = {(X, ω^♭ X)}` | closed 2-form |\n\n"
+        "Each factory records the subbundle name; isotropy / "
+        "involutivity remain axioms (the conditional theorems "
+        "`dω = 0 ⇒ L_ω` Dirac, `[π,π] = 0 ⇒ L_π` Dirac are out of "
+        "scope here).",
+    ),
+    (
+        "code",
+        "from jacopy.library.dirac import poisson_dirac, presymplectic_dirac\n\n"
+        "pi = Symbol(\"π\"); reg.declare(pi, Graded(degree=1))\n"
+        "omega = Symbol(\"ω\"); reg.declare(omega, Graded(degree=2))\n\n"
+        "L_pi    = poisson_dirac(pi,        courant=C)\n"
+        "L_omega = presymplectic_dirac(omega, courant=C)\n\n"
+        "print(f\"poisson_dirac        : {L_pi.name}\")\n"
+        "print(f\"presymplectic_dirac  : {L_omega.name}\")",
+    ),
+    (
+        "markdown",
+        "## Summary\n\n"
+        "* `SectionPair(X, α)` operands for both brackets; "
+        "`.vector` / `.form` accessors.\n"
+        "* `CourantAlgebroid` exposes `expand` (Courant) and "
+        "`expand_dorfman` on shared Cartan operators.\n"
+        "* `prove_courant_dorfman_bridge` — single theorem-step "
+        "asserting the exact correction `(0, ½ d(ι_X β + ι_Y α))`.\n"
+        "* `prove_jacobi_reduction` — vacuous when untwisted, lands "
+        "obstruction on `dH` when H-twisted.\n"
+        "* `DiracStructure` carries pairing + isotropy + "
+        "involutivity, all as axiom-tagged proof steps.\n"
+        "* `poisson_dirac` / `presymplectic_dirac` factories for the "
+        "two source geometries.",
+    ),
+]
+
+
+TUTORIAL_20: list[tuple[str, str]] = [
+    _BOOTSTRAP,
+    (
+        "markdown",
+        "# 20 — Connection, curvature, and Bianchi identities\n\n"
+        "Companion notebook to "
+        "[20_connection_curvature.md](20_connection_curvature.md). "
+        "`AffineConnection` carries `∇_X Y`; `Torsion` / `Curvature` "
+        "are the structural obstructions; `BianchiProblem` bundles "
+        "every rule needed to close the two Bianchi identities "
+        "mechanically.",
+    ),
+    (
+        "markdown",
+        "## `AffineConnection` and `∇_X Y`\n\n"
+        "An atom + an `eval(X, Y)` builder. Four engine rules realise "
+        "X-linearity, X-scalar-pull, Y-additivity, and Y-Leibniz.",
+    ),
+    (
+        "code",
+        "from jacopy.algebra.derivation import Derivation\n"
+        "from jacopy.calculus.connection import AffineConnection\n\n"
+        "nabla = AffineConnection(\"∇\")\n"
+        "X, Y, W, Z = (Derivation(s, 0) for s in (\"X\", \"Y\", \"W\", \"Z\"))\n\n"
+        "print(f\"connection : {nabla}\")\n"
+        "print(f\"∇_X Y      : {nabla.eval(X, Y)}\")",
+    ),
+    (
+        "markdown",
+        "## Torsion and curvature\n\n"
+        "$$T(X, Y) := \\nabla_X Y - \\nabla_Y X - [X, Y]$$\n"
+        "$$R(X, Y) Z := \\nabla_X \\nabla_Y Z - \\nabla_Y \\nabla_X Z "
+        "- \\nabla_{[X,Y]} Z$$\n\n"
+        "Both inert until `TorsionDefinitionDefinition` / "
+        "`CurvatureDefinitionDefinition` fire.",
+    ),
+    (
+        "code",
+        "from jacopy.calculus.torsion_curvature import Torsion, Curvature\n\n"
+        "T = Torsion(nabla, X, Y)\n"
+        "R = Curvature(nabla, X, Y, W)\n"
+        "print(f\"T(X, Y)   : {T}\")\n"
+        "print(f\"R(X, Y) W : {R}\")",
+    ),
+    (
+        "markdown",
+        "## `BianchiProblem` — the wrapper\n\n"
+        "Bundles every rule needed: four connection axioms, "
+        "torsion / curvature definitions, covariant-derivative "
+        "definitions, and the LBVF (or `BracketApply`) closure "
+        "family. The `registry` powers the Y-Leibniz `Graded(degree=0)` "
+        "test on function factors.",
+    ),
+    (
+        "code",
+        "from jacopy.core.registry import PropertyRegistry\n"
+        "from jacopy.library.bianchi_problem import BianchiProblem\n\n"
+        "reg = PropertyRegistry()\n"
+        "prob = BianchiProblem(nabla, registry=reg)\n"
+        "print(f\"engine rules : {len(prob.engine.definitions)}\")\n"
+        "print(f\"connection   : {prob.connection}\")",
+    ),
+    (
+        "markdown",
+        "## First Bianchi identity\n\n"
+        "$$\\mathrm{cycl}_{X,Y,Z}\\, R(X, Y) Z = "
+        "\\mathrm{cycl}_{X,Y,Z}\\, "
+        "[(\\nabla_X T)(Y, Z) + T(T(X, Y), Z)]$$\n\n"
+        "`prove_first_bianchi` builds the difference of both sides, "
+        "expands through the engine, and reports `ok=True` iff the "
+        "residue collapses to `0`.",
+    ),
+    (
+        "code",
+        "res1 = prob.prove_first_bianchi(X, Y, W)\n"
+        "print(f\"Bianchi I : ok={res1.ok}, steps={len(res1.lhs_steps)}\")",
+    ),
+    (
+        "markdown",
+        "## Second Bianchi identity\n\n"
+        "$$\\mathrm{cycl}_{X,Y,Z}\\, (\\nabla_X R)(Y, Z) W = "
+        "\\mathrm{cycl}_{X,Y,Z}\\, R(X, T(Y, Z)) W$$\n\n"
+        "Same protocol, one extra fixed argument.",
+    ),
+    (
+        "code",
+        "res2 = prob.prove_second_bianchi(X, Y, W, Z)\n"
+        "print(f\"Bianchi II : ok={res2.ok}, steps={len(res2.lhs_steps)}\")",
+    ),
+    (
+        "markdown",
+        "## Koszul connection — same identities on `T*M`\n\n"
+        "`koszul_connection(name, *, anchor)` produces an algebroid "
+        "connection on `T*M` for Poisson problems. Same "
+        "`BianchiProblem` wrapper works — engine swaps in "
+        "`BracketApply` closure rules and routes function-action "
+        "through the anchor.",
+    ),
+    (
+        "code",
+        "from jacopy.calculus.connection import koszul_connection\n"
+        "from jacopy.calculus.anchor import Anchor\n\n"
+        "pi_sharp = Anchor(\"π^♯\")\n"
+        "nabla_tilde = koszul_connection(\"∇̃\", anchor=pi_sharp)\n"
+        "print(f\"connection : {nabla_tilde}\")\n"
+        "print(f\"anchor     : {nabla_tilde.anchor}\")\n"
+        "print(f\"bracket    : {nabla_tilde.bracket}\")",
+    ),
+    (
+        "markdown",
+        "## Summary\n\n"
+        "* `AffineConnection(name)` atom + `eval(X, Y)` builder + "
+        "four defining-axiom engine rules.\n"
+        "* `Torsion(∇, X, Y)` / `Curvature(∇, X, Y, Z)` inert until "
+        "their definitions fire.\n"
+        "* `BianchiProblem` bundles every rule; "
+        "`prove_first_bianchi` / `prove_second_bianchi` close in "
+        "~60-63 steps.\n"
+        "* `koszul_connection` for the cotangent variant — same "
+        "wrapper, `BracketApply` closure family swapped in.",
+    ),
+]
+
+
+TUTORIAL_21: list[tuple[str, str]] = [
+    _BOOTSTRAP,
+    (
+        "markdown",
+        "# 21 — IndexedSum, Wedge, MultiEval\n\n"
+        "Companion notebook to "
+        "[21_indexed_sum_wedge_multi_eval.md](21_indexed_sum_wedge_multi_eval.md). "
+        "Three structural Expr nodes underpin everything from Faz 17 "
+        "onwards. They carry no algebraic content — antisymmetry, "
+        "distribution, Kronecker contraction, etc. live as engine "
+        "Definitions in the companion `*_axioms` modules.",
+    ),
+    (
+        "markdown",
+        "## `MultiEval` — multilinear evaluation\n\n"
+        "`multi_eval(head, *args, alternating=True, slot_kind=\"vector\")`. "
+        "Slot kind is declarative — `\"vector\"` (form-on-vectors) or "
+        "`\"covector\"` (multivector-on-forms). Arity NOT validated at "
+        "construction (head's degree may need a registry lookup).",
+    ),
+    (
+        "code",
+        "from jacopy.core.expr import Symbol\n"
+        "from jacopy.core.multi_eval import multi_eval, has_repeated_arg\n\n"
+        "omega = Symbol(\"ω\")\n"
+        "X, Y  = Symbol(\"X\"), Symbol(\"Y\")\n\n"
+        "me = multi_eval(omega, X, Y)\n"
+        "print(f\"ω(X, Y)        : {me}\")\n"
+        "print(f\"arity          : {me.arity}\")\n"
+        "print(f\"alternating    : {me.alternating}\")\n"
+        "print(f\"slot_kind      : {me.slot_kind}\")\n\n"
+        "swapped, sign = me.swapped(0, 1)\n"
+        "print(f\"swap → {swapped}, sign={sign}\")\n\n"
+        "me_repeat = multi_eval(omega, X, X)\n"
+        "print(f\"has_repeated_arg : {has_repeated_arg(me_repeat)}\")",
+    ),
+    (
+        "markdown",
+        "## `Wedge` — graded-antisymmetric product\n\n"
+        "Distinct from `Product` (which is non-commutative scalar / "
+        "operator product). `Wedge.make` flattens, absorbs `0`, drops "
+        "`1`. Degree-aware identities (`α ∧ α = 0`) live in "
+        "algorithms layer.",
+    ),
+    (
+        "code",
+        "from jacopy.core.expr import Integer\n"
+        "from jacopy.core.wedge import Wedge\n\n"
+        "alpha, beta, gamma = Symbol(\"α\"), Symbol(\"β\"), Symbol(\"γ\")\n\n"
+        "w = Wedge.make(alpha, beta, gamma)\n"
+        "print(f\"α ∧ β ∧ γ : {w}\")\n"
+        "print(f\"absorb 0  : {Wedge.make(alpha, Integer(0), beta)}\")\n"
+        "print(f\"drop 1    : {Wedge.make(alpha, Integer(1), beta)}\")",
+    ),
+    (
+        "markdown",
+        "## `WedgeMultiEvalAlternatingDefinition`\n\n"
+        "$$(\\alpha_1 \\wedge \\dots \\wedge \\alpha_p)(X_1, \\dots, X_p) "
+        "= \\sum_\\sigma \\mathrm{sign}(\\sigma) \\prod_i \\alpha_i(X_{\\sigma(i)})$$",
+    ),
+    (
+        "code",
+        "from jacopy.calculus.wedge_axioms import WedgeMultiEvalAlternatingDefinition\n"
+        "from jacopy.core.properties import Graded\n"
+        "from jacopy.core.registry import PropertyRegistry\n"
+        "from jacopy.proof.expansion import ExpansionEngine\n\n"
+        "reg = PropertyRegistry()\n"
+        "for f in (alpha, beta):\n"
+        "    reg.declare(f, Graded(degree=1))\n"
+        "for f in (X, Y):\n"
+        "    reg.declare(f, Graded(degree=0))\n\n"
+        "w_eval = multi_eval(Wedge.make(alpha, beta), X, Y)\n"
+        "engine = ExpansionEngine([WedgeMultiEvalAlternatingDefinition(registry=reg)])\n"
+        "out, steps = engine.expand(w_eval)\n"
+        "print(f\"(α ∧ β)(X, Y) → {out}\")\n"
+        "print(f\"rule          : {steps[0].rule}\")",
+    ),
+    (
+        "markdown",
+        "## `IndexedSum` — α-equivalence as `==`\n\n"
+        "`indexed_sum(dummy, range_, body)`. Equality compares "
+        "α-renamed forms via a depth-aware sentinel; nested binders "
+        "with overlapping names still distinguish correctly.",
+    ),
+    (
+        "code",
+        "from jacopy.calculus.local_frame import FrameIndex, LocalFrame\n"
+        "from jacopy.core.indexed_sum import indexed_sum\n\n"
+        "i = FrameIndex(\"i\")\n"
+        "j = FrameIndex(\"j\")\n"
+        "frame = LocalFrame(\"e\", dim=3)\n"
+        "T_i = Symbol(\"T_i\")\n\n"
+        "S   = indexed_sum(i, frame, T_i)\n"
+        "S_j = S.with_dummy(j)\n"
+        "print(f\"Σ_i T_i        : {S}\")\n"
+        "print(f\"Σ_j (renamed)  : {S_j}\")\n"
+        "print(f\"S == S_j       : {S == S_j}\")",
+    ),
+    (
+        "markdown",
+        "## `IndexedSum` axioms\n\n"
+        "| Rule | Folds |\n"
+        "|---|---|\n"
+        "| `IndexedSumSumDistributeDefinition` | `Σ_i (A + B) → Σ_i A + Σ_i B` |\n"
+        "| `IndexedSumNegPullDefinition` | `Σ_i Neg(X) → Neg(Σ_i X)` |\n"
+        "| `IndexedSumScalarPullDefinition` | `Σ_i (c · X) → c · Σ_i X` (c dummy-free) |\n"
+        "| `IndexedSumKroneckerContractDefinition` | `Σ_i δ_i^j A_i → A_j` |\n"
+        "| `MultiEval/Pairing/ConnectionEvalIndexedSumPushIn` | pull contraction past Σ |",
+    ),
+    (
+        "code",
+        "from jacopy.calculus.indexed_sum_axioms import (\n"
+        "    IndexedSumSumDistributeDefinition,\n"
+        ")\n"
+        "from jacopy.core.expr import Sum\n\n"
+        "A, B = Symbol(\"A_i\"), Symbol(\"B_i\")\n"
+        "S = indexed_sum(i, frame, Sum(A, B))\n"
+        "engine = ExpansionEngine([IndexedSumSumDistributeDefinition()])\n"
+        "out, steps = engine.expand(S)\n"
+        "print(f\"Σ_i (A + B) → {out}\")\n"
+        "print(f\"rule        : {steps[0].rule}\")",
+    ),
+    (
+        "markdown",
+        "## Summary\n\n"
+        "* `MultiEval(head, *args)` — multilinear evaluation. Slot "
+        "kind declarative; arity not validated. `swapped(i, j)` "
+        "carries the alternating sign.\n"
+        "* `Wedge.make(α, β, …)` — graded-antisymmetric product. "
+        "Smart constructor handles 0/1/associativity; degree-aware "
+        "`α ∧ α = 0` lives in algorithms layer.\n"
+        "* `IndexedSum(dummy, range_, body)` — bound-index sum with "
+        "α-equivalence as `==`. `with_dummy(new)` for explicit rename.\n"
+        "* Engine rules in `wedge_axioms` / `indexed_sum_axioms` "
+        "realise alternating expansion, sum-distribute, scalar-pull, "
+        "Kronecker contract, push-in past contraction nodes.\n"
+        "* Direct use rare — debugging Cartan / frame proofs is the "
+        "usual entry point.",
+    ),
+]
+
+
+TUTORIAL_22: list[tuple[str, str]] = [
+    _BOOTSTRAP,
+    (
+        "markdown",
+        "# 22 — Local frames and frame decomposition\n\n"
+        "Companion notebook to "
+        "[22_frame_decomposition.md](22_frame_decomposition.md). "
+        "`LocalFrame` is a library wrapper (not an Expr) bundling a "
+        "frame's identity and display symbols. It produces frame VFs "
+        "`X_a`, dual coframes `e^a`, and the frame-scoped duality "
+        "rule. Frame-decomposition rules are opt-in to avoid loops.",
+    ),
+    (
+        "markdown",
+        "## `LocalFrame` — the wrapper\n\n"
+        "Frames with the same `(name, dim, vf_symbol, coframe_symbol)` "
+        "compare equal. `dim=None` is the symbolic-dimension mode "
+        "Faz 17 proofs use.",
+    ),
+    (
+        "code",
+        "from jacopy.calculus.local_frame import LocalFrame, FrameIndex\n\n"
+        "F = LocalFrame(\"F\", dim=3)\n"
+        "print(f\"frame    : {F}\")\n"
+        "print(f\"name     : {F.name}\")\n"
+        "print(f\"dim      : {F.dim}\")\n"
+        "print(f\"vf sym   : {F.vf_symbol}\")\n"
+        "print(f\"coframe  : {F.coframe_symbol}\")",
+    ),
+    (
+        "markdown",
+        "## Indices and basis elements\n\n"
+        "`FrameVectorField` subclasses `Derivation` (degree 0) — "
+        "every existing pass picks frame VFs up automatically. "
+        "`FrameCovector` is an `Atom` mediated through `Pairing`. "
+        "Equality includes the frame name to keep coexisting frames "
+        "distinct.",
+    ),
+    (
+        "code",
+        "a, b = F.index(\"a\"), F.index(\"b\")\n"
+        "X_a, X_b = F.X(a),       F.X(b)\n"
+        "e_a, e_b = F.coframe(a), F.coframe(b)\n\n"
+        "print(f\"X_a : {X_a}    class={X_a.__class__.__name__}\")\n"
+        "print(f\"e_a : {e_a}    class={e_a.__class__.__name__}\")",
+    ),
+    (
+        "markdown",
+        "## `KroneckerDelta` — the contraction unit\n\n"
+        "`KroneckerDelta(i, j)` collapses to `One` when the indices "
+        "are structurally equal; stays opaque otherwise.",
+    ),
+    (
+        "code",
+        "from jacopy.calculus.local_frame import KroneckerDelta\n\n"
+        "print(f\"δ^a_a = {KroneckerDelta(a, a)}\")\n"
+        "print(f\"δ^a_b = {KroneckerDelta(a, b)}\")",
+    ),
+    (
+        "markdown",
+        "## `FramePairingDualityDefinition` — `⟨e^a, X_b⟩ → δ^a_b`\n\n"
+        "Frame-scoped: fires only when both halves belong to the "
+        "same `LocalFrame`. Build via `F.duality_definition()` to "
+        "wire the scoping correctly.",
+    ),
+    (
+        "code",
+        "from jacopy.calculus.pairing import Pairing\n"
+        "from jacopy.proof.expansion import ExpansionEngine\n\n"
+        "p = Pairing(e_b, X_a)\n"
+        "print(f\"raw pairing : {p}\")\n\n"
+        "engine = ExpansionEngine([F.duality_definition()])\n"
+        "out, steps = engine.expand(p)\n"
+        "print(f\"after rule  : {out}\")\n"
+        "print(f\"rule        : {steps[0].rule}\")",
+    ),
+    (
+        "markdown",
+        "## Frame decomposition — opt-in rules\n\n"
+        "`FrameDecompositionDefinition(F)` rewrites `W → Σ_a e^a(W) · X_a`. "
+        "**Opt-in**: pairing it with duality creates a loop. "
+        "`CartanStructureProblem` (tutorial 23) turns it on for a "
+        "specific sub-pass.",
+    ),
+    (
+        "code",
+        "from jacopy.algebra.derivation import Derivation\n"
+        "from jacopy.calculus.frame_decomposition import FrameDecompositionDefinition\n\n"
+        "W = Derivation(\"W\", 0)\n"
+        "rule = FrameDecompositionDefinition(F)\n\n"
+        "# Apply once directly (running the engine would loop).\n"
+        "print(f\"W → {rule.rewrite(W)}\")",
+    ),
+    (
+        "markdown",
+        "## The three frame-decomposition rules\n\n"
+        "| Rule | Folds |\n"
+        "|---|---|\n"
+        "| `FrameDecompositionDefinition(F)` | `W → Σ_a e^a(W) · X_a` for any non-frame VF |\n"
+        "| `ConnectionEvalYFrameDecompositionDefinition(F, ∇)` | `∇_X Y → ∇_X (Σ_a e^a(Y) · X_a)` |\n"
+        "| `ConnectionFormDecompositionDefinition(F, ∇, ω)` | `∇_V X_b → Σ_c ω^c_b(V) · X_c` |\n\n"
+        "The third introduces the **connection form** `ω^c_b(∇)` — "
+        "the keystone of Cartan structure equation proofs. Every "
+        "Christoffel-symbol calculation funnels through it.",
+    ),
+    (
+        "markdown",
+        "## Summary\n\n"
+        "* `LocalFrame` library wrapper; `dim=None` for symbolic "
+        "dimension. Equality on `(name, dim, vf_symbol, coframe_symbol)` "
+        "tuples.\n"
+        "* Four Expr shapes: `FrameIndex`, `FrameVectorField` "
+        "(Derivation subclass), `FrameCovector` (Atom), "
+        "`KroneckerDelta` (collapses on matching indices).\n"
+        "* `FramePairingDualityDefinition` — frame-scoped duality "
+        "rule. Build via `F.duality_definition()`.\n"
+        "* Three opt-in frame-decomposition rules; "
+        "`ConnectionFormDecompositionDefinition` introduces "
+        "`ω^c_b`. `CartanStructureProblem` (tutorial 23) handles "
+        "the loop-avoidance bookkeeping.",
+    ),
+]
+
+
+TUTORIAL_23: list[tuple[str, str]] = [
+    _BOOTSTRAP,
+    (
+        "markdown",
+        "# 23 — Cartan structure equations\n\n"
+        "Companion notebook to "
+        "[23_cartan_structure_equations.md](23_cartan_structure_equations.md). "
+        "`CartanStructureProblem(∇, F)` proves both Cartan I and II "
+        "mechanically:\n\n"
+        "$$T^a = de^a + \\sum_b \\omega^a{}_b \\wedge e^b "
+        "\\quad\\text{(I)}$$\n"
+        "$$R^a{}_b = d\\omega^a{}_b + \\sum_c \\omega^a{}_c \\wedge "
+        "\\omega^c{}_b \\quad\\text{(II)}$$",
+    ),
+    (
+        "markdown",
+        "## The three form atoms\n\n"
+        "`ConnectionForm` (`ω^a_b`), `TorsionForm` (`T^a`), "
+        "`CurvatureForm` (`R^a_b`) — all inert until their "
+        "definitions fire. All carry degree 1.",
+    ),
+    (
+        "code",
+        "from jacopy.calculus.connection import AffineConnection\n"
+        "from jacopy.calculus.local_frame import LocalFrame\n"
+        "from jacopy.calculus.cartan_forms import (\n"
+        "    ConnectionForm, TorsionForm, CurvatureForm,\n"
+        ")\n\n"
+        "nabla = AffineConnection(\"∇\")\n"
+        "F     = LocalFrame(\"F\", dim=3)\n\n"
+        "omega_ab = ConnectionForm(nabla, F, \"a\", \"b\")\n"
+        "T_a      = TorsionForm   (nabla, F, \"a\")\n"
+        "R_ab     = CurvatureForm (nabla, F, \"a\", \"b\")\n\n"
+        "print(f\"connection form : {omega_ab}\")\n"
+        "print(f\"torsion form    : {T_a}\")\n"
+        "print(f\"curvature form  : {R_ab}\")",
+    ),
+    (
+        "markdown",
+        "## `CartanStructureProblem`\n\n"
+        "24-rule engine bundling torsion / curvature unfolding, "
+        "connection axioms, frame decomposition, indexed-sum "
+        "machinery, wedge expansion, intrinsic `d`, frame duality. "
+        "Per-problem registry declares `FrameCovector` and "
+        "`ConnectionForm` as degree 1.",
+    ),
+    (
+        "code",
+        "from jacopy.library.cartan_structure import CartanStructureProblem\n\n"
+        "prob = CartanStructureProblem(nabla, F)\n"
+        "print(f\"name           : {prob.name}\")\n"
+        "print(f\"engine rules   : {len(prob.engine.definitions)}\")",
+    ),
+    (
+        "markdown",
+        "## LHS / RHS builders\n\n"
+        "`first_cartan_lhs` / `_rhs` (and their second-equation "
+        "counterparts) build the side terms as `MultiEval`s on a "
+        "`(U, V)` pair. The bound dummies (`b` in I, `c` in II) "
+        "are minted fresh per call.",
+    ),
+    (
+        "code",
+        "from jacopy.algebra.derivation import Derivation\n\n"
+        "U, V = Derivation(\"U\", 0), Derivation(\"V\", 0)\n\n"
+        "lhs1 = prob.first_cartan_lhs(U, V, \"a\")\n"
+        "rhs1 = prob.first_cartan_rhs(U, V, \"a\")\n"
+        "print(f\"Cartan I LHS : {lhs1}\")\n"
+        "print(f\"Cartan I RHS : {rhs1}\")",
+    ),
+    (
+        "markdown",
+        "## `prove_first_cartan` — Cartan I\n\n"
+        "~49 steps cover torsion-form opening, frame decomposition "
+        "of `U`/`V`, Y-Leibniz on each `∇_U V`, connection-form "
+        "decomposition of `∇_V X_b`, intrinsic `d` on `e^a`, wedge "
+        "alternating expansion, and Kronecker contractions + "
+        "pairing duality collapsing `⟨e^a, X_b⟩` matches.",
+    ),
+    (
+        "code",
+        "res1 = prob.prove_first_cartan(U, V, \"a\")\n"
+        "print(f\"Cartan I  : ok={res1.ok}, steps={len(res1.steps)}\")",
+    ),
+    (
+        "markdown",
+        "## `prove_second_cartan` — Cartan II\n\n"
+        "~54 steps. Structurally similar to Cartan I — both are "
+        "shadows of the same abstract identity.",
+    ),
+    (
+        "code",
+        "res2 = prob.prove_second_cartan(U, V, \"a\", \"b\")\n"
+        "print(f\"Cartan II : ok={res2.ok}, steps={len(res2.steps)}\")",
+    ),
+    (
+        "markdown",
+        "## When to use what\n\n"
+        "| If you want… | Reach for… |\n"
+        "|---|---|\n"
+        "| Index-laden Cartan structure equation | `CartanStructureProblem` |\n"
+        "| Coordinate-free Bianchi (no frame) | `BianchiProblem` (tutorial 20) |\n"
+        "| Generic operator equality on forms | `prove_intrinsic_equivalence` (tutorial 15) |\n"
+        "| Q9 Koszul mode (custom bracket on `∇`) | Same wrapper — auto-detects via `_intrinsic_d_rule` |",
+    ),
+    (
+        "markdown",
+        "## Summary\n\n"
+        "* `ConnectionForm`, `TorsionForm`, `CurvatureForm` — three "
+        "inert degree-1 form atoms; definitions in `cartan_forms` "
+        "engine rules.\n"
+        "* `CartanStructureProblem(∇, F)` — 24-rule engine spanning "
+        "seven phases (torsion/curvature, connection axioms, frame "
+        "decomp, indexed-sum, wedge, intrinsic d, duality).\n"
+        "* `prove_first_cartan` ~49 steps; `prove_second_cartan` "
+        "~54 steps. Both run engine + simplify (with `sort_product`) "
+        "to a fix-point.\n"
+        "* Auto-detects custom-bracket connections (Q9) and swaps "
+        "in `KoszulExteriorDIntrinsicDefinition` — no caller action "
+        "needed.\n"
+        "* Skip when the problem is coordinate-free (no frame, no "
+        "index).",
+    ),
+]
+
+
+TUTORIAL_24: list[tuple[str, str]] = [
+    _BOOTSTRAP,
+    (
+        "markdown",
+        "# 24 — Writing your own Problem wrapper\n\n"
+        "Companion notebook to "
+        "[24_custom_problem_wrapper.md](24_custom_problem_wrapper.md). "
+        "Five-step recipe walked end-to-end via a worked "
+        "`AlmostSymplecticProblem` (non-degenerate but **not** "
+        "closed `ω`) — illustrates every moving part without "
+        "overlapping any existing wrapper.",
+    ),
+    (
+        "markdown",
+        "## The five steps\n\n"
+        "1. Pick the geometric data the wrapper carries.\n"
+        "2. Auto-declare structural axioms on the registry "
+        "(check `has(...)` first — pre-declared flags take "
+        "precedence).\n"
+        "3. Assemble the engine — layer your rules onto "
+        "`default_engine(registry=…)`.\n"
+        "4. Write builder + prover methods.\n"
+        "5. (optional) Register seeded theorems for one-step "
+        "citations.",
+    ),
+    (
+        "markdown",
+        "## Worked example — `AlmostSymplecticProblem(ω)`\n\n"
+        "An almost-symplectic form is non-degenerate but not "
+        "necessarily closed. We get the vector-field-equality "
+        "rule (`ι_X ω = ι_Y ω ⇒ X = Y`) but *not* the "
+        "Hamiltonian / Poisson structure that closure unlocks.",
+    ),
+    (
+        "code",
+        "from typing import Optional\n"
+        "from jacopy.algebra.derivation import Act\n"
+        "from jacopy.calculus.interior import interior\n"
+        "from jacopy.calculus.nondegenerate_axioms import (\n"
+        "    NonDegenerateInteriorEqualityDefinition,\n"
+        ")\n"
+        "from jacopy.core.expr import Expr\n"
+        "from jacopy.core.properties import Graded, NonDegenerate\n"
+        "from jacopy.core.registry import PropertyRegistry\n"
+        "from jacopy.proof.expansion import ExpansionEngine, default_engine\n\n"
+        "class AlmostSymplecticProblem:\n"
+        "    \"\"\"`(ω, registry)` — non-degenerate (not necessarily closed) 2-form.\"\"\"\n\n"
+        "    __slots__ = (\"_omega\", \"_registry\", \"_engine\", \"_name\")\n\n"
+        "    def __init__(self, omega, *, registry=None, name=None):\n"
+        "        self._omega    = omega\n"
+        "        self._registry = registry or PropertyRegistry()\n"
+        "        # Step 2 — auto-declare; pre-declared flags take precedence.\n"
+        "        if not self._registry.has(omega, Graded):\n"
+        "            self._registry.declare(omega, Graded(degree=2))\n"
+        "        if not self._registry.has(omega, NonDegenerate):\n"
+        "            self._registry.declare(omega, NonDegenerate())\n"
+        "        # Step 3 — engine assembly.\n"
+        "        base = default_engine(registry=self._registry)\n"
+        "        self._engine = ExpansionEngine(\n"
+        "            list(base.definitions) + [\n"
+        "                NonDegenerateInteriorEqualityDefinition(\n"
+        "                    registry=self._registry,\n"
+        "                ),\n"
+        "            ]\n"
+        "        )\n"
+        "        self._name = name or f\"AlmostSymplecticProblem({omega._repr_inner()})\"\n\n"
+        "    @property\n"
+        "    def omega(self): return self._omega\n"
+        "    @property\n"
+        "    def registry(self): return self._registry\n"
+        "    @property\n"
+        "    def engine(self): return self._engine\n"
+        "    @property\n"
+        "    def name(self): return self._name\n\n"
+        "    # Step 4 — builders + provers.\n"
+        "    def musical_flat(self, X):\n"
+        "        \"\"\"`ω^♭(X) = ι_X ω`.\"\"\"\n"
+        "        return Act(interior(X), self._omega)\n",
+    ),
+    (
+        "markdown",
+        "## Try it — the rule fires on the difference\n\n"
+        "On the obstruction `ι_X ω − ι_Y ω`, the engine reduces "
+        "to `X − Y` in one step. That **is** the proof "
+        "transcript of `ι_X ω = ι_Y ω ⇒ X = Y` — the residue "
+        "`X − Y` is the equality the caller discharges.",
+    ),
+    (
+        "code",
+        "from jacopy.core.expr import Symbol, Sum, Neg\n\n"
+        "omega = Symbol(\"ω\")\n"
+        "X = Symbol(\"X\"); Y = Symbol(\"Y\")\n"
+        "reg = PropertyRegistry()\n"
+        "reg.declare(X, Graded(degree=1))\n"
+        "reg.declare(Y, Graded(degree=1))\n\n"
+        "prob = AlmostSymplecticProblem(omega, registry=reg)\n"
+        "print(f\"name         : {prob.name}\")\n"
+        "print(f\"engine rules : {len(prob.engine.definitions)}\")\n\n"
+        "obstruction = Sum(prob.musical_flat(X), Neg(prob.musical_flat(Y)))\n"
+        "out, steps = prob.engine.expand(obstruction)\n"
+        "print(f\"input  : {obstruction}\")\n"
+        "print(f\"output : {out}\")\n"
+        "print(f\"rule   : {steps[0].rule}\")",
+    ),
+    (
+        "markdown",
+        "## Picking your axioms — flags vs Definitions\n\n"
+        "| Mechanism | Use when | Example |\n"
+        "|---|---|---|\n"
+        "| Registry flag | Property is a one-bit fact about a single object | `Closed`, `NonDegenerate`, `Poisson` |\n"
+        "| Custom `Definition` subclass | Property is a non-trivial rewrite shape | tilde closure axioms |\n"
+        "| Seeded `Theorem` | Identity should appear as a single citation step | `poisson_jacobi`, `courant_dorfman_bridge` |\n\n"
+        "Prefer flags when you can — declarative, opt-out via "
+        "pre-declaration, single rule fires per object.",
+    ),
+    (
+        "markdown",
+        "## Where to look in the codebase\n\n"
+        "| Source | Read for |\n"
+        "|---|---|\n"
+        "| `library/symplectic.py` | Smallest non-trivial wrapper |\n"
+        "| `library/courant_algebroid.py` | Wrapper with seeded theorems + bridge identity |\n"
+        "| `library/bianchi_problem.py` | Custom proof loop (`_expand_to_canonical`) |\n"
+        "| `library/koszul_problem.py` | Largest wrapper — multi-engine + canonicalize_indices pre-pass |\n"
+        "| `library/cartan_structure.py` | Index-laden wrapper with per-problem registry |\n\n"
+        "Read the wrapper closest to your shape; the pattern repeats.",
+    ),
+    (
+        "markdown",
+        "## Summary\n\n"
+        "* Five-step recipe: data → axioms → engine → methods → "
+        "(seeded theorems).\n"
+        "* `registry.has(...)` check is the **opt-out mechanism**: "
+        "pre-declared flags take precedence.\n"
+        "* `default_engine(registry=…)` is the right base for most "
+        "form-side problems; layer your rules onto its "
+        "`definitions` list.\n"
+        "* Engine order: definitions before linearity; frame-scoped "
+        "rules before generic; opt-in rules for loop-prone pairs "
+        "(decomp + duality).\n"
+        "* Read `library/symplectic.py` for the smallest template, "
+        "`library/koszul_problem.py` for the largest.",
     ),
 ]
 
@@ -1225,6 +3505,21 @@ def build_all() -> None:
         "07_derived_bracket.ipynb": TUTORIAL_07,
         "08_unified_picture.ipynb": TUTORIAL_08,
         "09_foundations.ipynb": TUTORIAL_09,
+        "10_diagnostics.ipynb": TUTORIAL_10,
+        "11_publication_output.ipynb": TUTORIAL_11,
+        "12_schouten_nijenhuis.ipynb": TUTORIAL_12,
+        "13_closure_axioms.ipynb": TUTORIAL_13,
+        "14_problem_wrappers.ipynb": TUTORIAL_14,
+        "15_intrinsic_engine.ipynb": TUTORIAL_15,
+        "16_phase_13_deep_dive.ipynb": TUTORIAL_16,
+        "17_tilde_calculus.ipynb": TUTORIAL_17,
+        "18_derivator_identities.ipynb": TUTORIAL_18,
+        "19_courant_family.ipynb": TUTORIAL_19,
+        "20_connection_curvature.ipynb": TUTORIAL_20,
+        "21_indexed_sum_wedge_multi_eval.ipynb": TUTORIAL_21,
+        "22_frame_decomposition.ipynb": TUTORIAL_22,
+        "23_cartan_structure_equations.ipynb": TUTORIAL_23,
+        "24_custom_problem_wrapper.ipynb": TUTORIAL_24,
     }
     for fname, cells in sources.items():
         nb = _build(cells)
