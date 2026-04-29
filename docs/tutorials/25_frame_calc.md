@@ -454,6 +454,148 @@ correct; ``G.is_vacuum()`` and other zero-checks still work via
 SymPy's basic arithmetic. Use ``sp.simplify(LC[a, b, c])`` on the
 specific entries you want to inspect.
 
+## Custom connection — independent of the metric
+
+A **connection** and a **metric** are two independent geometric
+objects. The Levi-Civita connection is the *unique* connection
+that's both **torsion-free** and **metric-compatible** for a
+given metric — but it's just one of many possible connections on
+the same manifold. In Einstein-Cartan theory, teleparallel
+gravity, Palatini formulations, and other modified gravity
+frameworks, the connection is **not** Levi-Civita.
+
+`einstein_tensor(connection, g)` accepts **any**
+`ComponentConnection` — not just `LeviCivitaConnection`. So you
+can:
+
+- Build a connection with **arbitrary Christoffel symbols** via
+  `ComponentConnection(F, christoffel_table)`.
+- Compute the resulting Einstein tensor under that connection.
+- Compare against Levi-Civita to see how torsion / non-metricity
+  changes the answer.
+
+### Symbol-domain matching (important pitfall)
+
+When you supply Christoffel symbols by hand, **use the symbols
+the frame already carries** — not freshly-created ones. Library
+factories like `schwarzschild()` create symbols with specific
+assumptions (`r > 0`, `M > 0`); your hand-written `sp.symbols('r')`
+is a *different* symbol object even though it shares the name.
+
+```python
+F, g = schwarzschild()
+t, r, theta, phi = F.coords          # ← use these
+M = sp.Symbol("M", positive=True)    # ← assumption must match factory's
+```
+
+If you skip this, your Christoffel formulas will reference
+"phantom" symbols and `einstein_tensor` will produce nonsense.
+
+### Sanity check — manual Schwarzschild matches Levi-Civita
+
+Build the textbook Schwarzschild Christoffels by hand, wrap them
+in `ComponentConnection`, and verify the result matches
+`levi_civita(g)` exactly:
+
+```python
+import sympy as sp
+from jacopy.frame_calc import (
+    ComponentConnection, einstein_tensor, levi_civita,
+)
+from jacopy.frame_calc.library import schwarzschild
+
+F, g = schwarzschild()
+t, r, theta, phi = F.coords
+M = sp.Symbol("M", positive=True)
+
+# Pre-allocated zero array for the (1, 2)-tensor
+manual = sp.MutableDenseNDimArray.zeros(F.dim, F.dim, F.dim)
+
+# Set the 13 non-zero entries — textbook Schwarzschild
+factor = 1 - 2*M/r
+val = M / (r**2 * factor)
+manual[0, 0, 1] = val          # Γ^t_tr
+manual[0, 1, 0] = val          # Γ^t_rt
+manual[1, 0, 0] = M*factor/r**2   # Γ^r_tt
+manual[1, 1, 1] = -M / (r**2 * factor)   # Γ^r_rr
+manual[1, 2, 2] = -(r - 2*M)               # Γ^r_θθ
+manual[1, 3, 3] = -(r - 2*M)*sp.sin(theta)**2  # Γ^r_φφ
+manual[2, 1, 2] = manual[2, 2, 1] = 1/r    # Γ^θ_rθ, Γ^θ_θr
+manual[2, 3, 3] = -sp.sin(theta)*sp.cos(theta)  # Γ^θ_φφ
+manual[3, 1, 3] = manual[3, 3, 1] = 1/r    # Γ^φ_rφ, Γ^φ_φr
+manual[3, 2, 3] = manual[3, 3, 2] = (
+    sp.cos(theta) / sp.sin(theta)
+)   # Γ^φ_θφ, Γ^φ_φθ
+
+manual_conn = ComponentConnection(F, manual)
+LC = levi_civita(g)
+
+# Entry-by-entry comparison
+for a in range(F.dim):
+    for b in range(F.dim):
+        for c in range(F.dim):
+            assert sp.simplify(
+                sp.trigsimp(LC[a, b, c] - manual_conn[a, b, c])
+            ) == 0
+
+# Both produce the same vacuum Einstein tensor
+assert einstein_tensor(LC, g).is_vacuum()
+assert einstein_tensor(manual_conn, g).is_vacuum()
+```
+
+This is the smoke test — your hand-written Christoffels match
+the package's Levi-Civita output, so the API is consistent.
+
+### Non-trivial use: same metric, different connection
+
+For modified-gravity work, you'd add a torsion correction or use
+a fully independent connection. Here's a connection that's the
+Schwarzschild Levi-Civita **plus a torsion term** — the same
+metric, but the Einstein tensor is no longer vacuum because the
+connection is no longer torsion-free:
+
+```python
+# Levi-Civita as the baseline
+LC = levi_civita(g)
+
+# Add an antisymmetric correction: T^t_{rθ} = sin θ
+new_christoffel = sp.MutableDenseNDimArray.zeros(F.dim, F.dim, F.dim)
+for a in range(F.dim):
+    for b in range(F.dim):
+        for c in range(F.dim):
+            new_christoffel[a, b, c] = LC[a, b, c]
+
+# Antisymmetric torsion perturbation
+new_christoffel[0, 1, 2] += sp.Rational(1, 2) * sp.sin(theta)
+new_christoffel[0, 2, 1] -= sp.Rational(1, 2) * sp.sin(theta)
+
+torsion_conn = ComponentConnection(F, new_christoffel)
+G_with_torsion = einstein_tensor(torsion_conn, g)
+
+print("Levi-Civita G.is_vacuum():     ", einstein_tensor(LC, g).is_vacuum())
+print("Custom-torsion G.is_vacuum():  ", G_with_torsion.is_vacuum())
+# → True / False — adding torsion breaks vacuum
+```
+
+The `einstein_tensor(connection, g)` call doesn't care where the
+Christoffel symbols came from — it just computes
+`G_{ab} = Ric_{ab} - ½ R g_{ab}` from whatever connection you
+supply.
+
+### When you'd actually use this
+
+| Scenario | Why custom connection |
+|---|---|
+| Standard GR (vacuum, Einstein-Maxwell, Schwarzschild family) | Use Levi-Civita — `levi_civita(g)` |
+| Einstein-Cartan theory | Connection has torsion — supply Christoffels with `T ≠ 0` |
+| Teleparallel gravity | Connection is flat (`R = 0`) but has torsion |
+| Palatini formulation | Vary `g` and `Γ` independently |
+| Affine theory (no metric) | Connection alone determines the geometry |
+
+For the standard-GR cases the metric → Levi-Civita → tensors
+chain is all you need. The custom-connection path opens up when
+the physics requires it.
+
 ## When to use `frame_calc` vs the rest of jacopy
 
 | If you want… | Use… |

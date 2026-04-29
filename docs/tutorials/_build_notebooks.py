@@ -3743,6 +3743,124 @@ TUTORIAL_25: list[tuple[str, str]] = [
     ),
     (
         "markdown",
+        "## Custom connection — independent of the metric\n\n"
+        "**Connection and metric are independent geometric objects.** "
+        "The Levi-Civita connection is the *unique* connection that's "
+        "both torsion-free and metric-compatible for a given metric "
+        "— but it's just one of many possible connections. In "
+        "Einstein-Cartan theory, teleparallel gravity, Palatini "
+        "formulations, and other modified gravity frameworks, the "
+        "connection is **not** Levi-Civita.\n\n"
+        "`einstein_tensor(connection, g)` accepts **any** "
+        "`ComponentConnection`, not just `LeviCivitaConnection`. "
+        "Build a custom connection with `ComponentConnection(F, "
+        "christoffel_table)` and the rest of the pipeline runs "
+        "as-is.",
+    ),
+    (
+        "markdown",
+        "### Symbol-domain matching (important pitfall!)\n\n"
+        "When you supply Christoffel symbols by hand, **use the "
+        "symbols the frame already carries** — not freshly-created "
+        "ones. Library factories like `schwarzschild()` create "
+        "symbols with specific assumptions (`r > 0`, `M > 0`); your "
+        "hand-written `sp.symbols('r')` is a *different* symbol "
+        "object even though the name matches.\n\n"
+        "Pattern:\n"
+        "```python\n"
+        "F, g = schwarzschild()\n"
+        "t, r, theta, phi = F.coords            # ← use these\n"
+        "M = sp.Symbol('M', positive=True)      # ← match factory's assumption\n"
+        "```",
+    ),
+    (
+        "markdown",
+        "### Sanity check — manual Schwarzschild matches Levi-Civita\n\n"
+        "Build the textbook Schwarzschild Christoffels by hand, wrap "
+        "them in `ComponentConnection`, and verify the result matches "
+        "`levi_civita(g)` exactly.",
+    ),
+    (
+        "code",
+        "from jacopy.frame_calc import (\n"
+        "    ComponentConnection, einstein_tensor, levi_civita,\n"
+        ")\n"
+        "from jacopy.frame_calc.library import schwarzschild\n"
+        "import sympy as sp\n\n"
+        "F_sw, g_sw = schwarzschild()\n"
+        "t_sw, r_sw, theta_sw, phi_sw = F_sw.coords\n"
+        "M_sw = sp.Symbol('M', positive=True)\n\n"
+        "# 13 non-zero textbook Schwarzschild Christoffels\n"
+        "manual = sp.MutableDenseNDimArray.zeros(F_sw.dim, F_sw.dim, F_sw.dim)\n"
+        "factor = 1 - 2*M_sw/r_sw\n"
+        "val_t = M_sw / (r_sw**2 * factor)\n"
+        "manual[0, 0, 1] = val_t                                          # Γ^t_tr\n"
+        "manual[0, 1, 0] = val_t                                          # Γ^t_rt\n"
+        "manual[1, 0, 0] = M_sw * factor / r_sw**2                        # Γ^r_tt\n"
+        "manual[1, 1, 1] = -M_sw / (r_sw**2 * factor)                     # Γ^r_rr\n"
+        "manual[1, 2, 2] = -(r_sw - 2*M_sw)                               # Γ^r_θθ\n"
+        "manual[1, 3, 3] = -(r_sw - 2*M_sw) * sp.sin(theta_sw)**2         # Γ^r_φφ\n"
+        "manual[2, 1, 2] = manual[2, 2, 1] = 1/r_sw                       # Γ^θ_rθ\n"
+        "manual[2, 3, 3] = -sp.sin(theta_sw) * sp.cos(theta_sw)           # Γ^θ_φφ\n"
+        "manual[3, 1, 3] = manual[3, 3, 1] = 1/r_sw                       # Γ^φ_rφ\n"
+        "manual[3, 2, 3] = manual[3, 3, 2] = sp.cos(theta_sw)/sp.sin(theta_sw)\n\n"
+        "manual_conn = ComponentConnection(F_sw, manual)\n"
+        "LC_sw = levi_civita(g_sw)\n\n"
+        "# Entry-by-entry consistency\n"
+        "all_match = all(\n"
+        "    sp.simplify(sp.trigsimp(LC_sw[a, b, c] - manual_conn[a, b, c])) == 0\n"
+        "    for a in range(F_sw.dim) for b in range(F_sw.dim) for c in range(F_sw.dim)\n"
+        ")\n"
+        "print(f'manual vs Levi-Civita match? {all_match}')\n"
+        "print(f'einstein_tensor(manual_conn, g).is_vacuum() = {einstein_tensor(manual_conn, g_sw).is_vacuum()}')\n"
+        "print(f'einstein_tensor(LC, g).is_vacuum()         = {einstein_tensor(LC_sw, g_sw).is_vacuum()}')",
+    ),
+    (
+        "markdown",
+        "### Non-trivial use: same metric, different connection\n\n"
+        "For modified-gravity work, you'd add a torsion correction "
+        "or use a fully independent connection. Here's the same "
+        "Schwarzschild metric with a torsion-perturbed connection — "
+        "the Einstein tensor is no longer vacuum because the "
+        "connection is no longer torsion-free.",
+    ),
+    (
+        "code",
+        "from jacopy.frame_calc import torsion\n\n"
+        "# Levi-Civita baseline\n"
+        "LC = levi_civita(g_sw)\n\n"
+        "# Add antisymmetric torsion: T^t_{rθ} = sin θ\n"
+        "new_christoffel = sp.MutableDenseNDimArray.zeros(F_sw.dim, F_sw.dim, F_sw.dim)\n"
+        "for a in range(F_sw.dim):\n"
+        "    for b in range(F_sw.dim):\n"
+        "        for c in range(F_sw.dim):\n"
+        "            new_christoffel[a, b, c] = LC[a, b, c]\n\n"
+        "new_christoffel[0, 1, 2] += sp.Rational(1, 2) * sp.sin(theta_sw)\n"
+        "new_christoffel[0, 2, 1] -= sp.Rational(1, 2) * sp.sin(theta_sw)\n\n"
+        "torsion_conn = ComponentConnection(F_sw, new_christoffel)\n"
+        "T = torsion(torsion_conn)\n"
+        "print(f'Torsion is zero?              {T.is_zero()}')\n"
+        "print(f'T^t_{{rθ}} = {T[0, 1, 2]}')\n\n"
+        "G_torsion = einstein_tensor(torsion_conn, g_sw)\n"
+        "print(f'Same metric, custom connection: G.is_vacuum() = {G_torsion.is_vacuum()}')\n"
+        "print(f'Levi-Civita on same metric:     G.is_vacuum() = {einstein_tensor(LC, g_sw).is_vacuum()}')",
+    ),
+    (
+        "markdown",
+        "### When you'd actually use this\n\n"
+        "| Scenario | Custom connection? |\n"
+        "|---|---|\n"
+        "| Standard GR (vacuum, Einstein-Maxwell, Schwarzschild family) | No — `levi_civita(g)` |\n"
+        "| Einstein-Cartan theory (torsion present) | Yes |\n"
+        "| Teleparallel gravity (`R = 0`, torsion only) | Yes |\n"
+        "| Palatini formulation (`g`, `Γ` varied independently) | Yes |\n"
+        "| Affine theory (no metric) | Yes |\n\n"
+        "For the standard-GR cases the metric → Levi-Civita → "
+        "tensors chain is all you need. The custom-connection path "
+        "opens up when the physics requires it.",
+    ),
+    (
+        "markdown",
         "## Summary\n\n"
         "* `jacopy.frame_calc` is the component-level submodule for "
         "concrete metric calculations.\n"
