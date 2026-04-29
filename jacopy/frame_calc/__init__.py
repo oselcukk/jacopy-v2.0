@@ -43,6 +43,11 @@ from jacopy.frame_calc.curvature import (
     CurvatureTensor,
     curvature,
 )
+from jacopy.frame_calc.einstein import (
+    EinsteinTensor,
+    einstein_from_ricci,
+    einstein_tensor,
+)
 from jacopy.frame_calc.frame import (
     AbstractFrame,
     CoordinateFrame,
@@ -53,6 +58,14 @@ from jacopy.frame_calc.levi_civita import (
     KoszulStep,
     LeviCivitaConnection,
     levi_civita,
+)
+from jacopy.frame_calc.ricci import (
+    RicciStep,
+    RicciTensor,
+    ricci,
+    ricci_from_curvature,
+    ricci_scalar,
+    ricci_scalar_from_ricci,
 )
 from jacopy.frame_calc.symbolic_atoms import (
     FrameDerivativeExpr,
@@ -85,4 +98,15 @@ __all__ = [
     "curvature",
     "CurvatureTensor",
     "CurvatureStep",
+    # Ricci
+    "ricci",
+    "ricci_from_curvature",
+    "ricci_scalar",
+    "ricci_scalar_from_ricci",
+    "RicciTensor",
+    "RicciStep",
+    # Einstein
+    "einstein_tensor",
+    "einstein_from_ricci",
+    "EinsteinTensor",
 ]
