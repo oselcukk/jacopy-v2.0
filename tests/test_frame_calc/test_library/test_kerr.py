@@ -70,16 +70,29 @@ class TestKerrConstruction:
             kerr(a_sym="not a symbol")  # type: ignore[arg-type]
 
 
-class TestKerrSlowVacuum:
-    """Marked slow — full Kerr pipeline (G ≡ 0) takes ~60 s; skipped by
-    default. Run with `pytest -m slow` to exercise."""
+class TestKerrVacuumOptimized:
+    """Kerr's vacuum solution `G ≡ 0` verified in optimized mode.
 
-    @pytest.mark.skip(
-        reason="Kerr full einstein_tensor takes ~60s; manual verify only"
-    )
-    def test_kerr_vacuum(self) -> None:
+    Default mode timed out at 180 s (Ricci alone never finished —
+    sympy.simplify on Kerr-complexity expressions blows up).
+    Optimized mode (skip mid-formula simplify) completes the entire
+    pipeline in ~23 seconds, and the resulting Einstein-tensor
+    components are **literal zero** in raw form — SymPy's basic
+    arithmetic alone collapses the cancellations cleanly. No
+    sympy.simplify is needed for the vacuum check.
+
+    This test gates an important architectural result: the package
+    handles Kerr-class research-grade metrics in feasible time.
+    """
+
+    def test_kerr_vacuum_in_optimized_mode(self) -> None:
         from jacopy.frame_calc import einstein_tensor
 
         F, g = kerr()
-        G = einstein_tensor(levi_civita(g), g)
+        G = einstein_tensor(
+            levi_civita(g, optimized=True), g, optimized=True
+        )
         assert G.is_vacuum()
+        # Stronger claim: every entry is literal zero (raw form,
+        # no simplify needed). Documents the architectural win.
+        assert G.is_zero(simplify=False)
