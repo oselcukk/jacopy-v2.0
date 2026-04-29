@@ -44,6 +44,11 @@ from jacopy.frame_calc.frame import (
     Frame,
     Tetrad,
 )
+from jacopy.frame_calc.levi_civita import (
+    KoszulStep,
+    LeviCivitaConnection,
+    levi_civita,
+)
 from jacopy.frame_calc.symbolic_atoms import (
     FrameDerivativeExpr,
     GammaExpr,
@@ -63,4 +68,8 @@ __all__ = [
     "ComponentMetric",
     "ComponentMetricInverse",
     "ComponentConnection",
+    # Levi-Civita
+    "levi_civita",
+    "LeviCivitaConnection",
+    "KoszulStep",
 ]
