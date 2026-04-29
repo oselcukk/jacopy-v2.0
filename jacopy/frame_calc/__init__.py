@@ -1,0 +1,53 @@
+"""
+jacopy.frame_calc — frame-component differential geometry computations.
+
+A separate submodule from the rest of jacopy: given a frame ``F`` and
+a metric ``g`` (and optionally a connection ``∇``), compute Christoffel
+symbols, torsion, curvature, Ricci tensor, Ricci scalar, and the
+Einstein tensor — with step-by-step derivation transcripts that bridge
+to :class:`~jacopy.proof.chain.ProofChain` for paper-ready LaTeX
+output.
+
+The module supports three frame types — :class:`CoordinateFrame`,
+:class:`AbstractFrame`, :class:`Tetrad` — through a single
+:class:`Frame` protocol; higher-level computations
+(``levi_civita``, ``curvature``, ``ricci``, ``einstein_tensor``) are
+frame-agnostic.
+
+This module **requires SymPy**. Install via::
+
+    pip install "jacopy[components]"
+
+See :doc:`/tutorials/25_frame_calc` for an end-to-end walkthrough.
+"""
+
+from __future__ import annotations
+
+try:  # noqa: SIM105 — explicit ImportError message is the goal
+    import sympy as _sp  # noqa: F401
+except ImportError as exc:  # pragma: no cover
+    raise ImportError(
+        "jacopy.frame_calc requires SymPy. Install via "
+        "`pip install \"jacopy[components]\"` to enable component-level "
+        "differential geometry calculations."
+    ) from exc
+
+from jacopy.frame_calc.frame import (
+    AbstractFrame,
+    CoordinateFrame,
+    Frame,
+    Tetrad,
+)
+from jacopy.frame_calc.symbolic_atoms import (
+    FrameDerivativeExpr,
+    GammaExpr,
+)
+
+__all__ = [
+    "Frame",
+    "CoordinateFrame",
+    "AbstractFrame",
+    "Tetrad",
+    "FrameDerivativeExpr",
+    "GammaExpr",
+]

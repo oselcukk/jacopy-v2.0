@@ -40,12 +40,14 @@ docs = [
     "nbclient>=0.7",
     "ipykernel>=6.0",
 ]
+components = ["sympy>=1.12"]
 dev = [
     "pytest>=7.0",
     "rich>=13.0",
     "nbformat>=5.0",
     "nbclient>=0.7",
     "ipykernel>=6.0",
+    "sympy>=1.12",
 ]
 
 [tool.setuptools.packages.find]
