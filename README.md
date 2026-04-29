@@ -92,6 +92,8 @@ extras only enhance display, testing, and notebook execution.
 
 ## 📚 Library landmarks
 
+### Symbolic / proof layer (operator-level)
+
 The four high-level **Problem wrappers** are the user-facing
 entry points for textbook calculations:
 
@@ -105,6 +107,25 @@ entry points for textbook calculations:
 Lower-level primitives — `Expr` algebra, `PropertyRegistry`,
 `ExpansionEngine`, `prove_jacobi`, `prove_intrinsic_equivalence`,
 `theorem_book`, `ProofChain` — are documented in the tutorials.
+
+### `jacopy.frame_calc` — component-level differential geometry
+
+For concrete metric calculations (Christoffel symbols, Ricci tensor,
+Einstein tensor on real metrics like Schwarzschild or Kerr), use the
+`jacopy.frame_calc` submodule. It requires SymPy as an opt-in
+dependency (`pip install "jacopy[components]"`):
+
+```python
+from jacopy.frame_calc import einstein_tensor, levi_civita
+from jacopy.frame_calc.library import schwarzschild
+
+F, g = schwarzschild()
+G = einstein_tensor(levi_civita(g), g)
+assert G.is_vacuum()      # symbolic vacuum verification
+```
+
+Library fixtures: `minkowski`, `schwarzschild`, `frw`, `kerr`. Full
+walkthrough in [Tutorial 25](docs/tutorials/25_frame_calc.md).
 
 ## 📖 Documentation
 

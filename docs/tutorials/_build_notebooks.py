@@ -3466,6 +3466,197 @@ TUTORIAL_24: list[tuple[str, str]] = [
 ]
 
 
+TUTORIAL_25: list[tuple[str, str]] = [
+    _BOOTSTRAP,
+    (
+        "markdown",
+        "# 25 — Frame-component differential geometry (`jacopy.frame_calc`)\n\n"
+        "Companion notebook to "
+        "[25_frame_calc.md](25_frame_calc.md). "
+        "`jacopy.frame_calc` is jacopy's **component-level submodule** "
+        "for concrete metric calculations: given a metric `g` on a "
+        "frame, compute Christoffel symbols, Riemann curvature, "
+        "Ricci tensor, scalar curvature, Einstein tensor — with "
+        "step-by-step derivation transcripts that bridge to "
+        "`ProofChain` for paper-grade LaTeX output.\n\n"
+        "Requires SymPy: `pip install \"jacopy[components]\"`.",
+    ),
+    (
+        "markdown",
+        "## Quick taste — Schwarzschild vacuum in five lines",
+    ),
+    (
+        "code",
+        "from jacopy.frame_calc import einstein_tensor, levi_civita\n"
+        "from jacopy.frame_calc.library import schwarzschild\n\n"
+        "F, g = schwarzschild()\n"
+        "G = einstein_tensor(levi_civita(g), g)\n"
+        "print(f'G.is_vacuum() = {G.is_vacuum()}')",
+    ),
+    (
+        "markdown",
+        "## Frame setup — `CoordinateFrame`\n\n"
+        "Most physics literature uses coordinate frames "
+        "(`e_a = ∂/∂x^a`). The frame's `derivative(f, a)` is "
+        "`∂f/∂x^a`; `gamma(a, b, c) = 0` (coordinate frames are "
+        "holonomic).",
+    ),
+    (
+        "code",
+        "from jacopy.frame_calc import CoordinateFrame\n"
+        "import sympy as sp\n\n"
+        "t, r, theta, phi = sp.symbols('t r theta phi')\n"
+        "F = CoordinateFrame([t, r, theta, phi])\n"
+        "print(F)\n"
+        "print('dim:', F.dim)\n"
+        "print('e_r(r²) =', F.derivative(r**2, 1))\n"
+        "print('γ^a_bc =', F.gamma(0, 1, 0))",
+    ),
+    (
+        "markdown",
+        "## `ComponentMetric` and `inverse()`\n\n"
+        "Symmetry checked at construction. `inverse()` returns "
+        "`g^{ab}` as a `(2, 0)` tensor.",
+    ),
+    (
+        "code",
+        "from jacopy.frame_calc import ComponentMetric\n\n"
+        "M = sp.Symbol('M', positive=True)\n"
+        "g = ComponentMetric(F, sp.Matrix([\n"
+        "    [-(1 - 2*M/r),   0,                0,    0],\n"
+        "    [0,              1/(1 - 2*M/r),    0,    0],\n"
+        "    [0,              0,                r**2, 0],\n"
+        "    [0,              0,                0,    r**2 * sp.sin(theta)**2],\n"
+        "]))\n"
+        "print('g[0,0] =', g[0, 0])\n"
+        "print('g_inv[0,0] =', g.inverse()[0, 0])\n"
+        "# Verify g^{ac} g_{cb} = δ^a_b for one entry\n"
+        "g_inv = g.inverse()\n"
+        "delta_00 = sp.simplify(sum(g_inv[0, c] * g[c, 0] for c in range(4)))\n"
+        "print('δ^0_0 =', delta_00)",
+    ),
+    (
+        "markdown",
+        "## Levi-Civita Christoffel symbols via Koszul formula\n\n"
+        "The unique torsion-free metric-compatible connection.",
+    ),
+    (
+        "code",
+        "from jacopy.frame_calc import levi_civita\n\n"
+        "LC = levi_civita(g)\n"
+        "print(f'# non-zero Christoffel: {len(LC.nonzero_components())}')\n"
+        "print(f'Γ^t_tr = {LC[0, 0, 1]}')\n"
+        "print(f'Γ^θ_rθ = {LC[2, 1, 2]}')\n"
+        "print(f'Γ^r_θθ = {LC[1, 2, 2]}')",
+    ),
+    (
+        "markdown",
+        "## Step-by-step derivation transcript\n\n"
+        "Each Christoffel computation records `KoszulStep`s. Use "
+        "`format_derivation` for plain text or `derivation_chain` "
+        "for `ProofChain` → LaTeX.",
+    ),
+    (
+        "code",
+        "print(LC.format_derivation(0, 0, 1))",
+    ),
+    (
+        "markdown",
+        "## Curvature, Ricci, Einstein\n\n"
+        "Schwarzschild is Ricci-flat — `Ric = 0`, `R = 0`, `G = 0`. "
+        "This is the vacuum field equation result.",
+    ),
+    (
+        "code",
+        "from jacopy.frame_calc import (\n"
+        "    curvature, ricci, ricci_scalar, einstein_tensor,\n"
+        ")\n\n"
+        "R = curvature(LC)\n"
+        "Ric = ricci(LC)\n"
+        "R_scalar = ricci_scalar(LC, g)\n"
+        "G = einstein_tensor(LC, g)\n\n"
+        "print(f'curvature.is_zero():  {R.is_zero()}  (NOT flat)')\n"
+        "print(f'Ric.is_zero():        {Ric.is_zero()}')\n"
+        "print(f'R_scalar:             {R_scalar}')\n"
+        "print(f'G.is_vacuum():        {G.is_vacuum()}')",
+    ),
+    (
+        "markdown",
+        "## Optimised mode for Kerr-class metrics\n\n"
+        "Default mode runs `sympy.simplify` on every Christoffel / "
+        "Ricci / curvature entry. For Kerr (off-diagonal + complex "
+        "denominators), this blows up. **Optimised mode** skips "
+        "per-entry simplify; expressions stay raw but mathematically "
+        "correct. Trade-off: no derivation traces in optimised mode.",
+    ),
+    (
+        "code",
+        "from jacopy.frame_calc.library import kerr\n"
+        "import time\n\n"
+        "F_kerr, g_kerr = kerr()\n"
+        "t0 = time.perf_counter()\n"
+        "G_kerr = einstein_tensor(\n"
+        "    levi_civita(g_kerr, optimized=True), g_kerr, optimized=True\n"
+        ")\n"
+        "elapsed = time.perf_counter() - t0\n"
+        "print(f'Kerr full pipeline: {elapsed:.1f} s')\n"
+        "print(f'G.is_vacuum(): {G_kerr.is_vacuum()}')",
+    ),
+    (
+        "markdown",
+        "## Library fixtures\n\n"
+        "Ready-made factories: `minkowski`, `schwarzschild`, `frw`, "
+        "`kerr`. Each accepts `Symbol` / `Function` overrides.",
+    ),
+    (
+        "code",
+        "from jacopy.frame_calc.library import minkowski, frw\n\n"
+        "# Minkowski 4D — flat\n"
+        "F_m, g_m = minkowski()\n"
+        "G_m = einstein_tensor(levi_civita(g_m), g_m)\n"
+        "print(f'Minkowski G.is_vacuum(): {G_m.is_vacuum()}')\n\n"
+        "# FRW (k=0, a(t) symbolic) — non-vacuum cosmology\n"
+        "F_frw, g_frw = frw()\n"
+        "G_frw = einstein_tensor(levi_civita(g_frw), g_frw)\n"
+        "print(f'FRW G.is_zero(): {G_frw.is_zero()} (Friedmann eq form)')\n"
+        "print(f'FRW G[0,0] = {sp.simplify(G_frw[0, 0])}')",
+    ),
+    (
+        "markdown",
+        "## ProofChain bridge — paper-grade LaTeX\n\n"
+        "Each tracked tensor's `derivation_chain(...)` returns a "
+        "`ProofChain` compatible with `chain_to_latex_document`. "
+        "The `SymPyAtom` wrapper bridges SymPy expressions into "
+        "jacopy's `Expr` for ProofStep storage.",
+    ),
+    (
+        "code",
+        "from jacopy.display import chain_to_latex\n\n"
+        "chain = LC.derivation_chain(0, 0, 1)   # Γ^t_tr\n"
+        "print(f'chain length: {len(chain.steps)}')\n"
+        "print(f'first step rule: {chain.steps[0].rule}')\n"
+        "print(f'first step tag: {chain.steps[0].provenance_tag}')",
+    ),
+    (
+        "markdown",
+        "## Summary\n\n"
+        "* `jacopy.frame_calc` is the component-level submodule for "
+        "concrete metric calculations.\n"
+        "* Three frame types (CoordinateFrame, Tetrad, AbstractFrame) "
+        "share a common `Frame` protocol; higher-level operations are "
+        "frame-agnostic.\n"
+        "* Pipeline: `g → LC → R → Ric → R_scalar → G`. Default mode "
+        "records full derivation traces; optimised mode skips them "
+        "for Kerr-class performance.\n"
+        "* Library fixtures cover standard metrics; users build "
+        "custom metrics on any frame.\n"
+        "* `derivation_chain(...)` lifts any per-entry trace to a "
+        "`ProofChain` for paper-grade LaTeX rendering.\n"
+        "* SymPy is an opt-in dependency under `[components]`.",
+    ),
+]
+
+
 # --------------------------------------------------------------------- #
 # Builder                                                                #
 # --------------------------------------------------------------------- #
@@ -3520,6 +3711,7 @@ def build_all() -> None:
         "22_frame_decomposition.ipynb": TUTORIAL_22,
         "23_cartan_structure_equations.ipynb": TUTORIAL_23,
         "24_custom_problem_wrapper.ipynb": TUTORIAL_24,
+        "25_frame_calc.ipynb": TUTORIAL_25,
     }
     for fname, cells in sources.items():
         nb = _build(cells)

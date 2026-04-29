@@ -56,6 +56,7 @@ For someone debugging a residue or extending the engine.
 | `LocalFrame`, frame decomposition | [22](tutorials/22_frame_decomposition.md) |
 | Writing your own bracket | [06](tutorials/06_custom_bracket.md), [07](tutorials/07_derived_bracket.md) |
 | Writing your own Problem wrapper | [24](tutorials/24_custom_problem_wrapper.md) |
+| Concrete metric calculations (Schwarzschild, Kerr, FRW…) | [25](tutorials/25_frame_calc.md) |
 
 ## The full tutorial list
 
