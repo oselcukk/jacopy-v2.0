@@ -330,6 +330,130 @@ expressions inside jacopy `Expr` so they can sit in
 LaTeX dispatcher for `SymPyAtom` that delegates to `sympy.latex()`
 for clean rendering.
 
+## Drop-in template — paste your metric, get everything
+
+For paper work, the most common need is: "I have a metric on
+some chart, give me Christoffels / Ricci / Einstein". Copy the
+template below, **replace only the metric-matrix block**, and the
+rest of the pipeline runs as-is on whatever metric you provided.
+
+The example uses the **Reissner-Nordström** (charged Schwarzschild)
+metric — not in the library because it's a different *family*
+(non-vacuum, electromagnetic source). The point is to show that
+you don't need a library factory: any metric matrix works.
+
+```python
+import sympy as sp
+from jacopy.frame_calc import (
+    CoordinateFrame, ComponentMetric,
+    levi_civita, ricci, ricci_scalar, einstein_tensor,
+)
+
+# ─────────────────────────────────────────────────────────────
+# 1. Coordinates — adjust to your metric's chart
+# ─────────────────────────────────────────────────────────────
+t, r, theta, phi = sp.symbols("t r theta phi")
+coords = [t, r, theta, phi]
+
+# Any extra parameters (mass, charge, cosmological constant, …):
+M = sp.Symbol("M", positive=True)
+Q = sp.Symbol("Q", positive=True)
+
+# ─────────────────────────────────────────────────────────────
+# 2. METRIC MATRIX — REPLACE THIS BLOCK WITH YOUR OWN
+# ─────────────────────────────────────────────────────────────
+# Reissner-Nordström: charged static spherical black hole
+factor = 1 - 2*M/r + Q**2 / r**2
+metric_matrix = sp.Matrix([
+    [-factor,         0,        0,                          0],
+    [0,        1/factor,        0,                          0],
+    [0,               0,     r**2,                          0],
+    [0,               0,        0,    r**2 * sp.sin(theta)**2],
+])
+
+# ─────────────────────────────────────────────────────────────
+# 3. Pipeline — runs as-is on whatever metric is above
+# ─────────────────────────────────────────────────────────────
+F = CoordinateFrame(coords)
+g = ComponentMetric(F, metric_matrix)
+LC = levi_civita(g)
+Ric = ricci(LC)
+R = ricci_scalar(LC, g)
+G = einstein_tensor(LC, g)
+
+# ─────────────────────────────────────────────────────────────
+# 4. Output — summary + all non-zero entries
+# ─────────────────────────────────────────────────────────────
+names = F.index_names()
+print(f"# non-zero Christoffel: {len(LC.nonzero_components())}")
+print(f"Ricci scalar R   = {sp.simplify(R)}")
+print(f"Ric.is_zero()    = {Ric.is_zero()}")
+print(f"G.is_vacuum()    = {G.is_vacuum()}")
+
+print("\nChristoffel symbols (non-zero):")
+for (e, a, b), val in LC.nonzero_components().items():
+    print(f"  Γ^{names[e]}_{{{names[a]}{names[b]}}} = {val}")
+
+print("\nEinstein tensor entries (non-zero):")
+for a in range(F.dim):
+    for b in range(a, F.dim):
+        val = sp.simplify(sp.trigsimp(G[a, b]))
+        if val != 0:
+            print(f"  G_{{{names[a]}{names[b]}}} = {val}")
+```
+
+Output for Reissner-Nordström: 13 non-zero Christoffels,
+``R_scalar = 0`` (a known property), Ricci non-zero
+(non-vacuum), Einstein tensor with the four diagonal entries
+``G_{tt}, G_{rr}, G_{θθ}, G_{φφ}`` carrying the electromagnetic
+stress-energy form.
+
+**To compute on a different metric**, change *only* block 2.
+Examples you can drop in:
+
+```python
+# Schwarzschild-de Sitter (Λ ≠ 0): cosmological constant added
+Lambda = sp.Symbol("Lambda")
+factor = 1 - 2*M/r - Lambda*r**2/3
+metric_matrix = sp.Matrix([
+    [-factor,         0,        0,                          0],
+    [0,        1/factor,        0,                          0],
+    [0,               0,     r**2,                          0],
+    [0,               0,        0,    r**2 * sp.sin(theta)**2],
+])
+
+# Anti-de Sitter in static coordinates: Λ < 0
+# (just flip the sign of the Λr²/3 term)
+
+# Vaidya (radiating): r → r and t → u (advanced time), m = m(u)
+u = sp.Symbol("u")
+m = sp.Function("m")(u)
+metric_matrix = sp.Matrix([
+    [-(1 - 2*m/r),   1,       0,                       0],
+    [1,              0,       0,                       0],
+    [0,              0,    r**2,                       0],
+    [0,              0,       0,    r**2 * sp.sin(theta)**2],
+])
+# (use coords = [u, r, theta, phi])
+```
+
+Each of these runs through blocks 3-4 unchanged.
+
+For Kerr-class metrics where the default-mode pipeline times out,
+add ``optimized=True`` to every call:
+
+```python
+LC = levi_civita(g, optimized=True)
+Ric = ricci(LC, optimized=True)
+R = ricci_scalar(LC, g, optimized=True)
+G = einstein_tensor(LC, g, optimized=True)
+```
+
+The output entries become raw (unsimplified) but mathematically
+correct; ``G.is_vacuum()`` and other zero-checks still work via
+SymPy's basic arithmetic. Use ``sp.simplify(LC[a, b, c])`` on the
+specific entries you want to inspect.
+
 ## When to use `frame_calc` vs the rest of jacopy
 
 | If you want… | Use… |
