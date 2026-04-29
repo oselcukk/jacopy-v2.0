@@ -271,6 +271,108 @@ class ComponentTensor:
             self._frame, new_arr, signature=self._signature
         )
 
+    # ---- contraction ----------------------------------------------- #
+
+    def contract(
+        self, upper: int, lower: int
+    ) -> "ComponentTensor | Any":
+        r"""Contract one upper index with one lower index.
+
+        For a tensor of signature ``(q, r)``, the upper-index positions
+        run ``0 .. q-1`` and the lower-index positions run
+        ``q .. q+r-1``. This method sums over the chosen pair, returning
+        a new component tensor of signature ``(q-1, r-1)`` whose other
+        indices retain their original order.
+
+        Parameters
+        ----------
+        upper
+            Position of the upper index to contract; must satisfy
+            ``0 <= upper < q``.
+        lower
+            Position of the lower index to contract; must satisfy
+            ``q <= lower < q + r``.
+
+        Returns
+        -------
+        ComponentTensor of signature ``(q-1, r-1)``, **or** a scalar
+        SymPy expression when the result has rank 0 (i.e. the input
+        was rank ``(1, 1)`` and the trace was taken).
+
+        Examples
+        --------
+        Trace of a ``(1, 1)`` endomorphism::
+
+            trace = T.contract(upper=0, lower=1)   # scalar
+
+        Ricci contraction ``R^c_{acb}`` of a Riemann tensor stored
+        as ``(1, 3)`` with index order ``[a, b, c, d]`` (where ``a``
+        is upper)::
+
+            Ric = R.contract(upper=0, lower=2)   # signature (0, 2)
+
+        Notes
+        -----
+        Index *positions*, not labels: the caller chooses which slots
+        get contracted by their numeric position. There is no
+        Einstein-style implicit summation through repeated names.
+        """
+        q, r = self._signature
+        rank = self.rank
+        if not 0 <= upper < q:
+            raise IndexError(
+                f"contract: upper position {upper} out of range; this "
+                f"tensor has {q} upper indices [0, {q})"
+            )
+        if not q <= lower < rank:
+            raise IndexError(
+                f"contract: lower position {lower} out of range; this "
+                f"tensor has {r} lower indices [{q}, {rank})"
+            )
+
+        n = self._frame.dim
+        keep_positions = [
+            i for i in range(rank) if i != upper and i != lower
+        ]
+        new_rank = rank - 2
+
+        def _full_idx(
+            free: Tuple[int, ...], k: int
+        ) -> Tuple[int, ...]:
+            full = [0] * rank
+            full[upper] = k
+            full[lower] = k
+            for slot, val in zip(keep_positions, free):
+                full[slot] = val
+            return tuple(full)
+
+        # Rank-0 result → return a scalar.
+        if new_rank == 0:
+            s: Any = sp.S.Zero
+            for k in range(n):
+                s += self._components[_full_idx((), k)]
+            try:
+                s = sp.simplify(s)
+            except (TypeError, AttributeError):
+                pass
+            return s
+
+        new_shape = (n,) * new_rank
+        new_arr = sp.MutableDenseNDimArray.zeros(*new_shape)
+        for free_idx in _all_indices(new_shape):
+            s = sp.S.Zero
+            for k in range(n):
+                s += self._components[_full_idx(free_idx, k)]
+            try:
+                s = sp.simplify(s)
+            except (TypeError, AttributeError):
+                pass
+            new_arr[free_idx] = s
+
+        return ComponentTensor(
+            self._frame, new_arr, signature=(q - 1, r - 1)
+        )
+
     # ---- equality + repr ------------------------------------------ #
 
     def equals(self, other: object, *, simplify: bool = True) -> bool:

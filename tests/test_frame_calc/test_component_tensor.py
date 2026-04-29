@@ -338,6 +338,125 @@ class TestZeroDetection:
 
 
 # --------------------------------------------------------------------- #
+# Contraction                                                           #
+# --------------------------------------------------------------------- #
+
+
+class TestContraction:
+    """Stage-C addition: ComponentTensor.contract(upper, lower)."""
+
+    def test_trace_of_2d_identity_returns_dim(self) -> None:
+        """δ^a_a = dim — trace of identity (1,1) tensor."""
+        t, r = sp.symbols("t r")
+        F = CoordinateFrame([t, r])
+        delta = sp.MutableDenseNDimArray.zeros(2, 2)
+        for i in range(2):
+            delta[i, i] = 1
+        T = ComponentTensor(F, delta, signature=(1, 1))
+        trace = T.contract(upper=0, lower=1)
+        assert trace == 2
+
+    def test_trace_of_4d_identity(self) -> None:
+        coords = list(sp.symbols("t x y z"))
+        F = CoordinateFrame(coords)
+        delta = sp.MutableDenseNDimArray.zeros(4, 4)
+        for i in range(4):
+            delta[i, i] = 1
+        T = ComponentTensor(F, delta, signature=(1, 1))
+        assert T.contract(upper=0, lower=1) == 4
+
+    def test_trace_of_diagonal(self) -> None:
+        """Trace = sum of diagonal entries."""
+        t, r = sp.symbols("t r")
+        F = CoordinateFrame([t, r])
+        comp = sp.MutableDenseNDimArray.zeros(2, 2)
+        comp[0, 0] = sp.Symbol("alpha")
+        comp[1, 1] = sp.Symbol("beta")
+        T = ComponentTensor(F, comp, signature=(1, 1))
+        result = T.contract(upper=0, lower=1)
+        assert sp.simplify(result - (sp.Symbol("alpha") + sp.Symbol("beta"))) == 0
+
+    def test_signature_drops_correctly(self) -> None:
+        """A (1, 3) tensor contracted gives (0, 2)."""
+        t, r, theta = sp.symbols("t r theta")
+        F = CoordinateFrame([t, r, theta])
+        arr = sp.MutableDenseNDimArray.zeros(3, 3, 3, 3)
+        T = ComponentTensor(F, arr, signature=(1, 3))
+        result = T.contract(upper=0, lower=2)
+        assert isinstance(result, ComponentTensor)
+        assert result.signature == (0, 2)
+        assert result.shape == (3, 3)
+
+    def test_ricci_pattern_contraction(self) -> None:
+        """Hand-built `R^c_{acb}` style contraction of a (1, 3) tensor.
+
+        Construct R such that R[i, 0, i, 0] = i+1 for i = 0, 1.
+        Then `R^c_{a c b}` with a = b = 0 contracts to:
+            R[0, 0, 0, 0] + R[1, 0, 1, 0] = 1 + 2 = 3.
+        Other free entries remain zero.
+        """
+        t, r = sp.symbols("t r")
+        F = CoordinateFrame([t, r])
+        arr = sp.MutableDenseNDimArray.zeros(2, 2, 2, 2)
+        arr[0, 0, 0, 0] = 1
+        arr[1, 0, 1, 0] = 2
+        R = ComponentTensor(F, arr, signature=(1, 3))
+        Ric = R.contract(upper=0, lower=2)
+        assert Ric.signature == (0, 2)
+        assert Ric[0, 0] == 3
+        assert Ric[0, 1] == 0
+        assert Ric[1, 0] == 0
+        assert Ric[1, 1] == 0
+
+    def test_remaining_indices_preserve_order(self) -> None:
+        """For a (1, 3) tensor with index order [u, l1, l2, l3], contracting
+        u with l2 should leave [l1, l3] in that order."""
+        t, r = sp.symbols("t r")
+        F = CoordinateFrame([t, r])
+        arr = sp.MutableDenseNDimArray.zeros(2, 2, 2, 2)
+        # Set R[0, 1, 0, 2] = sym for testing
+        arr[0, 1, 0, 0] = sp.Symbol("X")
+        arr[1, 1, 1, 0] = sp.Symbol("Y")
+        T = ComponentTensor(F, arr, signature=(1, 3))
+        result = T.contract(upper=0, lower=2)
+        # Result[1, 0] = sum_k T[k, 1, k, 0] = X + Y
+        expected = sp.Symbol("X") + sp.Symbol("Y")
+        assert sp.simplify(result[1, 0] - expected) == 0
+
+    def test_contract_runs_simplify(self) -> None:
+        """Trace of a (1,1) with sin² + cos² = 1 entries simplifies."""
+        theta = sp.Symbol("theta")
+        F = CoordinateFrame([theta])
+        comp = sp.MutableDenseNDimArray([[sp.sin(theta) ** 2 + sp.cos(theta) ** 2]])
+        T = ComponentTensor(F, comp, signature=(1, 1))
+        # Single (1, 1) entry; contract gives the scalar 1
+        assert T.contract(upper=0, lower=1) == 1
+
+    def test_invalid_upper_position(self) -> None:
+        """Contracting upper=0 on a pure-lower tensor errors."""
+        t = sp.Symbol("t")
+        F = CoordinateFrame([t])
+        T = ComponentTensor(F, [[1]], signature=(0, 2))
+        with pytest.raises(IndexError, match="upper position 0 out of range"):
+            T.contract(upper=0, lower=1)
+
+    def test_invalid_lower_position(self) -> None:
+        """Contracting lower=0 on a (1, 1) tensor errors (0 is upper, not lower)."""
+        t, r = sp.symbols("t r")
+        F = CoordinateFrame([t, r])
+        T = ComponentTensor(F, sp.eye(2), signature=(1, 1))
+        with pytest.raises(IndexError, match="lower position 0 out of range"):
+            T.contract(upper=0, lower=0)
+
+    def test_invalid_lower_position_too_high(self) -> None:
+        t, r = sp.symbols("t r")
+        F = CoordinateFrame([t, r])
+        T = ComponentTensor(F, sp.eye(2), signature=(1, 1))
+        with pytest.raises(IndexError, match="out of range"):
+            T.contract(upper=0, lower=5)
+
+
+# --------------------------------------------------------------------- #
 # Equality                                                              #
 # --------------------------------------------------------------------- #
 
