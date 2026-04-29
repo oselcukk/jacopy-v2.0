@@ -38,6 +38,11 @@ from jacopy.frame_calc.component_tensor import (
     ComponentMetricInverse,
     ComponentTensor,
 )
+from jacopy.frame_calc.curvature import (
+    CurvatureStep,
+    CurvatureTensor,
+    curvature,
+)
 from jacopy.frame_calc.frame import (
     AbstractFrame,
     CoordinateFrame,
@@ -53,6 +58,7 @@ from jacopy.frame_calc.symbolic_atoms import (
     FrameDerivativeExpr,
     GammaExpr,
 )
+from jacopy.frame_calc.torsion import TorsionTensor, torsion
 
 __all__ = [
     # Frames
@@ -72,4 +78,11 @@ __all__ = [
     "levi_civita",
     "LeviCivitaConnection",
     "KoszulStep",
+    # Torsion
+    "torsion",
+    "TorsionTensor",
+    # Curvature
+    "curvature",
+    "CurvatureTensor",
+    "CurvatureStep",
 ]
