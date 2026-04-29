@@ -32,6 +32,12 @@ except ImportError as exc:  # pragma: no cover
         "differential geometry calculations."
     ) from exc
 
+from jacopy.frame_calc.component_tensor import (
+    ComponentConnection,
+    ComponentMetric,
+    ComponentMetricInverse,
+    ComponentTensor,
+)
 from jacopy.frame_calc.frame import (
     AbstractFrame,
     CoordinateFrame,
@@ -44,10 +50,17 @@ from jacopy.frame_calc.symbolic_atoms import (
 )
 
 __all__ = [
+    # Frames
     "Frame",
     "CoordinateFrame",
     "AbstractFrame",
     "Tetrad",
+    # Symbolic atoms (abstract-mode opaques)
     "FrameDerivativeExpr",
     "GammaExpr",
+    # Component tensors
+    "ComponentTensor",
+    "ComponentMetric",
+    "ComponentMetricInverse",
+    "ComponentConnection",
 ]
