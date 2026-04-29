@@ -3861,6 +3861,247 @@ TUTORIAL_25: list[tuple[str, str]] = [
     ),
     (
         "markdown",
+        "### API stress test — arbitrary symbols\n\n"
+        "Before showing physically-motivated patterns, let's check "
+        "the API accepts completely arbitrary symbol parameters.\n\n"
+        "**Schwarzschild with made-up A, B:** the API runs, but the "
+        "result is non-vacuum because A, B don't match Levi-Civita "
+        "and the angular-block Christoffels are missing.",
+    ),
+    (
+        "code",
+        "F_sw, g_sw = schwarzschild()\n"
+        "t_sw, r_sw, theta_sw, phi_sw = F_sw.coords\n"
+        "A, B = sp.symbols('A B')\n\n"
+        "manual = sp.MutableDenseNDimArray.zeros(F_sw.dim, F_sw.dim, F_sw.dim)\n"
+        "manual[0, 0, 1] = manual[0, 1, 0] = A\n"
+        "manual[1, 0, 0] = B\n"
+        "manual[1, 1, 1] = -B\n"
+        "manual[2, 1, 2] = manual[2, 2, 1] = 1 / r_sw\n"
+        "manual[3, 1, 3] = manual[3, 3, 1] = 1 / r_sw\n\n"
+        "manual_conn = ComponentConnection(F_sw, manual)\n"
+        "G_manual = einstein_tensor(manual_conn, g_sw)\n"
+        "print(f'is_vacuum?  {G_manual.is_vacuum()}')\n"
+        "print('non-zero G entries:')\n"
+        "for a in range(F_sw.dim):\n"
+        "    for b in range(a, F_sw.dim):\n"
+        "        val = sp.simplify(sp.trigsimp(G_manual[a, b]))\n"
+        "        if val != 0:\n"
+        "            print(f'  G[{a},{b}] = {val}')",
+    ),
+    (
+        "markdown",
+        "**2D polar with made-up A, B:** the result will reveal that "
+        "B doesn't appear in G — Lovelock 2D theorem in action!",
+    ),
+    (
+        "code",
+        "x, y = sp.symbols('x y')\n"
+        "A, B = sp.symbols('A B')\n"
+        "F2 = CoordinateFrame([x, y])\n"
+        "g2 = ComponentMetric(F2, sp.Matrix([[1, 0], [0, x**2]]))\n\n"
+        "manual = sp.MutableDenseNDimArray.zeros(F2.dim, F2.dim, F2.dim)\n"
+        "manual[0, 0, 0] = A          # Γ^x_{xx}\n"
+        "manual[0, 1, 1] = B*x        # Γ^x_{yy}\n"
+        "manual[1, 0, 1] = 1/x + A    # Γ^y_{xy}\n"
+        "manual[1, 1, 0] = 1/x - A    # Γ^y_{yx}\n\n"
+        "manual_conn = ComponentConnection(F2, manual)\n"
+        "G = einstein_tensor(manual_conn, g2)\n"
+        "for a in range(F2.dim):\n"
+        "    for b in range(F2.dim):\n"
+        "        val = sp.simplify(sp.trigsimp(G[a, b]))\n"
+        "        if val != 0:\n"
+        "            print(f'G[{a},{b}] = {val}')\n"
+        "print(f'\\nA=0 → vacuum?  {all(sp.simplify(G[a,b].subs(A, 0)) == 0 for a in range(2) for b in range(2))}')",
+    ),
+    (
+        "markdown",
+        "**Lovelock 2D detected**: B doesn't appear in `G`. The "
+        "torsion `T^y_{xy} = 2A` is the only thing breaking the "
+        "2D Lovelock theorem (`G ≡ 0` for any torsion-free "
+        "connection in 2D). At `A = 0`, the connection becomes "
+        "torsion-free regardless of B, and `G` collapses to zero.",
+    ),
+    (
+        "markdown",
+        "### Physically-motivated deformation patterns\n\n"
+        "Real paper work uses one of these patterns. Each is a "
+        "Levi-Civita connection plus a specific deformation tensor "
+        "parameterised by a small number of physical quantities.",
+    ),
+    (
+        "markdown",
+        "#### Pattern 1: Levi-Civita + antisymmetric torsion (2D polar)\n\n"
+        "Single scalar `α` controls a torsion-violating perturbation. "
+        "At `α = 0` recovers Levi-Civita (vacuum, by Lovelock 2D).",
+    ),
+    (
+        "code",
+        "x, y = sp.symbols('x y')\n"
+        "alpha = sp.Symbol('alpha', real=True)\n"
+        "F = CoordinateFrame([x, y])\n"
+        "g = ComponentMetric(F, sp.Matrix([[1, 0], [0, x**2]]))\n"
+        "LC = levi_civita(g)\n\n"
+        "Gamma = sp.MutableDenseNDimArray(LC.components)\n"
+        "Gamma[0, 0, 1] += alpha\n"
+        "Gamma[0, 1, 0] -= alpha\n"
+        "torsion_conn = ComponentConnection(F, Gamma)\n"
+        "G_torsion = einstein_tensor(torsion_conn, g)\n\n"
+        "print('Pattern 1: 2D polar + α torsion')\n"
+        "print(f'  LC vacuum?       {einstein_tensor(LC, g).is_vacuum()}')\n"
+        "print(f'  deformed vacuum? {G_torsion.is_vacuum()}')\n"
+        "for a in range(F.dim):\n"
+        "    for b in range(F.dim):\n"
+        "        val = sp.simplify(sp.trigsimp(G_torsion[a, b]))\n"
+        "        if val != 0:\n"
+        "            print(f'  G[{a},{b}] = {val}')\n"
+        "print(f'  α=0 recovers LC? {all(sp.simplify(G_torsion[a,b].subs(alpha, 0)) == 0 for a in range(2) for b in range(2))}')",
+    ),
+    (
+        "markdown",
+        "#### Pattern 2: Levi-Civita + Weyl non-metricity (2D polar)\n\n"
+        "Single scalar `W_x` controls a Weyl-type deformation. "
+        "**Surprise**: `G ≡ 0` even with `W_x ≠ 0`, because Weyl "
+        "preserves torsion-freeness — Lovelock 2D still applies. "
+        "Pedagogical lesson: torsion breaks Lovelock; non-metricity "
+        "doesn't.",
+    ),
+    (
+        "code",
+        "W_x = sp.Symbol('W_x', real=True)\n"
+        "LC = levi_civita(g)\n"
+        "g_mat = g.matrix()\n"
+        "g_inv = g_mat.inv()\n"
+        "W = [W_x, 0]\n"
+        "W_up = [sum(g_inv[a, b] * W[b] for b in range(F.dim)) for a in range(F.dim)]\n\n"
+        "Gamma = sp.MutableDenseNDimArray(LC.components)\n"
+        "for a in range(F.dim):\n"
+        "    for b in range(F.dim):\n"
+        "        for c in range(F.dim):\n"
+        "            d_ab = 1 if a == b else 0\n"
+        "            d_ac = 1 if a == c else 0\n"
+        "            Gamma[a, b, c] += sp.Rational(1, 2) * (\n"
+        "                d_ab * W[c] + d_ac * W[b] - g_mat[b, c] * W_up[a]\n"
+        "            )\n\n"
+        "weyl_conn = ComponentConnection(F, Gamma)\n"
+        "G_weyl = einstein_tensor(weyl_conn, g)\n"
+        "print('Pattern 2: 2D polar + Weyl non-metricity')\n"
+        "print(f'  deformed vacuum? {G_weyl.is_vacuum()}  ← Lovelock 2D, even with W_x ≠ 0')",
+    ),
+    (
+        "markdown",
+        "#### Pattern 3: Schwarzschild + antisymmetric torsion (4D)\n\n"
+        "Single scalar `ε` adds a `t-φ` cross-term torsion. The "
+        "result is compact: only `G_{tφ}` and `G_{φt}` non-zero.",
+    ),
+    (
+        "code",
+        "F_sw, g_sw = schwarzschild()\n"
+        "t, r, theta, phi = F_sw.coords\n"
+        "epsilon = sp.Symbol('epsilon', real=True)\n"
+        "LC = levi_civita(g_sw)\n\n"
+        "Gamma = sp.MutableDenseNDimArray(LC.components)\n"
+        "Gamma[3, 1, 0] += epsilon       # Γ^φ_{rt}\n"
+        "Gamma[3, 0, 1] -= epsilon       # Γ^φ_{tr}\n"
+        "torsion_conn = ComponentConnection(F_sw, Gamma)\n\n"
+        "G_torsion = einstein_tensor(torsion_conn, g_sw)\n"
+        "print('Pattern 3: Schwarzschild + ε torsion')\n"
+        "print(f'  deformed vacuum? {G_torsion.is_vacuum()}')\n"
+        "for a in range(F_sw.dim):\n"
+        "    for b in range(F_sw.dim):\n"
+        "        val = sp.simplify(sp.trigsimp(G_torsion[a, b]))\n"
+        "        if val != 0:\n"
+        "            print(f'  G[{a},{b}] = {val}')\n"
+        "print(f'  ε=0 recovers LC? {all(sp.simplify(G_torsion[a,b].subs(epsilon, 0) - einstein_tensor(LC, g_sw)[a,b]) == 0 for a in range(4) for b in range(4))}')",
+    ),
+    (
+        "markdown",
+        "#### Pattern 4: Schwarzschild + Weyl non-metricity (4D)\n\n"
+        "Same Weyl construction, on Schwarzschild. **Use `optimized=True`** "
+        "because the 4D pipeline is much slower without it.",
+    ),
+    (
+        "code",
+        "W_r = sp.Symbol('W_r', real=True)\n"
+        "LC = levi_civita(g_sw, optimized=True)   # optimized!\n"
+        "g_mat = g_sw.matrix()\n"
+        "g_inv = g_mat.inv()\n"
+        "W = [0, W_r, 0, 0]\n"
+        "W_up = [sum(g_inv[mu, nu] * W[nu] for nu in range(F_sw.dim)) for mu in range(F_sw.dim)]\n\n"
+        "Gamma = sp.MutableDenseNDimArray(LC.components)\n"
+        "for mu in range(F_sw.dim):\n"
+        "    for nu in range(F_sw.dim):\n"
+        "        for rho in range(F_sw.dim):\n"
+        "            d_munu = 1 if mu == nu else 0\n"
+        "            d_murho = 1 if mu == rho else 0\n"
+        "            Gamma[mu, nu, rho] += sp.Rational(1, 2) * (\n"
+        "                d_munu * W[rho] + d_murho * W[nu] - g_mat[nu, rho] * W_up[mu]\n"
+        "            )\n\n"
+        "weyl_conn = ComponentConnection(F_sw, Gamma)\n"
+        "G_weyl = einstein_tensor(weyl_conn, g_sw, optimized=True)\n"
+        "print('Pattern 4: Schwarzschild + W_r Weyl')\n"
+        "print(f'  deformed vacuum? {G_weyl.is_vacuum()}')\n"
+        "for a in range(F_sw.dim):\n"
+        "    for b in range(F_sw.dim):\n"
+        "        val = sp.simplify(sp.trigsimp(G_weyl[a, b]))\n"
+        "        if val != 0:\n"
+        "            print(f'  G[{a},{b}] = {val}')",
+    ),
+    (
+        "markdown",
+        "#### Pattern 5: FLRW + scalar-gradient projective deformation\n\n"
+        "Connection deformed by a scalar field's gradient — typical "
+        "scalar-tensor gravity setup. Coupling form `Γ + δ A_a + δ A_a` "
+        "where `A_μ = ∂_μ φ`.",
+    ),
+    (
+        "code",
+        "tt, rr, thh, ph = sp.symbols('t r theta phi')\n"
+        "a_func = sp.Function('a')(tt)\n"
+        "varphi = sp.Function('varphi')(tt)\n"
+        "F_flrw = CoordinateFrame([tt, rr, thh, ph])\n\n"
+        "g_flrw = ComponentMetric(F_flrw, sp.Matrix([\n"
+        "    [-1, 0, 0, 0],\n"
+        "    [0, a_func**2, 0, 0],\n"
+        "    [0, 0, a_func**2 * rr**2, 0],\n"
+        "    [0, 0, 0, a_func**2 * rr**2 * sp.sin(thh)**2],\n"
+        "]))\n"
+        "LC = levi_civita(g_flrw)\n\n"
+        "A = [sp.diff(varphi, c) for c in F_flrw.coords]\n"
+        "Gamma = sp.MutableDenseNDimArray(LC.components)\n"
+        "for mu in range(F_flrw.dim):\n"
+        "    for nu in range(F_flrw.dim):\n"
+        "        for rho in range(F_flrw.dim):\n"
+        "            d_munu = 1 if mu == nu else 0\n"
+        "            d_murho = 1 if mu == rho else 0\n"
+        "            Gamma[mu, nu, rho] += d_munu * A[rho] + d_murho * A[nu]\n\n"
+        "scalar_conn = ComponentConnection(F_flrw, Gamma)\n"
+        "G_def = einstein_tensor(scalar_conn, g_flrw)\n"
+        "print('Pattern 5: FLRW + scalar-gradient')\n"
+        "print(f'  LC G_tt = {sp.simplify(einstein_tensor(LC, g_flrw)[0, 0])}')\n"
+        "print(f'  G_def[0,0] = {sp.simplify(G_def[0, 0])}')",
+    ),
+    (
+        "markdown",
+        "### Insight summary\n\n"
+        "Five patterns, three structural lessons:\n\n"
+        "| Pattern | Recovers LC at | Lovelock 2D? |\n"
+        "|---|---|---|\n"
+        "| 2D + α torsion | `α = 0` | No (torsion breaks it) |\n"
+        "| 2D + W_x Weyl | `W_x = 0` | **Yes** (`G ≡ 0` always) |\n"
+        "| Schwarzschild + ε torsion | `ε = 0` | n/a (4D) |\n"
+        "| Schwarzschild + W_r Weyl | `W_r = 0` | n/a (4D) |\n"
+        "| FLRW + scalar-grad | `varphi'(t) = 0` | n/a (4D, non-vacuum) |\n\n"
+        "Key takeaways:\n\n"
+        "- **API stress-tests with arbitrary symbols** are valid "
+        "and accidentally surface deep theorems (Lovelock 2D from "
+        "the A, B examples).\n"
+        "- **Physically-meaningful examples** parameterise the "
+        "deformation by a small number of fields/constants, with the "
+        "`parameter → 0` limit recovering Levi-Civita.",
+    ),
+    (
+        "markdown",
         "## Summary\n\n"
         "* `jacopy.frame_calc` is the component-level submodule for "
         "concrete metric calculations.\n"

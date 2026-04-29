@@ -596,6 +596,240 @@ For the standard-GR cases the metric → Levi-Civita → tensors
 chain is all you need. The custom-connection path opens up when
 the physics requires it.
 
+### API stress test — arbitrary symbols
+
+Before showing physically-motivated patterns, here is what
+happens with **completely arbitrary** symbol parameters. Useful
+to verify the API accepts whatever you throw at it; not useful
+for paper work.
+
+**Schwarzschild metric, made-up A, B:**
+
+```python
+F_sw, g_sw = schwarzschild()
+t_sw, r_sw, theta_sw, phi_sw = F_sw.coords
+A, B = sp.symbols("A B")
+
+manual = sp.MutableDenseNDimArray.zeros(F_sw.dim, F_sw.dim, F_sw.dim)
+manual[0, 0, 1] = manual[0, 1, 0] = A
+manual[1, 0, 0] = B
+manual[1, 1, 1] = -B
+manual[2, 1, 2] = manual[2, 2, 1] = 1 / r_sw
+manual[3, 1, 3] = manual[3, 3, 1] = 1 / r_sw
+
+manual_conn = ComponentConnection(F_sw, manual)
+G_manual = einstein_tensor(manual_conn, g_sw)
+# G's entries are non-zero functions of A, B (4 diagonal)
+```
+
+The result is `G_{tt}, G_{rr}, G_{θθ}, G_{φφ}` non-zero with
+arbitrary A,B-dependence. Plug `A`, `B` into actual Levi-Civita
+values to recover vacuum — but **only the angular block is
+already filled** (1/r); the diagonal Schwarzschild Christoffels
+that A, B replace need *full* Levi-Civita formulas, otherwise
+the result stays non-vacuum.
+
+**2D polar metric, made-up A, B:**
+
+```python
+x, y = sp.symbols("x y")
+A, B = sp.symbols("A B")
+F = CoordinateFrame([x, y])
+g = ComponentMetric(F, sp.Matrix([[1, 0], [0, x**2]]))
+
+manual = sp.MutableDenseNDimArray.zeros(F.dim, F.dim, F.dim)
+manual[0, 0, 0] = A                 # Γ^x_{xx}
+manual[0, 1, 1] = B*x               # Γ^x_{yy}
+manual[1, 0, 1] = 1/x + A           # Γ^y_{xy}
+manual[1, 1, 0] = 1/x - A           # Γ^y_{yx}
+
+manual_conn = ComponentConnection(F, manual)
+G = einstein_tensor(manual_conn, g)
+# G_{xx} = -A/(2x), G_{yy} = A·x/2  ← B doesn't appear!
+```
+
+**The interesting fact**: `B` doesn't appear in `G` at all. The
+2D Lovelock theorem guarantees `G ≡ 0` for any **torsion-free**
+connection. Here `T^y_{xy} = Γ^y_{xy} − Γ^y_{yx} = 2A`, so
+`α=0` is the torsion-free condition. When you set `A=0`, `G`
+collapses to zero regardless of `B`. The arbitrary-parameter
+API test accidentally **verifies Lovelock's 2D theorem**
+symbolically.
+
+This is informative but not paper-grade input. For paper work,
+use one of the physically-motivated patterns below.
+
+### Physically-motivated deformation patterns
+
+These are the patterns you'd actually find in modified-gravity
+papers. Each is a Levi-Civita connection plus a specific
+deformation tensor parameterised by a small number of physical
+quantities.
+
+#### Pattern 1: Levi-Civita + antisymmetric torsion (2D)
+
+A single scalar `α` controls a torsion-violating perturbation:
+
+```python
+x, y = sp.symbols("x y")
+alpha = sp.Symbol("alpha", real=True)
+F = CoordinateFrame([x, y])
+g = ComponentMetric(F, sp.Matrix([[1, 0], [0, x**2]]))
+LC = levi_civita(g)
+
+Gamma = sp.MutableDenseNDimArray(LC.components)
+Gamma[0, 0, 1] += alpha             # Γ^x_{xy}
+Gamma[0, 1, 0] -= alpha             # Γ^x_{yx} (antisymmetric → torsion)
+
+torsion_conn = ComponentConnection(F, Gamma)
+G_torsion = einstein_tensor(torsion_conn, g)
+```
+
+**Output**: `G_{xx} = α²/(2x²)`, `G_{xy} = G_{yx} = -α/x`,
+`G_{yy} = -α²/2`. At `α = 0` recovers Levi-Civita (vacuum, by
+Lovelock 2D).
+
+#### Pattern 2: Levi-Civita + Weyl non-metricity (2D)
+
+Single scalar `W_x` controls a Weyl-type deformation:
+
+```python
+W_x = sp.Symbol("W_x", real=True)
+g_mat = g.matrix()
+g_inv = g_mat.inv()
+W = [W_x, 0]
+W_up = [sum(g_inv[a, b] * W[b] for b in range(F.dim)) for a in range(F.dim)]
+
+Gamma = sp.MutableDenseNDimArray(LC.components)
+for a in range(F.dim):
+    for b in range(F.dim):
+        for c in range(F.dim):
+            δ_ab = 1 if a == b else 0
+            δ_ac = 1 if a == c else 0
+            Gamma[a, b, c] += sp.Rational(1, 2) * (
+                δ_ab * W[c] + δ_ac * W[b] - g_mat[b, c] * W_up[a]
+            )
+
+weyl_conn = ComponentConnection(F, Gamma)
+G_weyl = einstein_tensor(weyl_conn, g)
+```
+
+**Output**: `G ≡ 0` even though the connection is non-metric.
+The Weyl deformation **preserves** torsion-freeness, so
+Lovelock still applies in 2D. Pedagogically: torsion is what
+breaks Lovelock, not non-metricity.
+
+#### Pattern 3: Schwarzschild + antisymmetric torsion (4D)
+
+Single scalar `ε` adds a `t-φ` cross-term torsion:
+
+```python
+F_sw, g_sw = schwarzschild()
+epsilon = sp.Symbol("epsilon", real=True)
+LC = levi_civita(g_sw)
+
+Gamma = sp.MutableDenseNDimArray(LC.components)
+Gamma[3, 1, 0] += epsilon           # Γ^φ_{rt}
+Gamma[3, 0, 1] -= epsilon           # Γ^φ_{tr}
+
+torsion_conn = ComponentConnection(F_sw, Gamma)
+G = einstein_tensor(torsion_conn, g_sw)
+```
+
+**Output**: only **two** non-zero entries:
+``G_{tφ} = ε(-2M+r) sin²θ`` and its mirror `G_{φt}`. Compact
+torsion-driven correction to vacuum Schwarzschild.
+
+#### Pattern 4: Schwarzschild + Weyl non-metricity (4D)
+
+Same Weyl construction, on Schwarzschild. **Use `optimized=True`
+because the 4D pipeline is slower:**
+
+```python
+W_r = sp.Symbol("W_r", real=True)
+LC = levi_civita(g_sw, optimized=True)
+g_mat = g_sw.matrix()
+g_inv = g_mat.inv()
+W = [0, W_r, 0, 0]
+W_up = [sum(g_inv[μ, ν] * W[ν] for ν in range(F_sw.dim))
+        for μ in range(F_sw.dim)]
+
+Gamma = sp.MutableDenseNDimArray(LC.components)
+for μ in range(F_sw.dim):
+    for ν in range(F_sw.dim):
+        for ρ in range(F_sw.dim):
+            δ_μν = 1 if μ == ν else 0
+            δ_μρ = 1 if μ == ρ else 0
+            Gamma[μ, ν, ρ] += sp.Rational(1, 2) * (
+                δ_μν * W[ρ] + δ_μρ * W[ν] - g_mat[ν, ρ] * W_up[μ]
+            )
+
+weyl_conn = ComponentConnection(F_sw, Gamma)
+G = einstein_tensor(weyl_conn, g_sw, optimized=True)
+```
+
+**Output**: four diagonal `G` entries, polynomial in `W_r`,
+`M`, `r`, plus `sin²θ` for `G_{φφ}`. At `W_r = 0` recovers
+vacuum.
+
+#### Pattern 5: FLRW + scalar-gradient projective deformation
+
+Connection deformed by a scalar field's gradient — a typical
+scalar-tensor gravity setup. Coupling form `Γ + δ A_a + δ A_a`:
+
+```python
+t, r, theta, phi = sp.symbols("t r theta phi")
+a_func = sp.Function("a")(t)
+varphi = sp.Function("varphi")(t)
+F = CoordinateFrame([t, r, theta, phi])
+
+g = ComponentMetric(F, sp.Matrix([
+    [-1, 0, 0, 0],
+    [0, a_func**2, 0, 0],
+    [0, 0, a_func**2 * r**2, 0],
+    [0, 0, 0, a_func**2 * r**2 * sp.sin(theta)**2],
+]))
+LC = levi_civita(g)
+
+A = [sp.diff(varphi, c) for c in F.coords]    # gradient ∂_μ φ
+Gamma = sp.MutableDenseNDimArray(LC.components)
+for μ in range(F.dim):
+    for ν in range(F.dim):
+        for ρ in range(F.dim):
+            δ_μν = 1 if μ == ν else 0
+            δ_μρ = 1 if μ == ρ else 0
+            Gamma[μ, ν, ρ] += δ_μν * A[ρ] + δ_μρ * A[ν]
+
+scalar_conn = ComponentConnection(F, Gamma)
+G_def = einstein_tensor(scalar_conn, g)
+```
+
+**Output**: full `G` with `Derivative(a, t)`, `Derivative(varphi, t)`,
+and second derivatives. Modified Friedmann equations form. At
+`varphi'(t) = 0` recovers FLRW Levi-Civita.
+
+### Insight summary
+
+Five patterns, three structural lessons:
+
+| Pattern | Recovers Levi-Civita at | Lovelock 2D collapse? |
+|---|---|---|
+| 2D + α torsion | `α = 0` | No (torsion breaks it) |
+| 2D + W_x Weyl | `W_x = 0` | **Yes** (`G ≡ 0` always) |
+| Schwarzschild + ε torsion | `ε = 0` | n/a (4D) |
+| Schwarzschild + W_r Weyl | `W_r = 0` | n/a (4D) |
+| FLRW + scalar-grad | `varphi'(t) = 0` | n/a (4D, non-vacuum baseline) |
+
+Two concrete takeaways:
+
+1. **API stress-tests with arbitrary symbols** are valid and
+   accidentally surface deep theorems (the A, B examples
+   verifying Lovelock 2D).
+2. **Physically-meaningful examples** parameterise the
+   deformation by a small number of fields/constants, with the
+   `parameter → 0` limit recovering Levi-Civita. This is the
+   pattern you'll find in modified-gravity papers.
+
 ## When to use `frame_calc` vs the rest of jacopy
 
 | If you want… | Use… |
