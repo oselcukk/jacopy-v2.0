@@ -225,12 +225,121 @@ class Test1DAndMinkowski:
         LC = levi_civita(g)
         assert LC.is_zero()
 
-    def test_minkowski_flat_christoffel_zero(self) -> None:
+    def test_minkowski_cartesian_christoffel_zero(self) -> None:
         coords = list(sp.symbols("t x y z"))
         F = CoordinateFrame(coords)
         g = ComponentMetric(F, sp.diag(-1, 1, 1, 1))
         LC = levi_civita(g)
         assert LC.is_zero()
+
+    def test_minkowski_signature_flip_christoffel_zero(self) -> None:
+        """Signature `+ - - -` is also flat in Cartesian coords."""
+        coords = list(sp.symbols("t x y z"))
+        F = CoordinateFrame(coords)
+        g = ComponentMetric(F, sp.diag(1, -1, -1, -1))
+        LC = levi_civita(g)
+        assert LC.is_zero()
+
+
+class TestMinkowskiCurvilinear:
+    """Minkowski in non-Cartesian coordinates: Christoffel symbols are
+    non-zero (the coordinates are curvilinear) even though the underlying
+    space-time is flat. Curvature tensor zero-ness is verified in Stage E.
+    """
+
+    def test_minkowski_spherical_known_components(self) -> None:
+        """`ds² = -dt² + dr² + r² dθ² + r² sin²θ dφ²`.
+
+        Christoffels match the spatial 3-sphere portion of Schwarzschild
+        with M = 0 — i.e. the angular block of Schwarzschild reduces
+        to spherical Minkowski.
+        """
+        t = sp.Symbol("t")
+        r, theta, phi = sp.symbols("r theta phi", positive=True)
+        F = CoordinateFrame([t, r, theta, phi])
+        g = ComponentMetric(F, sp.Matrix([
+            [-1, 0, 0, 0],
+            [0, 1, 0, 0],
+            [0, 0, r**2, 0],
+            [0, 0, 0, r**2 * sp.sin(theta)**2],
+        ]))
+        LC = levi_civita(g)
+        # Index convention: 0=t, 1=r, 2=θ, 3=φ
+        # Γ^r_{θθ} = -r
+        assert sp.simplify(LC[1, 2, 2] - (-r)) == 0
+        # Γ^r_{φφ} = -r sin²θ
+        assert sp.simplify(LC[1, 3, 3] - (-r * sp.sin(theta) ** 2)) == 0
+        # Γ^θ_{rθ} = 1/r
+        assert sp.simplify(LC[2, 1, 2] - 1 / r) == 0
+        # Γ^θ_{φφ} = -sin θ cos θ
+        assert (
+            sp.simplify(LC[2, 3, 3] + sp.sin(theta) * sp.cos(theta)) == 0
+        )
+        # Γ^φ_{rφ} = 1/r
+        assert sp.simplify(LC[3, 1, 3] - 1 / r) == 0
+        # Γ^φ_{θφ} = cot θ
+        assert (
+            sp.simplify(LC[3, 2, 3] - sp.cos(theta) / sp.sin(theta)) == 0
+        )
+
+    def test_minkowski_spherical_t_block_zero(self) -> None:
+        """`t` is unaffected by the curvilinear angular coords —
+        no Christoffel symbol touches the t-slot."""
+        t = sp.Symbol("t")
+        r, theta, phi = sp.symbols("r theta phi", positive=True)
+        F = CoordinateFrame([t, r, theta, phi])
+        g = ComponentMetric(F, sp.Matrix([
+            [-1, 0, 0, 0],
+            [0, 1, 0, 0],
+            [0, 0, r**2, 0],
+            [0, 0, 0, r**2 * sp.sin(theta)**2],
+        ]))
+        LC = levi_civita(g)
+        # Every Γ^t_{??} = 0 and Γ^?_{t?} = 0
+        for a in range(4):
+            for b in range(4):
+                # Upper t
+                assert LC[0, a, b] == 0, f"Γ^t_{{{a}{b}}} should be 0"
+                # Lower t in either slot
+                assert LC[a, 0, b] == 0, f"Γ^{a}_{{t{b}}} should be 0"
+                assert LC[a, b, 0] == 0, f"Γ^{a}_{{{b}t}} should be 0"
+
+    def test_minkowski_cylindrical_known_components(self) -> None:
+        """`ds² = -dt² + dρ² + ρ² dφ² + dz²` — flat coords on z and t."""
+        t, z = sp.symbols("t z")
+        rho = sp.Symbol("rho", positive=True)
+        phi = sp.Symbol("phi", positive=True)
+        F = CoordinateFrame([t, rho, phi, z])
+        g = ComponentMetric(F, sp.diag(-1, 1, rho**2, 1))
+        LC = levi_civita(g)
+
+        nz = LC.nonzero_components()
+        # Exactly 3 non-zero entries
+        assert len(nz) == 3
+        # Γ^ρ_{φφ} = -ρ
+        assert sp.simplify(LC[1, 2, 2] - (-rho)) == 0
+        # Γ^φ_{ρφ} = 1/ρ
+        assert sp.simplify(LC[2, 1, 2] - 1 / rho) == 0
+        # Γ^φ_{φρ} = 1/ρ
+        assert sp.simplify(LC[2, 2, 1] - 1 / rho) == 0
+
+    def test_rindler_2d_known_components(self) -> None:
+        """Rindler chart `ds² = -ρ² dτ² + dρ²` — uniformly accelerated
+        observer's frame. Non-zero Christoffels reflect the
+        pseudo-force; spacetime is still flat."""
+        tau = sp.Symbol("tau")
+        rho = sp.Symbol("rho", positive=True)
+        F = CoordinateFrame([tau, rho])
+        g = ComponentMetric(F, sp.Matrix([[-(rho**2), 0], [0, 1]]))
+        LC = levi_civita(g)
+
+        nz = LC.nonzero_components()
+        assert len(nz) == 3
+        # Γ^τ_{τρ} = Γ^τ_{ρτ} = 1/ρ
+        assert sp.simplify(LC[0, 0, 1] - 1 / rho) == 0
+        assert sp.simplify(LC[0, 1, 0] - 1 / rho) == 0
+        # Γ^ρ_{ττ} = ρ
+        assert sp.simplify(LC[1, 0, 0] - rho) == 0
 
 
 # --------------------------------------------------------------------- #
