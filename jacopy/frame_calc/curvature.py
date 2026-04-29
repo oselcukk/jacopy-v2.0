@@ -74,10 +74,10 @@ class CurvatureTensor(ComponentTensor):
     :meth:`ComponentTensor.contract`.
 
     Per-entry derivation traces accessible via
-    :meth:`derivation_steps`.
+    :meth:`derivation_steps` — unavailable in optimized mode.
     """
 
-    __slots__ = ("_derivations",)
+    __slots__ = ("_derivations", "_optimized")
 
     def __init__(
         self,
@@ -86,9 +86,17 @@ class CurvatureTensor(ComponentTensor):
         derivations: Dict[
             Tuple[int, int, int, int], List[CurvatureStep]
         ],
+        *,
+        optimized: bool = False,
     ) -> None:
         super().__init__(frame, components, signature=(1, 3))
         self._derivations = dict(derivations)
+        self._optimized = bool(optimized)
+
+    @property
+    def optimized(self) -> bool:
+        """``True`` if this curvature tensor was built via the fast path."""
+        return self._optimized
 
     def derivation_steps(
         self, a: int, b: int, c: int, d: int
@@ -98,7 +106,16 @@ class CurvatureTensor(ComponentTensor):
         Antisymmetry in ``(b, c)`` is honoured: only the canonical
         ordering ``b ≤ c`` is recorded internally; ``b > c`` lookups
         flip the sign in the rendering layer.
+
+        Raises :class:`RuntimeError` in optimized mode (no traces
+        recorded).
         """
+        if self._optimized:
+            raise RuntimeError(
+                "derivation_steps unavailable: this curvature tensor "
+                "was built with optimized=True. Rebuild via "
+                "curvature(connection) without the optimized flag."
+            )
         for label, value in (("a", a), ("b", b), ("c", c), ("d", d)):
             if not isinstance(value, int):
                 raise TypeError(
@@ -120,7 +137,14 @@ class CurvatureTensor(ComponentTensor):
     def format_derivation(
         self, a: int, b: int, c: int, d: int, *, indent: str = "  "
     ) -> str:
-        """Plain-text format of the derivation for ``R^a_{bcd}``."""
+        """Plain-text format of the derivation for ``R^a_{bcd}``.
+
+        Raises :class:`RuntimeError` in optimized mode.
+        """
+        if self._optimized:
+            raise RuntimeError(
+                "format_derivation unavailable in optimized mode."
+            )
         names = self._frame.index_names()
         title = (
             f"R^{names[a]}_{{{names[b]}{names[c]}{names[d]}}}"
@@ -145,6 +169,7 @@ class CurvatureTensor(ComponentTensor):
             out, self._frame, new_arr, signature=(1, 3)
         )
         out._derivations = dict(self._derivations)
+        out._optimized = self._optimized
         return out
 
 
@@ -153,7 +178,9 @@ class CurvatureTensor(ComponentTensor):
 # --------------------------------------------------------------------- #
 
 
-def curvature(connection: ComponentConnection) -> CurvatureTensor:
+def curvature(
+    connection: ComponentConnection, *, optimized: bool = False
+) -> CurvatureTensor:
     r"""Compute the Riemann curvature of a connection.
 
     For each ``(a, b, c, d)``::
@@ -172,12 +199,19 @@ def curvature(connection: ComponentConnection) -> CurvatureTensor:
         Any :class:`ComponentConnection` whose components are SymPy
         expressions. The frame's :meth:`derivative` and :meth:`gamma`
         methods are called on those components.
+    optimized
+        When ``True``, the **fast path** runs: no per-entry
+        ``simplify``, no derivation traces. Components remain
+        mathematically correct in raw form. See
+        :func:`~jacopy.frame_calc.levi_civita.levi_civita` for the
+        full optimized-mode contract.
 
     Returns
     -------
     CurvatureTensor
-        Of signature ``(1, 3)``, shape ``(dim,)*4``, with per-entry
-        derivation traces.
+        Of signature ``(1, 3)``, shape ``(dim,)*4``. With
+        ``optimized=False`` (default), per-entry derivation traces
+        are recorded.
 
     Examples
     --------
@@ -204,16 +238,24 @@ def curvature(connection: ComponentConnection) -> CurvatureTensor:
         for d in range(n):
             for b in range(n):
                 for c in range(b + 1, n):  # antisym: b < c only
-                    value, steps = _curvature_at(
-                        connection, frame, a, b, c, d
-                    )
+                    if optimized:
+                        value = _curvature_at_optimized(
+                            connection, frame, a, b, c, d
+                        )
+                    else:
+                        value, steps = _curvature_at(
+                            connection, frame, a, b, c, d
+                        )
+                        derivations[(a, b, c, d)] = steps
                     components[a, b, c, d] = value
                     components[a, c, b, d] = -value if value != 0 else 0
-                    derivations[(a, b, c, d)] = steps
-                # b == c gives zero (antisymmetry)
-                derivations.setdefault((a, b, b, d), [])
+                if not optimized:
+                    # b == c gives zero (antisymmetry)
+                    derivations.setdefault((a, b, b, d), [])
 
-    return CurvatureTensor(frame, components, derivations)
+    return CurvatureTensor(
+        frame, components, derivations, optimized=optimized
+    )
 
 
 # --------------------------------------------------------------------- #
@@ -326,3 +368,30 @@ def _curvature_at(
     )
 
     return value, steps
+
+
+def _curvature_at_optimized(
+    connection: ComponentConnection,
+    frame: Any,
+    a: int,
+    b: int,
+    c: int,
+    d: int,
+) -> Any:
+    """Fast-path Riemann entry: no per-step trace, no per-entry simplify.
+
+    Returns the **raw** Riemann formula result for ``R^a_{bcd}``.
+    """
+    n = frame.dim
+    deriv_diff = (
+        frame.derivative(connection[a, c, d], b)
+        - frame.derivative(connection[a, b, d], c)
+    )
+    prod_terms = sp.S.Zero
+    for e in range(n):
+        prod_terms += connection[e, c, d] * connection[a, b, e]
+        prod_terms -= connection[e, b, d] * connection[a, c, e]
+    gamma_term = sp.S.Zero
+    for e in range(n):
+        gamma_term -= frame.gamma(e, b, c) * connection[a, e, d]
+    return deriv_diff + prod_terms + gamma_term

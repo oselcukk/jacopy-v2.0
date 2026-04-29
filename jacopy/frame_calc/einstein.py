@@ -85,14 +85,22 @@ class EinsteinTensor(ComponentTensor):
 
 
 def einstein_tensor(
-    connection: ComponentConnection, g: ComponentMetric
+    connection: ComponentConnection,
+    g: ComponentMetric,
+    *,
+    optimized: bool = False,
 ) -> EinsteinTensor:
     r"""Compute the Einstein tensor from a connection and a metric.
 
     Runs the full pipeline ``connection → curvature → Ricci →
     Ricci scalar → G_{ab}`` end-to-end. For repeated computations
     where the Ricci tensor is already available, prefer
-    :func:`einstein_from_ricci`.
+    :func:`einstein_from_ricci`. When ``optimized=True``, every
+    intermediate stage skips per-entry simplify; the final ``G``
+    components are stored in raw form and the user can apply
+    :func:`sympy.simplify` (or
+    :meth:`~jacopy.frame_calc.component_tensor.ComponentTensor.simplify`)
+    at access time.
     """
     if not isinstance(connection, ComponentConnection):
         raise TypeError(
@@ -104,12 +112,15 @@ def einstein_tensor(
             "einstein_tensor expects a ComponentMetric, got "
             f"{type(g).__name__}"
         )
-    Ric = ricci(connection)
-    return einstein_from_ricci(Ric, g)
+    Ric = ricci(connection, optimized=optimized)
+    return einstein_from_ricci(Ric, g, optimized=optimized)
 
 
 def einstein_from_ricci(
-    Ric: RicciTensor, g: ComponentMetric
+    Ric: RicciTensor,
+    g: ComponentMetric,
+    *,
+    optimized: bool = False,
 ) -> EinsteinTensor:
     r"""``G_{ab} = Ric_{ab} - ½ R g_{ab}`` from existing Ricci and metric."""
     if not isinstance(Ric, RicciTensor):
@@ -127,7 +138,7 @@ def einstein_from_ricci(
             "einstein_from_ricci: Ric and g must share a frame"
         )
 
-    R_scalar = ricci_scalar_from_ricci(Ric, g)
+    R_scalar = ricci_scalar_from_ricci(Ric, g, optimized=optimized)
     n = Ric.frame.dim
     components = sp.MutableDenseNDimArray.zeros(n, n)
     for a in range(n):
@@ -135,9 +146,10 @@ def einstein_from_ricci(
             value = (
                 Ric[a, b] - sp.Rational(1, 2) * R_scalar * g[a, b]
             )
-            try:
-                value = sp.simplify(value)
-            except (TypeError, AttributeError):
-                pass
+            if not optimized:
+                try:
+                    value = sp.simplify(value)
+                except (TypeError, AttributeError):
+                    pass
             components[a, b] = value
     return EinsteinTensor(Ric.frame, components)

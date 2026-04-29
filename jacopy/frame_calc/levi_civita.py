@@ -104,18 +104,31 @@ class LeviCivitaConnection(ComponentConnection):
     :meth:`derivation_steps`. Equality / hashing inherit from the
     base class — two Levi-Civita connections compare equal iff their
     components match (the trace metadata is presentation-only).
+
+    The :attr:`optimized` attribute records whether this connection
+    was built via the fast path (no per-entry simplify, no derivation
+    traces). In optimized mode :meth:`derivation_steps` raises
+    :class:`RuntimeError`.
     """
 
-    __slots__ = ("_derivations",)
+    __slots__ = ("_derivations", "_optimized")
 
     def __init__(
         self,
         frame: Frame,
         christoffel: Any,
         derivations: Dict[Tuple[int, int, int], List[KoszulStep]],
+        *,
+        optimized: bool = False,
     ) -> None:
         super().__init__(frame, christoffel)
         self._derivations = dict(derivations)
+        self._optimized = bool(optimized)
+
+    @property
+    def optimized(self) -> bool:
+        """``True`` if this connection was built via the fast path."""
+        return self._optimized
 
     def derivation_steps(
         self, e: int, a: int, b: int
@@ -126,7 +139,20 @@ class LeviCivitaConnection(ComponentConnection):
         underlying derivation is returned — the connection is
         torsion-free, so only the canonical ordering ``a ≤ b`` is
         recorded internally.
+
+        Raises
+        ------
+        RuntimeError
+            If this connection was built with ``optimized=True``;
+            derivation traces are not recorded in the fast path.
         """
+        if self._optimized:
+            raise RuntimeError(
+                "derivation_steps unavailable: this connection was "
+                "built with optimized=True (fast path). Rebuild via "
+                "levi_civita(g) without the optimized flag to record "
+                "per-entry KoszulStep traces."
+            )
         for label, value in (("e", e), ("a", a), ("b", b)):
             if not isinstance(value, int):
                 raise TypeError(
@@ -153,7 +179,14 @@ class LeviCivitaConnection(ComponentConnection):
 
         Useful for terminal / Jupyter prints. Stage G will produce
         a publication-grade LaTeX render through ProofChain.
+
+        Raises :class:`RuntimeError` in optimized mode (no traces
+        recorded).
         """
+        if self._optimized:
+            raise RuntimeError(
+                "format_derivation unavailable in optimized mode."
+            )
         names = self._frame.index_names()
         title = (
             f"Γ^{names[e]}_{{{names[a]}{names[b]}}}  "
@@ -176,6 +209,7 @@ class LeviCivitaConnection(ComponentConnection):
         out = object.__new__(LeviCivitaConnection)
         ComponentConnection.__init__(out, self._frame, new_arr)
         out._derivations = dict(self._derivations)
+        out._optimized = self._optimized
         return out
 
 
@@ -184,7 +218,9 @@ class LeviCivitaConnection(ComponentConnection):
 # --------------------------------------------------------------------- #
 
 
-def levi_civita(g: ComponentMetric) -> LeviCivitaConnection:
+def levi_civita(
+    g: ComponentMetric, *, optimized: bool = False
+) -> LeviCivitaConnection:
     r"""Compute the Levi-Civita connection from a metric ``g``.
 
     Returns a :class:`LeviCivitaConnection` whose ``[e, a, b]`` entry
@@ -197,31 +233,42 @@ def levi_civita(g: ComponentMetric) -> LeviCivitaConnection:
     ----------
     g
         A symmetric :class:`ComponentMetric`.
+    optimized
+        When ``False`` (default), the full pipeline runs:
+        every Christoffel entry is :func:`sympy.simplify`-d to a
+        clean form, and per-entry :class:`KoszulStep` derivation
+        traces are recorded for paper-grade transcript output.
+
+        When ``True``, the **fast path** runs: no per-entry
+        ``simplify``, no derivation traces. Use for production
+        computations where the bottleneck is mid-formula
+        simplification on complex metrics (e.g. Kerr-class).
+        :meth:`LeviCivitaConnection.derivation_steps` will raise
+        :class:`RuntimeError` for entries computed in optimized
+        mode. Components remain mathematically correct — they are
+        just stored in raw, unsimplified form. Apply
+        :func:`sympy.simplify` (or
+        :meth:`ComponentTensor.simplify`) at user-access time when a
+        clean form is needed.
 
     Returns
     -------
     LeviCivitaConnection
-        Christoffel-symbol components plus per-entry derivation traces.
-
-    Raises
-    ------
-    TypeError
-        If ``g`` is not a :class:`ComponentMetric`.
-    NotImplementedError
-        If the metric's frame is :class:`AbstractFrame` (deferred to a
-        Stage D follow-up that introduces opaque ``g^{ab}`` atoms) or
-        :class:`Tetrad` (Stage B).
+        Christoffel-symbol components. With ``optimized=False`` the
+        connection also carries per-entry derivation traces.
 
     Examples
     --------
-    Polar plane ``ds² = dr² + r² dθ²``::
+    Default (full transparency, slower for complex metrics)::
 
-        r, theta = sp.symbols("r theta", positive=True)
-        F = CoordinateFrame([r, theta])
-        g = ComponentMetric(F, sp.Matrix([[1, 0], [0, r**2]]))
         LC = levi_civita(g)
-        LC[0, 1, 1]   # Γ^r_{θθ} = -r
-        LC[1, 0, 1]   # Γ^θ_{rθ} = 1/r
+        LC.derivation_steps(0, 1, 1)   # full Koszul-formula trace
+
+    Optimized (fast path, no traces)::
+
+        LC_fast = levi_civita(g, optimized=True)
+        LC_fast[0, 1, 1]                # raw expression
+        sp.simplify(LC_fast[0, 1, 1])   # clean form on demand
     """
     if not isinstance(g, ComponentMetric):
         raise TypeError(
@@ -249,20 +296,27 @@ def levi_civita(g: ComponentMetric) -> LeviCivitaConnection:
     g_inv = g.inverse()
 
     christoffel = sp.MutableDenseNDimArray.zeros(n, n, n)
-    derivations: Dict[
-        Tuple[int, int, int], List[KoszulStep]
-    ] = {}
+    derivations: Dict[Tuple[int, int, int], List[KoszulStep]] = {}
 
     for e in range(n):
         for a in range(n):
             for b in range(a, n):  # symmetry: only a ≤ b
-                value, steps = _koszul_at(g, g_inv, frame, e, a, b)
+                if optimized:
+                    value = _koszul_at_optimized(
+                        g, g_inv, frame, e, a, b
+                    )
+                else:
+                    value, steps = _koszul_at(
+                        g, g_inv, frame, e, a, b
+                    )
+                    derivations[(e, a, b)] = steps
                 christoffel[e, a, b] = value
                 if a != b:
                     christoffel[e, b, a] = value
-                derivations[(e, a, b)] = steps
 
-    return LeviCivitaConnection(frame, christoffel, derivations)
+    return LeviCivitaConnection(
+        frame, christoffel, derivations, optimized=optimized
+    )
 
 
 # --------------------------------------------------------------------- #
@@ -394,3 +448,42 @@ def _koszul_at(
     )
 
     return value, steps
+
+
+def _koszul_at_optimized(
+    g: ComponentMetric,
+    g_inv: ComponentMetricInverse,
+    frame: Frame,
+    e: int,
+    a: int,
+    b: int,
+) -> Any:
+    """Fast-path Koszul: no per-step trace, no per-entry simplify.
+
+    Returns the **raw** Koszul-formula result for ``Γ^e_{ab}``. The
+    expression is mathematically correct but not simplified — call
+    :func:`sympy.simplify` (or :meth:`ComponentTensor.simplify`) at
+    the user-access layer when a clean form is desired.
+
+    Used by :func:`levi_civita` when ``optimized=True``.
+    """
+    n = frame.dim
+    contraction = sp.S.Zero
+    for c in range(n):
+        # Three frame-derivative terms, summed:
+        d_a = frame.derivative(g[b, c], a)
+        d_b = frame.derivative(g[a, c], b)
+        d_c = frame.derivative(g[a, b], c)
+        deriv = d_a + d_b - d_c
+
+        # γ-correction (zero for coordinate frames, but we evaluate
+        # to keep the path uniform across frame types).
+        gamma_term = sp.S.Zero
+        for d in range(n):
+            gamma_term -= frame.gamma(d, b, c) * g[d, a]
+            gamma_term -= frame.gamma(d, a, c) * g[d, b]
+            gamma_term += frame.gamma(d, a, b) * g[d, c]
+
+        contraction += g_inv[e, c] * (deriv + gamma_term)
+
+    return contraction / 2

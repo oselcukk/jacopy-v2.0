@@ -66,23 +66,40 @@ class RicciTensor(ComponentTensor):
     of the Riemann curvature.
     """
 
-    __slots__ = ("_derivations",)
+    __slots__ = ("_derivations", "_optimized")
 
     def __init__(
         self,
         frame: Any,
         components: Any,
         derivations: Dict[Tuple[int, int], List[RicciStep]] | None = None,
+        *,
+        optimized: bool = False,
     ) -> None:
         super().__init__(frame, components, signature=(0, 2))
         self._derivations = (
             dict(derivations) if derivations is not None else {}
         )
+        self._optimized = bool(optimized)
+
+    @property
+    def optimized(self) -> bool:
+        """``True`` if this Ricci tensor was built via the fast path."""
+        return self._optimized
 
     def derivation_steps(
         self, a: int, b: int
     ) -> Tuple[RicciStep, ...]:
-        """Recorded :class:`RicciStep`s for ``Ric_{ab}``."""
+        """Recorded :class:`RicciStep`s for ``Ric_{ab}``.
+
+        Raises :class:`RuntimeError` in optimized mode (no traces
+        recorded).
+        """
+        if self._optimized:
+            raise RuntimeError(
+                "derivation_steps unavailable: this Ricci tensor was "
+                "built with optimized=True."
+            )
         for label, value in (("a", a), ("b", b)):
             if not isinstance(value, int):
                 raise TypeError(
@@ -104,6 +121,10 @@ class RicciTensor(ComponentTensor):
     def format_derivation(
         self, a: int, b: int, *, indent: str = "  "
     ) -> str:
+        if self._optimized:
+            raise RuntimeError(
+                "format_derivation unavailable in optimized mode."
+            )
         names = self._frame.index_names()
         title = f"Ric_{{{names[a]}{names[b]}}}  (Ricci tensor)"
         lines = [title, "─" * len(title)]
@@ -129,6 +150,7 @@ class RicciTensor(ComponentTensor):
             out, self._frame, new_arr, signature=(0, 2)
         )
         out._derivations = dict(self._derivations)
+        out._optimized = self._optimized
         return out
 
 
@@ -137,7 +159,9 @@ class RicciTensor(ComponentTensor):
 # --------------------------------------------------------------------- #
 
 
-def ricci(connection: ComponentConnection) -> RicciTensor:
+def ricci(
+    connection: ComponentConnection, *, optimized: bool = False
+) -> RicciTensor:
     r"""Compute the Ricci tensor from a connection.
 
     Internally calls :func:`~jacopy.frame_calc.curvature.curvature`
@@ -165,16 +189,21 @@ def ricci(connection: ComponentConnection) -> RicciTensor:
             "ricci expects a ComponentConnection, got "
             f"{type(connection).__name__}"
         )
-    R = curvature(connection)
-    return ricci_from_curvature(R)
+    R = curvature(connection, optimized=optimized)
+    return ricci_from_curvature(R, optimized=optimized)
 
 
-def ricci_from_curvature(R: CurvatureTensor) -> RicciTensor:
+def ricci_from_curvature(
+    R: CurvatureTensor, *, optimized: bool = False
+) -> RicciTensor:
     r"""Build the Ricci tensor by contracting an existing curvature.
 
     Avoids recomputing the curvature when the caller already has it.
     Contracts ``R^c_{acb}`` — i.e. position 0 (upper) with position 2
-    (the second lower index).
+    (the second lower index). The ``optimized`` flag is propagated
+    forward — if the input curvature was built optimized, set
+    ``optimized=True`` here too to skip the per-entry derivation
+    trace.
     """
     if not isinstance(R, CurvatureTensor):
         raise TypeError(
@@ -183,33 +212,35 @@ def ricci_from_curvature(R: CurvatureTensor) -> RicciTensor:
         )
 
     contracted = R.contract(upper=0, lower=2)
-    # Promote to RicciTensor with derivation traces
     frame = R.frame
     n = frame.dim
     derivations: Dict[Tuple[int, int], List[RicciStep]] = {}
 
-    names = frame.index_names()
-    for a in range(n):
-        for b in range(a, n):
-            steps: List[RicciStep] = [
-                RicciStep(
-                    rule="Ricci contraction",
-                    description=(
-                        f"Ric_{{{names[a]}{names[b]}}} = "
-                        f"R^c_{{{names[a]} c {names[b]}}}"
+    if not optimized:
+        names = frame.index_names()
+        for a in range(n):
+            for b in range(a, n):
+                steps: List[RicciStep] = [
+                    RicciStep(
+                        rule="Ricci contraction",
+                        description=(
+                            f"Ric_{{{names[a]}{names[b]}}} = "
+                            f"R^c_{{{names[a]} c {names[b]}}}"
+                        ),
                     ),
-                ),
-                RicciStep(
-                    rule="Sum over c",
-                    description=(
-                        f"Σ_{{c=0..{n-1}}} R^c_{{{names[a]} c {names[b]}}}"
+                    RicciStep(
+                        rule="Sum over c",
+                        description=(
+                            f"Σ_{{c=0..{n-1}}} R^c_{{{names[a]} c {names[b]}}}"
+                        ),
+                        expression=contracted[a, b],
                     ),
-                    expression=contracted[a, b],
-                ),
-            ]
-            derivations[(a, b)] = steps
+                ]
+                derivations[(a, b)] = steps
 
-    return RicciTensor(frame, contracted.components, derivations)
+    return RicciTensor(
+        frame, contracted.components, derivations, optimized=optimized
+    )
 
 
 # --------------------------------------------------------------------- #
@@ -218,7 +249,10 @@ def ricci_from_curvature(R: CurvatureTensor) -> RicciTensor:
 
 
 def ricci_scalar(
-    connection: ComponentConnection, g: ComponentMetric
+    connection: ComponentConnection,
+    g: ComponentMetric,
+    *,
+    optimized: bool = False,
 ) -> Any:
     r"""Compute the Ricci scalar from a connection and metric.
 
@@ -236,12 +270,15 @@ def ricci_scalar(
             "ricci_scalar expects a ComponentMetric, got "
             f"{type(g).__name__}"
         )
-    Ric = ricci(connection)
-    return ricci_scalar_from_ricci(Ric, g)
+    Ric = ricci(connection, optimized=optimized)
+    return ricci_scalar_from_ricci(Ric, g, optimized=optimized)
 
 
 def ricci_scalar_from_ricci(
-    Ric: RicciTensor, g: ComponentMetric
+    Ric: RicciTensor,
+    g: ComponentMetric,
+    *,
+    optimized: bool = False,
 ) -> Any:
     r"""``R = Ric_{ab} g^{ab}`` from existing Ricci and metric.
 
@@ -268,8 +305,9 @@ def ricci_scalar_from_ricci(
     for a in range(n):
         for b in range(n):
             s += g_inv[a, b] * Ric[a, b]
-    try:
-        s = sp.simplify(s)
-    except (TypeError, AttributeError):
-        pass
+    if not optimized:
+        try:
+            s = sp.simplify(s)
+        except (TypeError, AttributeError):
+            pass
     return s
