@@ -38,7 +38,15 @@ class ProofStep:
 
     #: Recognised provenance tags. ``None`` means the step carries no
     #: provenance claim (e.g. a structural rewrite like ``product-rule``).
-    _VALID_TAGS = (None, "axiom", "theorem")
+    #:
+    #: * ``"axiom"`` — primitive equation accepted as input.
+    #: * ``"theorem"`` — derived from other primitives; foundational
+    #:   mode can recover the sub-proof.
+    #: * ``"computation"`` — a frame-component / numerical-symbolic
+    #:   step (typically Stage G of :mod:`jacopy.frame_calc`); not a
+    #:   citation but a calculation. Carries the same paper-grade
+    #:   render path as axiom / theorem.
+    _VALID_TAGS = (None, "axiom", "theorem", "computation")
 
     def __init__(
         self,

@@ -67,9 +67,11 @@ from jacopy.frame_calc.ricci import (
     ricci_scalar,
     ricci_scalar_from_ricci,
 )
+from jacopy.frame_calc.proof_bridge import steps_to_proof_chain
 from jacopy.frame_calc.symbolic_atoms import (
     FrameDerivativeExpr,
     GammaExpr,
+    SymPyAtom,
 )
 from jacopy.frame_calc.torsion import TorsionTensor, torsion
 
@@ -79,9 +81,11 @@ __all__ = [
     "CoordinateFrame",
     "AbstractFrame",
     "Tetrad",
-    # Symbolic atoms (abstract-mode opaques)
+    # Symbolic atoms (abstract-mode opaques + ProofChain bridge)
     "FrameDerivativeExpr",
     "GammaExpr",
+    "SymPyAtom",
+    "steps_to_proof_chain",
     # Component tensors
     "ComponentTensor",
     "ComponentMetric",

@@ -134,6 +134,23 @@ class CurvatureTensor(ComponentTensor):
             )
         return tuple(steps)
 
+    def derivation_chain(
+        self, a: int, b: int, c: int, d: int
+    ) -> "ProofChain":  # noqa: F821
+        r"""Return a :class:`~jacopy.proof.chain.ProofChain` for ``R^a_{bcd}``.
+
+        Raises :class:`RuntimeError` in optimized mode.
+        """
+        from jacopy.frame_calc.proof_bridge import steps_to_proof_chain
+
+        steps = self.derivation_steps(a, b, c, d)
+        names = self._frame.index_names()
+        head = (
+            f"R^{names[a]}_{{{names[b]}{names[c]}{names[d]}}} "
+            f"(Riemann curvature)"
+        )
+        return steps_to_proof_chain(steps, head_label=head)
+
     def format_derivation(
         self, a: int, b: int, c: int, d: int, *, indent: str = "  "
     ) -> str:

@@ -172,6 +172,28 @@ class LeviCivitaConnection(ComponentConnection):
             )
         return tuple(steps)
 
+    def derivation_chain(
+        self, e: int, a: int, b: int
+    ) -> "ProofChain":  # noqa: F821 — string form to avoid import cycle
+        r"""Return a :class:`~jacopy.proof.chain.ProofChain` for ``Γ^e_{ab}``.
+
+        The chain wraps the recorded :class:`KoszulStep`s into
+        :class:`~jacopy.proof.step.ProofStep`s tagged
+        ``provenance_tag="computation"`` — ready for paper-grade
+        LaTeX output via
+        :func:`~jacopy.display.chain_to_latex.chain_to_latex_document`.
+
+        Raises :class:`RuntimeError` in optimized mode.
+        """
+        from jacopy.frame_calc.proof_bridge import steps_to_proof_chain
+
+        steps = self.derivation_steps(e, a, b)  # raises if optimized
+        names = self._frame.index_names()
+        head = (
+            f"Γ^{names[e]}_{{{names[a]}{names[b]}}} via Koszul formula"
+        )
+        return steps_to_proof_chain(steps, head_label=head)
+
     def format_derivation(
         self, e: int, a: int, b: int, *, indent: str = "  "
     ) -> str:

@@ -152,3 +152,59 @@ class GammaExpr(Atom):
     def _repr_inner(self) -> str:
         names = self._frame.index_names()
         return f"γ^{names[self._a]}_{{{names[self._b]}{names[self._c]}}}"
+
+
+# --------------------------------------------------------------------- #
+# SymPyAtom — jacopy `Expr` wrapping a SymPy expression                 #
+# --------------------------------------------------------------------- #
+
+
+class SymPyAtom(Atom):
+    r"""Opaque jacopy :class:`Atom` wrapping a SymPy expression.
+
+    The Stage G :class:`~jacopy.proof.chain.ProofChain` bridge needs
+    to embed SymPy expressions (component values like ``Γ^t_{tr} =
+    M/(r²(1-2M/r))``) inside :class:`~jacopy.proof.step.ProofStep`'s
+    ``before`` / ``after`` slots, which require jacopy ``Expr``
+    instances.
+
+    :class:`SymPyAtom` is the bridge: a jacopy :class:`Atom` whose
+    only payload is a SymPy expression. Equality / hashing key on
+    the structural form of the underlying SymPy expression.
+
+    Display: :meth:`_repr_inner` calls ``str(sp_expr)``; the LaTeX
+    layer (:mod:`jacopy.display.latex`) registers a dedicated
+    handler that uses :func:`sympy.latex`, so paper-grade
+    :func:`~jacopy.display.chain_to_latex_document` output renders
+    SymPy entries correctly.
+
+    The wrapping is **opaque from jacopy's algebra perspective** —
+    no jacopy engine rule fires on it, no substitution descends
+    into it. That's intentional: SymPy and jacopy operate on
+    different algebras, and the bridge only mediates *display*,
+    not arithmetic.
+    """
+
+    __slots__ = ("_sympy",)
+
+    def __init__(self, sympy_expr: Any) -> None:
+        # Coerce ints / floats to sympy if needed
+        try:
+            import sympy as _sp
+            if not isinstance(sympy_expr, _sp.Basic):
+                sympy_expr = _sp.sympify(sympy_expr)
+        except Exception:  # noqa: BLE001
+            pass
+        self._sympy = sympy_expr
+
+    @property
+    def sympy(self) -> Any:
+        """The wrapped SymPy expression."""
+        return self._sympy
+
+    def _key(self) -> Any:
+        # SymPy expressions are hashable; key directly on them
+        return ("SymPyAtom", self._sympy)
+
+    def _repr_inner(self) -> str:
+        return str(self._sympy)
