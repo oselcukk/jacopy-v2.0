@@ -31,21 +31,15 @@ class TestLeviCivitaTypeChecks:
         with pytest.raises(NotImplementedError, match="AbstractFrame"):
             levi_civita(m)
 
-    def test_tetrad_raises(self) -> None:
+    def test_tetrad_supported(self) -> None:
+        """Stage B: Tetrad is now supported via frame protocol."""
         t, r = sp.symbols("t r")
         coord = CoordinateFrame([t, r])
         T = Tetrad(coord, vielbein=sp.eye(2))
-        # ComponentMetric on Tetrad: depends on what tetrad does;
-        # build a minimal stub by overriding gamma for storage
-        # Actually just test that levi_civita rejects the Tetrad type.
-        # Minimal trick: bypass Tetrad's NotImplementedError on gamma
-        # by constructing a metric whose levi_civita call hits Tetrad
-        # before any frame method is invoked.
-        # We do that by creating ComponentMetric, which only stores —
-        # doesn't call frame.derivative or frame.gamma.
         m = ComponentMetric(T, sp.eye(2))
-        with pytest.raises(NotImplementedError, match="Tetrad"):
-            levi_civita(m)
+        # Should run without error (even if trivial result for identity tetrad)
+        LC = levi_civita(m)
+        assert LC.is_zero()  # identity tetrad on Minkowski → flat
 
 
 # --------------------------------------------------------------------- #

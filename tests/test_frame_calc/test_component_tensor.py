@@ -213,16 +213,26 @@ class TestComponentMetric:
                 expected = 1 if a == b else 0
                 assert sp.simplify(s - expected) == 0
 
-    def test_abstract_frame_inverse_raises(self) -> None:
+    def test_abstract_frame_inverse_returns_opaque(self) -> None:
+        """AbstractFrame inverse returns a ComponentMetricInverse with
+        opaque InverseMetricEntryExpr atoms — the symbolic g^{ab}.
+        """
+        from jacopy.frame_calc.symbolic_atoms import InverseMetricEntryExpr
+
         F = AbstractFrame(dim=2)
-        # Build a metric with simple jacopy-Expr-free SymPy entries —
-        # the AbstractFrame storage works fine, but inverse should
-        # refuse with a clear "deferred to Stage D" message.
         m = ComponentMetric(F, sp.eye(2))
-        with pytest.raises(NotImplementedError, match="Stage D"):
-            m.inverse()
+        m_inv = m.inverse()
+        assert isinstance(m_inv, ComponentMetricInverse)
+        # Each entry is an opaque atom keyed on the metric id
+        assert isinstance(m_inv[0, 0], InverseMetricEntryExpr)
+        assert isinstance(m_inv[0, 1], InverseMetricEntryExpr)
+        # Two distinct metrics get distinct atoms (keyed on id)
+        m2 = ComponentMetric(F, sp.eye(2))
+        assert m_inv[0, 0] != m2.inverse()[0, 0]
 
     def test_abstract_frame_det_raises(self) -> None:
+        """det on AbstractFrame remains deferred — would need its own
+        opaque-atom design (no polymorphic determinant on jacopy Expr)."""
         F = AbstractFrame(dim=2)
         m = ComponentMetric(F, sp.eye(2))
         with pytest.raises(NotImplementedError, match="Stage D"):

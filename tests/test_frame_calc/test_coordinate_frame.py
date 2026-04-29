@@ -401,26 +401,111 @@ class TestAbstractFrameAtomComposition:
 # --------------------------------------------------------------------- #
 
 
-class TestTetradStub:
+class TestTetradConstruction:
+    """Stage B: Tetrad fully populated with vielbein-based computation."""
+
     def test_construction_succeeds(self) -> None:
         t, r = sp.symbols("t r")
         coord_frame = CoordinateFrame([t, r])
         T = Tetrad(coord_frame, vielbein=sp.eye(2))
         assert T.dim == 2
         assert T.name == "tetrad(coord(t,r))"
+        assert isinstance(T, Tetrad)
 
     def test_non_coord_frame_rejected(self) -> None:
         with pytest.raises(TypeError, match="CoordinateFrame"):
             Tetrad("not a frame", vielbein=None)  # type: ignore[arg-type]
 
-    def test_derivative_raises_stage_b(self) -> None:
-        t = sp.Symbol("t")
-        T = Tetrad(CoordinateFrame([t]), vielbein=sp.eye(1))
-        with pytest.raises(NotImplementedError, match="Stage B"):
-            T.derivative("expr", 0)
+    def test_vielbein_shape_mismatch_rejected(self) -> None:
+        t, r = sp.symbols("t r")
+        coord_frame = CoordinateFrame([t, r])
+        with pytest.raises(ValueError, match="shape"):
+            Tetrad(coord_frame, vielbein=sp.eye(3))
 
-    def test_gamma_raises_stage_b(self) -> None:
+    def test_invalid_vielbein_type(self) -> None:
         t = sp.Symbol("t")
-        T = Tetrad(CoordinateFrame([t]), vielbein=sp.eye(1))
-        with pytest.raises(NotImplementedError, match="Stage B"):
-            T.gamma(0, 0, 0)
+        with pytest.raises(TypeError, match="Matrix"):
+            Tetrad(CoordinateFrame([t]), vielbein="not a matrix")
+
+    def test_explicit_name(self) -> None:
+        t = sp.Symbol("t")
+        T = Tetrad(
+            CoordinateFrame([t]), vielbein=sp.eye(1), name="my-tetrad"
+        )
+        assert T.name == "my-tetrad"
+
+
+class TestTetradIdentityCase:
+    """Identity vielbein → tetrad coincides with the coord frame."""
+
+    def test_derivative_matches_coord_frame(self) -> None:
+        t, r = sp.symbols("t r")
+        coord_frame = CoordinateFrame([t, r])
+        T = Tetrad(coord_frame, vielbein=sp.eye(2))
+        # e_a(f) should equal coord_frame.derivative(f, a)
+        assert sp.simplify(T.derivative(r**2, 1) - 2 * r) == 0
+        assert sp.simplify(T.derivative(t * r, 0) - r) == 0
+
+    def test_gamma_zero_for_identity(self) -> None:
+        t, r = sp.symbols("t r")
+        coord_frame = CoordinateFrame([t, r])
+        T = Tetrad(coord_frame, vielbein=sp.eye(2))
+        # Identity vielbein → constant frame components → bracket = 0
+        for a in range(2):
+            for b in range(2):
+                for c in range(2):
+                    assert T.gamma(a, b, c) == 0
+
+
+class TestTetradGamma:
+    """Non-trivial vielbein → genuine structure constants."""
+
+    def test_gamma_antisymmetric(self) -> None:
+        """γ^a_{bc} = -γ^a_{cb} for any tetrad."""
+        x, y = sp.symbols("x y", positive=True)
+        coord_frame = CoordinateFrame([x, y])
+        # A non-trivial vielbein with x-dependence
+        vielbein = sp.Matrix([
+            [1, 0],
+            [0, 1 / x],   # e_1 = (1/x) ∂/∂y
+        ])
+        T = Tetrad(coord_frame, vielbein=vielbein)
+        for a in range(2):
+            for b in range(2):
+                for c in range(2):
+                    assert sp.simplify(
+                        T.gamma(a, b, c) + T.gamma(a, c, b)
+                    ) == 0
+
+    def test_gamma_b_equals_c_zero(self) -> None:
+        x, y = sp.symbols("x y", positive=True)
+        coord_frame = CoordinateFrame([x, y])
+        vielbein = sp.Matrix([[1, 0], [0, 1 / x]])
+        T = Tetrad(coord_frame, vielbein=vielbein)
+        for a in range(2):
+            for b in range(2):
+                assert T.gamma(a, b, b) == 0
+
+    def test_singular_vielbein_raises(self) -> None:
+        x, y = sp.symbols("x y")
+        coord_frame = CoordinateFrame([x, y])
+        # Singular vielbein
+        T = Tetrad(coord_frame, vielbein=sp.Matrix([[1, 0], [0, 0]]))
+        with pytest.raises(ValueError, match="singular"):
+            T.gamma(0, 0, 1)
+
+
+class TestTetradWithLeviCivita:
+    """The frame protocol should now let levi_civita work on a Tetrad."""
+
+    def test_identity_tetrad_minkowski_christoffel_zero(self) -> None:
+        from jacopy.frame_calc import ComponentMetric, levi_civita
+
+        t, x, y, z = sp.symbols("t x y z", real=True)
+        coord_frame = CoordinateFrame([t, x, y, z])
+        T = Tetrad(coord_frame, vielbein=sp.eye(4))
+        # In an identity-tetrad with Minkowski metric in tetrad indices,
+        # the Christoffel symbols should be zero (flat space, flat tetrad).
+        g = ComponentMetric(T, sp.diag(-1, 1, 1, 1))
+        LC = levi_civita(g)
+        assert LC.is_zero()

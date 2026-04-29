@@ -159,6 +159,62 @@ class GammaExpr(Atom):
 # --------------------------------------------------------------------- #
 
 
+class InverseMetricEntryExpr(Atom):
+    r"""Opaque atom for ``g^{ab}`` when the metric is abstract.
+
+    On an :class:`AbstractFrame`, the inverse metric components
+    cannot be computed via SymPy's :meth:`Matrix.inv` because the
+    underlying metric entries are jacopy :class:`Expr` atoms (not
+    SymPy expressions). The Levi-Civita / Koszul formula needs to
+    refer to ``g^{ab}`` symbolically, so we expose each inverse
+    entry as a fresh :class:`Atom` keyed on ``(metric_id, a, b)``.
+
+    The atom carries no algebraic relation to the metric — its
+    only contract is structural identity. Higher-level proofs that
+    need the relation ``g^{ac} g_{cb} = δ^a_b`` would need explicit
+    rewrite rules (out of scope for Stage A.2 / Stage D follow-up).
+    """
+
+    __slots__ = ("_frame", "_metric_id", "_a", "_b")
+
+    def __init__(
+        self,
+        frame: Any,
+        metric_id: int,
+        a: int,
+        b: int,
+    ) -> None:
+        for label, value in (("a", a), ("b", b)):
+            if not isinstance(value, int):
+                raise TypeError(
+                    f"InverseMetricEntryExpr index {label} must be int"
+                )
+        self._frame = frame
+        self._metric_id = metric_id
+        self._a = a
+        self._b = b
+
+    @property
+    def frame(self) -> Any:
+        return self._frame
+
+    @property
+    def upper(self) -> Tuple[int, int]:
+        return (self._a, self._b)
+
+    def _key(self) -> Any:
+        return (
+            "InverseMetricEntryExpr",
+            self._metric_id,
+            self._a,
+            self._b,
+        )
+
+    def _repr_inner(self) -> str:
+        names = self._frame.index_names()
+        return f"g^{{{names[self._a]}{names[self._b]}}}"
+
+
 class SymPyAtom(Atom):
     r"""Opaque jacopy :class:`Atom` wrapping a SymPy expression.
 

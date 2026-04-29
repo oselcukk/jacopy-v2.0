@@ -300,16 +300,15 @@ def levi_civita(
     frame = g.frame
     if isinstance(frame, AbstractFrame):
         raise NotImplementedError(
-            "levi_civita on AbstractFrame requires opaque g^{ab} atoms; "
-            "this Stage D follow-up is not yet implemented."
+            "levi_civita on AbstractFrame requires polymorphic "
+            "arithmetic that mixes jacopy Expr atoms and SymPy "
+            "expressions in a single formula. The opaque "
+            "InverseMetricEntryExpr atom for g^{ab} landed in this "
+            "stage, but the full pipeline (jacopy Sum / division by "
+            "Rational, mixed-type contraction) is non-trivial — "
+            "deferred to a dedicated abstract-mode pass."
         )
-    if isinstance(frame, Tetrad) and not isinstance(
-        frame, CoordinateFrame
-    ):
-        raise NotImplementedError(
-            "levi_civita on Tetrad arrives in Stage B."
-        )
-    if not isinstance(frame, CoordinateFrame):
+    if not isinstance(frame, (CoordinateFrame, Tetrad)):
         raise TypeError(
             f"levi_civita: unsupported frame type {type(frame).__name__}"
         )

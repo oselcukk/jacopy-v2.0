@@ -367,17 +367,58 @@ class AbstractFrame(Frame):
 
 
 class Tetrad(Frame):
-    r"""Tetrad ``e_a = e_a^μ ∂/∂x^μ`` — Stage B stub.
+    r"""Tetrad ``e_a = e_a^μ ∂/∂x^μ`` defined by a vielbein matrix.
 
-    Will be populated with:
+    A tetrad sits on top of a coordinate frame; the **vielbein** is
+    a square matrix whose row ``a`` gives the components of the
+    tetrad vector ``e_a`` against the coordinate basis vectors:
 
-    * ``derivative(f, a)`` = ``e_a^μ ∂f/∂x^μ`` (vielbein-weighted
-      coordinate derivative).
-    * ``gamma(a, b, c)`` computed from the vielbein and SymPy
-      bracket ``[e_b, e_c]^μ = e_b^ν ∂_ν e_c^μ − e_c^ν ∂_ν e_b^μ``.
+    .. math::
+
+        e_a = e_a{}^\mu \, \frac{\partial}{\partial x^\mu}.
+
+    The frame derivative is the vielbein-weighted coordinate
+    derivative
+
+    .. math::
+
+        e_a(f) = e_a{}^\mu \, \partial_\mu f.
+
+    The Lie bracket structure constants ``γ^a_{bc}`` come from
+    expanding ``[e_b, e_c] = γ^a_{bc} e_a`` in the coordinate
+    basis; explicitly,
+
+    .. math::
+
+        [e_b, e_c]^\mu
+        = e_b{}^\nu \, \partial_\nu e_c{}^\mu
+        - e_c{}^\nu \, \partial_\nu e_b{}^\mu,
+        \qquad
+        \gamma^a{}_{bc} = (e^{-1})^a{}_\mu \, [e_b, e_c]^\mu,
+
+    where ``e^{-1}`` is the inverse vielbein (dual coframe) matrix.
+
+    Parameters
+    ----------
+    coord_frame
+        The underlying :class:`CoordinateFrame` on whose chart the
+        tetrad sits.
+    vielbein
+        ``dim × dim`` SymPy matrix; row ``a`` is ``e_a^μ``. Must
+        match ``coord_frame.dim``.
+    name
+        Optional display name; defaults to
+        ``f"tetrad({coord_frame.name})"``.
+
+    Notes
+    -----
+    The vielbein must be **invertible** (so ``γ`` can be computed
+    from the inverse). Singularity is detected lazily on the first
+    :meth:`gamma` call. An identity vielbein reduces the tetrad to
+    the underlying coordinate frame (γ ≡ 0).
     """
 
-    __slots__ = ("dim", "name", "_coord_frame", "_vielbein")
+    __slots__ = ("dim", "name", "_coord_frame", "_vielbein", "_vielbein_inv")
 
     def __init__(
         self,
@@ -390,8 +431,21 @@ class Tetrad(Frame):
             raise TypeError(
                 "Tetrad coord_frame must be a CoordinateFrame"
             )
+        if not isinstance(vielbein, sp.Matrix):
+            try:
+                vielbein = sp.Matrix(vielbein)
+            except Exception as exc:  # noqa: BLE001
+                raise TypeError(
+                    "Tetrad vielbein must be a SymPy Matrix or matrix-like"
+                ) from exc
+        if vielbein.shape != (coord_frame.dim, coord_frame.dim):
+            raise ValueError(
+                f"Tetrad vielbein shape {vielbein.shape} must match "
+                f"coord_frame.dim={coord_frame.dim}"
+            )
         self._coord_frame = coord_frame
         self._vielbein = vielbein
+        self._vielbein_inv: sp.Matrix | None = None
         self.dim = coord_frame.dim
         self.name = (
             name
@@ -399,12 +453,93 @@ class Tetrad(Frame):
             else f"tetrad({coord_frame.name})"
         )
 
-    def derivative(self, expr: Any, a: int) -> Any:
-        raise NotImplementedError(
-            "Tetrad.derivative will be populated at Stage B."
-        )
+    # ---- accessors ------------------------------------------------- #
 
-    def gamma(self, a: int, b: int, c: int) -> Any:
-        raise NotImplementedError(
-            "Tetrad.gamma will be populated at Stage B."
-        )
+    @property
+    def coord_frame(self) -> CoordinateFrame:
+        return self._coord_frame
+
+    @property
+    def vielbein(self) -> sp.Matrix:
+        """Vielbein matrix; row ``a`` is ``e_a^μ``."""
+        return self._vielbein
+
+    @property
+    def vielbein_inverse(self) -> sp.Matrix:
+        """Inverse vielbein (dual coframe); cached after first compute."""
+        if self._vielbein_inv is None:
+            try:
+                self._vielbein_inv = self._vielbein.inv()
+            except (sp.matrices.exceptions.NonInvertibleMatrixError, ValueError) as exc:
+                raise ValueError(
+                    "Tetrad vielbein is singular; γ structure constants "
+                    "and frame-component algebra require an invertible "
+                    "vielbein."
+                ) from exc
+        return self._vielbein_inv
+
+    def index_names(self) -> Tuple[str, ...]:
+        # Tetrad indices are abstract (not coordinates); name them
+        # numerically unless the coord frame's names happen to fit
+        # (e.g. an identity vielbein where the tetrad coincides with
+        # coordinates).
+        return tuple(f"^{i}" for i in range(self.dim))
+
+    # ---- protocol methods ----------------------------------------- #
+
+    def derivative(self, expr: Any, a: int) -> sp.Expr:
+        r"""Frame derivative ``e_a(expr) = e_a^μ ∂_μ expr``."""
+        self._check_index("derivative", a)
+        # Coerce to SymPy if needed
+        try:
+            sp_expr = sp.sympify(expr)
+        except Exception as exc:  # noqa: BLE001
+            raise TypeError(
+                "Tetrad.derivative requires a SymPy-coercible expression"
+            ) from exc
+        result: sp.Expr = sp.S.Zero
+        for mu in range(self.dim):
+            comp = self._vielbein[a, mu]
+            if comp == 0:
+                continue
+            result += comp * self._coord_frame.derivative(sp_expr, mu)
+        return result
+
+    def gamma(self, a: int, b: int, c: int) -> sp.Expr:
+        r"""Structure constant ``γ^a_{bc}`` from the vielbein."""
+        for label, value in (("a", a), ("b", b), ("c", c)):
+            self._check_index(f"gamma {label}", value)
+
+        # Antisymmetry in (b, c)
+        if b == c:
+            return sp.Integer(0)
+        if b > c:
+            return -self.gamma(a, c, b)
+
+        # Compute [e_b, e_c]^μ
+        bracket_mu: list[sp.Expr] = []
+        for mu in range(self.dim):
+            term: sp.Expr = sp.S.Zero
+            for nu in range(self.dim):
+                # e_b^ν ∂_ν e_c^μ
+                e_b_nu = self._vielbein[b, nu]
+                if e_b_nu != 0:
+                    term += e_b_nu * self._coord_frame.derivative(
+                        self._vielbein[c, mu], nu
+                    )
+                # − e_c^ν ∂_ν e_b^μ
+                e_c_nu = self._vielbein[c, nu]
+                if e_c_nu != 0:
+                    term -= e_c_nu * self._coord_frame.derivative(
+                        self._vielbein[b, mu], nu
+                    )
+            bracket_mu.append(sp.simplify(term))
+
+        # γ^a_{bc} = (e^{-1})^a_μ [e_b, e_c]^μ
+        # The inverse vielbein has shape (dim, dim) where the row
+        # is the upper index a and the column is the coord index μ.
+        e_inv = self.vielbein_inverse
+        result: sp.Expr = sp.S.Zero
+        for mu in range(self.dim):
+            result += e_inv[a, mu] * bracket_mu[mu]
+        return sp.simplify(result)

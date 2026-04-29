@@ -446,19 +446,29 @@ class ComponentMetric(ComponentTensor):
 
     def __init__(self, frame: Frame, matrix: Any) -> None:
         super().__init__(frame, matrix, signature=(0, 2))
-        # Symmetry check (best-effort)
+        # Symmetry check (best-effort): structural equality first,
+        # then sp.simplify on the difference if both sides are SymPy.
         for a in range(frame.dim):
             for b in range(a + 1, frame.dim):
-                diff = self._components[a, b] - self._components[b, a]
+                lhs = self._components[a, b]
+                rhs = self._components[b, a]
+                # Fast structural check — works for jacopy Expr and SymPy.
+                if lhs == rhs:
+                    continue
+                # Fall back to sp.simplify on the difference. May raise
+                # SympifyError for jacopy Expr — caught below.
                 try:
+                    diff = lhs - rhs
                     diff = sp.simplify(diff)
-                except (TypeError, AttributeError):
-                    pass
+                except (TypeError, AttributeError, sp.SympifyError):
+                    # Couldn't normalise — accept the structural mismatch
+                    # as user error iff lhs != rhs at the structural
+                    # level too.
+                    diff = lhs - rhs
                 if diff != 0:
                     raise ValueError(
                         f"ComponentMetric is not symmetric: "
-                        f"g[{a},{b}] = {self._components[a, b]} ≠ "
-                        f"g[{b},{a}] = {self._components[b, a]}"
+                        f"g[{a},{b}] = {lhs} ≠ g[{b},{a}] = {rhs}"
                     )
 
     # ---- typed accessors ------------------------------------------ #
@@ -485,21 +495,31 @@ class ComponentMetric(ComponentTensor):
     def inverse(self) -> "ComponentMetricInverse":
         r"""Compute ``g^{ab}`` — the (2, 0) inverse metric.
 
-        Concrete (SymPy) entries: returns a :class:`ComponentMetricInverse`
-        whose matrix is :meth:`sympy.Matrix.inv` of this metric. Each
-        entry is run through :func:`sympy.simplify` for readability.
+        Concrete frames (:class:`CoordinateFrame`, :class:`Tetrad`):
+        returns a :class:`ComponentMetricInverse` whose matrix is
+        :meth:`sympy.Matrix.inv` of this metric. Each entry is run
+        through :func:`sympy.simplify` for readability.
 
-        Abstract entries: raises :class:`NotImplementedError`. The
-        Levi-Civita stage (D) will introduce opaque ``g^{ab}`` atoms
-        for the abstract path; until then, abstract-mode inverse is
-        unsupported.
+        Abstract frames (:class:`AbstractFrame`): returns a
+        :class:`ComponentMetricInverse` whose entries are opaque
+        :class:`~jacopy.frame_calc.symbolic_atoms.InverseMetricEntryExpr`
+        atoms. The atoms carry the metric's identity (via ``id(g)``)
+        so two distinct abstract metrics' inverses don't alias.
         """
         if isinstance(self._frame, AbstractFrame):
-            raise NotImplementedError(
-                "ComponentMetric.inverse on AbstractFrame is deferred "
-                "to Stage D, where opaque g^{ab} atoms will be "
-                "introduced for the symbolic Koszul-formula path."
+            from jacopy.frame_calc.symbolic_atoms import (
+                InverseMetricEntryExpr,
             )
+            n = self._frame.dim
+            entries = [
+                [
+                    InverseMetricEntryExpr(self._frame, id(self), a, b)
+                    for b in range(n)
+                ]
+                for a in range(n)
+            ]
+            inv_components = sp.MutableDenseNDimArray(entries)
+            return ComponentMetricInverse(self._frame, inv_components)
         inv = self.matrix().inv()
         # Apply simplify component-wise for cleaner output
         inv_simplified = sp.Matrix(inv.shape[0], inv.shape[1], lambda i, j: sp.simplify(inv[i, j]))
