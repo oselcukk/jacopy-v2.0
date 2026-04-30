@@ -48,6 +48,18 @@ from jacopy.frame_calc.einstein import (
     einstein_from_ricci,
     einstein_tensor,
 )
+from jacopy.frame_calc.analyze import analyze_metric
+from jacopy.frame_calc.custom_connections import (
+    connection_with_torsion,
+    projective_connection,
+    weyl_connection,
+)
+from jacopy.frame_calc.latex_table import to_latex_table
+from jacopy.frame_calc.invariants import (
+    cotton,
+    kretschmann,
+    ricci_squared,
+)
 from jacopy.frame_calc.frame import (
     AbstractFrame,
     CoordinateFrame,
@@ -113,4 +125,16 @@ __all__ = [
     "einstein_tensor",
     "einstein_from_ricci",
     "EinsteinTensor",
+    # Curvature invariants
+    "kretschmann",
+    "ricci_squared",
+    "cotton",
+    # One-shot helper
+    "analyze_metric",
+    # LaTeX table render
+    "to_latex_table",
+    # Custom-connection helpers
+    "connection_with_torsion",
+    "weyl_connection",
+    "projective_connection",
 ]

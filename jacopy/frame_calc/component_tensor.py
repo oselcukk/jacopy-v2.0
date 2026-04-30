@@ -263,6 +263,33 @@ class ComponentTensor:
                 pass  # abstract entries (jacopy Expr) — leave alone
         return self._rebuild_from_array(new_arr)
 
+    def subs(self, mapping: Any, *args: Any) -> "ComponentTensor":
+        """Apply SymPy ``subs`` to every component, return same-typed tensor.
+
+        Accepts the same call shapes as :meth:`sympy.Basic.subs`:
+
+        * ``T.subs({M: 1, r: 2.5})`` — dict of replacements
+        * ``T.subs(M, 1)`` — single old/new pair
+        * ``T.subs([(M, 1), (r, 2.5)])`` — list of pairs
+
+        The returned tensor preserves the subclass identity (via
+        ``_rebuild_from_array``), so a :class:`LeviCivitaConnection`
+        stays a :class:`LeviCivitaConnection`. Use this for numeric
+        evaluation at a point (plotting / sanity checks)::
+
+            F, g = schwarzschild()
+            LC = levi_civita(g)
+            LC_at = LC.subs({M: 1, r: 2.5})    # numeric Christoffels
+        """
+        new_arr = sp.MutableDenseNDimArray(self._components)
+        for idx in self.all_indices():
+            entry = self._components[idx]
+            try:
+                new_arr[idx] = entry.subs(mapping, *args) if hasattr(entry, "subs") else entry
+            except (TypeError, AttributeError):
+                pass  # opaque entry — leave alone
+        return self._rebuild_from_array(new_arr)
+
     def _rebuild_from_array(
         self, new_arr: sp.MutableDenseNDimArray
     ) -> "ComponentTensor":
