@@ -1,6 +1,6 @@
 # Documentation
 
-`jacopy` ships with 24 tutorials, paired `.md` (for reading) and
+`jacopy` ships with 25 tutorials, paired `.md` (for reading) and
 `.ipynb` (for running). The tutorials are the primary documentation
 — there is no separate API reference (the tutorials cover every
 public class). Pick the path that matches what you came for.
@@ -56,12 +56,14 @@ For someone debugging a residue or extending the engine.
 | `LocalFrame`, frame decomposition | [22](tutorials/22_frame_decomposition.md) |
 | Writing your own bracket | [06](tutorials/06_custom_bracket.md), [07](tutorials/07_derived_bracket.md) |
 | Writing your own Problem wrapper | [24](tutorials/24_custom_problem_wrapper.md) |
-| Concrete metric calculations (Schwarzschild, Kerr, FRW…) | [25](tutorials/25_frame_calc.md) |
+| Concrete metric calculations (Schwarzschild, Kerr, FRW, RN, dS/AdS, Vaidya, Bianchi, Gödel) | [25](tutorials/25_frame_calc.md) |
+| Curvature invariants (Kretschmann, Ricci², Cotton) | [25](tutorials/25_frame_calc.md) |
+| Custom connections (torsion, Weyl, projective) | [25](tutorials/25_frame_calc.md) |
 
 ## The full tutorial list
 
 See [tutorials/README.md](tutorials/README.md) for one-line
-descriptions of all 24 tutorials and their dependency arrows.
+descriptions of all 25 tutorials and their dependency arrows.
 
 ## What's *not* here
 
@@ -78,7 +80,7 @@ The `.ipynb` files are regenerated from
 
 ```bash
 python3 docs/tutorials/_build_notebooks.py
-python3 -m pytest tests/test_docs/test_notebooks.py   # 24/24
+python3 -m pytest tests/test_docs/test_notebooks.py   # 25/25
 ```
 
 Notebook execution dependencies (one-time):

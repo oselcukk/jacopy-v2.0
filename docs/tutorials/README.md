@@ -1,6 +1,6 @@
 # Tutorials
 
-24 tutorials, paired `.md` (read) and `.ipynb` (run). All in
+25 tutorials, paired `.md` (read) and `.ipynb` (run). All in
 English. Each `.ipynb` is a smoke test in
 `tests/test_docs/test_notebooks.py` and re-generated from
 `_build_notebooks.py`.
@@ -8,7 +8,7 @@ English. Each `.ipynb` is a smoke test in
 For reading paths (practitioner / depth-first / topical), see
 [`docs/README.md`](../README.md).
 
-## The 24 tutorials
+## The 25 tutorials
 
 ### Foundations (01–09)
 
@@ -50,7 +50,7 @@ For reading paths (practitioner / depth-first / topical), see
 | 19 | [Courant family](19_courant_family.md) | Dorfman, Courant, H-twist, Dirac (`poisson_dirac`, `presymplectic_dirac`) |
 | 20 | [Connection, curvature, Bianchi](20_connection_curvature.md) | `AffineConnection`, `Torsion`, `Curvature`, `BianchiProblem` |
 
-### Internals (21–24)
+### Internals + applied (21–25)
 
 | # | Title | What you get |
 |---|---|---|
@@ -85,11 +85,17 @@ Lateral links across this graph appear inside individual
 tutorials when relevant — the cross-references aren't
 load-bearing for the main reading order.
 
+Tutorial **25** sits outside this graph: `jacopy.frame_calc` is an
+opt-in submodule (requires SymPy) for component-level differential
+geometry on concrete metrics. Familiarity with curvature concepts
+from tutorials 05 (Cartan calculus) or 20 (Bianchi) helps but is
+not required.
+
 ## Building / testing
 
 ```bash
 python3 docs/tutorials/_build_notebooks.py        # regenerate all .ipynb
-python3 -m pytest tests/test_docs/test_notebooks.py -q   # 24/24 in ~18s
+python3 -m pytest tests/test_docs/test_notebooks.py -q   # 25/25 in ~18s
 ```
 
 The `_build_notebooks.py` script is also where the markdown

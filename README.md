@@ -144,7 +144,7 @@ Full walkthrough in [Tutorial 25](docs/tutorials/25_frame_calc.md).
 
 ## 📖 Documentation
 
-`jacopy` ships with **24 paired tutorials** (`.md` for reading,
+`jacopy` ships with **25 paired tutorials** (`.md` for reading,
 `.ipynb` for running). All tutorials are smoke-tested in CI.
 
 - **[`docs/README.md`](docs/README.md)** — three reading paths
@@ -152,7 +152,7 @@ Full walkthrough in [Tutorial 25](docs/tutorials/25_frame_calc.md).
 - **[`docs/tutorials/`](docs/tutorials/)** — start at
   [`01_first_steps.md`](docs/tutorials/01_first_steps.md).
 - **[`docs/tutorials/README.md`](docs/tutorials/README.md)** —
-  full index of all 24 tutorials with one-line descriptions
+  full index of all 25 tutorials with one-line descriptions
   and dependency arrows.
 - **[`examples/`](examples/)** — the textbook problems the package
   was first calibrated against (Math 595 question sheets).
