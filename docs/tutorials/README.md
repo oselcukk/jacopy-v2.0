@@ -58,7 +58,7 @@ For reading paths (practitioner / depth-first / topical), see
 | 22 | [Local frames, frame decomposition](22_frame_decomposition.md) | `LocalFrame`, duality, opt-in decomposition rules |
 | 23 | [Cartan structure equations](23_cartan_structure_equations.md) | `CartanStructureProblem` I & II in 49 / 54 steps |
 | 24 | [Writing your own Problem wrapper](24_custom_problem_wrapper.md) | The five-step recipe via `AlmostSymplecticProblem` |
-| 25 | [Frame-component differential geometry](25_frame_calc.md) | `jacopy.frame_calc` — Christoffel / Ricci / Einstein on concrete metrics; Schwarzschild & Kerr fixtures |
+| 25 | [Frame-component differential geometry](25_frame_calc.md) | `jacopy.frame_calc` — Christoffel / Ricci / Einstein / Kretschmann on concrete metrics; 10 library fixtures (Schwarzschild, Kerr, RN, dS/AdS, Vaidya, Bianchi I/V/IX, Gödel, FRW, Minkowski); custom-connection helpers |
 
 ## Dependency arrows
 

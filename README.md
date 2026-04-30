@@ -3,7 +3,7 @@
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Status: Pre-Alpha](https://img.shields.io/badge/status-pre--alpha-orange)](https://pypi.org/classifiers/)
-[![Tests: 2792](https://img.shields.io/badge/tests-2792%20passing-brightgreen)](#testing)
+[![Tests: 3108](https://img.shields.io/badge/tests-3108%20passing-brightgreen)](#testing)
 
 > **Symbolic engine for graded algebra, brackets, and Cartan calculus —
 > with step-by-step proofs the engine generates and the user can read.**
@@ -124,8 +124,23 @@ G = einstein_tensor(levi_civita(g), g)
 assert G.is_vacuum()      # symbolic vacuum verification
 ```
 
-Library fixtures: `minkowski`, `schwarzschild`, `frw`, `kerr`. Full
-walkthrough in [Tutorial 25](docs/tutorials/25_frame_calc.md).
+**Library fixtures (10):** `minkowski`, `schwarzschild`,
+`reissner_nordstrom`, `kerr`, `frw`, `de_sitter`, `anti_de_sitter`,
+`vaidya`, `bianchi_I/V/IX`, `godel`.
+
+**Curvature invariants:** `kretschmann`, `ricci_squared`, `cotton` (3D).
+For Schwarzschild: `kretschmann(R, g)` returns `48 M² / r⁶` —
+diagnoses the horizon as a coordinate (not real) singularity.
+
+**Custom connections:** `connection_with_torsion` (Einstein-Cartan),
+`weyl_connection`, `projective_connection` — drop in any user-defined
+deformation and route the rest of the pipeline through it.
+
+**Helpers:** `analyze_metric(matrix, coords)` runs the full pipeline
+in one call; `to_latex_table(tensor)` renders Christoffel/Ricci as
+paper-grade LaTeX `align*`.
+
+Full walkthrough in [Tutorial 25](docs/tutorials/25_frame_calc.md).
 
 ## 📖 Documentation
 
@@ -149,13 +164,13 @@ walkthrough in [Tutorial 25](docs/tutorials/25_frame_calc.md).
 ## 🧪 Testing
 
 ```bash
-pytest                                          # full suite — 2792 tests
+pytest                                          # full suite — 3108 tests
 pytest tests/test_docs/test_notebooks.py -q     # 24 notebook smoke tests
 ```
 
 | Suite | Count | Time |
 |---|---|---|
-| Unit tests | 2792 | ~20 s |
+| Unit tests | 3108 | ~60 s |
 | Notebook smoke | 24 | ~18 s |
 
 The mathematical surface (bracket families, Cartan calculus,
