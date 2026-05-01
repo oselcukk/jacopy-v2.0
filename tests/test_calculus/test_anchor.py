@@ -100,7 +100,7 @@ class TestAnchoredVectorField:
         assert applied.arg is f
 
     def test_section_is_opaque_slot_not_child(self):
-        """Section lives in a slot, not in ``children`` — atom semantics."""
+        """Section lives in a slot, not in ``children``, atom semantics."""
         rho = Anchor("π^♯")
         omega = Symbol("ω")
         avf = AnchoredVectorField(rho, omega)

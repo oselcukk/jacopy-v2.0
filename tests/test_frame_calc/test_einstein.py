@@ -77,7 +77,7 @@ class TestEinsteinTypeChecks:
 
 class TestSchwarzschildVacuum:
     """Stage F integration test: Einstein tensor identically zero on
-    Schwarzschild — symbolic verification of the vacuum solution."""
+    Schwarzschild, symbolic verification of the vacuum solution."""
 
     def test_einstein_tensor_zero(self, schwarzschild) -> None:
         F, g = schwarzschild

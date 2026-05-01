@@ -118,7 +118,7 @@ class TestRuleMatches:
         Y = Derivation("Y", 0)
         Z = Derivation("Z", 0)
         rule = NonDegenerateInteriorEqualityDefinition(registry=reg)
-        # Sum(ι_Y ω, ι_Z ω) — same sign, doesn't match injectivity shape.
+        # Sum(ι_Y ω, ι_Z ω), same sign, doesn't match injectivity shape.
         expr = Sum(
             Act(interior(Y), omega),
             Act(interior(Z), omega),
@@ -194,7 +194,7 @@ class TestRuleRewrite:
         Y = Derivation("Y", 0)
         Z = Derivation("Z", 0)
         rule = NonDegenerateInteriorEqualityDefinition(registry=reg)
-        # Sum(Neg(ι_Z ω), ι_Y ω) — negated first; rewrite still maps to
+        # Sum(Neg(ι_Z ω), ι_Y ω), negated first; rewrite still maps to
         # Y − Z (the positive child names Y, the negated names Z).
         expr = Sum(
             Neg(Act(interior(Z), omega)),
@@ -216,7 +216,7 @@ class TestEngineIntegration:
         engine = ExpansionEngine(
             [NonDegenerateInteriorEqualityDefinition(registry=reg)]
         )
-        # Sum(ι_Y ω, Neg(ι_Y ω)) — even before the rule fires the Sum
+        # Sum(ι_Y ω, Neg(ι_Y ω)), even before the rule fires the Sum
         # may collapse via canonicalization, but the rule firing is
         # the proof step we want to observe.
         expr = Sum(
@@ -224,7 +224,7 @@ class TestEngineIntegration:
             Neg(Act(interior(Y), omega)),
         )
         out, _steps = engine.expand(expr)
-        # After rule fires: Sum(Y, Neg(Y)) — the canonical-form
+        # After rule fires: Sum(Y, Neg(Y)), the canonical-form
         # pipeline reduces this to 0 via simplify, but engine.expand
         # only fires definitions; check it's at least at the
         # peeled-off shape.

@@ -1,4 +1,4 @@
-"""Tests for CartanCalculus — relation access, verification, modes."""
+"""Tests for CartanCalculus, relation access, verification, modes."""
 
 import pytest
 
@@ -126,7 +126,7 @@ class TestRelationBuilder:
 
 
 # --------------------------------------------------------------------- #
-# verify() — the one reliably-closing relation on a function algebra     #
+# verify(), the one reliably-closing relation on a function algebra     #
 # --------------------------------------------------------------------- #
 
 
@@ -174,7 +174,7 @@ class TestVerifyCartanMagic:
 
 
 # --------------------------------------------------------------------- #
-# verify() — the other four relations on a function algebra              #
+# verify(), the other four relations on a function algebra              #
 # --------------------------------------------------------------------- #
 
 
@@ -234,17 +234,17 @@ class TestVerifyOtherRelations:
 
     def test_verify_threads_custom_d_into_default_engine(self, context):
         """A CartanCalculus built with a non-default ``d`` propagates
-        that ``d`` into the auto-constructed expansion engine — the
+        that ``d`` into the auto-constructed expansion engine, the
         ``d² = 0`` and ``ι_X(df) = X(f)`` rules are pinned to the
         bundle's own exterior derivative, not the TM default.
 
         Before this threading, a custom ``d_E`` calculus silently drove
-        the engine's default_d-bound rules, so ``d_E²`` never reduced —
+        the engine's default_d-bound rules, so ``d_E²`` never reduced,
         the residual surfaced as a :class:`ProofFailure` on
         ``d_squared_zero``. The ``L_X``-bearing relations
         (``cartan_magic``, ``d_lie``, etc.) also need the calculus'
         ``lie_derivative`` factory to plumb ``d_E`` / ``ι_E`` into
-        every ``L_{E,X}`` it produces — that's what the algebroid
+        every ``L_{E,X}`` it produces, that's what the algebroid
         ``LieAlgebroid`` wrapper does, and the full five-relation
         parity test lives on the algebroid side."""
         from jacopy.calculus.exterior_d import ExteriorDerivative
@@ -267,18 +267,18 @@ class TestVerifyOtherRelations:
 
 
 # --------------------------------------------------------------------- #
-# verify() — flow-mode L_X on all five relations                         #
+# verify(), flow-mode L_X on all five relations                         #
 # --------------------------------------------------------------------- #
 
 
 class TestVerifyFlowMode:
-    """Regression for flow-mode Cartan relations — Faz 11 erteleme 1.
+    """Regression for flow-mode Cartan relations, Faz 11 erteleme 1.
 
     ``LieDerivative(X, definition="flow")`` keeps ``L_X`` opaque rather
     than unfolding it via the Cartan magic formula. The two flow-mode
     rewrite rules ``L_X(f) = X(f)`` on 0-forms and ``L_X ∘ d = d ∘ L_X``
     let the same five Cartan relations close as rewrite cascades rather
-    than as definitional tautologies — the magic formula now holds as a
+    than as definitional tautologies, the magic formula now holds as a
     theorem in flow mode, not by construction.
     """
 

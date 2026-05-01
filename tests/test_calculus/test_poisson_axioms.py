@@ -1,4 +1,4 @@
-"""Tests for Faz 13.E — function-level Poisson axioms."""
+"""Tests for Faz 13.E, function-level Poisson axioms."""
 
 import pytest
 
@@ -17,7 +17,7 @@ from jacopy.proof.expansion import ExpansionEngine
 
 
 # --------------------------------------------------------------------- #
-# Axiom 2g-1 — PoissonAsHamiltonianDefinition                            #
+# Axiom 2g-1, PoissonAsHamiltonianDefinition                            #
 # --------------------------------------------------------------------- #
 
 
@@ -106,7 +106,7 @@ class TestPoissonAsHamiltonianEngine:
 
 
 # --------------------------------------------------------------------- #
-# Axiom 2g-2 — HamiltonianCyclicSnFormulaDefinition                      #
+# Axiom 2g-2, HamiltonianCyclicSnFormulaDefinition                      #
 # --------------------------------------------------------------------- #
 
 
@@ -197,7 +197,7 @@ class TestHamiltonianCyclicSnMatches:
         assert not rule.matches(s)
 
     def test_no_match_on_mixed_polarity(self):
-        # One Neg-wrapped + two positive — polarity mismatch.
+        # One Neg-wrapped + two positive, polarity mismatch.
         pi = Symbol("π")
         f, g, h = Symbol("f"), Symbol("g"), Symbol("h")
         rule = HamiltonianCyclicSnFormulaDefinition(pi)
@@ -224,7 +224,7 @@ class TestHamiltonianCyclicSnMatches:
         pi = Symbol("π")
         f, g, h = Symbol("f"), Symbol("g"), Symbol("h")
         rule = HamiltonianCyclicSnFormulaDefinition(pi)
-        # Bare-symbol inner — not Act(X_b, c).
+        # Bare-symbol inner, not Act(X_b, c).
         bad = Act(_ham(f, pi), Act(Symbol("Y"), h))
         s = Sum(
             bad,

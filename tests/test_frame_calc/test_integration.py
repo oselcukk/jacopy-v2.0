@@ -1,7 +1,7 @@
 """Cross-stage integration tests (Faz 18 Stage J).
 
 End-to-end paper-grade workflow tests that exercise multiple
-stages together — verifying the full pipeline (Frame → Metric →
+stages together, verifying the full pipeline (Frame → Metric →
 LeviCivita → Curvature → Ricci → Einstein → ProofChain → LaTeX)
 works in one go on each canonical fixture.
 """
@@ -31,7 +31,7 @@ from jacopy.proof.chain import ProofChain
 
 
 # --------------------------------------------------------------------- #
-# Schwarzschild — full paper-grade workflow                              #
+# Schwarzschild, full paper-grade workflow                              #
 # --------------------------------------------------------------------- #
 
 
@@ -110,7 +110,7 @@ class TestMinkowskiCoordinateSystems:
 
     def test_spherical_minkowski_vacuum(self) -> None:
         """Spherical Minkowski has 9 non-zero Christoffels (curvilinear
-        coordinates) but is still flat — Riemann ≡ 0 → G = 0."""
+        coordinates) but is still flat, Riemann ≡ 0 → G = 0."""
         t, r, theta, phi = sp.symbols("t r theta phi")
         F = CoordinateFrame([t, r, theta, phi])
         g = ComponentMetric(F, sp.Matrix([
@@ -122,7 +122,7 @@ class TestMinkowskiCoordinateSystems:
         LC = levi_civita(g)
         # Many non-zero Christoffels
         assert len(LC.nonzero_components()) >= 9
-        # But still flat — Riemann zero
+        # But still flat, Riemann zero
         R = curvature(LC)
         assert R.is_zero()
         # Vacuum
@@ -131,7 +131,7 @@ class TestMinkowskiCoordinateSystems:
 
 
 # --------------------------------------------------------------------- #
-# FRW cosmology — non-vacuum                                             #
+# FRW cosmology, non-vacuum                                             #
 # --------------------------------------------------------------------- #
 
 
@@ -156,7 +156,7 @@ class TestFRWCosmology:
 
 
 # --------------------------------------------------------------------- #
-# Kerr — vacuum via optimised mode                                      #
+# Kerr, vacuum via optimised mode                                      #
 # --------------------------------------------------------------------- #
 
 
@@ -191,7 +191,7 @@ class TestTetradPath:
         assert G.is_vacuum()
 
     def test_tetrad_christoffel_uses_gamma(self) -> None:
-        """A non-trivial vielbein produces non-zero γ — and the Koszul
+        """A non-trivial vielbein produces non-zero γ, and the Koszul
         formula's γ-correction terms fire."""
         x, y = sp.symbols("x y", positive=True)
         coord = CoordinateFrame([x, y])
@@ -246,7 +246,7 @@ class TestSignConventionConsistency:
     """The package's chosen sign convention is consistent across pipeline."""
 
     def test_schwarzschild_vacuum_is_convention_independent(self) -> None:
-        """Schwarzschild G ≡ 0 holds regardless of sign — Ric and ½ R g
+        """Schwarzschild G ≡ 0 holds regardless of sign, Ric and ½ R g
         both flip together."""
         F, g = schwarzschild()
         G = einstein_tensor(levi_civita(g), g)

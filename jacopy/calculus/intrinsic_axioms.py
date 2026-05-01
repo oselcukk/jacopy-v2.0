@@ -12,13 +12,13 @@ Engine rewrite rules that *open up* the textbook formulas
 so that whenever the user wraps an operator-valued head inside a
 :class:`MultiEval`, the engine can take a single rewrite step that
 expands the operator into its multilinear definition. Faz 12.A.1
-ships the simplest of the three — the interior product — so the
+ships the simplest of the three, the interior product, so the
 patterns stay easy to inspect; A.2 (Lie derivative) and A.3
 (exterior derivative / Koszul formula) layer on top.
 
 Each rule is structurally narrow: it fires only when the
 :class:`~jacopy.core.multi_eval.MultiEval` head matches the operator's
-shape. Slot-kind and alternating flags are preserved verbatim — the
+shape. Slot-kind and alternating flags are preserved verbatim, the
 intrinsic rewrite never converts a vector-slot evaluation into a
 covector one or vice versa.
 """
@@ -60,15 +60,15 @@ class InteriorProductIntrinsicDefinition(Definition):
     Restricted to vector-slot evaluations (``slot_kind="vector"``); the
     interior product is a form-on-vectors operation, so a covector-slot
     bivector evaluation is left untouched. The alternating flag carries
-    over — antisymmetry and slot-linearity are properties of the
+    over, antisymmetry and slot-linearity are properties of the
     underlying form, not of the contracted variant.
 
-    The operand ``ω`` is taken structurally as ``Act.arg`` — it can be
+    The operand ``ω`` is taken structurally as ``Act.arg``, it can be
     a plain :class:`~jacopy.core.expr.Symbol`, an
     :class:`Act` (e.g. ``d β``), a sum, or any expression. When ``ω``
     is itself a Sum, the auxiliary
     :class:`~jacopy.calculus.multi_eval_axioms.MultiEvalHeadLinearityDefinition`
-    will subsequently distribute the head — but only after the
+    will subsequently distribute the head, but only after the
     surrounding ``Act(ι_X, Sum)`` is itself unfolded by an upstream
     iota-linearity rule (not part of this pass).
     """
@@ -116,7 +116,7 @@ class LieDerivativeIntrinsicDefinition(Definition):
                  \omega\bigl(Y_1, \dots, [X, Y_i]_{VF}, \dots, Y_p\bigr).
 
     The first term wraps the inner :class:`MultiEval` in an
-    :class:`~jacopy.algebra.derivation.Act` along ``X`` — the action
+    :class:`~jacopy.algebra.derivation.Act` along ``X``, the action
     of a vector field on the scalar function ``ω(Y_1, …, Y_p)``. The
     bracket terms use the opaque
     :class:`~jacopy.algebra.lie_bracket_vf.LieBracketVF` atom so the
@@ -124,7 +124,7 @@ class LieDerivativeIntrinsicDefinition(Definition):
     framework and downstream rules (arg-linearity, repeat-arg-zero,
     head-linearity) can keep firing.
 
-    Restricted to vector-slot evaluations — the Lie derivative on a
+    Restricted to vector-slot evaluations, the Lie derivative on a
     p-form pairs against vector fields, so a covector-slot bivector
     evaluation is left untouched. The alternating flag carries over.
     """
@@ -174,7 +174,7 @@ class LieDerivativeIntrinsicDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# Exterior derivative — Koszul invariant formula                         #
+# Exterior derivative, Koszul invariant formula                         #
 # (dω)(X_0,…,X_p) = Σ_i (−1)^i X_i(ω(…,hat_i,…))                         #
 #                 + Σ_{i<j} (−1)^{i+j} ω([X_i,X_j]_VF, …,hat_i,…,hat_j,…)#
 # --------------------------------------------------------------------- #
@@ -204,7 +204,7 @@ class ExteriorDIntrinsicDefinition(Definition):
 
     Restricted to vector-slot evaluations. Both the arity-≥ 2 case (full
     Koszul expansion) and the arity-1 scalar identity ``(df)(X) = X(f)``
-    fire — the latter emits a single ``Act(X, f)`` with no inner
+    fire, the latter emits a single ``Act(X, f)`` with no inner
     :class:`MultiEval` wrap and no bracket sum, since there is exactly
     one argument and therefore no pairs to enumerate. Alternating +
     slot_kind flags are propagated to every emitted inner
@@ -315,7 +315,7 @@ class KoszulExteriorDIntrinsicDefinition(Definition):
         if connection.bracket is None:
             raise ValueError(
                 "KoszulExteriorDIntrinsicDefinition requires the connection "
-                "to carry a bracket — pass a koszul_connection(...) or "
+                "to carry a bracket, pass a koszul_connection(...) or "
                 "another bracket-equipped AffineConnection"
             )
         self._conn = connection

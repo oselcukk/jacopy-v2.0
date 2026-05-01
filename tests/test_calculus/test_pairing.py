@@ -48,7 +48,7 @@ class TestEquality:
         assert hash(a1) == hash(a2)
 
     def test_slot_order_matters(self):
-        """``⟨α, X⟩`` and ``⟨X, α⟩`` are distinct Exprs — the semantic
+        """``⟨α, X⟩`` and ``⟨X, α⟩`` are distinct Exprs, the semantic
         convention (first slot: 1-form) is the caller's responsibility."""
         alpha, X = Symbol("α"), Symbol("X")
         assert pairing(alpha, X) != pairing(X, alpha)
@@ -56,6 +56,6 @@ class TestEquality:
 
 class TestDegree:
     def test_pairing_is_scalar(self):
-        """The pairing lands in ℝ regardless of its inputs — degree 0."""
+        """The pairing lands in ℝ regardless of its inputs, degree 0."""
         p = pairing(Symbol("α"), Symbol("X"))
         assert degree_of(p) == Degree.const(0)

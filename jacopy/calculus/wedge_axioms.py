@@ -1,11 +1,11 @@
 r"""
-Engine rules for :class:`~jacopy.core.wedge.Wedge` — Faz 17.F.1.5.
+Engine rules for :class:`~jacopy.core.wedge.Wedge`, Faz 17.F.1.5.
 
 A :class:`Wedge` node is purely structural; the alternating-sum
 expansion that gives a wedge its meaning lives here as a
 :class:`~jacopy.proof.expansion.Definition`.
 
-* :class:`WedgeMultiEvalAlternatingDefinition` —
+* :class:`WedgeMultiEvalAlternatingDefinition`,
 
   .. math::
 
@@ -87,7 +87,7 @@ class WedgeMultiEvalAlternatingDefinition(Definition):
 
     * the head is a :class:`Wedge`;
     * every wedge factor has registry-determinable degree ``1``;
-    * the :class:`MultiEval` is alternating (``alternating=True``) —
+    * the :class:`MultiEval` is alternating (``alternating=True``),
       a non-alternating evaluation does not get the antisymmetric
       expansion, and pretending otherwise would be incorrect;
     * the arity equals the number of wedge factors.

@@ -1,4 +1,4 @@
-"""Tests for Faz 13.B — Pairing R-linearity and Pairing-Lie Leibniz."""
+"""Tests for Faz 13.B, Pairing R-linearity and Pairing-Lie Leibniz."""
 
 from jacopy.algebra.derivation import Act
 from jacopy.algorithms.simplify import simplify

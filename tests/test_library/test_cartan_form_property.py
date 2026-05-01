@@ -373,7 +373,7 @@ def test_steps_are_non_empty_for_non_trivial_proof():
 
 
 # --------------------------------------------------------------------- #
-# Q9 Stage 9.D — Koszul-connection mode                                  #
+# Q9 Stage 9.D, Koszul-connection mode                                  #
 # --------------------------------------------------------------------- #
 
 
@@ -385,7 +385,7 @@ class TestKoszulConnectionFormProperties:
     ``C^∞``-bilinearity + antisymmetry shape as their Lie-algebroid /
     smooth-manifold counterparts: the property proofs only push scalars
     and Sums through the connection slots and pull them out of the
-    pairing — they don't open the bracket. Confirming the existing
+    pairing, they don't open the bracket. Confirming the existing
     :class:`CartanFormPropertyProblem` engine bundle closes all 12
     pure-V / V-additive / antisym claims unchanged when the connection
     carries a Koszul bracket. This is the "Q9 Stage 9.D" certification

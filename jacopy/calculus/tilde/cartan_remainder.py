@@ -34,7 +34,7 @@ from jacopy.core.expr import Expr
 
 
 class TildeCartanRemainder(Derivation):
-    """``K̃_η`` — degree-0 tilde Cartan-remainder operator on multivectors.
+    """``K̃_η``, degree-0 tilde Cartan-remainder operator on multivectors.
 
     Carries the indexing 1-form ``η`` and Poisson bivector ``π`` on
     :attr:`form` and :attr:`bivector`. The defining identity

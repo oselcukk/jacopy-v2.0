@@ -1,5 +1,5 @@
 r"""
-Anti–de Sitter metric — maximally symmetric spacetime with negative
+Anti–de Sitter metric, maximally symmetric spacetime with negative
 cosmological constant.
 
 In static coordinates ``(t, r, θ, φ)``:
@@ -12,7 +12,7 @@ In static coordinates ``(t, r, θ, φ)``:
 
 Solution of vacuum Einstein equations with negative cosmological
 constant: ``R_{ab} = -|\Lambda| g_{ab}``. Famous for AdS/CFT
-correspondence — boundary CFT lives at conformal infinity.
+correspondence, boundary CFT lives at conformal infinity.
 """
 
 from __future__ import annotations
@@ -34,7 +34,7 @@ def anti_de_sitter(
     ----------
     Lambda_sym
         Cosmological constant magnitude. If ``None``, a fresh
-        ``Symbol("Lambda", positive=True)`` is created — the metric
+        ``Symbol("Lambda", positive=True)`` is created, the metric
         applies the negative sign internally.
 
     Returns
@@ -44,7 +44,7 @@ def anti_de_sitter(
 
     Notes
     -----
-    No horizon — ``f(r) > 0`` everywhere. The conformal boundary at
+    No horizon, ``f(r) > 0`` everywhere. The conformal boundary at
     ``r → ∞`` is where the dual CFT lives in AdS/CFT.
     """
     if Lambda_sym is None:

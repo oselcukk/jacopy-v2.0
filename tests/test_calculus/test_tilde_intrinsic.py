@@ -68,7 +68,7 @@ class TestTildeIotaIntrinsic:
         _, _, omega, eta, V, _, _ = _setup()
         rule = TildeIotaIntrinsicDefinition()
         head = Act(TildeInteriorProduct(omega), V)
-        # Wrong slot kind — standard-side recognisers would handle this.
+        # Wrong slot kind, standard-side recognisers would handle this.
         expr = multi_eval(head, eta, slot_kind="vector")
         assert not rule.matches(expr)
 
@@ -162,7 +162,7 @@ class TestTildeDIntrinsic:
         assert not rule.matches(expr)
 
     def test_arity_one_collapses_to_anchor_action(self):
-        # (d̃ f)(η_0) = π^♯(η_0)·f — single term, no inner MultiEval, no bracket sum.
+        # (d̃ f)(η_0) = π^♯(η_0)·f, single term, no inner MultiEval, no bracket sum.
         _, pi, _, eta, _, sharp, koszul = _setup()
         f = Symbol("f")
         rule = TildeDIntrinsicDefinition(pi, koszul, sharp=sharp)
@@ -245,7 +245,7 @@ class TestTildeIntrinsicEngineFactory:
 
     def test_engine_expands_iota_one_form(self):
         # ι̃_ω V evaluated on η: should rewrite to V(ω, η). The alternating
-        # canonicaliser may reorder the slots — compare structurally
+        # canonicaliser may reorder the slots, compare structurally
         # against the alternating-MultiEval normal form by re-running the
         # alternating rule on the expected RHS.
         _, pi, omega, eta, V, _, koszul = _setup()
@@ -359,7 +359,7 @@ class TestTildeRecognizer:
 
 class TestProveTildeCartanRelation:
     def test_reflexive_returns_proof_chain(self):
-        # Driver should accept reflexive equalities — single-step chain.
+        # Driver should accept reflexive equalities, single-step chain.
         _, pi, omega, eta, V, _, koszul = _setup()
         eng = tilde_intrinsic_engine(pi, koszul)
         head = Act(TildeInteriorProduct(omega), V)
@@ -461,7 +461,7 @@ class TestKoszulProblemTildeAccessors:
 
 
 # --------------------------------------------------------------------- #
-# Faz 14.G — WrappedPairingAnchorAntisymmetryDefinition                  #
+# Faz 14.G, WrappedPairingAnchorAntisymmetryDefinition                  #
 # --------------------------------------------------------------------- #
 
 
@@ -518,7 +518,7 @@ class TestWrappedPairingAnchorAntisymmetry:
         from jacopy.core.expr import Sum
 
         rule, sharp, _, a, b, Pairing = self._setup()
-        # ⟨π^♯a, b⟩ − ⟨π^♯b, a⟩ — opposite signs, doesn't cancel.
+        # ⟨π^♯a, b⟩ − ⟨π^♯b, a⟩, opposite signs, doesn't cancel.
         s = Sum.make(
             Pairing(Act(sharp, a), b),
             Neg(Pairing(Act(sharp, b), a)),
@@ -547,7 +547,7 @@ class TestWrappedPairingAnchorAntisymmetry:
 
 
 # --------------------------------------------------------------------- #
-# Faz 14.G — TildeSnJacobiResidueDefinition                              #
+# Faz 14.G, TildeSnJacobiResidueDefinition                              #
 # --------------------------------------------------------------------- #
 
 
@@ -635,7 +635,7 @@ class TestTildeSnJacobiResidue:
         assert not rule.matches(partial)
 
     def _build_flipped_residue(self, sharp, pi, a, b, c, Pairing, HVF, lie_der):
-        """Same SN-Jacobi 5-term identity, every sign flipped — the form
+        """Same SN-Jacobi 5-term identity, every sign flipped, the form
         Faz 14.G+H residues take when wrapped under ``MultiEval(V, d(·),
         γ)`` (T2/T3 derived identities)."""
         from jacopy.core.expr import Sum

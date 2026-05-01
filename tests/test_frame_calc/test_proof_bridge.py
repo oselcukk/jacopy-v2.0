@@ -132,7 +132,7 @@ class TestStepsToProofChain:
 
 
 # --------------------------------------------------------------------- #
-# LaTeX rendering — ProofChain → LaTeX with SymPyAtom                   #
+# LaTeX rendering, ProofChain → LaTeX with SymPyAtom                   #
 # --------------------------------------------------------------------- #
 
 

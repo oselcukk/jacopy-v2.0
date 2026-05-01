@@ -9,7 +9,7 @@ the wrapper derives the musical operators
 with the :class:`~jacopy.calculus.musical.MusicalCompatibility` axiom
 that declares the two maps mutually inverse.
 
-The wrapper is thin — it bundles data that already exist in
+The wrapper is thin, it bundles data that already exist in
 :mod:`jacopy.calculus.musical` and :mod:`jacopy.calculus.hamiltonian_vf`
 so application code can name a symplectic manifold once and obtain the
 Hamiltonian vector field, the symplectic obstruction, and the musical
@@ -33,7 +33,7 @@ from jacopy.proof.chain import ProofChain
 
 
 class SymplecticManifold:
-    """``(M, ω)`` — a symplectic manifold, optionally carrying ``π = ω^{-1}``.
+    """``(M, ω)``, a symplectic manifold, optionally carrying ``π = ω^{-1}``.
 
     Parameters
     ----------
@@ -49,8 +49,8 @@ class SymplecticManifold:
 
     Notes
     -----
-    * Without ``bivector``, :attr:`flat` is still built — the flat map
-      ``ω^♭`` is intrinsic to ``ω`` alone — but :attr:`sharp` and
+    * Without ``bivector``, :attr:`flat` is still built, the flat map
+      ``ω^♭`` is intrinsic to ``ω`` alone, but :attr:`sharp` and
       :attr:`compatibility` are ``None``.
     * The wrapper does *not* verify ``dω = 0`` or non-degeneracy; those
       belong to a higher-level verification pass, not to the data
@@ -120,12 +120,12 @@ class SymplecticManifold:
         """Return ``X_f`` on this manifold.
 
         The returned :class:`HamiltonianVectorField` carries whichever
-        of ``(bivector, symplectic_form)`` are attached to the manifold —
+        of ``(bivector, symplectic_form)`` are attached to the manifold,
         both if ``π`` was supplied, ``ω`` alone otherwise. The caller
         then has access to the matching subset of ``X_f`` methods.
 
         The ``sign`` kwarg selects the convention for
-        ``ι_{X_f} ω = sign·df`` — defaults to ``'-'`` (geometer's
+        ``ι_{X_f} ω = sign·df``, defaults to ``'-'`` (geometer's
         convention); pass ``sign='+'`` for textbook problems.
         """
         if not isinstance(f, Expr):
@@ -143,7 +143,7 @@ class SymplecticManifold:
         Drives the
         :class:`~jacopy.calculus.musical.MusicalCompatibilityBilinearDefinition`
         rule (Faz 12.B #8) on the LHS and witnesses its rewrite to the
-        bivector-evaluation form. The chain is a single step — useful
+        bivector-evaluation form. The chain is a single step, useful
         when downstream proofs need the equality cited rather than
         rederived. Requires the manifold to have been constructed with
         a compatible bivector.

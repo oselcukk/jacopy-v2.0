@@ -4,22 +4,22 @@ Public surface over the tilde intrinsic-formula axioms (Faz 14.E).
 Three pieces, mirroring :mod:`jacopy.calculus.intrinsic_engine`
 (Faz 12.A.5) on the Koszul side:
 
-* :func:`tilde_intrinsic_engine` — bundles the three tilde intrinsic
+* :func:`tilde_intrinsic_engine`, bundles the three tilde intrinsic
   rules (Faz 14.E.1) with the standard MultiEval helpers (Faz 12.A.0),
   Sharp axioms (Faz 13.A), and the Koszul-bracket expansion rule into a
   single :class:`~jacopy.proof.expansion.ExpansionEngine`. Callers who
   want the same plumbing the tilde Cartan-relation proofs use reach for
   this instead of assembling rule lists by hand.
 
-* :class:`TildeIntrinsicFormulaRecognizer` — pure-shape inspector
+* :class:`TildeIntrinsicFormulaRecognizer`, pure-shape inspector
   mirroring :class:`~jacopy.calculus.intrinsic_engine.IntrinsicFormulaRecognizer`.
   Given a covector-slot :class:`~jacopy.core.multi_eval.MultiEval`, it
   answers "is the head a tilde-:math:`\iota`, tilde-:math:`L`, or
   tilde-:math:`d` applied to a multivector, and if so what's inside?".
-  No engine, no rewrite — just structured field extraction for
+  No engine, no rewrite, just structured field extraction for
   higher-level tactics.
 
-* :func:`prove_tilde_cartan_relation` — wraps the
+* :func:`prove_tilde_cartan_relation`, wraps the
   ``MultiEval(lhs, *etas) == MultiEval(rhs, *etas)`` cycle into a
   single call. Forms both sides under the covector-slot evaluation,
   feeds the resulting equality to the tilde intrinsic engine, and
@@ -32,7 +32,7 @@ bundle are the iota anti-commute (relation 1), the Cartan magic
 :class:`~jacopy.core.properties.Poisson` flag plumbed through and may
 require additional closure rules; ``[L̃_α, L̃_β] = L̃_{[α,β]_K}`` (4)
 and ``[L̃_α, ι̃_β] = ι̃_{[α,β]_K}`` (5) need the Koszul bracket
-unfolded — both are scheduled for follow-up passes that extend the
+unfolded, both are scheduled for follow-up passes that extend the
 engine returned here.
 """
 
@@ -227,15 +227,15 @@ class TildeIntrinsicFormulaMatch:
     """Successful :class:`TildeIntrinsicFormulaRecognizer` result.
 
     Fields:
-      * ``operator`` — ``"tilde_interior"``, ``"tilde_lie"``, or
+      * ``operator``, ``"tilde_interior"``, ``"tilde_lie"``, or
         ``"tilde_exterior_d"``.
-      * ``form`` — the ``ω`` in :math:`\\tilde{\\iota}_\\omega` /
+      * ``form``, the ``ω`` in :math:`\\tilde{\\iota}_\\omega` /
         :math:`\\tilde{L}_\\omega`; ``None`` for :math:`\\tilde{d}`.
-      * ``bivector`` — the ``π`` carried by the operator (all three
+      * ``bivector``, the ``π`` carried by the operator (all three
         tilde operators carry one); preserved verbatim from the head.
-      * ``multivector`` — the ``V`` (``head.arg``).
-      * ``args`` — the multi-eval evaluation slots (1-forms).
-      * ``alternating`` / ``slot_kind`` — flags carried verbatim from
+      * ``multivector``, the ``V`` (``head.arg``).
+      * ``args``, the multi-eval evaluation slots (1-forms).
+      * ``alternating`` / ``slot_kind``, flags carried verbatim from
         the matched :class:`MultiEval`.
     """
 
@@ -251,14 +251,14 @@ class TildeIntrinsicFormulaMatch:
 class TildeIntrinsicFormulaRecognizer:
     r"""Recognise ``MultiEval(Act(op, V), η_1, …, η_p)`` for tilde ``op``.
 
-    Pure shape inspection — answers "is this a covector-slot evaluation
+    Pure shape inspection, answers "is this a covector-slot evaluation
     whose head is a tilde-operator applied to a multivector?". No
     engine, no rewrite. Mirrors
     :class:`~jacopy.calculus.intrinsic_engine.IntrinsicFormulaRecognizer`
     on the standard side.
 
     Reports ``None`` on any non-match, including non-covector slot
-    kinds — a vector-slot evaluation belongs to the standard-side
+    kinds, a vector-slot evaluation belongs to the standard-side
     recogniser. Nested operators are not unwrapped: the inner
     ``Act`` is reported verbatim as ``multivector``, so a caller can
     re-recognise on it after the outer rule has fired.
@@ -356,7 +356,7 @@ def prove_tilde_cartan_relation(
     lhs, rhs
         Operator-valued :class:`Expr` whose equality is to be shown.
         Both sides typically read like ``Act(<tilde-op>, V)`` or a
-        :class:`Sum` / :class:`Neg` thereof — the bare
+        :class:`Sum` / :class:`Neg` thereof, the bare
         operator-on-multivector shape, not yet evaluated.
     etas
         Tuple of 1-forms ``(η_1, …, η_p)`` against which both sides
@@ -374,7 +374,7 @@ def prove_tilde_cartan_relation(
         :func:`prove_intrinsic_equivalence`'s simplify pipeline.
     alternating
         Whether the :class:`MultiEval` wrap is graded-antisymmetric in
-        its argument slots. Defaults to ``True`` — the convention for
+        its argument slots. Defaults to ``True``, the convention for
         evaluating multivector-valued expressions.
 
     Notes

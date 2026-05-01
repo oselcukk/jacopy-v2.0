@@ -7,7 +7,7 @@ compose as :class:`Product` children (operator composition), appear
 inside :class:`Commutator` nodes, and apply to an operand via
 :class:`Act`.
 
-:class:`Act` is the *uninterpreted* application node ``D(x)`` — keeping
+:class:`Act` is the *uninterpreted* application node ``D(x)``, keeping
 it inert lets the algorithms layer decide when to expand. The
 graded-Leibniz expansion lives in :mod:`jacopy.algorithms.product_rule`.
 
@@ -79,7 +79,7 @@ class Derivation(Atom):
 class Act(Expr):
     """Application of an operator to an argument: ``op(arg)``.
 
-    This is inert — it does not apply Leibniz at construction. The
+    This is inert, it does not apply Leibniz at construction. The
     :mod:`jacopy.algorithms.product_rule` pass is the one that rewrites
     ``Act(D, Product(...))`` into the expanded Leibniz sum.
     """
@@ -125,21 +125,21 @@ def degree_of(
 
     Resolution order:
 
-    * :class:`Derivation` — its own ``degree``.
-    * Numeric literal (:class:`Integer`, :class:`Rational`) — degree 0.
-    * :class:`Product` — sum of child degrees. This covers two uses:
+    * :class:`Derivation`, its own ``degree``.
+    * Numeric literal (:class:`Integer`, :class:`Rational`), degree 0.
+    * :class:`Product`, sum of child degrees. This covers two uses:
       a graded tensor product ``|a*b| = |a|+|b|`` and operator
       composition ``|D1∘D2| = |D1|+|D2|`` (the two are represented by
       the same ``Product`` node).
-    * :class:`Neg` — same as its argument; negation is a scalar sign.
-    * :class:`Act` — ``|D(x)| = |D| + |x|``.
-    * :class:`jacopy.brackets.base.BracketApply` —
+    * :class:`Neg`, same as its argument; negation is a scalar sign.
+    * :class:`Act`, ``|D(x)| = |D| + |x|``.
+    * :class:`jacopy.brackets.base.BracketApply`,
       ``|[a, b]| = |a| + |b| + bracket.degree``. Resolved via a late
       import so the algebra layer does not depend on the brackets
       layer at import time.
-    * Registry :class:`Scalar` — degree 0.
-    * Registry :class:`Graded` — its own degree.
-    * Otherwise — :class:`ValueError`.
+    * Registry :class:`Scalar`, degree 0.
+    * Registry :class:`Graded`, its own degree.
+    * Otherwise, :class:`ValueError`.
 
     :class:`Sum` is intentionally *not* walked: a Sum has a degree only
     when every term's degree agrees, and that policy is cleaner kept in
@@ -211,7 +211,7 @@ def compose(*ops: Expr) -> Expr:
     """Compose operators left-to-right: ``compose(D1, D2)(x) = D1(D2(x))``.
 
     Returns a :class:`Product` node whose children are the operators in
-    the order given — composition and element-wise product share the
+    the order given, composition and element-wise product share the
     same non-commutative :class:`Product` representation. Single-operator
     compositions collapse to the operator itself; a zero-argument call
     is rejected because the identity operator has no canonical

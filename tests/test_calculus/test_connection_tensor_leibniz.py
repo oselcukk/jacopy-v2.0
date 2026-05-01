@@ -1,4 +1,4 @@
-"""Tests for ∇-on-tensor Leibniz rules — Faz 16.C."""
+"""Tests for ∇-on-tensor Leibniz rules, Faz 16.C."""
 
 from __future__ import annotations
 
@@ -297,7 +297,7 @@ def test_engine_expands_curvature_cov_deriv():
 
 def test_engine_expands_torsion_cov_deriv_then_torsion_definitions():
     """Composing tensor-Leibniz with the Torsion-definition rule keeps
-    walking — the inner ``T(V,W)``, ``T(∇_U V, W)``, ``T(V, ∇_U W)`` all
+    walking, the inner ``T(V,W)``, ``T(∇_U V, W)``, ``T(V, ∇_U W)`` all
     further unfold into ∇-commutator + LBVF terms."""
     from jacopy.proof.expansion import ExpansionEngine
     from jacopy.calculus.torsion_curvature import (

@@ -1,4 +1,4 @@
-# 02 — The Jacobi identity
+# 02, The Jacobi identity
 
 This tutorial shows how the Jacobi identity for a Lie bracket
 closes as a `ProofChain` in `jacopy`. Familiarity with the
@@ -8,8 +8,8 @@ closes as a `ProofChain` in `jacopy`. Familiarity with the
 
 `jacopy.brackets.lie` exposes two things:
 
-- `LieBracket` — a `GradedBracket` subclass with an optional name.
-- `lie` — the process-wide singleton for the standard ("TM") Lie
+- `LieBracket`, a `GradedBracket` subclass with an optional name.
+- `lie`, the process-wide singleton for the standard ("TM") Lie
   bracket.
 
 Tutorials use the singleton throughout. On a specific manifold or
@@ -23,7 +23,7 @@ from jacopy.brackets.lie import lie
 ## Three vector fields
 
 Jacobi needs three symbols. The `VectorFields` helper declares
-each as `Graded(degree=0)` — the `PropertyRegistry` derives the
+each as `Graded(degree=0)`, the `PropertyRegistry` derives the
 sign rules in the Jacobi expansion from that degree.
 
 ```python
@@ -35,7 +35,7 @@ X, Y, Z = VectorFields("X Y Z", registry=reg)
 ```
 
 For the primitive path, see the *Declaring properties* section of
-[01_first_steps.md](01_first_steps.md) — the helper is just a
+[01_first_steps.md](01_first_steps.md), the helper is just a
 wrapper around `Symbol(...) + reg.declare(sym, Graded(degree=0))`.
 
 ## `prove_jacobi`
@@ -55,7 +55,7 @@ returns a `ProofChain`:
 from jacopy.proof import prove_jacobi
 
 chain = prove_jacobi(lie, X, Y, Z, registry=reg)
-assert chain.steps[-1].after  # final state — should be 0
+assert chain.steps[-1].after  # final state, should be 0
 ```
 
 The chain length depends on the bracket's internal rewrite rules.
@@ -85,7 +85,7 @@ Not every bracket satisfies Jacobi unconditionally. The
 `CourantBracket`, for example, sets
 `satisfies_graded_jacobi=None`: with an H-twist the obstruction
 equals `dH`, without it the obstruction is `0`. `prove_jacobi`
-does **not** carry that signal — instead, reach for
+does **not** carry that signal, instead, reach for
 `bracket.jacobi_condition()` to obtain a `VanishingCondition`. A
 `ProofChain` is then built through library-level helpers such as
 `CourantAlgebroid.prove_jacobi_reduction`.

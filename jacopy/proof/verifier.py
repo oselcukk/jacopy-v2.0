@@ -10,7 +10,7 @@ pair of expressions, and return a :class:`ProofChain`. Faz 7 C adds
 a :class:`Property`'s provenance and surfaces the axioms it rests on).
 
 The verifier module is the intended entry point for application
-code — strategies and engines are plumbing that callers rarely name
+code, strategies and engines are plumbing that callers rarely name
 directly.
 """
 
@@ -48,7 +48,7 @@ def show_equal(
     Default strategy is :class:`ExpandAndSimplify` with the standard
     expansion engine. Raises
     :class:`jacopy.proof.strategies.ProofFailure` if the chosen
-    strategy cannot close the gap — the exception message carries the
+    strategy cannot close the gap, the exception message carries the
     surviving residual.
     """
     strat = strategy if strategy is not None else ExpandAndSimplify()
@@ -70,7 +70,7 @@ def prove_jacobi(
     Dispatches on the bracket type:
 
     * a :class:`DerivedBracket` is handled by
-      :class:`DerivedBracketStrategy` — one theorem step replaces the
+      :class:`DerivedBracketStrategy`, one theorem step replaces the
       triple Jacobi sum with the universal obstruction ``[Q, Q]_base``,
       which is then simplified to zero.
     * any other :class:`GradedBracket` falls back to
@@ -92,7 +92,7 @@ def prove_jacobi(
     # children alone (the bracket reference isn't one of them), so any
     # residual bracket node downstream breaks the ExpandAndSimplify
     # pipeline. Unfold every bracket node to its definitional form here
-    # — the pipeline then only sees ordinary :class:`Sum` / :class:`Neg`
+    #, the pipeline then only sees ordinary :class:`Sum` / :class:`Neg`
     # / :class:`Product` / atom shapes. Once Faz 7 adds a bracket-aware
     # definition to :class:`ExpansionEngine`, this pre-pass can move
     # into the engine and drop from the verifier layer.
@@ -128,16 +128,16 @@ def prove_equivalence(
     vanishing conditions, or raw expressions:
 
     * ``GradedBracket, GradedBracket`` with two trailing :class:`Expr`
-      operands ``a, b`` — expands each bracket on ``(a, b)`` and proves
+      operands ``a, b``, expands each bracket on ``(a, b)`` and proves
       the two expansions equal. This is the classical-vs-derived
       bracket equivalence the package uses for Koszul, Poisson, and
       Courant identifications.
-    * ``VanishingCondition, VanishingCondition`` — proves the two
+    * ``VanishingCondition, VanishingCondition``, proves the two
       obstructions are equal as expressions. Two conditions with equal
       obstructions describe the same constraint even when their display
       names differ; callers typically use this to relate e.g.
       ``[Θ + H, Θ + H]_SN = 0`` to ``dH = 0``.
-    * ``Expr, Expr`` — straight aliasing of :func:`show_equal`, provided
+    * ``Expr, Expr``, straight aliasing of :func:`show_equal`, provided
       so a caller can write ``prove_equivalence`` without switching
       verbs mid-file.
 
@@ -235,7 +235,7 @@ def prove_operator_equation(
     A thin wrapper around :class:`AgreementOnGenerators`: two graded
     derivations that agree on a generating set extend uniquely to
     equal operators. ``algebra`` must expose a ``generators``
-    property — :class:`~jacopy.calculus.exterior_algebra.ExteriorAlgebra`
+    property, :class:`~jacopy.calculus.exterior_algebra.ExteriorAlgebra`
     is the canonical example. ``sub_strategy`` is forwarded to
     :class:`AgreementOnGenerators` and controls the per-generator
     element-level proof (defaults to :class:`ExpandAndSimplify`).
@@ -251,16 +251,16 @@ def unroll_property(prop: Property) -> ProofChain:
 
     Behaviour:
 
-    * :attr:`Provenance.AXIOM` — returns a one-step chain whose single
+    * :attr:`Provenance.AXIOM`, returns a one-step chain whose single
       :class:`ProofStep` is tagged ``"axiom"`` with a justification
       recording that the property is declared, not derived.
-    * :attr:`Provenance.DERIVED` — returns a one-step chain tagged
+    * :attr:`Provenance.DERIVED`, returns a one-step chain tagged
       ``"theorem"`` whose justification names the
       :class:`~jacopy.core.properties.ProofRef` rule and lists the
       sources the property depends on.
 
     The chain is intentionally shallow. A :class:`ProofRef` today only
-    carries a rule name and a tuple of source specifiers — there is
+    carries a rule name and a tuple of source specifiers, there is
     no rehydratable proof tree to expand. Once the Theorem Book (Faz
     9) lets a :class:`ProofRef` resolve to a concrete proof builder,
     this helper will delegate to it and return the full unrolled
@@ -271,7 +271,7 @@ def unroll_property(prop: Property) -> ProofChain:
 
     # Build a marker Expr pair purely for the transcript's sake. The
     # ``before``/``after`` positions on a property-level step are a
-    # bit artificial — the step isn't a rewrite — so we reuse the
+    # bit artificial, the step isn't a rewrite, so we reuse the
     # property's repr on both sides to make the chain displayable.
     marker = _PropertyMarker(prop)
 

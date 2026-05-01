@@ -1,43 +1,43 @@
 r"""
-Engine rules for :class:`~jacopy.core.indexed_sum.IndexedSum` — Faz 17.E.3-E.6.
+Engine rules for :class:`~jacopy.core.indexed_sum.IndexedSum`, Faz 17.E.3-E.6.
 
 The companion module to :mod:`jacopy.core.indexed_sum`. The Expr node
 itself is purely structural; every meaningful manipulation lives here
 as an :class:`~jacopy.proof.expansion.Definition`:
 
 Sum / sign distribution (17.E.3)
-    * :class:`IndexedSumSumDistributeDefinition` —
+    * :class:`IndexedSumSumDistributeDefinition`,
       :math:`\Sigma_d (X + Y) \to \Sigma_d X + \Sigma_d Y`.
-    * :class:`IndexedSumNegPullDefinition` —
+    * :class:`IndexedSumNegPullDefinition`,
       :math:`\Sigma_d (-X) \to -\Sigma_d X`.
-    * :class:`IndexedSumScalarPullDefinition` — pull every dummy-free
+    * :class:`IndexedSumScalarPullDefinition`, pull every dummy-free
       factor out of a Product body.
 
 Pairing pull-in (17.E.5)
-    * :class:`IndexedSumPairingPushInRightDefinition` —
+    * :class:`IndexedSumPairingPushInRightDefinition`,
       :math:`\langle \alpha,\, \Sigma_d \mathrm{body}(d) \rangle \to
       \Sigma_d\langle \alpha, \mathrm{body}(d) \rangle` when ``α`` is
       dummy-free.
-    * :class:`IndexedSumPairingPushInLeftDefinition` — symmetric
+    * :class:`IndexedSumPairingPushInLeftDefinition`, symmetric
       left-slot variant for completeness; rarely used in practice.
 
 Connection-eval push-in (17.F.1)
-    * :class:`ConnectionEvalIndexedSumPushInDefinition` —
+    * :class:`ConnectionEvalIndexedSumPushInDefinition`,
       :math:`\nabla_X (\Sigma_d \mathrm{body}(d)) \to
       \Sigma_d \nabla_X \mathrm{body}(d)` when ``X`` is dummy-free.
       Required by Cartan I/II reductions to expose Y-Leibniz inside
       the binder.
 
 MultiEval push-in (17.F.2)
-    * :class:`MultiEvalIndexedSumPushInDefinition` —
+    * :class:`MultiEvalIndexedSumPushInDefinition`,
       :math:`\mathrm{MultiEval}(\Sigma_d \mathrm{body}(d), X_1, \ldots, X_p)
       \to \Sigma_d \mathrm{MultiEval}(\mathrm{body}(d), X_1, \ldots, X_p)`
       when every argument is dummy-free. Lifts the IndexedSum out of a
       MultiEval head so the wedge alternating expansion can fire on
-      the body — needed by ``Σ_b (ω^a_b ∧ e^b)(U, V)`` reductions.
+      the body, needed by ``Σ_b (ω^a_b ∧ e^b)(U, V)`` reductions.
 
 Kronecker contraction (17.E.6)
-    * :class:`IndexedSumKroneckerContractDefinition` —
+    * :class:`IndexedSumKroneckerContractDefinition`,
       :math:`\Sigma_d \delta(a, d)\cdot \mathrm{rest}(d) \to \mathrm{rest}(a)`
       when ``a`` is a free index. The proof-engine omurgası: every
       Cartan reduction terminates here.
@@ -48,7 +48,7 @@ wedge products structurally via :class:`~jacopy.core.expr.Product`. A
 dedicated wedge rule would be added later if a use case ever exposes
 a wedge node with semantics distinct from non-commutative product.
 
-Frame-decomposition axioms (17.E.7) are *not* in this module — they
+Frame-decomposition axioms (17.E.7) are *not* in this module, they
 pull a vector field or a covariant derivative into an :class:`IndexedSum`
 shape, which is one-directional and shouldn't be auto-fired by the
 engine. They live in :mod:`jacopy.calculus.frame_decomposition`.
@@ -68,7 +68,7 @@ from jacopy.proof.expansion import Definition
 
 
 # --------------------------------------------------------------------- #
-# 17.E.3 — Sum / Neg distribute over IndexedSum                          #
+# 17.E.3, Sum / Neg distribute over IndexedSum                          #
 # --------------------------------------------------------------------- #
 
 
@@ -151,7 +151,7 @@ class IndexedSumScalarPullDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# 17.E.5 — Pairing push-in                                               #
+# 17.E.5, Pairing push-in                                               #
 # --------------------------------------------------------------------- #
 
 
@@ -198,7 +198,7 @@ class IndexedSumPairingPushInLeftDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# 17.F.1 — Connection-eval push-in over IndexedSum                       #
+# 17.F.1, Connection-eval push-in over IndexedSum                       #
 # --------------------------------------------------------------------- #
 
 
@@ -251,7 +251,7 @@ class ConnectionEvalIndexedSumPushInDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# 17.F.2 — MultiEval push-in over IndexedSum                             #
+# 17.F.2, MultiEval push-in over IndexedSum                             #
 # --------------------------------------------------------------------- #
 
 
@@ -299,7 +299,7 @@ class MultiEvalIndexedSumPushInDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# 17.E.6 — Kronecker contraction                                         #
+# 17.E.6, Kronecker contraction                                         #
 # --------------------------------------------------------------------- #
 
 
@@ -310,7 +310,7 @@ def _find_contracting_partner(
     or ``δ(dummy, a)`` appears in ``body``, or :data:`None` if no such
     Kronecker delta is present.
 
-    Respects :class:`IndexedSum` shadowing — when the walk meets an
+    Respects :class:`IndexedSum` shadowing, when the walk meets an
     inner binder whose dummy matches ``dummy`` (by name + kind), the
     walk stops there.
     """
@@ -346,7 +346,7 @@ class IndexedSumKroneckerContractDefinition(Definition):
     :data:`~jacopy.core.expr.One` automatically (free-free same-name
     rule on KroneckerDelta).
 
-    This is the proof-engine omurgası of Faz 17 — every Cartan
+    This is the proof-engine omurgası of Faz 17, every Cartan
     reduction terminates by removing an :class:`IndexedSum` via this
     rewrite.
     """

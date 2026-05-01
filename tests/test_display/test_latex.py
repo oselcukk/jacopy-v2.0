@@ -61,7 +61,7 @@ class TestLatexName:
         assert latex_name("X_ab") == "X_{ab}"
 
     def test_greek_with_subscript(self):
-        # ι_X — single-char subscript stays bare.
+        # ι_X, single-char subscript stays bare.
         assert latex_name("ι_X") == r"\iota_X"
 
     def test_greek_with_multichar_subscript(self):
@@ -232,7 +232,7 @@ class TestProofTranscript:
 
     def test_step_translates_unicode_in_rule_via_ensuremath(self):
         """Regression: rule names carry math glyphs (ι, ∘, ω). Text-mode
-        \\text{…} can't host raw Unicode — pdfLaTeX errors with
+        \\text{…} can't host raw Unicode, pdfLaTeX errors with
         'Unicode character not set up for use with LaTeX'. Each glyph
         must land inside \\ensuremath{…} so math mode is entered
         locally."""

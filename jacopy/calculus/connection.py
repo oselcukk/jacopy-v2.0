@@ -1,5 +1,5 @@
 r"""
-Affine connection ∇ — Faz 16.A.
+Affine connection ∇, Faz 16.A.
 
 An affine connection ``∇`` on a smooth manifold is a binary operator
 that takes a vector field ``X`` and a vector field ``Y`` and produces
@@ -12,14 +12,14 @@ a vector field ``∇_X Y``. It is :math:`C^\infty`-linear in ``X``,
 
 This module ships:
 
-* :class:`AffineConnection` — an :class:`~jacopy.core.expr.Atom`
+* :class:`AffineConnection`, an :class:`~jacopy.core.expr.Atom`
   carrying just a display name, used as the connection identifier
   inside :class:`ConnectionEvalExpr`.
-* :class:`ConnectionEvalExpr` — the ``∇_X Y`` evaluation node,
+* :class:`ConnectionEvalExpr`, the ``∇_X Y`` evaluation node,
   parametric in the connection. Children are ``(X, Y)`` so the
-  expansion engine walks naturally into both slots — no
+  expansion engine walks naturally into both slots, no
   operator-atom-index pre-pass needed (unlike Lie / interior /
-  exterior-d, whose vector-field slot is private — see
+  exterior-d, whose vector-field slot is private, see
   ``operator_atom_index_opacity.md``).
 * Three engine :class:`~jacopy.proof.expansion.Definition` rules
   (X-additivity, Y-additivity, Y-Leibniz) that turn ``∇`` into a
@@ -27,7 +27,7 @@ This module ships:
   Bianchi machinery.
 
 The connection on functions is by definition the directional
-derivative ``∇_X f := X(f)`` — the Y-Leibniz rule's ``X(f)`` term
+derivative ``∇_X f := X(f)``, the Y-Leibniz rule's ``X(f)`` term
 relies on this convention. For an algebroid connection
 ``∇̃`` carrying an anchor ``ρ`` the convention generalises to
 ``∇̃_σ f := ρ(σ)(f)`` (Q9 / Math 595, Poisson side ``ρ = π^♯``),
@@ -52,12 +52,12 @@ from jacopy.proof.expansion import Definition
 
 
 class AffineConnection(Atom):
-    r"""An affine connection ``∇`` — opaque named atom.
+    r"""An affine connection ``∇``, opaque named atom.
 
     Carries a display name and an optional :class:`Anchor`. Two
     :class:`AffineConnection` instances with the same ``(name, anchor)``
     pair compare equal. The atom itself does not appear inside
-    :class:`Act` nodes — vector-field application is the role of
+    :class:`Act` nodes, vector-field application is the role of
     :class:`ConnectionEvalExpr`. It exists so that engine rules can
     dispatch on a specific connection (e.g. "this rule fires only on
     ``∇ = nabla``"), in line with how
@@ -131,7 +131,7 @@ class AffineConnection(Atom):
     def function_action(self, X: Expr, f: Expr) -> Expr:
         r"""Return the directional-derivative term ``∇_X f`` on a 0-form ``f``.
 
-        For a plain affine connection: ``Act(X, f)`` — i.e. the vector
+        For a plain affine connection: ``Act(X, f)``, i.e. the vector
         field ``X`` acting on ``f`` as a derivation. For an algebroid
         connection with ``anchor = ρ`` set: ``Act(ρ(X), f)`` where
         ``ρ(X)`` is wrapped as an :class:`AnchoredVectorField`. The
@@ -187,7 +187,7 @@ def koszul_connection(
     explicit ``BracketApply`` constructions) or let the factory build
     a fresh anchor + Koszul bracket pair.
 
-    Used as the ``∇̃`` instance in Q9 (Math 595) — the cotangent-bundle
+    Used as the ``∇̃`` instance in Q9 (Math 595), the cotangent-bundle
     counterpart to the tangent-bundle ``∇`` of Q7 / Q8.
     """
     if anchor is None:
@@ -209,7 +209,7 @@ class ConnectionEvalExpr(Expr):
     Stores the connection as a parametric slot (not a child) and the
     two vector-field arguments as children. This keeps the
     connection identity opaque (engine rules dispatch on it) while
-    letting bottom-up rewriting walk freely into ``X`` and ``Y`` —
+    letting bottom-up rewriting walk freely into ``X`` and ``Y``,
     the slot-opacity workaround that the Lie-derivative-style atoms
     require (``AtomSlotLift``, see Faz 15.C) is unnecessary here by
     construction.
@@ -322,7 +322,7 @@ class ConnectionXLinearityDefinition(Definition):
 
 
 class ConnectionXScalarPullDefinition(Definition):
-    r"""``∇_{f · X} Y → f · ∇_X Y`` — :math:`C^\infty`-linearity in X.
+    r"""``∇_{f · X} Y → f · ∇_X Y``, :math:`C^\infty`-linearity in X.
 
     Fires when the X-slot is a :class:`Product` of two or more factors.
     The leading factors are folded into the scalar prefactor ``f`` and
@@ -403,7 +403,7 @@ class ConnectionYLeibnizDefinition(Definition):
     Fires when ``Y``-slot is a :class:`~jacopy.core.expr.Product`
     whose first factor resolves to degree zero in the registry.
     Anything more complicated (multi-factor products, mixed-degree
-    factors) is left alone — let the X-additivity / Y-additivity
+    factors) is left alone, let the X-additivity / Y-additivity
     rules canonicalise the slot first.
 
     The ``X(f)`` term is emitted via the connection's

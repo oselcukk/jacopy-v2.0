@@ -1,7 +1,7 @@
 """Tests for Cartan-remainder operator atoms (Faz 15.A).
 
 Covers both standard ``K_V`` (forms-side) and tilde ``K̃_η``
-(multivectors-side). Stage A is the inert-atom layer only — defining
+(multivectors-side). Stage A is the inert-atom layer only, defining
 rewrites land in Faz 15.B.
 """
 
@@ -142,7 +142,7 @@ class TestTildeCartanRemainder:
 
 class TestStandardVsTildeDisjoint:
     """Standard K_V and tilde K̃_η are different operator families even
-    when their underlying parameters share a Symbol — the indexing
+    when their underlying parameters share a Symbol, the indexing
     semantics differ (vector field vs. form), so they must not alias."""
 
     def test_standard_and_tilde_are_distinct_types(self):

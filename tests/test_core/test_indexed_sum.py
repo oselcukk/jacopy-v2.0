@@ -1,4 +1,4 @@
-"""Tests for the :class:`IndexedSum` Expr node — Faz 17.E.1 + 17.E.2."""
+"""Tests for the :class:`IndexedSum` Expr node, Faz 17.E.1 + 17.E.2."""
 
 from __future__ import annotations
 

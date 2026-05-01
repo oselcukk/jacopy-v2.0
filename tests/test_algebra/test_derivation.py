@@ -146,7 +146,7 @@ class TestDegreeOf:
             degree_of(x, None)
 
     def test_sum_raises(self):
-        # Sum has a degree only when every term's degree agrees — a
+        # Sum has a degree only when every term's degree agrees, a
         # policy we leave to the caller. degree_of refuses to walk it.
         s = Sum(Symbol("x"), Symbol("y"))
         with pytest.raises(ValueError):
@@ -173,7 +173,7 @@ class TestDegreeOf:
         assert degree_of(Product(D, E)) == Degree.var("|D|") + Degree.const(2)
 
     def test_neg_passthrough(self):
-        """Negation is a scalar sign — doesn't shift degree."""
+        """Negation is a scalar sign, doesn't shift degree."""
         d = Derivation("d", degree=3)
         assert degree_of(Neg(d)) == Degree.const(3)
 
@@ -243,7 +243,7 @@ class TestCompose:
 
     def test_single_operator_collapses(self):
         D = Derivation("D", degree=1)
-        # No wrapping Product for a lone operator — compose(D) is D.
+        # No wrapping Product for a lone operator, compose(D) is D.
         assert compose(D) is D
 
     def test_empty_rejected(self):
@@ -255,7 +255,7 @@ class TestCompose:
             compose(Derivation("D", 1), "not-an-expr")  # type: ignore[arg-type]
 
     def test_composition_degree_is_sum(self):
-        """|D1 ∘ D2| = |D1| + |D2| — falls out of the Product rule."""
+        """|D1 ∘ D2| = |D1| + |D2|, falls out of the Product rule."""
         D1 = Derivation("D1", degree=1)
         D2 = Derivation("D2", degree=2)
         assert degree_of(compose(D1, D2)) == Degree.const(3)

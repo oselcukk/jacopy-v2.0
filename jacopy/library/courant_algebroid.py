@@ -6,23 +6,23 @@ Courant algebroid on ``TM ⊕ T*M``: the Courant bracket, its Dorfman
 twin built on the *same* Cartan operators, and optional H-twist. The
 wrapper exposes:
 
-* ``expand`` / ``expand_dorfman`` — the two bracket views, produced
+* ``expand`` / ``expand_dorfman``, the two bracket views, produced
   off the same ``(d, L, ι, vector_bracket)`` quadruple so identities
   involving both stay faithful;
-* ``jacobi_condition`` / ``prove_jacobi_reduction`` — the Courant
+* ``jacobi_condition`` / ``prove_jacobi_reduction``, the Courant
   Jacobi condition (vacuous in the untwisted case; ``dH = 0`` in the
   H-twisted case) plus a single-step axiomatic reduction to that
   condition;
 * ``courant_dorfman_obstruction`` / ``bridge_correction`` /
-  ``prove_courant_dorfman_bridge`` — the classical algebraic identity
+  ``prove_courant_dorfman_bridge``, the classical algebraic identity
   ``[·,·]_D − [·,·]_C = (0, ½ d(ι_X β + ι_Y α))``, previously deferred
   from the Stage 3 Courant pass.
 
 Seeded theorems (added to :data:`~jacopy.library.theorem_book.theorem_book`
 at import time):
 
-* ``courant_jacobi_twist`` — H-twisted Courant Jacobi ⟺ ``dH = 0``;
-* ``courant_dorfman_bridge`` — the Courant–Dorfman correction identity.
+* ``courant_jacobi_twist``, H-twisted Courant Jacobi ⟺ ``dH = 0``;
+* ``courant_dorfman_bridge``, the Courant–Dorfman correction identity.
 
 The Courant algebroid's anchor is the canonical projection
 ``pr_TM: TM ⊕ T*M → TM``; it is not surfaced here as an :class:`Anchor`
@@ -63,7 +63,7 @@ InteriorFactory = Callable[[Expr], Derivation]
 
 
 class CourantAlgebroid:
-    """``(TM ⊕ T*M, [·,·]_C)`` — the standard exact Courant algebroid.
+    """``(TM ⊕ T*M, [·,·]_C)``, the standard exact Courant algebroid.
 
     Parameters
     ----------
@@ -78,7 +78,7 @@ class CourantAlgebroid:
     background_H
         Optional closed 3-form ``H``. When supplied, :attr:`courant`
         is the H-twisted Courant bracket; the Dorfman twin is *not*
-        twisted — the bridge identity holds without the twist term.
+        twisted, the bridge identity holds without the twist term.
     name
         Optional display name; defaults to ``"Courant(TM⊕T*M)"`` or a
         twist-tagged variant.
@@ -86,7 +86,7 @@ class CourantAlgebroid:
     Notes
     -----
     * The wrapper does *not* model the canonical pairing
-      ``⟨(X, α), (Y, β)⟩ = ½(ι_X β + ι_Y α)`` as its own object —
+      ``⟨(X, α), (Y, β)⟩ = ½(ι_X β + ι_Y α)`` as its own object,
       :meth:`bridge_correction` surfaces the exact combination that
       shows up in the correction identity and downstream callers can
       read off the pairing from there.
@@ -207,7 +207,7 @@ class CourantAlgebroid:
         b: SectionPair,
         registry: Optional[PropertyRegistry] = None,
     ) -> SectionPair:
-        """``[a, b]_C`` — the Courant bracket on section pairs."""
+        """``[a, b]_C``, the Courant bracket on section pairs."""
         return self._courant.expand(a, b, registry)
 
     def expand_dorfman(
@@ -216,7 +216,7 @@ class CourantAlgebroid:
         b: SectionPair,
         registry: Optional[PropertyRegistry] = None,
     ) -> SectionPair:
-        """``[a, b]_D`` — the Dorfman twin, same Cartan operators."""
+        """``[a, b]_D``, the Dorfman twin, same Cartan operators."""
         return self._dorfman.expand(a, b, registry)
 
     # ---- Jacobi ---------------------------------------------------- #
@@ -239,7 +239,7 @@ class CourantAlgebroid:
     ) -> ProofChain:
         """One-step axiomatic reduction of Courant Jacobi to its condition.
 
-        * Untwisted: the reduction is vacuous — a single reflexive step
+        * Untwisted: the reduction is vacuous, a single reflexive step
           mapping the literal ``0`` obstruction to itself.
         * H-twisted: the step cites the Courant-algebroid Jacobi axiom
           and lands on the ``dH`` obstruction, which the caller
@@ -259,7 +259,7 @@ class CourantAlgebroid:
                     rule="CourantAlgebroidJacobi",
                     justification=(
                         "Untwisted Courant Jacobi holds unconditionally "
-                        "on (TM ⊕ T*M) — obstruction is the vacuous 0."
+                        "on (TM ⊕ T*M), obstruction is the vacuous 0."
                     ),
                     provenance_tag="axiom",
                 )
@@ -287,7 +287,7 @@ class CourantAlgebroid:
         b: SectionPair,
         registry: Optional[PropertyRegistry] = None,
     ) -> SectionPair:
-        """``[a, b]_D − [a, b]_C`` — the difference whose identity we
+        """``[a, b]_D − [a, b]_C``, the difference whose identity we
         assert with :meth:`prove_courant_dorfman_bridge`.
 
         The vector halves match by construction (both brackets run the
@@ -309,7 +309,7 @@ class CourantAlgebroid:
         )
 
     def bridge_correction(self, a: SectionPair, b: SectionPair) -> SectionPair:
-        """``(0, ½ d(ι_X β + ι_Y α))`` — the canonical correction term.
+        """``(0, ½ d(ι_X β + ι_Y α))``, the canonical correction term.
 
         Built from the algebroid's own Cartan operators so that the
         identity ``[·,·]_D − [·,·]_C = correction`` holds on matching
@@ -341,7 +341,7 @@ class CourantAlgebroid:
         Dorfman against the ``−L_Y α`` in Courant, leaving the exact
         correction ``½ d(ι_X β + ι_Y α)``. The chain records that
         derivation as a single ``theorem``-tagged step rather than
-        unfolding the cancellation arithmetic — the algebraic identity
+        unfolding the cancellation arithmetic, the algebraic identity
         is the theorem, not the rewrite.
         """
         obs = self.courant_dorfman_obstruction(a, b, registry)
@@ -405,7 +405,7 @@ def courant_algebroid(
 
 
 def _build_courant_jacobi_twist_theorem() -> Theorem:
-    """``courant_jacobi_twist`` — H-twisted Courant Jacobi ⟺ dH = 0.
+    """``courant_jacobi_twist``, H-twisted Courant Jacobi ⟺ dH = 0.
 
     Single axiom-tagged step citing the Courant algebroid Jacobi axiom
     on the H-twisted side. The obstruction ``dH`` is surfaced literally
@@ -428,14 +428,14 @@ def _build_courant_jacobi_twist_theorem() -> Theorem:
         notes=(
             "The obstruction to H-twisted Courant Jacobi is exactly "
             "dH (see CourantBracket.jacobi_condition). Supplying dH = 0 "
-            "— i.e. H is closed — discharges the condition and yields "
+            ", i.e. H is closed, discharges the condition and yields "
             "the full Courant algebroid Jacobi identity."
         ),
     )
 
 
 def _build_courant_dorfman_bridge_theorem() -> Theorem:
-    """``courant_dorfman_bridge`` — the classical correction identity.
+    """``courant_dorfman_bridge``, the classical correction identity.
 
     Concrete witness with generic symbols ``(X, α), (Y, β)`` on the
     untwisted algebroid; downstream callers produce their own chain on
@@ -470,7 +470,7 @@ def _build_courant_dorfman_bridge_theorem() -> Theorem:
             "The Dorfman − Courant correction is the symmetrised "
             "d-exact piece d(ι_X β + ι_Y α) / 2. Previously deferred "
             "from the Stage 3 Courant pass (see stage3_courant_plan.md). "
-            "Closed here as a single theorem-tagged step — the "
+            "Closed here as a single theorem-tagged step, the "
             "algebraic identity is the result, not the Cartan-magic "
             "arithmetic that produces it."
         ),

@@ -49,7 +49,7 @@ class TestCommutatorConstruction:
 
 
 # --------------------------------------------------------------------- #
-# expand — even parity                                                   #
+# expand, even parity                                                   #
 # --------------------------------------------------------------------- #
 
 
@@ -81,7 +81,7 @@ class TestExpandEvenParity:
 
 
 # --------------------------------------------------------------------- #
-# expand — odd parity                                                    #
+# expand, odd parity                                                    #
 # --------------------------------------------------------------------- #
 
 
@@ -94,7 +94,7 @@ class TestExpandOddParity:
         assert c.expand() == Sum(Product(A, B), Product(B, A))
 
     def test_d_d_anticommutator(self):
-        """[d, d] = 2 d² on the nose — just the syntactic expansion."""
+        """[d, d] = 2 d² on the nose, just the syntactic expansion."""
         d = Derivation("d", degree=1)
         c = Commutator(d, d)
         # |d|*|d| = 1 odd → d*d + d*d
@@ -102,7 +102,7 @@ class TestExpandOddParity:
 
 
 # --------------------------------------------------------------------- #
-# expand — symbolic parity                                               #
+# expand, symbolic parity                                               #
 # --------------------------------------------------------------------- #
 
 
@@ -162,7 +162,7 @@ class TestAntisymmetry:
         B = Derivation("B", degree=1)
         lhs = Commutator(A, B).expand()       # A*B + B*A
         rhs = Commutator(B, A).expand()       # B*A + A*B
-        # Compare as multisets of summands — Sum preserves order, but
+        # Compare as multisets of summands, Sum preserves order, but
         # the identity is order-independent.
         assert isinstance(lhs, Sum) and isinstance(rhs, Sum)
         assert sorted(lhs.children, key=repr) == sorted(

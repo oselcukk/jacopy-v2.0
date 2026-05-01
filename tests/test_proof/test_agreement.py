@@ -48,14 +48,14 @@ class TestDegreeChecks:
         algebra = ExteriorAlgebra((Symbol("f"),))
         iota_X = interior(Symbol("X"))
         strat = AgreementOnGenerators(algebra)
-        # |d| = 1, |ι_X| = -1 — clearly distinct.
+        # |d| = 1, |ι_X| = -1, clearly distinct.
         with pytest.raises(ProofFailure, match="distinct degrees"):
             strat.prove(d, iota_X)
 
     def test_inhomogeneous_sum_fails(self):
         algebra = ExteriorAlgebra((Symbol("f"),))
         iota_X = interior(Symbol("X"))
-        # Sum(d, ι_X) has summands of different degree — ill-formed.
+        # Sum(d, ι_X) has summands of different degree, ill-formed.
         strat = AgreementOnGenerators(algebra)
         with pytest.raises(ProofFailure, match="determinable degrees"):
             strat.prove(Sum(d, iota_X), d)
@@ -89,12 +89,12 @@ class TestReflexive:
 
 
 # --------------------------------------------------------------------- #
-# Cartan magic formula — [d, ι_X] = L_X in cartan mode                   #
+# Cartan magic formula, [d, ι_X] = L_X in cartan mode                   #
 # --------------------------------------------------------------------- #
 
 
 class TestCartanMagicFormula:
-    """In cartan-mode the formula is tautological — the proof closes
+    """In cartan-mode the formula is tautological, the proof closes
     structurally, generator by generator, using only the Cartan
     definition rewrite and Act-over-Sum linearity.
     """
@@ -198,7 +198,7 @@ class TestCustomSubStrategy:
         Y_deriv = Derivation("Y", degree=0)
 
         strat = AgreementOnGenerators(algebra, sub_strategy=_AlwaysCloseStrategy())
-        # Normally unequal derivations would fail — here the sub-strategy
+        # Normally unequal derivations would fail, here the sub-strategy
         # rubber-stamps each generator so the outer proof succeeds.
         chain = strat.prove(X_deriv, Y_deriv, registry=reg)
         parent = chain.steps[0]

@@ -45,7 +45,7 @@ def f(reg):
 
 
 # --------------------------------------------------------------------- #
-# Aux-1 — TildeIotaOnZeroVectorDefinition                               #
+# Aux-1, TildeIotaOnZeroVectorDefinition                               #
 # --------------------------------------------------------------------- #
 
 
@@ -88,7 +88,7 @@ class TestIotaOnZeroVector:
 
 
 # --------------------------------------------------------------------- #
-# Aux-2 — TildeIotaSquaredZeroDefinition                                #
+# Aux-2, TildeIotaSquaredZeroDefinition                                #
 # --------------------------------------------------------------------- #
 
 
@@ -108,7 +108,7 @@ class TestIotaSquaredZero:
         eta = Symbol("η")
         V = Symbol("V")
         rule = TildeIotaSquaredZeroDefinition()
-        # ι̃_ω(ι̃_η V) is a distinct shape — anti-commute owns it.
+        # ι̃_ω(ι̃_η V) is a distinct shape, anti-commute owns it.
         assert not rule.matches(
             Act(tilde_interior(omega), Act(tilde_interior(eta), V))
         )
@@ -132,7 +132,7 @@ class TestIotaSquaredZero:
 
 
 # --------------------------------------------------------------------- #
-# Aux-3 — TildeLieOnZeroVectorDefinition                                #
+# Aux-3, TildeLieOnZeroVectorDefinition                                #
 # --------------------------------------------------------------------- #
 
 
@@ -171,7 +171,7 @@ class TestLieOnZeroVector:
 
 
 # --------------------------------------------------------------------- #
-# Aux-4 — TildeDOfFunctionDefinition                                    #
+# Aux-4, TildeDOfFunctionDefinition                                    #
 # --------------------------------------------------------------------- #
 
 
@@ -211,7 +211,7 @@ class TestDOfFunction:
 
 
 # --------------------------------------------------------------------- #
-# Aux-5 — TildeDSquaredPoissonDefinition                                #
+# Aux-5, TildeDSquaredPoissonDefinition                                #
 # --------------------------------------------------------------------- #
 
 
@@ -251,7 +251,7 @@ class TestDSquaredPoisson:
         reg.declare(pi1, Poisson())
         reg.declare(pi2, Poisson())
         rule = TildeDSquaredPoissonDefinition(pi1, registry=reg)
-        # Outer head is for pi2 — rule scoped to pi1 must not match.
+        # Outer head is for pi2, rule scoped to pi1 must not match.
         assert not rule.matches(Act(tilde_d(pi2), Act(tilde_d(pi2), V)))
 
     def test_rewrite_returns_zero(self, reg, pi):
@@ -263,7 +263,7 @@ class TestDSquaredPoisson:
 
 
 # --------------------------------------------------------------------- #
-# Engine integration — the four "single-shape" auxiliaries that fire    #
+# Engine integration, the four "single-shape" auxiliaries that fire    #
 # under the engine's leftmost-innermost traversal.                       #
 # --------------------------------------------------------------------- #
 
@@ -295,7 +295,7 @@ class TestEngineIntegration:
 
 
 # --------------------------------------------------------------------- #
-# Engine traversal limitation note — "double-shape" Aux-2 and Aux-5     #
+# Engine traversal limitation note, "double-shape" Aux-2 and Aux-5     #
 # can't fire under the engine's leftmost-innermost traversal because    #
 # the inner subterm is rewritten by a defining axiom (swap or           #
 # Lichnerowicz) before the parent rule sees the original shape.         #

@@ -101,7 +101,7 @@ class TestEquality:
 
     def test_order_matters_no_auto_sort(self):
         a, b = Symbol("α"), Symbol("β")
-        # Wedge does NOT sort at construction — graded reordering needs
+        # Wedge does NOT sort at construction, graded reordering needs
         # degree information and lives elsewhere.
         assert Wedge(a, b) != Wedge(b, a)
 

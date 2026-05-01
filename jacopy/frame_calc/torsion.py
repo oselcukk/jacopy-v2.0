@@ -1,5 +1,5 @@
 r"""
-Torsion tensor from a connection — Stage E.
+Torsion tensor from a connection, Stage E.
 
 The torsion of a connection ``∇`` on a frame ``F`` has frame
 components
@@ -10,7 +10,7 @@ components
     = \Gamma^a{}_{bc} - \Gamma^a{}_{cb} - \gamma^a{}_{bc}.
 
 For the Levi-Civita connection (and any torsion-free connection in a
-holonomic frame) every entry vanishes — :class:`TorsionTensor` is
+holonomic frame) every entry vanishes, :class:`TorsionTensor` is
 mainly useful for testing and for connections built by hand.
 """
 
@@ -32,7 +32,7 @@ from jacopy.frame_calc.component_tensor import (
 
 
 class TorsionTensor(ComponentTensor):
-    r"""``(1, 2)`` tensor ``T^a_{bc}`` — torsion of a connection.
+    r"""``(1, 2)`` tensor ``T^a_{bc}``, torsion of a connection.
 
     Same shape as :class:`ComponentConnection` (one upper, two lower),
     but antisymmetric in the lower pair: ``T^a_{bc} = -T^a_{cb}``.

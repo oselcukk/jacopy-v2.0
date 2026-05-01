@@ -100,7 +100,7 @@ class TestLieDerivativeCartanDefinition:
         assert result == expected
 
     def test_rewrite_uses_both_bundle_slots(self):
-        """Algebroid case — L carries both d_E and the ι_E factory."""
+        """Algebroid case, L carries both d_E and the ι_E factory."""
         X = Symbol("X")
         d_E = ExteriorDerivative("d_E")
 
@@ -155,7 +155,7 @@ class TestLieDerivativeOnZeroFormDefinition:
         assert not defn.matches(Act(L, alpha))
 
     def test_does_not_match_non_derivation_field(self):
-        """X must be a Derivation or composite — bare Symbol shouldn't fire."""
+        """X must be a Derivation or composite, bare Symbol shouldn't fire."""
         reg = PropertyRegistry()
         f = Symbol("f")
         reg.declare(f, Graded(degree=0))
@@ -417,12 +417,12 @@ class TestDSquaredZeroDefinition:
     def test_does_not_match_mixed_d_and_d_E(self):
         d_E = ExteriorDerivative("d_E")
         f = Symbol("f")
-        # Outer d, inner d_E — not a d² occurrence.
+        # Outer d, inner d_E, not a d² occurrence.
         assert not DSquaredZeroDefinition().matches(Act(d, Act(d_E, f)))
 
 
 # --------------------------------------------------------------------- #
-# DSquaredZeroDefinition — classification (axiom vs theorem)             #
+# DSquaredZeroDefinition, classification (axiom vs theorem)             #
 # --------------------------------------------------------------------- #
 
 
@@ -440,7 +440,7 @@ class TestDSquaredZeroClassification:
         assert defn.theorem_proof_builder() is not None
 
     def test_rewrite_unchanged_by_classification(self):
-        """Both classifications rewrite to zero — only bookkeeping differs."""
+        """Both classifications rewrite to zero, only bookkeeping differs."""
         f = Symbol("f")
         dd_f = Act(d, Act(d, f))
         assert DSquaredZeroDefinition().rewrite(dd_f) == Integer(0)
@@ -460,7 +460,7 @@ class TestDSquaredZeroClassification:
             DSquaredZeroDefinition(classification="lemma")
 
     def test_theorem_builder_cites_generator_axiom(self):
-        """Sub-proof bottoms out at d(df) = 0 — the foundational primitive."""
+        """Sub-proof bottoms out at d(df) = 0, the foundational primitive."""
         f = Symbol("f")
         dd_f = Act(d, Act(d, f))
         defn = DSquaredZeroDefinition(classification="theorem")

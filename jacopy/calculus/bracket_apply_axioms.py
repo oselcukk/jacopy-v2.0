@@ -1,5 +1,5 @@
 r"""
-BracketApply-side axioms — Q9 Stage 9.C.
+BracketApply-side axioms, Q9 Stage 9.C.
 
 Parallel of the Lie-bracket-of-vector-fields closure family
 (:mod:`jacopy.calculus.closure_axioms` plus the LBVF rules in
@@ -13,23 +13,23 @@ collapsing it to ``LieBracketVF`` first.
 
 Five rules, mirroring the LBVF set:
 
-* :class:`BracketApplySumLinearityDefinition` — Sum distribution through
+* :class:`BracketApplySumLinearityDefinition`, Sum distribution through
   either bracket slot.
-* :class:`BracketApplyNegLinearityDefinition` — Neg pull-out through
+* :class:`BracketApplyNegLinearityDefinition`, Neg pull-out through
   either bracket slot.
-* :class:`BracketApplyArgAntisymmetryDefinition` — atom-level
+* :class:`BracketApplyArgAntisymmetryDefinition`, atom-level
   arg-canonicalization ``[b, a] → −[a, b]`` via deterministic ``repr``
   ordering. Gated on ``is_graded_antisymmetric=True`` and degree-0
   (the only case the sign collapses cleanly without graded parity
   tracking).
-* :class:`BracketApplyAntiSymmetryDefinition` — Sum-level pair
+* :class:`BracketApplyAntiSymmetryDefinition`, Sum-level pair
   cancellation ``[a, b] + [b, a] → 0`` inside a structurally-shared
   wrapper. Same gate.
-* :class:`BracketApplyJacobiDefinition` — Sum-level cyclic-triple finder
+* :class:`BracketApplyJacobiDefinition`, Sum-level cyclic-triple finder
   for graded Jacobi at degree 0; same shape as the LBVF Jacobi rule but
   scoped to a specific bracket head.
 
-Each rule scopes on a single :class:`GradedBracket` instance — two
+Each rule scopes on a single :class:`GradedBracket` instance, two
 coexisting brackets in a proof don't cross-fire, mirroring the
 ``Sharp``-scoped rules in :mod:`sn_function_axiom`.
 """
@@ -134,7 +134,7 @@ class BracketApplyNegLinearityDefinition(Definition):
 def _require_graded_antisym(bracket: GradedBracket, ctx: str) -> None:
     """Guard for the antisym / Jacobi rules.
 
-    All three rules require ``is_graded_antisymmetric=True`` — without
+    All three rules require ``is_graded_antisymmetric=True``, without
     it, the swap and Jacobi-term sign hooks return ``None`` and the
     rules can't fire safely.
 
@@ -199,7 +199,7 @@ class BracketApplyArgAntisymmetryDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# Wrapper extraction — parallel of closure_axioms._extract_…             #
+# Wrapper extraction, parallel of closure_axioms._extract_…             #
 # --------------------------------------------------------------------- #
 
 
@@ -219,8 +219,8 @@ def _extract_bracket_apply_with_wrapper(
     Why a parallel function instead of a parametric refactor of the
     LBVF version: the two payload types have disjoint structural roles
     (LieBracketVF is a Derivation atom, BracketApply carries an
-    explicit bracket head) and downstream consumers — the cyclic-triple
-    finder, the antisym pair finder — also stay in their own
+    explicit bracket head) and downstream consumers, the cyclic-triple
+    finder, the antisym pair finder, also stay in their own
     bracket-specific lane. Sharing a walker would force a runtime
     discriminant on the payload type with no real reuse benefit.
     """
@@ -235,8 +235,8 @@ def _extract_bracket_apply_with_wrapper(
         op, arg = expr.op, expr.arg
         # Act head can be a BracketApply (e.g. ``Act([U,V]_K, f)`` after
         # an outer scalar commutator has been folded). We don't expect
-        # this for Q9 — connection rules emit BracketApply only inside
-        # ConnectionEvalExpr.X — but keep the symmetry with the LBVF
+        # this for Q9, connection rules emit BracketApply only inside
+        # ConnectionEvalExpr.X, but keep the symmetry with the LBVF
         # walker.
         if isinstance(op, BracketApply) and op.bracket == target_bracket:
             wrapper = Act(_BRACKET_PLACEHOLDER, arg)
@@ -303,7 +303,7 @@ def _extract_bracket_apply_with_wrapper(
 
 
 def _compose_wrapper(outer: Expr, inner_key: Optional[Expr]) -> Expr:
-    """Same composition rule as the LBVF version — re-exported here.
+    """Same composition rule as the LBVF version, re-exported here.
 
     Splices the inner key tree back into the placeholder slot when the
     outer wrapper sits above a non-bare inner wrapper. Bare-bracket keys
@@ -330,7 +330,7 @@ class BracketApplyAntiSymmetryDefinition(Definition):
     Two children of a Sum cancel when their wrapper-redacted shapes
     coincide, the underlying bracket pair is ``([a, b], [b, a])`` (with
     ``a != b``), and the outer Sum signs ``(s1, s2)`` satisfy
-    ``s1 + s2 · swap_sign(b, a) = 0`` — i.e. ``s2 = −s1 · swap_sign``.
+    ``s1 + s2 · swap_sign(b, a) = 0``, i.e. ``s2 = −s1 · swap_sign``.
 
     For the default literal-antisym convention (``swap_sign = −1``)
     that's just ``s1 == s2``: two outer-positive copies (or two
@@ -407,7 +407,7 @@ def _peel_bracket_apply_jacobi(
     and the outer swap that flips ``[[B, C], A] → [A, [B, C]]``); for the
     default literal-antisym convention the swap sign is ``−1``,
     reproducing the original four (``+1, −1, −1, +1``) variant signs.
-    Scoped on ``target_bracket`` — both the outer and inner brackets
+    Scoped on ``target_bracket``, both the outer and inner brackets
     must be the same :class:`GradedBracket` instance.
     """
     if not isinstance(bracket, BracketApply):
@@ -443,7 +443,7 @@ class BracketApplyJacobiDefinition(Definition):
     Sum-level analog of
     :class:`~jacopy.calculus.closure_axioms.LieBracketVfJacobiDefinition`.
     Recognises three children whose nested-bracket payloads form the
-    cyclic triple ``[A,[B,C]] + [B,[C,A]] + [C,[A,B]] = 0`` — in any
+    cyclic triple ``[A,[B,C]] + [B,[C,A]] + [C,[A,B]] = 0``, in any
     sign-permuted algebraic guise (Leibniz form, negated Leibniz form,
     outer-anti-symmetrised cyclic form), all of which collapse to the
     same canonical ``(A, B, C)`` triple under the four-variant
@@ -457,7 +457,7 @@ class BracketApplyJacobiDefinition(Definition):
 
     For brackets whose Jacobi is *conditional* (``KoszulBracket``
     declares ``satisfies_graded_jacobi=None``, leaving the truth on
-    ``[π, π]_SN = 0``) the rule still fires — engaging the rule is the
+    ``[π, π]_SN = 0``) the rule still fires, engaging the rule is the
     user's assertion that the Jacobi hypothesis holds in the proof
     context. Mirror of the LBVF Jacobi rule, which fires
     unconditionally even though Lie-bracket Jacobi is itself a theorem.

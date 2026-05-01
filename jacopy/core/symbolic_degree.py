@@ -1,5 +1,5 @@
 """
-Symbolic degrees — integer-valued polynomials used as gradings.
+Symbolic degrees, integer-valued polynomials used as gradings.
 
 Every graded object in the package carries a degree: ``|d| = 1``,
 ``|ι_X| = -1``, ``|L_X| = 0``, or for a generic p-form simply ``|α| = p``
@@ -11,7 +11,7 @@ integer degrees.
 The central operation is :meth:`Degree.parity`. Koszul signs have the
 form ``(-1)^{d}`` where ``d`` is a degree, and the sign depends only
 on ``d mod 2``. Even when the degree is symbolic, parity can often be
-decided — ``2|α||β|`` is always even regardless of how ``|α|`` and
+decided, ``2|α||β|`` is always even regardless of how ``|α|`` and
 ``|β|`` resolve, because its integer coefficient is even. This is
 what lets generic-degree proofs of Cartan-type identities close.
 """
@@ -33,7 +33,7 @@ class Degree:
 
     Instances are immutable. Internal representation is a canonical
     tuple of ``(monomial, coefficient)`` pairs sorted by monomial with
-    zero coefficients stripped — so equality and hashing are
+    zero coefficients stripped, so equality and hashing are
     structural and ``Degree(...) == Degree(...)`` means the two
     polynomials are *equal as polynomials*, not merely numerically
     coincident at some point.
@@ -109,7 +109,7 @@ class Degree:
         return frozenset(vs)
 
     def parity(self) -> Optional[int]:
-        """Parity of the degree — 0 (even), 1 (odd), or ``None``.
+        """Parity of the degree, 0 (even), 1 (odd), or ``None``.
 
         Returns ``None`` when parity depends on the unknown values of
         the free variables. A symbolic term contributes 0 mod 2 iff
@@ -255,7 +255,7 @@ DegreeLike = Union[int, Degree]
 def as_degree(value: DegreeLike) -> Degree:
     """Coerce an ``int`` or :class:`Degree` into a :class:`Degree`.
 
-    Rejects ``bool`` deliberately — ``Graded(degree=True)`` is almost
+    Rejects ``bool`` deliberately, ``Graded(degree=True)`` is almost
     always a bug.
     """
     if isinstance(value, Degree):

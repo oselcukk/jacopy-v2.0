@@ -15,7 +15,7 @@ matching the derived-bracket convention.
 
 The classical form lives here. The *derived* form ``{α, β}_{sn, π}`` and
 the theorem stating the two agree when ``ρ = π^♯`` are built on top of
-this module (Stage 2B — :class:`DerivedBracket` gains an ``acting_on``
+this module (Stage 2B, :class:`DerivedBracket` gains an ``acting_on``
 parameter that lifts 1-form operands through an anchor, and a separate
 proof-layer helper closes the equivalence as a :class:`ProofChain`).
 
@@ -52,7 +52,7 @@ class KoszulBracket(GradedBracket):
     Parameters
     ----------
     anchor
-        The anchor ``ρ: T*M → TM`` — any degree-0
+        The anchor ``ρ: T*M → TM``, any degree-0
         :class:`~jacopy.algebra.derivation.Derivation`. The canonical
         choices are a dedicated :class:`~jacopy.calculus.anchor.Anchor`
         on a Lie algebroid and the musical map
@@ -74,7 +74,7 @@ class KoszulBracket(GradedBracket):
     * Degree 0, graded-antisymmetric.
     * Graded Jacobi is declared *conditional* (``None``) rather than
       ``True`` because its proof rests on anchor-compatibility plus a
-      vanishing generator obstruction — the same pattern used by
+      vanishing generator obstruction, the same pattern used by
       :class:`DerivedBracket`.
     * Leibniz is declared ``True`` at the type level; on 1-forms the
       "product" is wedge, handled by the usual product-rule layer.
@@ -158,12 +158,12 @@ class KoszulBracket(GradedBracket):
 
         On a Poisson manifold with anchor ``ρ = π^♯``, the classical
         result is that the Koszul bracket on 1-forms satisfies graded
-        Jacobi iff ``[π, π]_SN = 0`` — the same vanishing condition
+        Jacobi iff ``[π, π]_SN = 0``, the same vanishing condition
         that controls the derived bracket
         :class:`DerivedBracket(sn, π)`. The helper exposes that link
         explicitly, without recomputing the proof each time.
 
-        The anchor stored on this Koszul bracket is *not* used here —
+        The anchor stored on this Koszul bracket is *not* used here,
         the returned condition lives on ``π`` directly and is
         anchor-agnostic. Callers working on a Lie algebroid with an
         independent anchor substitute their own generator.
@@ -201,7 +201,7 @@ class KoszulBracket(GradedBracket):
             via ``self.anchor`` before applying the Koszul formula.
         bivector
             The SN generator ``π``. The reduction theorem applies when
-            ``self.anchor = π^♯`` — :meth:`prove_jacobi_reduction` does
+            ``self.anchor = π^♯``, :meth:`prove_jacobi_reduction` does
             not check anchor / bivector compatibility; supplying a
             mismatched pair gives a chain whose obstruction is the
             stated ``[π, π]_SN`` but whose reduction is only valid in

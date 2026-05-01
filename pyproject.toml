@@ -8,7 +8,7 @@ version = "0.0.1"
 description = "Symbolic computation for graded algebra, brackets, and Cartan calculus with step-by-step proofs."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "Proprietary — Source-Available, Personal Use Only" }
+license = { text = "Proprietary, Source-Available, Personal Use Only" }
 authors = [{ name = "Oğuzhan Selçuk", email = "stabledifgc@gmail.com" }]
 keywords = [
     "graded algebra",

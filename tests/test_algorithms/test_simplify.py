@@ -1,4 +1,4 @@
-"""Tests for jacopy.algorithms.simplify — the Faz 2 pipeline."""
+"""Tests for jacopy.algorithms.simplify, the Faz 2 pipeline."""
 
 import pytest
 
@@ -53,7 +53,7 @@ class TestWithRegistry:
         a, b = Symbol("a"), Symbol("b")
         reg.declare(a, Scalar())
         reg.declare(b, Graded(degree=1))
-        # (b * a) — b has higher sort key; a should move to front.
+        # (b * a), b has higher sort key; a should move to front.
         expr = Product(b, a)
         out = simplify(expr, reg)
         # Scalars bucket before graded; a first.

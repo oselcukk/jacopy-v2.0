@@ -1,8 +1,8 @@
-# 11 — Publication-ready output
+# 11, Publication-ready output
 
 `jacopy` keeps proofs as data: a `ProofChain` is a list of
 `ProofStep`s, each a triple `(before, after, rule)`. That structure is
-useful in a notebook — you can iterate, inspect, render — but the
+useful in a notebook, you can iterate, inspect, render, but the
 moment you want to *paste a proof into a paper*, you need LaTeX. This
 tutorial covers the four publication helpers:
 
@@ -14,7 +14,7 @@ tutorial covers the four publication helpers:
 | `chain_to_tikz_document` | full document with `tikz` preamble | One-shot pdflatex compile |
 
 The two `_document` variants are **not** wrappers around the inline
-ones — they assemble a complete preamble (`amsmath`, `amssymb`,
+ones, they assemble a complete preamble (`amsmath`, `amssymb`,
 `tikz`, `positioning`) so the output compiles standalone. Use them
 when you want a quick PDF; use the inline variants when you're
 splicing into an existing source.
@@ -22,7 +22,7 @@ splicing into an existing source.
 ## A worked chain
 
 For demonstration we use a tiny but real proof: `d(d(ω)) == 0`. The
-default engine knows `d² = 0` as an axiom, so the chain is two steps —
+default engine knows `d² = 0` as an axiom, so the chain is two steps,
 just enough to exercise both renderers without flooding the output.
 
 ```python
@@ -48,7 +48,7 @@ for s in chain.steps:
 
 ## Inline LaTeX: `chain_to_latex`
 
-`chain_to_latex(chain)` returns a `gather*` block — one math row per
+`chain_to_latex(chain)` returns a `gather*` block, one math row per
 step. The result wraps the body in `\allowdisplaybreaks\scriptsize`
 so long chains page-break properly and rule annotations don't crowd
 out the expressions.
@@ -71,7 +71,7 @@ For a one-shot PDF, wrap the chain in a full document via
 `chain_to_latex_document`. The function assembles the
 `\documentclass{article}` preamble, splices a `\title` / `\author` /
 `\maketitle` block when those kwargs are non-empty, and ends with
-`\end{document}` — `pdflatex output.tex` compiles directly.
+`\end{document}`, `pdflatex output.tex` compiles directly.
 
 ```python
 from jacopy.display import chain_to_latex_document
@@ -86,7 +86,7 @@ print(doc[:400])
 ```
 
 `preamble_extras=` lets you splice your project's macros between the
-default `amsmath`/`amssymb` block and `\begin{document}` — for
+default `amsmath`/`amssymb` block and `\begin{document}`, for
 instance, redefining `\renewcommand{\arraystretch}{1.3}` or pulling
 in your group's `\input{macros.tex}`.
 
@@ -104,10 +104,10 @@ diagram = chain_to_tikz(chain)
 print(diagram)
 ```
 
-Use this when prose isn't enough — when you want a reader to *see*
+Use this when prose isn't enough, when you want a reader to *see*
 the rewriting tree at a glance. For deeply nested chains the diagram
 flattens to its top-level steps; nested sub-proofs aren't exploded
-inline (deliberately — the `tikzpicture` would explode in size).
+inline (deliberately, the `tikzpicture` would explode in size).
 
 ## Standalone TikZ document
 
@@ -126,7 +126,7 @@ doc = chain_to_tikz_document(
 print(doc[:300])
 ```
 
-`node_distance` controls the vertical spacing — bump it up when your
+`node_distance` controls the vertical spacing, bump it up when your
 expression labels are long enough to crowd each other.
 
 ## Round-trip to PDF
@@ -150,7 +150,7 @@ with tempfile.TemporaryDirectory() as tmp:
     print(sorted(Path(tmp).iterdir()))
 ```
 
-If `pdflatex` isn't installed, the call raises `FileNotFoundError` —
+If `pdflatex` isn't installed, the call raises `FileNotFoundError`,
 that's purely an environmental issue, not something `jacopy` can
 fix. The `.tex` content stands on its own; any LaTeX compiler
 (`pdflatex`, `lualatex`, `xelatex`) handles it.
@@ -167,7 +167,7 @@ fix. The `.tex` content stands on its own; any LaTeX compiler
 In a notebook the LaTeX block also renders inline if you wrap it in
 `Markdown` / `IPython.display.Math`, but for that workflow the richer
 `display_chain` (`jacopy.display.display_chain`) is the better entry
-point — it knows about `_repr_latex_` and renders without a manual
+point, it knows about `_repr_latex_` and renders without a manual
 `Markdown(...)` wrap.
 
 ## Summary
@@ -176,6 +176,6 @@ point — it knows about `_repr_latex_` and renders without a manual
   standalone (`chain_to_latex_document`, `chain_to_tikz_document`).
 * Inline: paste into existing `.tex`. Standalone: write + `pdflatex`.
 * Title / author / preamble extras are kwargs on the `_document`
-  variants — empty strings produce a body-only document.
-* Nested sub-proofs flatten in both renderers — pick the inline
+  variants, empty strings produce a body-only document.
+* Nested sub-proofs flatten in both renderers, pick the inline
   helpers and compose by hand if you want a tree.

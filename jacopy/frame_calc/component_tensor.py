@@ -1,27 +1,27 @@
 r"""
-Component-tensor wrappers — Stage C.
+Component-tensor wrappers, Stage C.
 
 A *component tensor* stores the frame components of a
 ``(q, r)``-tensor as a SymPy ``MutableDenseNDimArray`` of shape
 ``(dim,) * (q + r)``. The wrapper carries the frame, signature, and
 ergonomic helpers (``__getitem__``, ``is_zero``, ``simplify``,
 ``matrix`` view for rank-2). It is **not** an
-:class:`~jacopy.core.expr.Expr` — it sits one level above the
+:class:`~jacopy.core.expr.Expr`, it sits one level above the
 expression layer, holding multiple expressions in an indexed
 container.
 
 Three typed subclasses cover the layer's needs at this stage:
 
-* :class:`ComponentMetric` — symmetric ``(0, 2)`` tensor ``g_{ab}``.
+* :class:`ComponentMetric`, symmetric ``(0, 2)`` tensor ``g_{ab}``.
   Carries :meth:`inverse` (SymPy ``Matrix.inv()``) and :meth:`det`.
-* :class:`ComponentMetricInverse` — ``(2, 0)`` tensor ``g^{ab}``.
+* :class:`ComponentMetricInverse`, ``(2, 0)`` tensor ``g^{ab}``.
   Same shape as the metric; the type itself signals which slot
   position is upper.
-* :class:`ComponentConnection` — ``(1, 2)`` tensor ``Γ^a_{bc}``.
+* :class:`ComponentConnection`, ``(1, 2)`` tensor ``Γ^a_{bc}``.
   Used for Christoffel symbols and any user-supplied connection.
 
 Stage-C scope is **concrete** entries (SymPy expressions). Abstract
-entries — produced by :class:`AbstractFrame` upstream — slot in
+entries, produced by :class:`AbstractFrame` upstream, slot in
 naturally for storage and indexing, but :meth:`ComponentMetric.inverse`
 needs SymPy semantics it cannot apply to jacopy ``Expr`` atoms; the
 abstract path is deferred to Stage D, where the Koszul-formula
@@ -70,7 +70,7 @@ def _as_array(
         if len(expected_shape) != 2:
             raise ValueError(
                 f"Cannot wrap an sp.Matrix as a rank-{len(expected_shape)} "
-                "tensor — Matrix is rank-2 only"
+                "tensor, Matrix is rank-2 only"
             )
         arr = sp.MutableDenseNDimArray(components.tolist())
     else:
@@ -96,7 +96,7 @@ def _all_indices(shape: Tuple[int, ...]) -> Iterator[Tuple[int, ...]]:
 
 
 # --------------------------------------------------------------------- #
-# ComponentTensor — base class                                          #
+# ComponentTensor, base class                                          #
 # --------------------------------------------------------------------- #
 
 
@@ -108,11 +108,11 @@ class ComponentTensor:
     frame
         The :class:`Frame` whose dimension the tensor's shape matches.
     components
-        Initial entries — accepts ``sp.Matrix`` (rank 2 only),
+        Initial entries, accepts ``sp.Matrix`` (rank 2 only),
         ``sp.MutableDenseNDimArray`` /
         ``sp.ImmutableDenseNDimArray``, or nested list/tuple.
     signature
-        ``(q, r)`` — number of upper and lower indices. ``q + r``
+        ``(q, r)``, number of upper and lower indices. ``q + r``
         must equal the rank of ``components``.
 
     Notes
@@ -260,7 +260,7 @@ class ComponentTensor:
             try:
                 new_arr[idx] = sp.simplify(self._components[idx])
             except (TypeError, AttributeError):
-                pass  # abstract entries (jacopy Expr) — leave alone
+                pass  # abstract entries (jacopy Expr), leave alone
         return self._rebuild_from_array(new_arr)
 
     def subs(self, mapping: Any, *args: Any) -> "ComponentTensor":
@@ -268,9 +268,9 @@ class ComponentTensor:
 
         Accepts the same call shapes as :meth:`sympy.Basic.subs`:
 
-        * ``T.subs({M: 1, r: 2.5})`` — dict of replacements
-        * ``T.subs(M, 1)`` — single old/new pair
-        * ``T.subs([(M, 1), (r, 2.5)])`` — list of pairs
+        * ``T.subs({M: 1, r: 2.5})``, dict of replacements
+        * ``T.subs(M, 1)``, single old/new pair
+        * ``T.subs([(M, 1), (r, 2.5)])``, list of pairs
 
         The returned tensor preserves the subclass identity (via
         ``_rebuild_from_array``), so a :class:`LeviCivitaConnection`
@@ -287,7 +287,7 @@ class ComponentTensor:
             try:
                 new_arr[idx] = entry.subs(mapping, *args) if hasattr(entry, "subs") else entry
             except (TypeError, AttributeError):
-                pass  # opaque entry — leave alone
+                pass  # opaque entry, leave alone
         return self._rebuild_from_array(new_arr)
 
     def _rebuild_from_array(
@@ -440,7 +440,7 @@ class ComponentTensor:
 
 
 # --------------------------------------------------------------------- #
-# ComponentMetric — symmetric (0, 2) tensor                             #
+# ComponentMetric, symmetric (0, 2) tensor                             #
 # --------------------------------------------------------------------- #
 
 
@@ -461,7 +461,7 @@ class ComponentMetric(ComponentTensor):
     Notes
     -----
     On a concrete frame (:class:`CoordinateFrame`,
-    :class:`Tetrad`) the entries are SymPy expressions — full
+    :class:`Tetrad`) the entries are SymPy expressions, full
     arithmetic available. On an :class:`AbstractFrame` the entries
     may be jacopy :class:`~jacopy.core.expr.Expr` atoms; storage and
     indexing work, but :meth:`inverse` requires SymPy semantics and
@@ -479,16 +479,16 @@ class ComponentMetric(ComponentTensor):
             for b in range(a + 1, frame.dim):
                 lhs = self._components[a, b]
                 rhs = self._components[b, a]
-                # Fast structural check — works for jacopy Expr and SymPy.
+                # Fast structural check, works for jacopy Expr and SymPy.
                 if lhs == rhs:
                     continue
                 # Fall back to sp.simplify on the difference. May raise
-                # SympifyError for jacopy Expr — caught below.
+                # SympifyError for jacopy Expr, caught below.
                 try:
                     diff = lhs - rhs
                     diff = sp.simplify(diff)
                 except (TypeError, AttributeError, sp.SympifyError):
-                    # Couldn't normalise — accept the structural mismatch
+                    # Couldn't normalise, accept the structural mismatch
                     # as user error iff lhs != rhs at the structural
                     # level too.
                     diff = lhs - rhs
@@ -520,7 +520,7 @@ class ComponentMetric(ComponentTensor):
         return self.matrix().det()
 
     def inverse(self) -> "ComponentMetricInverse":
-        r"""Compute ``g^{ab}`` — the (2, 0) inverse metric.
+        r"""Compute ``g^{ab}``, the (2, 0) inverse metric.
 
         Concrete frames (:class:`CoordinateFrame`, :class:`Tetrad`):
         returns a :class:`ComponentMetricInverse` whose matrix is
@@ -557,7 +557,7 @@ class ComponentMetric(ComponentTensor):
     def _rebuild_from_array(
         self, new_arr: sp.MutableDenseNDimArray
     ) -> "ComponentMetric":
-        # Bypass symmetry re-check on rebuild — the source is a
+        # Bypass symmetry re-check on rebuild, the source is a
         # ComponentMetric so symmetry was verified at construction.
         out = object.__new__(ComponentMetric)
         ComponentTensor.__init__(
@@ -567,7 +567,7 @@ class ComponentMetric(ComponentTensor):
 
 
 # --------------------------------------------------------------------- #
-# ComponentMetricInverse — (2, 0) tensor                                #
+# ComponentMetricInverse, (2, 0) tensor                                #
 # --------------------------------------------------------------------- #
 
 
@@ -589,7 +589,7 @@ class ComponentMetricInverse(ComponentTensor):
         return sp.Matrix(self._components.tolist())
 
     def inverse(self) -> ComponentMetric:
-        r"""``(g^{ab})^{-1} = g_{ab}`` — round-trip back to the metric."""
+        r"""``(g^{ab})^{-1} = g_{ab}``, round-trip back to the metric."""
         if isinstance(self._frame, AbstractFrame):
             raise NotImplementedError(
                 "ComponentMetricInverse.inverse on AbstractFrame is "
@@ -610,12 +610,12 @@ class ComponentMetricInverse(ComponentTensor):
 
 
 # --------------------------------------------------------------------- #
-# ComponentConnection — (1, 2) tensor of Christoffel symbols            #
+# ComponentConnection, (1, 2) tensor of Christoffel symbols            #
 # --------------------------------------------------------------------- #
 
 
 class ComponentConnection(ComponentTensor):
-    r"""``(1, 2)`` tensor ``Γ^a_{bc}`` — connection coefficients.
+    r"""``(1, 2)`` tensor ``Γ^a_{bc}``, connection coefficients.
 
     Index convention: ``connection[a, b, c]`` is ``Γ^a_{bc}``, with
     ``a`` upper and ``(b, c)`` lower. The plan's Stage D will produce

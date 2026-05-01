@@ -224,7 +224,7 @@ class TestGrading:
     def test_degree_does_not_require_registry(self):
         omega = Symbol("ω")
         X, Y = Symbol("X"), Symbol("Y")
-        # No registry — head's degree is undefined, but MultiEval still
+        # No registry, head's degree is undefined, but MultiEval still
         # reports degree 0 (an evaluation always produces a scalar).
         m = multi_eval(omega, X, Y)
         assert degree_of(m) == Degree.const(0)

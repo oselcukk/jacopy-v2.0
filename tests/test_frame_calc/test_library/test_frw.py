@@ -47,7 +47,7 @@ class TestFRWConstruction:
 
 
 class TestFRWPipeline:
-    """FRW is a non-vacuum solution — Einstein tensor non-zero in general."""
+    """FRW is a non-vacuum solution, Einstein tensor non-zero in general."""
 
     def test_einstein_tensor_nonzero(self) -> None:
         F, g = frw()

@@ -2,7 +2,7 @@
 Plain-text renderer for :class:`~jacopy.core.expr.Expr` trees and
 :class:`~jacopy.proof.step.ProofStep` / :class:`~jacopy.proof.chain.ProofChain`.
 
-The goal is a mathematically legible ASCII form — closer to how the
+The goal is a mathematically legible ASCII form, closer to how the
 objects are written in prose than the raw ``__repr__`` output. Sign
 normalisation folds ``Sum(a, Neg(b), c)`` into ``a - b + c`` instead of
 ``(a + (-b) + c)``, and precedence-aware parentheses keep nested
@@ -15,7 +15,7 @@ falls through to the generic :class:`Derivation` handler without every
 subclass having to register one.
 
 The ``to_ascii`` entry point treats the Unicode glyphs that appear in
-operator names (``ι``, ``ω``, ``♭``, ``⟨⟩``) as plain text — the
+operator names (``ι``, ``ω``, ``♭``, ``⟨⟩``) as plain text, the
 terminal typically prints them fine, and anything that cannot handle
 Unicode also cannot handle the rest of the mathematical symbols the
 package uses. The LaTeX renderer ships a dedicated sanitiser for the
@@ -229,9 +229,9 @@ def _multi_eval(expr: MultiEval, ctx: int) -> str:
 
 #: Recognised verbosity levels for proof-transcript rendering.
 #:
-#: * ``"full"``   — rule + tag + ``before → after`` + justification + children.
-#: * ``"summary"`` — rule + tag + ``before → after`` + children (no justification).
-#: * ``"compact"`` — rule + tag only (flat list; no before/after, no children).
+#: * ``"full"``  , rule + tag + ``before → after`` + justification + children.
+#: * ``"summary"``, rule + tag + ``before → after`` + children (no justification).
+#: * ``"compact"``, rule + tag only (flat list; no before/after, no children).
 VERBOSITY_MODES = ("full", "summary", "compact")
 
 
@@ -255,7 +255,7 @@ def step_to_ascii(
     / ``after`` expressions through :func:`to_ascii` so sign
     normalisation and precedence-aware parens kick in.
 
-    ``verbosity`` selects how much of each step is shown — see
+    ``verbosity`` selects how much of each step is shown, see
     :data:`VERBOSITY_MODES`.
     """
     if not isinstance(step, ProofStep):
@@ -264,7 +264,7 @@ def step_to_ascii(
     pad = "  " * indent
     tag = f" ({step.provenance_tag})" if step.provenance_tag else ""
     if verbosity == "compact":
-        # Rule + tag only — a one-line table-of-contents entry.
+        # Rule + tag only, a one-line table-of-contents entry.
         return f"{pad}[{step.rule}]{tag}"
     before = to_ascii(step.before)
     after = to_ascii(step.after)

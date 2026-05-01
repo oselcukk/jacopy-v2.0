@@ -1,26 +1,26 @@
 r"""
-Tilde-side closure axioms — Faz 14.G.
+Tilde-side closure axioms, Faz 14.G.
 
 Two engine rewrite rules that close the residues left by the Faz 14.E
 intrinsic formulas on the harder Cartan relations
 (``[L̃_α, L̃_β] = L̃_{[α,β]_K}`` rel-4 and ``[L̃_α, d̃] = 0`` rel-6):
 
-* :class:`MultiEvalLieCommutatorSlotDefinition` — Sum-level rule that
+* :class:`MultiEvalLieCommutatorSlotDefinition`, Sum-level rule that
   combines two ``MultiEval`` children differing in exactly one slot,
   where the differing slots are
   ``Act(LieDerivative(X), Act(LieDerivative(Y), ω))`` (positive child)
   and ``Act(LieDerivative(Y), Act(LieDerivative(X), ω))`` (negative
   child) for the same ``X, Y, ω``. The pair collapses into a single
   ``MultiEval`` whose differing slot is
-  ``Act(LieDerivative(LieBracketVF(X, Y)), ω)`` — the operator-level
+  ``Act(LieDerivative(LieBracketVF(X, Y)), ω)``, the operator-level
   Lie-commutator-equals-bracket-VF identity, lifted from the bare
   ``Act`` level (Faz 13.C ``OpCommutatorVfDefinition``) up into a
   ``MultiEval`` slot.
 
-* :class:`AnchorLieHomomorphismDefinition` — fires on a
+* :class:`AnchorLieHomomorphismDefinition`, fires on a
   ``LieBracketVF(Act(Sharp(π), α), Act(Sharp(π), β))`` (anywhere in the
   expression tree) and rewrites to
-  ``Act(Sharp(π), BracketApply(koszul, α, β))`` — the Lie-algebra
+  ``Act(Sharp(π), BracketApply(koszul, α, β))``, the Lie-algebra
   homomorphism ``π^♯ : (Ω¹, [·,·]_K) → (X(M), [·,·]_VF)`` that
   expresses the integrability of ``π``. Poisson-flag-gated: only fires
   when ``π`` carries the :class:`~jacopy.core.properties.Poisson`
@@ -73,7 +73,7 @@ def _match_lie_lie_slot(
 ) -> Optional[Tuple[LieDerivative, LieDerivative, Expr]]:
     """Match ``Act(L_X, Act(L_Y, ω))`` for two LieDerivative atoms.
 
-    Returns ``(L_X, L_Y, ω)`` or ``None``. ``L_X != L_Y`` is required —
+    Returns ``(L_X, L_Y, ω)`` or ``None``. ``L_X != L_Y`` is required,
     otherwise the commutator is trivially zero and there's nothing to
     fold.
     """
@@ -108,7 +108,7 @@ class MultiEvalLieCommutatorSlotDefinition(Definition):
     distinguished one. The two children are removed and replaced with
     a single
     ``MultiEval(V, ..., Act(LieDerivative(LieBracketVF(X, Y)), ω),
-    ..., other_args)`` — the bracket-VF-acting-on-the-form form of the
+    ..., other_args)``, the bracket-VF-acting-on-the-form form of the
     operator commutator, lifted into the slot.
 
     Why this rule is needed: after the Faz 14.E tilde-intrinsic
@@ -119,7 +119,7 @@ class MultiEvalLieCommutatorSlotDefinition(Definition):
     fires at the *bare-Act* Sum level; it can't reach into a
     ``MultiEval`` slot. This rule lifts that operator-level identity to
     the slot level, producing
-    ``+V(L_{[π^♯(α), π^♯(η)]_VF}(ξ))`` — at which point
+    ``+V(L_{[π^♯(α), π^♯(η)]_VF}(ξ))``, at which point
     :class:`AnchorLieHomomorphismDefinition` rewrites the inner bracket
     via the Poisson identity and the bracket-expansion rule unfolds
     ``[α, η]_K``, lining the term up with the sibling
@@ -128,7 +128,7 @@ class MultiEvalLieCommutatorSlotDefinition(Definition):
     The matched ``LieDerivative`` atoms can be constructed via any
     factory; the rule's ``lie_derivative_factory`` parameter selects
     which factory builds the resulting
-    ``LieDerivative(LieBracketVF(X, Y))`` — pass a custom one when the
+    ``LieDerivative(LieBracketVF(X, Y))``, pass a custom one when the
     host calculus uses a non-default ``d`` or interior product.
     """
 
@@ -167,15 +167,15 @@ class MultiEvalLieCommutatorSlotDefinition(Definition):
         """Locate the first cancelling slot-Lie pair in the Sum.
 
         Returns ``(i, j, sign, slot_idx, parent_pos, X, Y, ω)`` where:
-          * ``i, j`` — child indices in the Sum
-          * ``sign`` — overall sign to attach to the merged result
+          * ``i, j``, child indices in the Sum
+          * ``sign``, overall sign to attach to the merged result
             (``+1`` if the +child came in canonical order ``L_X∘L_Y``,
-            ``-1`` if it came in reversed order — see the docstring of
+            ``-1`` if it came in reversed order, see the docstring of
             the rewrite for the algebra)
-          * ``slot_idx`` — index of the differing slot in the MultiEval
-          * ``parent_pos`` — the +child's MultiEval (used to inherit
+          * ``slot_idx``, index of the differing slot in the MultiEval
+          * ``parent_pos``, the +child's MultiEval (used to inherit
             head, alternating, slot_kind, and other-slot args)
-          * ``X, Y, ω`` — operator commutator components, ordered so
+          * ``X, Y, ω``, operator commutator components, ordered so
             that ``+V(L_X(L_Y(ω))) − V(L_Y(L_X(ω))) = V(L_[X,Y]_VF(ω))``
         """
         children = sum_expr.children
@@ -258,7 +258,7 @@ class MultiEvalLieCommutatorSlotDefinition(Definition):
 
 
 class AnchorLieHomomorphismDefinition(Definition):
-    r"""``[π^♯α, π^♯β]_VF → π^♯([α, β]_K)`` — Poisson-gated.
+    r"""``[π^♯α, π^♯β]_VF → π^♯([α, β]_K)``, Poisson-gated.
 
     Fires on a :class:`LieBracketVF` whose two operands are both
     ``Act(Sharp(π), _)`` for the same ``Sharp(π)``, and rewrites the
@@ -268,7 +268,7 @@ class AnchorLieHomomorphismDefinition(Definition):
     algebra homomorphism is *equivalent* to ``[π, π]_SN = 0``, i.e. to
     ``π`` being a Poisson bivector. The rule is therefore registry-
     gated: it only fires when ``π`` carries the
-    :class:`~jacopy.core.properties.Poisson` property — the same flag
+    :class:`~jacopy.core.properties.Poisson` property, the same flag
     set by :meth:`~jacopy.library.koszul_problem.KoszulProblem.assume_poisson`
     that Faz 14.D's
     :class:`~jacopy.calculus.tilde.aux_axioms.TildeDSquaredPoissonDefinition`
@@ -284,7 +284,7 @@ class AnchorLieHomomorphismDefinition(Definition):
     Tree-traversal note: the engine descends through :class:`Act` and
     other compound shapes, so a ``LieBracketVF`` sitting as the
     ``vector_field`` of a :class:`LieDerivative` is reached by
-    matching at the LieDerivative-as-children level — but this rule
+    matching at the LieDerivative-as-children level, but this rule
     matches the bare ``LieBracketVF`` node directly, wherever it
     appears. (LieDerivative itself is opaque; that case is handled by
     a sibling rule that matches the LieDerivative shape.)
@@ -366,8 +366,8 @@ class AnchorLieHomomorphismDefinition(Definition):
 class LieDerivativeOfAnchorBracketDefinition(Definition):
     r"""Rewrite ``LieDerivative(LieBracketVF(π^♯α, π^♯β))`` under Poisson.
 
-    The :class:`LieDerivative` is opaque to engine tree traversal — its
-    ``vector_field`` doesn't surface as a child — so the bare
+    The :class:`LieDerivative` is opaque to engine tree traversal, its
+    ``vector_field`` doesn't surface as a child, so the bare
     :class:`AnchorLieHomomorphismDefinition` cannot reach a
     ``LieBracketVF`` sitting inside one. This rule fills that gap: it
     matches a :class:`LieDerivative` whose ``vector_field`` is a
@@ -475,7 +475,7 @@ class LieCommutesWithDTildeDefinition(Definition):
     :class:`~jacopy.proof.expansion.LieDerivativeCommutesWithDDefinition`
     that drops the flow-mode restriction. The identity ``[L_X, d] = 0``
     is true in both axiomatic modes; the flow-mode gate on the
-    proof-engine version was conservative — it kept Cartan-mode
+    proof-engine version was conservative, it kept Cartan-mode
     expansions from racing with their own magic-formula unfold. In the
     tilde engine the L̃/d̃ intrinsic rules carry the heavy lifting and
     the ``L_X(d…)`` shapes left in residues come from Koszul-bracket
@@ -505,7 +505,7 @@ class LieCommutesWithDTildeDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# L_{π^♯α}(π^♯β) → π^♯([α,β]_K) — Poisson-gated                          #
+# L_{π^♯α}(π^♯β) → π^♯([α,β]_K), Poisson-gated                          #
 # --------------------------------------------------------------------- #
 
 
@@ -598,12 +598,12 @@ class LieDerivativeOnAnchorImageDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# Hamiltonian-pairing antisymmetry from π — Sum-level cancellation      #
+# Hamiltonian-pairing antisymmetry from π, Sum-level cancellation      #
 # --------------------------------------------------------------------- #
 
 
 class HamiltonianAnchorPairingAntisymmetryDefinition(Definition):
-    r"""``X_⟨π^♯a, b⟩(c) + X_⟨π^♯b, a⟩(c) → 0`` — Sum-level π antisymmetry.
+    r"""``X_⟨π^♯a, b⟩(c) + X_⟨π^♯b, a⟩(c) → 0``, Sum-level π antisymmetry.
 
     The bivector ``π`` is antisymmetric, so for any 1-forms ``a, b``
 
@@ -706,7 +706,7 @@ class HamiltonianAnchorPairingAntisymmetryDefinition(Definition):
         for (i, p1), (j, p2) in combinations(candidates, 2):
             neg1, a1, b1, c1 = p1
             neg2, a2, b2, c2 = p2
-            # Same outer sign — both X_⟨πa,b⟩(c) bare or both Neg-wrapped.
+            # Same outer sign, both X_⟨πa,b⟩(c) bare or both Neg-wrapped.
             if neg1 != neg2:
                 continue
             # Operand must match.
@@ -720,7 +720,7 @@ class HamiltonianAnchorPairingAntisymmetryDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# ⟨X, dF⟩ → L_X(F) — pairing-with-exact-form identity                    #
+# ⟨X, dF⟩ → L_X(F), pairing-with-exact-form identity                    #
 # --------------------------------------------------------------------- #
 
 
@@ -745,12 +745,12 @@ class TildeSnJacobiResidueDefinition(Definition):
     Under the :class:`~jacopy.core.properties.Poisson` property the
     sum vanishes; the rule removes all five matched children. Multiple
     matches in the same Sum are handled across successive engine
-    iterations — each call removes one quintuple.
+    iterations, each call removes one quintuple.
 
     Why a focused recognizer rather than expanding the SN-Jacobi
     identity step-by-step: the constituent identities (Pairing
     Leibniz, ``L_{π^♯a}π^♯b = π^♯[a,b]_K``, ``X_F = π^♯(dF)``) interact
-    multiplicatively — installing them all would oscillate without a
+    multiplicatively, installing them all would oscillate without a
     canonical normalization, and the resulting search space dwarfs
     the recognizer cost. The 5-term shape is stable across rel-4 and
     rel-6 (verified empirically with ``assume_poisson()`` on a generic
@@ -898,7 +898,7 @@ class TildeSnJacobiResidueDefinition(Definition):
 
     def _search_group(self, members) -> Optional[set]:
         """Find five members that match the SN-Jacobi pattern for some
-        triple ``(a, b, c)``. Tries both polarities — canonical (anchor
+        triple ``(a, b, c)``. Tries both polarities, canonical (anchor
         on H+) and overall-sign-flipped (anchor on H−). Both encode the
         same ``[π,π]_SN(a,b,c) = 0`` identity; which one a downstream
         rewrite leaves depends on the wrap chain (e.g. an outer
@@ -941,7 +941,7 @@ class TildeSnJacobiResidueDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# Wrapped pairing antisymmetry — Sum-level π antisym through wrappers   #
+# Wrapped pairing antisymmetry, Sum-level π antisym through wrappers   #
 # --------------------------------------------------------------------- #
 
 
@@ -1006,7 +1006,7 @@ class WrappedPairingAnchorAntisymmetryDefinition(Definition):
 
         ``neg`` is the outer-Neg flag. ``wrap_key`` is a tuple-encoded
         signature of the wrapping (Acts and MultiEval evaluations) around
-        the pairing — outermost first. Two terms cancel only when their
+        the pairing, outermost first. Two terms cancel only when their
         ``wrap_key`` tuples are equal. The innermost expression must be a
         :class:`Pairing` whose first slot is ``Act(Sharp(π), a)``.
         """
@@ -1078,12 +1078,12 @@ class WrappedPairingAnchorAntisymmetryDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# ⟨X, dF⟩ → L_X(F) — pairing-with-exact-form identity                    #
+# ⟨X, dF⟩ → L_X(F), pairing-with-exact-form identity                    #
 # --------------------------------------------------------------------- #
 
 
 class PairingWithExactFormDefinition(Definition):
-    r"""``⟨X, d F⟩ → L_X(F)`` — pairing of a VF with an exact 1-form.
+    r"""``⟨X, d F⟩ → L_X(F)``, pairing of a VF with an exact 1-form.
 
     For any vector field ``X`` and 0-form ``F``:
 
@@ -1098,7 +1098,7 @@ class PairingWithExactFormDefinition(Definition):
     :class:`LieCommutesWithDTildeDefinition` can pick up where this
     rule left off.
 
-    This identity isn't restricted to anchor-image VFs — it's a basic
+    This identity isn't restricted to anchor-image VFs, it's a basic
     pairing identity. Restricting the operator argument to a generic
     :class:`Expr` keeps the rule from firing on ``Pairing(form, dF)``
     where the first slot is itself a 1-form (no VF semantics). The

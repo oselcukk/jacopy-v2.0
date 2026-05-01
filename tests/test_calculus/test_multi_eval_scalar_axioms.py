@@ -124,7 +124,7 @@ class TestMultiEvalScalarPullRewrite:
         assert inner.alternating is False
 
     def test_first_slot_wins_when_multiple_products(self):
-        # Both slot 0 and slot 1 are Products — slot 0 fires first.
+        # Both slot 0 and slot 1 are Products, slot 0 fires first.
         rule = MultiEvalScalarPullDefinition()
         f, g, pi, alpha, beta = (
             Symbol("f"),

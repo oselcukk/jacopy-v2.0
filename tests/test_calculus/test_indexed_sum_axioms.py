@@ -1,4 +1,4 @@
-"""Tests for the IndexedSum engine axioms — Faz 17.E.3-E.6 + Faz 17.F.1."""
+"""Tests for the IndexedSum engine axioms, Faz 17.E.3-E.6 + Faz 17.F.1."""
 
 from __future__ import annotations
 
@@ -30,7 +30,7 @@ from jacopy.proof.expansion import ExpansionEngine
 
 
 # --------------------------------------------------------------------- #
-# 17.E.3 — Sum / Neg distribute                                          #
+# 17.E.3, Sum / Neg distribute                                          #
 # --------------------------------------------------------------------- #
 
 
@@ -124,7 +124,7 @@ def test_scalar_pull_when_body_has_no_dependent_factor_leaves_one_inside():
 
 
 # --------------------------------------------------------------------- #
-# 17.E.5 — Pairing push-in                                               #
+# 17.E.5, Pairing push-in                                               #
 # --------------------------------------------------------------------- #
 
 
@@ -166,7 +166,7 @@ def test_pairing_push_in_left_when_X_dummy_free():
 
 
 # --------------------------------------------------------------------- #
-# 17.E.6 — Kronecker contraction                                         #
+# 17.E.6, Kronecker contraction                                         #
 # --------------------------------------------------------------------- #
 
 
@@ -248,7 +248,7 @@ def test_pipeline_scalar_paired_indexed_sum_reduces_to_scalar():
 
 
 # --------------------------------------------------------------------- #
-# 17.F.1 — ConnectionEval push-in over IndexedSum                        #
+# 17.F.1, ConnectionEval push-in over IndexedSum                        #
 # --------------------------------------------------------------------- #
 
 
@@ -307,13 +307,13 @@ def test_conn_eval_pushin_does_not_match_when_x_uses_dummy():
     nabla = connection("∇")
     F = LocalFrame("F")
     b = F.index("b", bound=True)
-    # X uses the same bound name; ∇_{X_b}(IS_b body) — pushing in would capture.
+    # X uses the same bound name; ∇_{X_b}(IS_b body), pushing in would capture.
     expr = ConnectionEvalExpr(nabla, F.X(b), IndexedSum(b, F, F.X(b)))
     assert not ConnectionEvalIndexedSumPushInDefinition(nabla).matches(expr)
 
 
 # --------------------------------------------------------------------- #
-# 17.F.2 — MultiEval push-in over IndexedSum                             #
+# 17.F.2, MultiEval push-in over IndexedSum                             #
 # --------------------------------------------------------------------- #
 
 

@@ -1,5 +1,5 @@
 r"""
-de Sitter metric — maximally symmetric spacetime with positive cosmological
+de Sitter metric, maximally symmetric spacetime with positive cosmological
 constant.
 
 In static coordinates ``(t, r, θ, φ)``:

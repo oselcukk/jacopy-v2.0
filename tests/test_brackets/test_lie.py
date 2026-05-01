@@ -58,7 +58,7 @@ class TestAxioms:
         """Plan-required test: ``[[X,Y],Z] + [[Y,Z],X] + [[Z,X],Y] = 0``.
 
         The Lie bracket's Jacobi identity is a theorem of associativity
-        — for vector-field symbols whose product is associative and
+       , for vector-field symbols whose product is associative and
         non-commutative, expanding every commutator layer and
         collecting like terms must leave nothing behind.
         """

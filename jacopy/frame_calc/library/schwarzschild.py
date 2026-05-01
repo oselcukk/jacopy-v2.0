@@ -1,5 +1,5 @@
 r"""
-Schwarzschild metric — static, spherically symmetric vacuum solution.
+Schwarzschild metric, static, spherically symmetric vacuum solution.
 
 In Schwarzschild coordinates ``(t, r, θ, φ)``:
 

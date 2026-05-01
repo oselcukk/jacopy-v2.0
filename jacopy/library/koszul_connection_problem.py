@@ -1,5 +1,5 @@
 r"""
-Koszul-connection capstone wrapper — Q9 Stage 9.F.
+Koszul-connection capstone wrapper, Q9 Stage 9.F.
 
 A :class:`KoszulConnectionProblem` bundles a single
 :class:`~jacopy.calculus.connection.AffineConnection` whose vector
@@ -8,14 +8,14 @@ bracket is a :class:`~jacopy.brackets.base.GradedBracket`
 ``T*M`` for the Q9 Poisson setting) together with a local frame and
 forwards the three families of mechanised proofs the Q9 chapter cites:
 
-* Bianchi I / II — via :class:`~jacopy.library.bianchi_problem.BianchiProblem`
+* Bianchi I / II, via :class:`~jacopy.library.bianchi_problem.BianchiProblem`
   with its ``BracketApply`` closure family swapped in for the LBVF
   rules (Stage 9.C).
 * Cartan form-property props (``ω̃``, ``T̃``, ``R̃`` C∞-bilinearity +
-  antisymmetry) — via :class:`~jacopy.library.cartan_form_property.CartanFormPropertyProblem`,
+  antisymmetry), via :class:`~jacopy.library.cartan_form_property.CartanFormPropertyProblem`,
   inherited verbatim because the property axioms don't open the
   bracket (Stage 9.D certification).
-* Cartan structure equations I / II on T*M — via
+* Cartan structure equations I / II on T*M, via
   :class:`~jacopy.library.cartan_structure.CartanStructureProblem`,
   whose engine swaps in the anchor-pulled
   :class:`~jacopy.calculus.intrinsic_axioms.KoszulExteriorDIntrinsicDefinition`
@@ -42,7 +42,7 @@ from jacopy.library.cartan_structure import CartanStructureProblem
 
 
 class KoszulConnectionProblem:
-    r"""``(∇̃, F)`` — Koszul-connection capstone bundle.
+    r"""``(∇̃, F)``, Koszul-connection capstone bundle.
 
     Parameters
     ----------
@@ -89,7 +89,7 @@ class KoszulConnectionProblem:
         if connection.bracket is None:
             raise ValueError(
                 "KoszulConnectionProblem requires the connection to "
-                "carry a bracket — pass a koszul_connection(...) or "
+                "carry a bracket, pass a koszul_connection(...) or "
                 "another bracket-equipped AffineConnection. For a "
                 "bracket-free connection use the BianchiProblem / "
                 "CartanStructureProblem wrappers directly."

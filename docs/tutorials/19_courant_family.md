@@ -1,16 +1,16 @@
-# 19 — The Courant family: Dorfman, Courant, Dirac
+# 19, The Courant family: Dorfman, Courant, Dirac
 
-The Courant algebroid lives on ``TM ⊕ T*M`` — vector fields and
+The Courant algebroid lives on ``TM ⊕ T*M``, vector fields and
 1-forms paired together. It carries:
 
-* the **Courant bracket** ``[·, ·]_C`` — graded-antisymmetric, Jacobi
+* the **Courant bracket** ``[·, ·]_C``, graded-antisymmetric, Jacobi
   fails up to an exact term;
-* the **Dorfman bracket** ``[·, ·]_D`` — *not* antisymmetric, but
+* the **Dorfman bracket** ``[·, ·]_D``, *not* antisymmetric, but
   Jacobi (Leibniz) holds exactly;
 * an optional **H-twist** by a closed 3-form ``H`` modifying the form
   half;
-* **Dirac subbundles** ``L ⊂ TM ⊕ T*M`` — maximally isotropic,
-  involutive — generalising both Poisson and presymplectic structures.
+* **Dirac subbundles** ``L ⊂ TM ⊕ T*M``, maximally isotropic,
+  involutive, generalising both Poisson and presymplectic structures.
 
 The two brackets are *the same machinery* viewed two ways: same
 Cartan operators, same Lie bracket on vectors, different combination
@@ -19,12 +19,12 @@ statement of how they differ.
 
 This tutorial covers:
 
-1. `SectionPair` — operands as ``(X, α)`` pairs.
-2. `CourantAlgebroid` — both brackets, the H-twist, and the bridge.
-3. `prove_courant_dorfman_bridge` and `prove_jacobi_reduction` — the
+1. `SectionPair`, operands as ``(X, α)`` pairs.
+2. `CourantAlgebroid`, both brackets, the H-twist, and the bridge.
+3. `prove_courant_dorfman_bridge` and `prove_jacobi_reduction`, the
    two seeded theorems.
-4. `DiracStructure` — pairing, isotropy, involutivity.
-5. `poisson_dirac` and `presymplectic_dirac` — the canonical Dirac
+4. `DiracStructure`, pairing, isotropy, involutivity.
+5. `poisson_dirac` and `presymplectic_dirac`, the canonical Dirac
    structures of the two source geometries.
 
 ## Section pairs as operands
@@ -52,11 +52,11 @@ print(f"a = ({a.vector}, {a.form})")
 print(f"b = ({b.vector}, {b.form})")
 ```
 
-## `CourantAlgebroid` — both brackets at once
+## `CourantAlgebroid`, both brackets at once
 
 Construct with no arguments for the standard untwisted algebroid;
 pass `background_H=H` to twist by a closed 3-form ``H``. Both
-brackets are exposed and use the **same** Cartan operators — that
+brackets are exposed and use the **same** Cartan operators, that
 sharing is what makes the Courant–Dorfman bridge identity exact
 rather than approximate.
 
@@ -88,7 +88,7 @@ collapses to a single exact correction:
 [a, b]_D − [a, b]_C = (0, ½ d(ι_X β + ι_Y α))
 ```
 
-The proof is a single `theorem`-tagged step — the algebraic identity
+The proof is a single `theorem`-tagged step, the algebraic identity
 *is* the theorem. Cartan's magic formula
 ``L_Y α = d(ι_Y α) + ι_Y(dα)`` is what makes the cancellation work.
 
@@ -110,7 +110,7 @@ re-cite it without re-running the proof.
 
 ## H-twisted Jacobi
 
-The untwisted Courant algebroid satisfies Jacobi exactly — the
+The untwisted Courant algebroid satisfies Jacobi exactly, the
 obstruction is the literal ``0``. Adding an H-twist puts the
 obstruction at ``dH``: Jacobi closes iff ``dH = 0``.
 
@@ -130,7 +130,7 @@ Both `prove_jacobi_reduction` variants emit a single
 `axiom`-tagged step. The untwisted case maps the literal ``0``
 obstruction to itself (vacuous Jacobi); the twisted case lands on
 ``dH``, leaving the caller to discharge ``dH = 0`` separately
-(typically by declaring `Closed(H)` on the registry — see tutorial
+(typically by declaring `Closed(H)` on the registry, see tutorial
 13).
 
 ## Dirac structures
@@ -138,7 +138,7 @@ obstruction to itself (vacuous Jacobi); the twisted case lands on
 A `DiracStructure` pins a maximally-isotropic involutive subbundle
 ``L ⊂ TM ⊕ T*M``. The wrapper carries the ambient
 `CourantAlgebroid` and a symbolic name for ``L``; it does **not**
-model section membership ``a ∈ Γ(L)`` symbolically — there's no
+model section membership ``a ∈ Γ(L)`` symbolically, there's no
 predicate algebra for that. What it does model is the two defining
 properties as **axiom**-tagged proof steps.
 
@@ -178,7 +178,7 @@ print(f"involutivity   : {len(chain)} step, rule={chain.steps[0].rule}")
 ```
 
 Both `prove_isotropy` and `prove_involutivity` emit single
-`axiom`-tagged steps — the citation form. Callers that want to
+`axiom`-tagged steps, the citation form. Callers that want to
 expand the pairing arithmetically should reach for `pairing` and
 `isotropy_obstruction` directly and run the engine themselves.
 
@@ -210,7 +210,7 @@ Each factory only records the subbundle name (``L_π`` /
 ``L_ω``); the isotropy and involutivity axioms remain axioms on
 the resulting `DiracStructure`. *Proving* "``dω = 0`` ⇒ ``L_ω`` is
 Dirac" or "``[π, π]_SN = 0`` ⇒ ``L_π`` is Dirac" is a separate
-theorem — both inherit the axiom-step proofs unchanged from the
+theorem, both inherit the axiom-step proofs unchanged from the
 parent class.
 
 ## When to use what
@@ -225,7 +225,7 @@ parent class.
 | Poisson / presymplectic special cases | `poisson_dirac` / `presymplectic_dirac` |
 
 The Courant family is mostly *citation-shaped* in the engine layer
-— the deep algebraic content lives in the seeded theorems
+, the deep algebraic content lives in the seeded theorems
 (`courant_jacobi_twist`, `courant_dorfman_bridge`,
 `dirac_isotropy`, `dirac_involutivity`), not in step-by-step
 rewrites. That's a deliberate choice: spelling these out in the

@@ -1,5 +1,5 @@
 """
-Schouten-Nijenhuis bivector formula — Faz 13.D.
+Schouten-Nijenhuis bivector formula, Faz 13.D.
 
 After OpCommutator collapse (Faz 13.C axiom 5) the cyclic Koszul Jacobi
 sum's iterated-Lie group folds into three terms of the shape
@@ -11,7 +11,7 @@ sharps of the same bivector ``π``. This module's
 :class:`SnBivectorFormulaDefinition` is the engine-level expression of
 the classical evaluator formula
 
-    Σ_cyc L_{[π^♯a, π^♯b]_VF}(c) = ½⟨[π,π]_SN, a∧b∧c⟩ — represented
+    Σ_cyc L_{[π^♯a, π^♯b]_VF}(c) = ½⟨[π,π]_SN, a∧b∧c⟩, represented
     here as the inert ``BracketApply([·,·]_SN, π, π)`` node, which
     the surrounding strategy can pair against ``a∧b∧c`` downstream.
 
@@ -31,7 +31,7 @@ those rewrites is precisely the cyclic ``L_{[π^♯·, π^♯·]_VF}(·)`` tripl
 plus a residue of bookkeeping terms (nested ``L_π^♯(L_π^♯ ·)``,
 ``d⟨·, ·⟩``, ``L_X(d⟨·, ·⟩)``) that the strategy layer can simplify or
 the user can interpret as the leftover ``[π,π]_SN``-pairing pieces. The
-axiom captures the *named-bracket* part of the cancellation —
+axiom captures the *named-bracket* part of the cancellation,
 ``[π^♯·, π^♯·]_VF`` is what carries the SN content; the rest is
 bilinear reshape.
 """
@@ -64,7 +64,7 @@ def _peel_sharp(expr: Expr, sharp_atom: Sharp) -> Optional[Expr]:
 
 
 # --------------------------------------------------------------------- #
-# Axiom 6 — SN bivector formula                                          #
+# Axiom 6, SN bivector formula                                          #
 # --------------------------------------------------------------------- #
 
 
@@ -75,7 +75,7 @@ class SnBivectorFormulaDefinition(Definition):
     ``Act(L_{[Act(π^♯, a), Act(π^♯, b)]_VF}, c)`` whose inner
     ``(a, b, c)`` triples form a cyclic permutation. The three matched
     terms are stripped from the Sum and replaced by a single
-    ``BracketApply(sn, π, π)`` — the inert SN self-bracket node that
+    ``BracketApply(sn, π, π)``, the inert SN self-bracket node that
     Faz 9 Stage B treats as the universal Poisson obstruction.
 
     Parameters
@@ -86,7 +86,7 @@ class SnBivectorFormulaDefinition(Definition):
         ``LieBracketVF(X, Y)`` must have ``X = Act(sharp, ·)`` and
         ``Y = Act(sharp, ·)`` for this same ``sharp`` instance.
     sn_bracket
-        Optional :class:`~jacopy.brackets.schouten.SchoutenBracket` —
+        Optional :class:`~jacopy.brackets.schouten.SchoutenBracket`,
         defaults to :data:`jacopy.brackets.schouten.sn`. Override to
         thread a non-default SN bracket through the rewrite.
 
@@ -137,7 +137,7 @@ class SnBivectorFormulaDefinition(Definition):
         self, term: Expr
     ) -> Optional[Tuple[Expr, Expr, Expr]]:
         """Return ``(a, b, c)`` for ``Act(L_{[π^♯a, π^♯b]_VF}, c)``,
-        else ``None``. ``Neg``-wrapped terms decline — the cyclic
+        else ``None``. ``Neg``-wrapped terms decline, the cyclic
         formula is the *positive* triple."""
         if isinstance(term, Neg):
             return None

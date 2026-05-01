@@ -5,7 +5,7 @@ any cell raising an exception fails the test. This keeps the
 tutorials in ``docs/tutorials/`` from bit-rotting silently as the
 library API evolves.
 
-Skips entirely when ``nbformat`` / ``nbclient`` aren't installed —
+Skips entirely when ``nbformat`` / ``nbclient`` aren't installed,
 they're optional extras under ``[project.optional-dependencies.docs]``
 so contributors who don't touch docs don't need to install them.
 

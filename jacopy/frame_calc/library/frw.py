@@ -1,5 +1,5 @@
 r"""
-Friedmann–Robertson–Walker (FRW) metric — homogeneous isotropic cosmology.
+Friedmann–Robertson–Walker (FRW) metric, homogeneous isotropic cosmology.
 
 In comoving coordinates ``(t, r, θ, φ)``:
 
@@ -9,7 +9,7 @@ In comoving coordinates ``(t, r, θ, φ)``:
            + r^2\,d\theta^2 + r^2\sin^2\theta\,d\varphi^2\right]
 
 with curvature parameter ``k ∈ {-1, 0, +1}`` (open / flat / closed)
-and scale factor ``a(t)``. The metric is **not** vacuum — its
+and scale factor ``a(t)``. The metric is **not** vacuum, its
 Einstein tensor encodes the Friedmann equations once a stress-energy
 ``T`` is supplied.
 """
@@ -40,7 +40,7 @@ def frw(
         explicit applied function when you want to specialise to a
         specific evolution (e.g. ``a(t) = t**(2/3)`` for matter-dominated).
     k
-        Curvature parameter — must be ``-1``, ``0``, or ``+1``.
+        Curvature parameter, must be ``-1``, ``0``, or ``+1``.
         Default ``0`` (spatially flat).
     t_sym
         Time symbol. If ``None``, a fresh ``Symbol("t", real=True)`` is
@@ -57,7 +57,7 @@ def frw(
 
     Notes
     -----
-    For ``k = 0``: ``ds² = -dt² + a(t)²(dr² + r² dΩ²)`` — flat space
+    For ``k = 0``: ``ds² = -dt² + a(t)²(dr² + r² dΩ²)``, flat space
     expanded by ``a(t)``.
 
     For ``k = ±1``: the radial term takes the curved form

@@ -1,4 +1,4 @@
-"""Integration tests — ``ProofFailure.report`` carries diagnostic hints
+"""Integration tests, ``ProofFailure.report`` carries diagnostic hints
 when :class:`ExpandAndSimplify` stalls.
 """
 
@@ -23,7 +23,7 @@ from jacopy.proof import (
 
 
 def _engine_without_d_squared(registry):
-    """Engine with the Cartan axioms minus ``d² = 0`` — lets the
+    """Engine with the Cartan axioms minus ``d² = 0``, lets the
     diagnostic surface residual ``Act(d, Act(d, f))`` shapes that the
     default engine would have eliminated."""
     return ExpansionEngine(
@@ -75,7 +75,7 @@ class TestProofFailureCarriesReport:
         assert "stalled-d-squared" in text
 
     def test_empty_report_does_not_pollute_str(self):
-        """Legacy path — a ProofFailure constructed without a report
+        """Legacy path, a ProofFailure constructed without a report
         should still render the bare message (no trailing empty block)."""
         exc = ProofFailure("plain message")
         assert str(exc) == "plain message"

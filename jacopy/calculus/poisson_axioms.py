@@ -1,8 +1,8 @@
 """
-Function-level Poisson axioms — Faz 13.E.
+Function-level Poisson axioms, Faz 13.E.
 
 Two engine-level rewrite rules that drive the 2g-deep cancellation
-chain — the function-level analog of the 2f-deep / 13.D pass — from
+chain, the function-level analog of the 2f-deep / 13.D pass, from
 the cyclic Poisson Jacobi sum
 
     Σ_cyc {f, {g, h}_π}_π
@@ -11,24 +11,24 @@ down to the SN self-bracket handle ``BracketApply([·,·]_SN, π, π)``.
 The reduction proceeds in two steps after the LHS is formed via
 :meth:`DerivedBracket.graded_jacobi_obstruction`:
 
-* :class:`PoissonAsHamiltonianDefinition` — replaces a pinned
+* :class:`PoissonAsHamiltonianDefinition`, replaces a pinned
   Poisson-derived ``BracketApply(P, f, g)`` with ``Act(X_f, g)``,
   collapsing the bracket to its Hamiltonian vector-field action.
   Applies bottom-up to inner and outer brackets in turn, so a triply
   nested Jacobi term ``{f, {g, h}}`` rewrites to the iterated
   derivation ``X_f(X_g(h))``.
-* :class:`HamiltonianCyclicSnFormulaDefinition` — the function-level
+* :class:`HamiltonianCyclicSnFormulaDefinition`, the function-level
   sister of :class:`SnBivectorFormulaDefinition` (Faz 13.D). Fires on
   a :class:`Sum` containing three cyclic ``Act(X_a, Act(X_b, c))``
   terms over the same bivector and rewrites them to a single
   :class:`BracketApply` ``[·,·]_SN(π, π)``. Tolerates a global ``Neg``
-  on each term — the Koszul-signed Jacobi obstruction on functions
+  on each term, the Koszul-signed Jacobi obstruction on functions
   enters the chain with each cyclic term wrapped in :class:`Neg`,
   and the rule preserves that polarity in its emitted SN handle.
 
 Together these collapse the function-level cyclic Poisson Jacobi to
 the same universal SN obstruction the form-level (2f-deep) chain
-produces — the function-level evaluator formula of the Schouten-
+produces, the function-level evaluator formula of the Schouten-
 Nijenhuis bracket, without citing the Derived Bracket Theorem.
 """
 
@@ -50,7 +50,7 @@ from jacopy.proof.expansion import Definition
 
 
 # --------------------------------------------------------------------- #
-# Axiom 2g-1 — Poisson bracket as Hamiltonian action                     #
+# Axiom 2g-1, Poisson bracket as Hamiltonian action                     #
 # --------------------------------------------------------------------- #
 
 
@@ -59,7 +59,7 @@ class PoissonAsHamiltonianDefinition(Definition):
 
     Fires on :class:`BracketApply` nodes whose bracket is the specific
     :class:`DerivedBracket` instance supplied at construction. The
-    rewrite emits ``Act(HamiltonianVectorField(f, bivector=π), g)`` —
+    rewrite emits ``Act(HamiltonianVectorField(f, bivector=π), g)``,
     the standard identification of the Poisson bracket with the
     Hamiltonian vector field's action on the second argument.
 
@@ -67,8 +67,8 @@ class PoissonAsHamiltonianDefinition(Definition):
     the same proof from being swept up: a Courant or Schouten bracket
     sharing a name with the Poisson one would otherwise match this
     rule. The rule deliberately does not consult the bracket's name or
-    base — only object identity (``is``) and structural equality
-    (``==``) — so the caller controls the scope precisely.
+    base, only object identity (``is``) and structural equality
+    (``==``), so the caller controls the scope precisely.
 
     Parameters
     ----------
@@ -118,7 +118,7 @@ class PoissonAsHamiltonianDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# Axiom 2g-2 — function-level SN bivector formula                        #
+# Axiom 2g-2, function-level SN bivector formula                        #
 # --------------------------------------------------------------------- #
 
 
@@ -130,7 +130,7 @@ class HamiltonianCyclicSnFormulaDefinition(Definition):
     whose ``(a, b, c)`` triples form a cyclic permutation, with each
     Hamiltonian vector field built over the same bivector. The three
     matched terms are stripped from the Sum and replaced with a single
-    ``BracketApply(sn, π, π)`` — the inert SN self-bracket node that
+    ``BracketApply(sn, π, π)``, the inert SN self-bracket node that
     the Faz 9 Stage B machinery treats as the universal Poisson
     obstruction.
 

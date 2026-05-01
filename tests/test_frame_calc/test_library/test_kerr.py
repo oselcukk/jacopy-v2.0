@@ -73,11 +73,11 @@ class TestKerrConstruction:
 class TestKerrVacuumOptimized:
     """Kerr's vacuum solution `G ≡ 0` verified in optimized mode.
 
-    Default mode timed out at 180 s (Ricci alone never finished —
+    Default mode timed out at 180 s (Ricci alone never finished,
     sympy.simplify on Kerr-complexity expressions blows up).
     Optimized mode (skip mid-formula simplify) completes the entire
     pipeline in ~23 seconds, and the resulting Einstein-tensor
-    components are **literal zero** in raw form — SymPy's basic
+    components are **literal zero** in raw form, SymPy's basic
     arithmetic alone collapses the cancellations cleanly. No
     sympy.simplify is needed for the vacuum check.
 

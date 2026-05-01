@@ -7,7 +7,7 @@ A non-degenerate 2-form ``ω`` induces a bundle map
 ``α ↦ π(α, ·)``. When ``ω`` and ``π`` arise from the same geometric
 structure (a symplectic manifold, or a Poisson manifold whose
 bivector is the inverse of a symplectic form), the two maps are
-mutual inverses — this is the **musical compatibility** that bridges
+mutual inverses, this is the **musical compatibility** that bridges
 the symplectic and derived definitions of the Hamiltonian vector
 field.
 
@@ -20,19 +20,19 @@ are tensorial, not derivative.
 
 Compatibility is surfaced in two shapes:
 
-* :class:`MusicalCompatibility` — a frozen dataclass carrying the
+* :class:`MusicalCompatibility`, a frozen dataclass carrying the
   ``(ω, π)`` pair, the specific :class:`Flat` and :class:`Sharp`
   instances built from them, and a
   :meth:`~MusicalCompatibility.as_definition` factory returning the
   proof-engine rewrite rule.
-* :class:`MusicalCompatibilityDefinition` — an
+* :class:`MusicalCompatibilityDefinition`, an
   :class:`~jacopy.proof.expansion.Definition` that rewrites
   ``ω^♭(π^♯(α)) → α`` whenever the nested Act targets the registered
   compatible pair.
 
 Both shapes share their data so the user declares the compatibility
 once and lets the proof layer consume it. The reverse composition
-``π^♯(ω^♭(X)) → X`` is covered by the same definition — the axiom
+``π^♯(ω^♭(X)) → X`` is covered by the same definition, the axiom
 ``ω^♭ ∘ π^♯ = id`` and its partner ``π^♯ ∘ ω^♭ = id`` are logically
 a single fact in the non-degenerate case.
 """
@@ -55,7 +55,7 @@ from jacopy.proof.expansion import Definition
 
 
 class Flat(Derivation):
-    """``ω^♭`` — the flat musical map of a 2-form ``ω``.
+    """``ω^♭``, the flat musical map of a 2-form ``ω``.
 
     A degree-0 derivation atom. ``Act(Flat(ω), X)`` represents the
     1-form ``ω(X, ·)``. Equality is structural over the generating
@@ -91,7 +91,7 @@ def flat(omega: Expr, *, name: Optional[str] = None) -> Flat:
 
 
 class Sharp(Derivation):
-    """``π^♯`` — the sharp musical map of a bivector ``π``.
+    """``π^♯``, the sharp musical map of a bivector ``π``.
 
     Degree-0 derivation atom mirror of :class:`Flat`. ``Act(Sharp(π),
     α)`` represents the vector field ``π(α, ·)``.
@@ -120,7 +120,7 @@ def sharp(pi: Expr, *, name: Optional[str] = None) -> Sharp:
 
 
 # --------------------------------------------------------------------- #
-# Musical compatibility — the axiom ω♭ ∘ π♯ = id                        #
+# Musical compatibility, the axiom ω♭ ∘ π♯ = id                        #
 # --------------------------------------------------------------------- #
 
 
@@ -188,13 +188,13 @@ class MusicalCompatibility:
         axiom on an :class:`~jacopy.proof.expansion.ExpansionEngine`.
         The tuple bundles:
 
-        1. :class:`IotaFlatDefinition` — for this ``ω``,
+        1. :class:`IotaFlatDefinition`, for this ``ω``,
            ``ι_X ω → ω^♭(X)`` (shape identity on 2-forms).
-        2. :class:`ArgNegLinearityDefinition` — linearity
+        2. :class:`ArgNegLinearityDefinition`, linearity
            ``D(−x) → −D(x)`` for Derivation ``D``. Needed so the
            compatibility rule can see through a wrapping ``Neg`` left
            over from the Hamiltonian's derived sign convention.
-        3. :class:`MusicalCompatibilityDefinition` —
+        3. :class:`MusicalCompatibilityDefinition`,
            ``ω^♭ ∘ π^♯ = id`` (and ``π^♯ ∘ ω^♭ = id``).
 
         The Hamiltonian-specific rewrite ``X_f → −π^♯(df)`` is kept in
@@ -215,13 +215,13 @@ class MusicalCompatibility:
 
 
 class MusicalCompatibilityDefinition(Definition):
-    """``ω^♭(π^♯(α)) = α`` and ``π^♯(ω^♭(X)) = X`` — the musical axiom.
+    """``ω^♭(π^♯(α)) = α`` and ``π^♯(ω^♭(X)) = X``, the musical axiom.
 
     Registered on an :class:`~jacopy.proof.expansion.ExpansionEngine`
     this rule peels the nested composition whenever the outer and
     inner operators match the compatibility's declared
     :class:`Flat` / :class:`Sharp` pair. Other flat/sharp operators
-    (a different form, a different bivector) are ignored — two
+    (a different form, a different bivector) are ignored, two
     distinct symplectic structures on the same manifold coexist
     without rewrites bleeding across them.
     """
@@ -258,7 +258,7 @@ class MusicalCompatibilityDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# Iota-flat identity — ι_X ω = ω♭(X) on the compatibility's 2-form       #
+# Iota-flat identity, ι_X ω = ω♭(X) on the compatibility's 2-form       #
 # --------------------------------------------------------------------- #
 
 
@@ -268,7 +268,7 @@ class IotaFlatDefinition(Definition):
     Tied to a specific :class:`MusicalCompatibility` so the rewrite
     fires only when the 2-form in the ``Act`` argument is the one the
     user has declared compatible. ``ι`` on a 2-form contracts in the
-    first slot, producing a 1-form — exactly the image of the flat
+    first slot, producing a 1-form, exactly the image of the flat
     map. Treating this as an engine rule (rather than a structural
     identity on :class:`InteriorProduct`) keeps the rewrite scoped:
     only proofs that have opted in via a compatibility axiom see it
@@ -300,7 +300,7 @@ class IotaFlatDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# Argument linearity — D(-x) = -D(x) on any Derivation D                 #
+# Argument linearity, D(-x) = -D(x) on any Derivation D                 #
 # --------------------------------------------------------------------- #
 
 
@@ -331,12 +331,12 @@ class ArgNegLinearityDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# Musical bilinear — ω(π♯α, π♯β) = π(α, β)                                #
+# Musical bilinear, ω(π♯α, π♯β) = π(α, β)                                #
 # --------------------------------------------------------------------- #
 
 
 class MusicalCompatibilityBilinearDefinition(Definition):
-    r"""``ω(π^♯α, π^♯β) → π(α, β)`` — the bilinear face of musical compat.
+    r"""``ω(π^♯α, π^♯β) → π(α, β)``, the bilinear face of musical compat.
 
     Tied to a specific :class:`MusicalCompatibility` so the rule fires
     only when the outer 2-form and both ``π^♯`` operators match the

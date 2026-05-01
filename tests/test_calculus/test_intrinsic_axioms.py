@@ -45,11 +45,11 @@ class TestInteriorProductIntrinsicMatches:
         omega = Symbol("ω")
         X, Y = Derivation("X", 0), Derivation("Y", 0)
         rule = InteriorProductIntrinsicDefinition()
-        # d ω as head — different operator, shouldn't fire.
+        # d ω as head, different operator, shouldn't fire.
         assert not rule.matches(multi_eval(default_d(omega), X, Y))
 
     def test_no_match_covector_slot_kind(self):
-        # Bivector-on-covectors evaluation — interior product doesn't
+        # Bivector-on-covectors evaluation, interior product doesn't
         # apply, the rule must stay inert.
         omega = Symbol("ω")
         alpha = Symbol("α")
@@ -100,7 +100,7 @@ class TestInteriorProductIntrinsicRewrite:
         assert out.slot_kind == "vector"
 
     def test_works_with_compound_form(self):
-        # Form is itself an Act — e.g. d β at the head — the rewrite
+        # Form is itself an Act, e.g. d β at the head, the rewrite
         # treats it structurally, no special unwrapping.
         beta = Symbol("β")
         X, Y, Z = (Derivation(s, 0) for s in ("X", "Y", "Z"))
@@ -190,7 +190,7 @@ class TestLieDerivativeIntrinsicMatches:
         assert not rule.matches(multi_eval(omega, X))
 
     def test_no_match_iota_head(self):
-        # ι_X is not L_X — different operator family.
+        # ι_X is not L_X, different operator family.
         omega = Symbol("ω")
         X, Y = Derivation("X", 0), Derivation("Y", 0)
         rule = LieDerivativeIntrinsicDefinition()
@@ -257,7 +257,7 @@ class TestLieDerivativeIntrinsicRewrite:
         out = rule.rewrite(
             multi_eval(lie_derivative(X)(omega), Y, alternating=False)
         )
-        # Both inner MultiEvals — the X-action one and the bracket one —
+        # Both inner MultiEvals, the X-action one and the bracket one,
         # carry the non-alternating flag forward.
         assert isinstance(out, Sum)
         first, neg = out.children
@@ -274,7 +274,7 @@ class TestLieDerivativeIntrinsicRewrite:
         assert neg.arg.slot_kind == "vector"
 
     def test_works_with_compound_form(self):
-        # Form is itself an Act — e.g. d β at the head.
+        # Form is itself an Act, e.g. d β at the head.
         beta = Symbol("β")
         X, Y = Derivation("X", 0), Derivation("Y", 0)
         rule = LieDerivativeIntrinsicDefinition()
@@ -494,7 +494,7 @@ class TestExteriorDEngineIntegration:
         assert len(steps) == 1
 
     def test_engine_combines_with_iota_intrinsic(self):
-        # (d (ι_Z ω))(X, Y) — ω is a 2-form, so ι_Z ω is a 1-form, and
+        # (d (ι_Z ω))(X, Y), ω is a 2-form, so ι_Z ω is a 1-form, and
         # d(ι_Z ω) is a 2-form. The d intrinsic fires first:
         #   X((ι_Z ω)(Y)) − Y((ι_Z ω)(X)) − (ι_Z ω)([X, Y]_VF)
         # then the ι intrinsic absorbs Z into each remaining slot:
@@ -522,7 +522,7 @@ class TestExteriorDEngineIntegration:
         # then each expands by Koszul:
         #   X(ω(Z)) − Z(ω(X)) − ω([X, Z]_VF)
         # + Y(ω(Z)) − Z(ω(Y)) − ω([Y, Z]_VF)
-        # ArgLinearity must run *first* (top-down) — but the engine is
+        # ArgLinearity must run *first* (top-down), but the engine is
         # bottom-up, so the d-intrinsic on the compound first arg fires
         # and gets [X+Y, Z]_VF as an opaque atom; ArgLinearity then
         # distributes only inside the inner MultiEvals it can see.
@@ -557,14 +557,14 @@ class TestExteriorDEngineIntegration:
 
 
 # --------------------------------------------------------------------- #
-# Q9 Stage 9.E — Koszul intrinsic d̃                                     #
+# Q9 Stage 9.E, Koszul intrinsic d̃                                     #
 # --------------------------------------------------------------------- #
 
 
 class TestKoszulExteriorDIntrinsic:
     """Connection-parametric d̃ rule routes the function action through
     ``connection.function_action`` and emits a ``BracketApply`` of the
-    connection's bracket — both essential to closing Cartan I/II on a
+    connection's bracket, both essential to closing Cartan I/II on a
     Koszul connection.
     """
 
@@ -612,10 +612,10 @@ class TestKoszulExteriorDIntrinsic:
         X, Y = Derivation("X", 0), Derivation("Y", 0)
         expr = MultiEval(Act(d, omega), X, Y, slot_kind="vector")
         out = rule.rewrite(expr)
-        # Last summand carries ω([X, Y]_K) — the BracketApply uses the
+        # Last summand carries ω([X, Y]_K), the BracketApply uses the
         # connection's bracket, not LieBracketVF.
         bracket_summand = out.children[-1]
-        # bracket summand is Neg(MultiEval(ω, [X,Y]_K)) — sign (i+j)%2=1
+        # bracket summand is Neg(MultiEval(ω, [X,Y]_K)), sign (i+j)%2=1
         # for (0, 1).
         from jacopy.core.expr import Neg
         assert isinstance(bracket_summand, Neg)

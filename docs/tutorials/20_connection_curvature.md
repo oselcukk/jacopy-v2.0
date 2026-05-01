@@ -1,28 +1,28 @@
-# 20 — Connection, curvature, and Bianchi identities
+# 20, Connection, curvature, and Bianchi identities
 
 An **affine connection** ``∇`` on ``TM`` is the linear-algebraic
 backbone of differential geometry: it's what lets you take directional
 derivatives of vector fields. Once you have ``∇`` you get **torsion**
 ``T(X, Y)`` measuring its asymmetry, **curvature** ``R(X, Y) Z``
-measuring its non-flatness, and the **two Bianchi identities** —
+measuring its non-flatness, and the **two Bianchi identities**,
 algebraic identities relating ``T``, ``R``, and their covariant
 derivatives.
 
 This tutorial covers:
 
-1. `AffineConnection` — the atom, ``∇_X Y`` evaluation, the four
+1. `AffineConnection`, the atom, ``∇_X Y`` evaluation, the four
    connection axioms.
-2. `Torsion` and `Curvature` — the symbolic builders.
-3. `cov_deriv_torsion` / `cov_deriv_curvature` — covariant derivatives.
-4. `BianchiProblem` — the wrapper that bundles every rule needed.
-5. `prove_first_bianchi` / `prove_second_bianchi` — the two
+2. `Torsion` and `Curvature`, the symbolic builders.
+3. `cov_deriv_torsion` / `cov_deriv_curvature`, covariant derivatives.
+4. `BianchiProblem`, the wrapper that bundles every rule needed.
+5. `prove_first_bianchi` / `prove_second_bianchi`, the two
    identities, mechanically.
-6. `koszul_connection` — the cotangent-bundle Koszul variant for
+6. `koszul_connection`, the cotangent-bundle Koszul variant for
    problems on ``T*M``.
 
 ## `AffineConnection` and `∇_X Y`
 
-`AffineConnection(name)` is an atom — opaque to the engine until a
+`AffineConnection(name)` is an atom, opaque to the engine until a
 rule fires. Its core operation is `∇.eval(X, Y)` building the
 `ConnectionEvalExpr` node ``∇_X Y``.
 
@@ -48,7 +48,7 @@ affine connection:
 | `ConnectionYLeibnizDefinition` | ``∇_X (f Y) = X(f) Y + f ∇_X Y`` |
 
 The Leibniz rule's ``X(f)`` term routes through
-`AffineConnection.function_action(X, f)` — that's the hook for
+`AffineConnection.function_action(X, f)`, that's the hook for
 algebroid connections to swap ``X(f)`` for ``ρ(X)(f)``.
 
 ## `Torsion` and `Curvature`
@@ -76,13 +76,13 @@ print(f"R(X, Y) W      : {R}")
 ```
 
 The bracket inside ``T`` and ``R`` is the
-**vector-field bracket** of the connection — `LieBracketVF` by
+**vector-field bracket** of the connection, `LieBracketVF` by
 default, or a custom bracket if the connection was built with one.
 That's what makes the same `BianchiProblem` machinery work for both
 plain affine connections and the algebroid Koszul connection (see
 the bottom section).
 
-## `BianchiProblem` — the wrapper
+## `BianchiProblem`, the wrapper
 
 `BianchiProblem(connection, *, registry)` bundles every rule needed
 to close the two Bianchi identities: the four connection axioms, the
@@ -101,7 +101,7 @@ print(f"connection   : {prob.connection}")
 ```
 
 The `registry` is consulted by the Y-Leibniz rule for the
-`Graded(degree=0)` test on a function factor — pass `None` if you
+`Graded(degree=0)` test on a function factor, pass `None` if you
 only have pure vector-field arguments.
 
 ## First Bianchi identity
@@ -138,14 +138,14 @@ res2 = prob.prove_second_bianchi(X, Y, W, Z)
 print(f"Bianchi II : ok={res2.ok}, steps={len(res2.lhs_steps)}")
 ```
 
-The second identity is structurally similar — three cyclic terms on
+The second identity is structurally similar, three cyclic terms on
 each side, comparable engine workload, ~63 steps in total.
 
-## The Koszul connection — same identities on `T*M`
+## The Koszul connection, same identities on `T*M`
 
 `koszul_connection(name, *, anchor, bracket)` produces an algebroid
 connection ``∇̃`` on ``T*M`` for Poisson problems. The same
-`BianchiProblem` wrapper works on it — the engine swaps in the
+`BianchiProblem` wrapper works on it, the engine swaps in the
 `BracketApply` closure family (instead of LBVF) but otherwise the
 proof is identical.
 
@@ -161,7 +161,7 @@ print(f"bracket    : {nabla_tilde.bracket}")
 ```
 
 The torsion and curvature definitions on `nabla_tilde` emit
-`BracketApply([·,·]_K, X, Y)` instead of `LieBracketVF(X, Y)` — and
+`BracketApply([·,·]_K, X, Y)` instead of `LieBracketVF(X, Y)`, and
 the function-action ``X(f)`` becomes ``π^♯(X)(f)`` through the
 anchor. None of that is your concern at the call site:
 `BianchiProblem(nabla_tilde)` does the right thing.
@@ -169,15 +169,15 @@ anchor. None of that is your concern at the call site:
 ## Where this sits in the bigger picture
 
 `BianchiProblem` is the **structural backbone** of the connection
-machinery — every other higher-level wrapper (`KoszulConnectionProblem`,
+machinery, every other higher-level wrapper (`KoszulConnectionProblem`,
 `CartanStructureProblem`) layers on top of it. The Koszul facet of
 `KoszulConnectionProblem` is just a `BianchiProblem` with the right
 connection plugged in; the Cartan structure equations of tutorial 23
 use the same connection axioms one level up.
 
 If you only need ``∇_X Y`` evaluation without going through Bianchi
-— e.g. you're proving an identity that involves a ``∇_X Y`` term but
-no torsion / curvature — reach for the **four connection axioms
+, e.g. you're proving an identity that involves a ``∇_X Y`` term but
+no torsion / curvature, reach for the **four connection axioms
 directly** rather than the full `BianchiProblem` engine. Their
 constructors take `(connection, *, registry)` and slot into any
 custom engine.
@@ -189,7 +189,7 @@ custom engine.
 * Four defining-axiom engine rules:
   `ConnectionXLinearity`, `ConnectionXScalarPull`,
   `ConnectionYAdditivity`, `ConnectionYLeibniz`.
-* `Torsion(∇, X, Y)` and `Curvature(∇, X, Y, Z)` — inert until the
+* `Torsion(∇, X, Y)` and `Curvature(∇, X, Y, Z)`, inert until the
   engine's `TorsionDefinition` / `CurvatureDefinition` fire,
   unfolding to ``∇``-commutators + bracket terms.
 * `BianchiProblem(connection, *, registry)` bundles every rule into

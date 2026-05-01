@@ -1,5 +1,5 @@
 r"""
-Vaidya metric — radiating / accreting black hole with time-dependent mass.
+Vaidya metric, radiating / accreting black hole with time-dependent mass.
 
 In ingoing Eddington–Finkelstein null coordinates ``(v, r, θ, φ)`` with
 mass function ``M(v)``:
@@ -54,7 +54,7 @@ def vaidya(
     Notes
     -----
     Reduces to ingoing-EF Schwarzschild when ``M(v) = M`` constant.
-    The metric is **non-vacuum** for non-constant ``M(v)`` — the
+    The metric is **non-vacuum** for non-constant ``M(v)``, the
     Einstein tensor encodes the incoming null radiation flux.
     """
     if v_sym is None:

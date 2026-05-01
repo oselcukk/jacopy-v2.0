@@ -11,13 +11,13 @@ derivation lets the Cartan bundle hold the same five relations
 (``d_H² = 0``, Cartan magic, ``[d_H, L_{H,X}] = 0``, ``[L, L]``,
 ``[L, ι]``) by the same agreement-on-generators closure used for the
 untwisted TM bundle. The package does *not* decompose ``d_H`` as
-``d + H∧`` inside the expansion engine — closure of ``d_H² = 0``
+``d + H∧`` inside the expansion engine, closure of ``d_H² = 0``
 relies on the classical identity ``d_H² = dH ∧ (−)``, which vanishes
 precisely when ``H`` is closed. Constructing a
 :class:`TwistedCartanBundle` is the act of asserting that closure.
 
 The pattern mirrors :class:`~jacopy.library.lie_algebroid.LieAlgebroid`
-— a fresh :class:`~jacopy.calculus.exterior_d.ExteriorDerivative` for
+, a fresh :class:`~jacopy.calculus.exterior_d.ExteriorDerivative` for
 ``d_H``, a Lie-derivative factory that threads ``d_H`` into each
 ``L_{H,X}``'s bundle slots, and the standard ``ι_X`` factory (the
 interior product carries no dependency on the twist). The expansion
@@ -41,12 +41,12 @@ from jacopy.core.expr import Expr
 
 
 class TwistedCartanBundle:
-    """``(d_H, L_{H,·}, ι_{·}, [·,·])`` — Cartan bundle for ``d_H = d + H∧``.
+    """``(d_H, L_{H,·}, ι_{·}, [·,·])``, Cartan bundle for ``d_H = d + H∧``.
 
     Parameters
     ----------
     twist_form
-        The twist 3-form ``H``. Used only as a display handle — the
+        The twist 3-form ``H``. Used only as a display handle, the
         bundle does *not* expand ``d_H`` as ``d + H∧`` anywhere; it
         treats ``d_H`` as a formal degree-+1 derivation whose square
         vanishes. Caller asserts ``dH = 0`` by instantiating this
@@ -63,7 +63,7 @@ class TwistedCartanBundle:
     formal graded-Leibniz application of ``d_H``: the exact
     identification ``d_H = d + H∧`` forces a twisted correction term
     that the untwisted Leibniz machinery doesn't produce. This bundle
-    works at one level of abstraction above that — ``d_H`` is a
+    works at one level of abstraction above that, ``d_H`` is a
     symbolic degree-+1 derivation with ``d_H² = 0``, and the five
     Cartan relations are verified against that abstract data. Use
     :meth:`verify` when you want to close a relation on a concrete
@@ -146,7 +146,7 @@ class TwistedCartanBundle:
 
     @property
     def cartan(self) -> CartanCalculus:
-        """Twisted Cartan bundle — ``(d_H, L_{H,·}, ι_·, [·,·])``."""
+        """Twisted Cartan bundle, ``(d_H, L_{H,·}, ι_·, [·,·])``."""
         return self._cartan
 
     @property

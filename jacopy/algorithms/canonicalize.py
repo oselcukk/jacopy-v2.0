@@ -14,7 +14,7 @@ small, conservative set of identities:
   output.
 
 Non-commutative reordering of *non-numeric* Product factors is
-deliberately not performed here — that lives in
+deliberately not performed here, that lives in
 :mod:`jacopy.algorithms.sort_product`, which needs grading information.
 The goal of this module is to give proofs a deterministic, readable
 pre-form; anything that needs the Koszul sign rule is a separate pass.
@@ -64,7 +64,7 @@ def canonicalize(expr: Expr) -> Expr:
     if isinstance(expr, Power):
         return _canon_power(new_children[0], new_children[1])
 
-    # Unknown compound — rebuild preserving structure.
+    # Unknown compound, rebuild preserving structure.
     return expr._rebuild(new_children)
 
 
@@ -228,7 +228,7 @@ def _canon_sum(children: Tuple[Expr, ...]) -> Expr:
 def _canon_product(children: Tuple[Expr, ...]) -> Expr:
     """Fold numeric factors, propagate sign, preserve non-numeric order.
 
-    We deliberately do *not* reorder non-numeric factors — products are
+    We deliberately do *not* reorder non-numeric factors, products are
     non-commutative here. The Koszul-signed sort is
     :mod:`jacopy.algorithms.sort_product`.
     """
@@ -301,8 +301,8 @@ def semantically_equal(a: Expr, b: Expr) -> bool:
     """Return ``True`` iff ``a`` and ``b`` canonicalize to the same tree.
 
     Coarser than structural ``==`` (``x + x`` equals ``2 * x``), but
-    still conservative: anything requiring grading information — Koszul
-    sign rule, symmetric/antisymmetric bracket collapse — is out of
+    still conservative: anything requiring grading information, Koszul
+    sign rule, symmetric/antisymmetric bracket collapse, is out of
     scope. Use :func:`jacopy.algorithms.sort_product` downstream when
     those are needed.
     """

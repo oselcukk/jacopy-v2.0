@@ -43,7 +43,7 @@ class TestPairingScalarPullMatches:
 
     def test_no_match_one_factor_product(self):
         # Product.make folds a single child away, so only an explicitly
-        # constructed Product(x) would have len 1 — and even then, the
+        # constructed Product(x) would have len 1, and even then, the
         # rule requires >= 2 factors, so it shouldn't fire.
         rule = PairingScalarPullDefinition()
         alpha, X = Symbol("α"), Symbol("X")
@@ -110,7 +110,7 @@ class TestPairingScalarPullEngineIntegration:
         )
         expr = pairing(Product(f, alpha), Product(g, X))
         out, steps = engine.expand(expr)
-        # After two passes both slots are clean — the result is a flat
+        # After two passes both slots are clean, the result is a flat
         # Product(f, g, ⟨α, X⟩) (or with nested f / g that simplify
         # would flatten; structurally we accept either).
         assert pairing(alpha, X) in _atoms(out)

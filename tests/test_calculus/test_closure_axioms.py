@@ -39,7 +39,7 @@ class TestVfActCommutator:
         assert rule.rewrite(expr) == Act(LieBracketVF(X, Y), f)
 
     def test_matches_swapped_order(self):
-        # Negated child first, positive second — still folds.
+        # Negated child first, positive second, still folds.
         X, Y = Derivation("X", 0), Derivation("Y", 0)
         f = Symbol("f")
         rule = VfActCommutatorDefinition()
@@ -70,7 +70,7 @@ class TestVfActCommutator:
 
     def test_skips_cartan_operators(self):
         # Generic VF-commutator deliberately doesn't fire on L_X / ι_X
-        # / d — those have their own intrinsic axioms.
+        # / d, those have their own intrinsic axioms.
         X, Y = Derivation("X", 0), Derivation("Y", 0)
         omega = Symbol("ω")
         rule = VfActCommutatorDefinition()
@@ -99,7 +99,7 @@ class TestLieBracketAntiSymmetry:
         assert rule.rewrite(expr) == Integer(0)
 
     def test_cancels_inside_multi_eval_slot(self):
-        # ω(W, [X,Y]) + ω(W, [Y,X]) = 0 — same wrapper, opposite
+        # ω(W, [X,Y]) + ω(W, [Y,X]) = 0, same wrapper, opposite
         # bracket orientations.
         X, Y, W = (Derivation(s, 0) for s in ("X", "Y", "W"))
         omega = Symbol("ω")
@@ -166,7 +166,7 @@ class TestLieBracketJacobi:
         assert rule.rewrite(expr) == Integer(0)
 
     def test_outer_anti_symmetric_form(self):
-        # [[X,Y],Z] − [[X,Z],Y] + [[Y,Z],X] = 0 — the d²=0 residue
+        # [[X,Y],Z] − [[X,Z],Y] + [[Y,Z],X] = 0, the d²=0 residue
         # pattern after outer-anti-symmetrising.
         X, Y, Z = (Derivation(s, 0) for s in ("X", "Y", "Z"))
         f = Symbol("f")
@@ -205,7 +205,7 @@ class TestLieBracketJacobi:
         assert rule.rewrite(expr) == g
 
     def test_skips_two_term_partial(self):
-        # Only two cyclic terms — not enough for Jacobi.
+        # Only two cyclic terms, not enough for Jacobi.
         X, Y, Z = (Derivation(s, 0) for s in ("X", "Y", "Z"))
         f = Symbol("f")
         rule = LieBracketVfJacobiDefinition()
@@ -234,7 +234,7 @@ class TestPeelHelpers:
 
     def test_peel_unnested(self):
         X, Y = Derivation("X", 0), Derivation("Y", 0)
-        # [X, Y] is depth-1, not depth-2 — no Jacobi variants.
+        # [X, Y] is depth-1, not depth-2, no Jacobi variants.
         assert _peel_lie_bracket_jacobi(LieBracketVF(X, Y)) == ()
 
     def test_extract_bare(self):
@@ -243,7 +243,7 @@ class TestPeelHelpers:
         assert bracket == LieBracketVF(X, Y)
 
     def test_extract_act_op(self):
-        # Act(LieBracketVF(X, Y), f) — bracket is the operator.
+        # Act(LieBracketVF(X, Y), f), bracket is the operator.
         X, Y = Derivation("X", 0), Derivation("Y", 0)
         f = Symbol("f")
         bracket, _ = _extract_bracket_with_wrapper(Act(LieBracketVF(X, Y), f))
@@ -251,7 +251,7 @@ class TestPeelHelpers:
 
     def test_extract_skips_two_brackets(self):
         # If two args of a MultiEval each contain a bracket, the
-        # wrapper is ambiguous — return None rather than picking one.
+        # wrapper is ambiguous, return None rather than picking one.
         X, Y, Z, W = (Derivation(s, 0) for s in ("X", "Y", "Z", "W"))
         omega = Symbol("ω")
         expr = multi_eval(omega, LieBracketVF(X, Y), LieBracketVF(Z, W))
@@ -266,14 +266,14 @@ class TestPeelHelpers:
 
 class TestIotaActAsScalar:
     def test_matches_plain_vf_outer(self):
-        # Act(Y, Act(ι_X, ω)) — Y plain VF, inner is ι_X(ω).
+        # Act(Y, Act(ι_X, ω)), Y plain VF, inner is ι_X(ω).
         omega = Symbol("ω")
         X, Y = Derivation("X", 0), Derivation("Y", 0)
         rule = IotaActAsScalarDefinition()
         assert rule.matches(Act(Y, Act(interior(X), omega)))
 
     def test_no_match_outer_d(self):
-        # Act(d, Act(ι_X, ω)) — outer is exterior derivative; d treats
+        # Act(d, Act(ι_X, ω)), outer is exterior derivative; d treats
         # ι_X(ω) as a form, not a scalar. Don't bridge here.
         omega = Symbol("ω")
         X = Derivation("X", 0)
@@ -281,28 +281,28 @@ class TestIotaActAsScalar:
         assert not rule.matches(Act(default_d, Act(interior(X), omega)))
 
     def test_no_match_outer_lie(self):
-        # Act(L_Y, Act(ι_X, ω)) — outer Lie derivative is a Cartan op.
+        # Act(L_Y, Act(ι_X, ω)), outer Lie derivative is a Cartan op.
         omega = Symbol("ω")
         X, Y = Derivation("X", 0), Derivation("Y", 0)
         rule = IotaActAsScalarDefinition()
         assert not rule.matches(Act(lie_derivative(Y), Act(interior(X), omega)))
 
     def test_no_match_outer_iota(self):
-        # Act(ι_Y, Act(ι_X, ω)) — both layers are interior products.
+        # Act(ι_Y, Act(ι_X, ω)), both layers are interior products.
         omega = Symbol("ω")
         X, Y = Derivation("X", 0), Derivation("Y", 0)
         rule = IotaActAsScalarDefinition()
         assert not rule.matches(Act(interior(Y), Act(interior(X), omega)))
 
     def test_no_match_inner_not_iota(self):
-        # Act(Y, Act(Z, f)) — inner Act has a plain VF, not ι_X.
+        # Act(Y, Act(Z, f)), inner Act has a plain VF, not ι_X.
         X, Y, Z = (Derivation(s, 0) for s in ("X", "Y", "Z"))
         f = Symbol("f")
         rule = IotaActAsScalarDefinition()
         assert not rule.matches(Act(Y, Act(Z, f)))
 
     def test_no_match_bare_iota_act(self):
-        # Just Act(ι_X, ω) — no outer Act. Rule needs the outer scalar
+        # Just Act(ι_X, ω), no outer Act. Rule needs the outer scalar
         # context to fire (the in-MultiEval case is the iota-intrinsic's
         # responsibility).
         omega = Symbol("ω")

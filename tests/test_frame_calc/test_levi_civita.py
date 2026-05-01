@@ -43,7 +43,7 @@ class TestLeviCivitaTypeChecks:
 
 
 # --------------------------------------------------------------------- #
-# Polar frame — flat 2D in polar coords                                 #
+# Polar frame, flat 2D in polar coords                                 #
 # --------------------------------------------------------------------- #
 
 
@@ -245,7 +245,7 @@ class TestMinkowskiCurvilinear:
         """`ds² = -dt² + dr² + r² dθ² + r² sin²θ dφ²`.
 
         Christoffels match the spatial 3-sphere portion of Schwarzschild
-        with M = 0 — i.e. the angular block of Schwarzschild reduces
+        with M = 0, i.e. the angular block of Schwarzschild reduces
         to spherical Minkowski.
         """
         t = sp.Symbol("t")
@@ -277,7 +277,7 @@ class TestMinkowskiCurvilinear:
         )
 
     def test_minkowski_spherical_t_block_zero(self) -> None:
-        """`t` is unaffected by the curvilinear angular coords —
+        """`t` is unaffected by the curvilinear angular coords,
         no Christoffel symbol touches the t-slot."""
         t = sp.Symbol("t")
         r, theta, phi = sp.symbols("r theta phi", positive=True)
@@ -299,7 +299,7 @@ class TestMinkowskiCurvilinear:
                 assert LC[a, b, 0] == 0, f"Γ^{a}_{{{b}t}} should be 0"
 
     def test_minkowski_cylindrical_known_components(self) -> None:
-        """`ds² = -dt² + dρ² + ρ² dφ² + dz²` — flat coords on z and t."""
+        """`ds² = -dt² + dρ² + ρ² dφ² + dz²`, flat coords on z and t."""
         t, z = sp.symbols("t z")
         rho = sp.Symbol("rho", positive=True)
         phi = sp.Symbol("phi", positive=True)
@@ -318,7 +318,7 @@ class TestMinkowskiCurvilinear:
         assert sp.simplify(LC[2, 2, 1] - 1 / rho) == 0
 
     def test_rindler_2d_known_components(self) -> None:
-        """Rindler chart `ds² = -ρ² dτ² + dρ²` — uniformly accelerated
+        """Rindler chart `ds² = -ρ² dτ² + dρ²`, uniformly accelerated
         observer's frame. Non-zero Christoffels reflect the
         pseudo-force; spacetime is still flat."""
         tau = sp.Symbol("tau")

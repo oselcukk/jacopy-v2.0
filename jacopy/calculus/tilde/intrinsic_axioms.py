@@ -1,5 +1,5 @@
 r"""
-Tilde-calculus intrinsic axioms — Faz 14.E.
+Tilde-calculus intrinsic axioms, Faz 14.E.
 
 Three engine rewrite rules that *open up* the dual of the textbook
 Cartan formulas for the tilde operators on a multivector ``V``
@@ -13,7 +13,7 @@ evaluated against 1-forms ``η_1, …, η_p``:
 
 Each rule fires on a :class:`~jacopy.core.multi_eval.MultiEval` whose
 head is a tilde-operator :class:`~jacopy.algebra.derivation.Act` and
-whose ``slot_kind`` is ``"covector"`` — the dual of the standard-side
+whose ``slot_kind`` is ``"covector"``, the dual of the standard-side
 ``slot_kind="vector"`` discipline. A multivector ``V`` evaluated on
 ``p`` 1-forms is a scalar; the rules unfold the operator action into a
 multilinear-evaluation residue that downstream MultiEval-linearity,
@@ -31,7 +31,7 @@ The ``[η_i, η_j]_K`` bracket terms are emitted as
 :class:`~jacopy.library.koszul_problem.KoszulBracketExpansionDefinition`
 rule (already wired into KoszulProblem) unfolds them to the classical
 ``L_{ρα}β − L_{ρβ}α − d⟨ρα, β⟩`` form when needed. The ``π^♯(η)·…``
-action terms emit ``Act(Act(Sharp(π), η), …)`` — the same nested-Act
+action terms emit ``Act(Act(Sharp(π), η), …)``, the same nested-Act
 shape that :class:`~jacopy.calculus.tilde.aux_axioms.TildeLieOnZeroVectorDefinition`
 already uses, so existing Sharp-axiom infrastructure picks up where
 this rule leaves off.
@@ -73,12 +73,12 @@ class TildeIotaIntrinsicDefinition(Definition):
            = V(\omega, \eta_1, \dots, \eta_{p-1}).
 
     The dual of :class:`~jacopy.calculus.intrinsic_axioms.InteriorProductIntrinsicDefinition`
-    — there ``X`` (a vector field) was injected into a vector-slot
+   , there ``X`` (a vector field) was injected into a vector-slot
     multilinear evaluation; here ``ω`` (a 1-form) is injected into a
     covector-slot one. Restricted to ``slot_kind="covector"`` so a
     standard-side ``MultiEval(Act(ι_X, ω), Y_1, …)`` is left untouched.
 
-    The alternating flag and slot kind carry over verbatim — ``ι̃_ω``
+    The alternating flag and slot kind carry over verbatim, ``ι̃_ω``
     is graded-antisymmetric in its operand-multivector slots, so the
     contracted variant inherits that symmetry. ``V`` is taken
     structurally as ``Act.arg``; if it is a :class:`Sum` or a compound
@@ -135,8 +135,8 @@ class TildeLieIntrinsicDefinition(Definition):
     π-scoped: matches only when the head's
     :attr:`~jacopy.calculus.tilde.operators.TildeLieDerivative.bivector`
     equals ``self._pi``. The first term wraps the inner
-    :class:`MultiEval` in nested :class:`Act` along ``Sharp(π)·ω`` —
-    the anchor's image of the indexing form, a vector field — acting
+    :class:`MultiEval` in nested :class:`Act` along ``Sharp(π)·ω``,
+    the anchor's image of the indexing form, a vector field, acting
     on the scalar ``V(η_1, …, η_p)``. The bracket terms emit
     :class:`BracketApply` over the stored
     :class:`~jacopy.brackets.koszul.KoszulBracket`, leaving the
@@ -257,7 +257,7 @@ class TildeDIntrinsicDefinition(Definition):
     π-scoped: matches only when the head equals
     ``TildeExteriorDerivative(self._pi)`` structurally. Sign handling
     mirrors :class:`~jacopy.calculus.intrinsic_axioms.ExteriorDIntrinsicDefinition`
-    — odd-parity terms are wrapped in :class:`Neg`. The bracket terms
+   , odd-parity terms are wrapped in :class:`Neg`. The bracket terms
     use :class:`BracketApply` over the stored
     :class:`~jacopy.brackets.koszul.KoszulBracket` so the result stays
     inside the multilinear-evaluation framework.

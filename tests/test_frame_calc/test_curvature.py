@@ -91,7 +91,7 @@ class TestFlatSpaceCurvature:
 
     def test_minkowski_spherical_flat(self, minkowski_spherical) -> None:
         """Spherical Minkowski has 9 non-zero Christoffels but is
-        still flat — Riemann curvature must vanish identically."""
+        still flat, Riemann curvature must vanish identically."""
         R = curvature(minkowski_spherical)
         assert R.is_zero()
 

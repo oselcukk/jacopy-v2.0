@@ -1,14 +1,14 @@
 """
-Tilde calculus — Cartan operators on the Koszul (multivector) side.
+Tilde calculus, Cartan operators on the Koszul (multivector) side.
 
 Three operators parameterise the dual of the standard exterior calculus
 on a Poisson manifold ``(M, π)``:
 
-* :class:`TildeInteriorProduct` ``ι̃_ω`` — form-indexed contraction on
+* :class:`TildeInteriorProduct` ``ι̃_ω``, form-indexed contraction on
   multivectors, ``ι̃_ω V := ι_V ω``.
-* :class:`TildeExteriorDerivative` ``d̃`` — Lichnerowicz differential
+* :class:`TildeExteriorDerivative` ``d̃``, Lichnerowicz differential
   on multivectors, ``d̃ V := [π, V]_SN``.
-* :class:`TildeLieDerivative` ``L̃_ω`` — Cartan magic on the tilde side,
+* :class:`TildeLieDerivative` ``L̃_ω``, Cartan magic on the tilde side,
   ``L̃_ω := d̃ ∘ ι̃_ω + ι̃_ω ∘ d̃``.
 
 This sub-package exposes only the Expr-level operator atoms (Faz 14.A).

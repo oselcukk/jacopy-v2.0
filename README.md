@@ -5,7 +5,7 @@
 [![Status: Pre-Alpha](https://img.shields.io/badge/status-pre--alpha-orange)](https://pypi.org/classifiers/)
 [![Tests: 3108](https://img.shields.io/badge/tests-3108%20passing-brightgreen)](#testing)
 
-> **Symbolic engine for graded algebra, brackets, and Cartan calculus —
+> **Symbolic engine for graded algebra, brackets, and Cartan calculus,
 > with step-by-step proofs the engine generates and the user can read.**
 
 The mathematical core: the *Derived Bracket Theorem* unifies
@@ -70,7 +70,7 @@ pip install git+https://github.com/oselcukk/jacopy-v2.0.git
 ```
 
 If you want the component-level differential geometry submodule
-(`jacopy.frame_calc` — Christoffel / Ricci / Einstein / Kretschmann
+(`jacopy.frame_calc`, Christoffel / Ricci / Einstein / Kretschmann
 on concrete metrics), install with the `components` extra:
 
 ```bash
@@ -92,14 +92,14 @@ pip install -e ".[dev]"        # editable + dev tools (pytest, rich, nbformat, s
 
 | Extras | Adds |
 |---|---|
-| `[rich]` | `rich` — coloured terminal tree rendering |
+| `[rich]` | `rich`, coloured terminal tree rendering |
 | `[test]` | `pytest` |
-| `[docs]` | `nbformat`, `nbclient`, `ipykernel` — needed for tutorial notebooks |
-| `[components]` | `sympy` — required for `jacopy.frame_calc` (component-level differential geometry) |
+| `[docs]` | `nbformat`, `nbclient`, `ipykernel`, needed for tutorial notebooks |
+| `[components]` | `sympy`, required for `jacopy.frame_calc` (component-level differential geometry) |
 | `[dev]` | All of the above (single one-liner for contributors) |
 
 **Requirements:** Python ≥ 3.10. **Zero required runtime dependencies**
-for the proof / bracket / Cartan core — works with the standard
+for the proof / bracket / Cartan core, works with the standard
 library alone. The `frame_calc` submodule is the only part that
 needs SymPy (via the `[components]` extra).
 
@@ -117,11 +117,11 @@ entry points for textbook calculations:
 | `BianchiProblem(∇)` | Torsion / curvature, both Bianchi identities |
 | `CartanStructureProblem(∇, F)` | Cartan I & II structure equations |
 
-Lower-level primitives — `Expr` algebra, `PropertyRegistry`,
+Lower-level primitives, `Expr` algebra, `PropertyRegistry`,
 `ExpansionEngine`, `prove_jacobi`, `prove_intrinsic_equivalence`,
-`theorem_book`, `ProofChain` — are documented in the tutorials.
+`theorem_book`, `ProofChain`, are documented in the tutorials.
 
-### `jacopy.frame_calc` — component-level differential geometry
+### `jacopy.frame_calc`, component-level differential geometry
 
 For concrete metric calculations (Christoffel symbols, Ricci tensor,
 Einstein tensor on real metrics like Schwarzschild or Kerr), use the
@@ -142,11 +142,11 @@ assert G.is_vacuum()      # symbolic vacuum verification
 `vaidya`, `bianchi_I/V/IX`, `godel`.
 
 **Curvature invariants:** `kretschmann`, `ricci_squared`, `cotton` (3D).
-For Schwarzschild: `kretschmann(R, g)` returns `48 M² / r⁶` —
+For Schwarzschild: `kretschmann(R, g)` returns `48 M² / r⁶`,
 diagnoses the horizon as a coordinate (not real) singularity.
 
 **Custom connections:** `connection_with_torsion` (Einstein-Cartan),
-`weyl_connection`, `projective_connection` — drop in any user-defined
+`weyl_connection`, `projective_connection`, drop in any user-defined
 deformation and route the rest of the pipeline through it.
 
 **Helpers:** `analyze_metric(matrix, coords)` runs the full pipeline
@@ -160,14 +160,14 @@ Full walkthrough in [Tutorial 25](docs/tutorials/25_frame_calc.md).
 `jacopy` ships with **25 paired tutorials** (`.md` for reading,
 `.ipynb` for running). All tutorials are smoke-tested in CI.
 
-- **[`docs/README.md`](docs/README.md)** — three reading paths
+- **[`docs/README.md`](docs/README.md)**, three reading paths
   (practitioner / depth-first / topical).
-- **[`docs/tutorials/`](docs/tutorials/)** — start at
+- **[`docs/tutorials/`](docs/tutorials/)**, start at
   [`01_first_steps.md`](docs/tutorials/01_first_steps.md).
-- **[`docs/tutorials/README.md`](docs/tutorials/README.md)** —
+- **[`docs/tutorials/README.md`](docs/tutorials/README.md)**,
   full index of all 25 tutorials with one-line descriptions
   and dependency arrows.
-- **[`examples/`](examples/)** — the textbook problems the package
+- **[`examples/`](examples/)**, the textbook problems the package
   was first calibrated against (Math 595 question sheets).
 
 > **Note:** A generated API reference (Sphinx + autodoc) is
@@ -177,7 +177,7 @@ Full walkthrough in [Tutorial 25](docs/tutorials/25_frame_calc.md).
 ## 🧪 Testing
 
 ```bash
-pytest                                          # full suite — 3108 tests
+pytest                                          # full suite, 3108 tests
 pytest tests/test_docs/test_notebooks.py -q     # 24 notebook smoke tests
 ```
 
@@ -219,7 +219,7 @@ If you use `jacopy` in academic work, please cite:
 
 ## 📄 License
 
-**Proprietary — Source-Available, Personal Use Only.**
+**Proprietary, Source-Available, Personal Use Only.**
 
 Copyright (c) 2026 Oğuzhan Selçuk. All rights reserved.
 
@@ -237,5 +237,5 @@ For commercial licensing or extended-rights inquiries, contact
 
 > 💡 **Pre-alpha note.** The user-facing API is stable enough to
 > write papers against, but not yet pinned by SemVer. Breaking
-> changes between `0.0.x` releases are possible — pin a specific
+> changes between `0.0.x` releases are possible, pin a specific
 > commit if you depend on it for reproducible work.

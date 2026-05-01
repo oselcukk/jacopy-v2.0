@@ -9,7 +9,7 @@ degrees via :func:`jacopy.algebra.derivation.degree_of` and folds the
 Koszul sign when its parity is decidable.
 
 The commutator of two graded derivations is itself a graded derivation
-of degree ``|A| + |B|`` — that statement is a *theorem* that belongs in
+of degree ``|A| + |B|``, that statement is a *theorem* that belongs in
 the proof layer, not here. This module only provides the syntactic
 object and its definitional expansion.
 """
@@ -30,7 +30,7 @@ from jacopy.core.symbolic_degree import Degree
 
 
 class Commutator(Expr):
-    """``[A, B]`` — graded commutator node.
+    """``[A, B]``, graded commutator node.
 
     Inert by construction. :meth:`expand` produces the signed Sum when
     the degrees of ``A`` and ``B`` combine to a decidable parity.
@@ -73,7 +73,7 @@ class Commutator(Expr):
 
         Falls back to :func:`expand_commutator`, which handles the
         decidable / symbolic-parity distinction. Raises
-        :class:`ValueError` when the parity is undecidable — the caller
+        :class:`ValueError` when the parity is undecidable, the caller
         is expected to keep the Commutator node around in that case.
         """
         return expand_commutator(self, registry)
@@ -99,7 +99,7 @@ def expand_commutator(
     * Compute ``|A|`` and ``|B|`` via :func:`degree_of`.
     * The sign exponent is ``|A| * |B|``. If parity is even, the result
       is ``A*B − B*A``; if odd, it's ``A*B + B*A``.
-    * Undecidable parity raises :class:`ValueError` — representing a
+    * Undecidable parity raises :class:`ValueError`, representing a
       half-concrete sign would require a ``(−1)^{…}`` expression type
       that the core layer doesn't yet offer.
     """

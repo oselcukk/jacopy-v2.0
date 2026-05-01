@@ -1,5 +1,5 @@
 """
-Proof strategies — algorithms that take two expressions and close the
+Proof strategies, algorithms that take two expressions and close the
 gap between them with a :class:`ProofChain`.
 
 Faz 7 A-scope ships only the base :class:`Strategy` interface and
@@ -42,7 +42,7 @@ class ProofFailure(Exception):
     strategy from closing.
 
     When the raising strategy has a residual on hand, it may attach a
-    :class:`DiagnosticReport` as the ``report`` kwarg — callers can
+    :class:`DiagnosticReport` as the ``report`` kwarg, callers can
     read ``exc.report`` to get structural hints about which rewrite
     stalled. A ``report`` is optional; legacy call sites still raise
     with a bare message and ``report`` defaults to ``None``.
@@ -91,7 +91,7 @@ class ExpandAndSimplify(Strategy):
     :class:`Integer` ``0`` the proof closes; otherwise
     :class:`ProofFailure` carries the surviving residual.
 
-    :mod:`product_rule` is run in between — definition rewrites often
+    :mod:`product_rule` is run in between, definition rewrites often
     leave :class:`Act` over :class:`Product` composition and
     :class:`Act` over :class:`Sum` shapes that :func:`simplify` alone
     doesn't unfold. Running Leibniz / linearity expansion once is the
@@ -112,7 +112,7 @@ class ExpandAndSimplify(Strategy):
         eng = engine if engine is not None else default_engine()
         chain = ProofChain()
 
-        # Reflexive shortcut — syntactically identical, nothing to do.
+        # Reflexive shortcut, syntactically identical, nothing to do.
         if lhs == rhs:
             chain.append(
                 ProofStep(
@@ -129,7 +129,7 @@ class ExpandAndSimplify(Strategy):
         # Phases 1-2 interleave until a fix-point. Definition expansion
         # often lands shapes (``Act(d∘ι_X, arg)``, ``Act(Sum(...), arg)``)
         # that only unfold once :mod:`product_rule` distributes the
-        # Leibniz / linearity through — and that distribution itself
+        # Leibniz / linearity through, and that distribution itself
         # exposes fresh element-level shapes (``Act(d, Act(d, x))``,
         # ``Act(ι_X, Act(d, f))``) that axioms like ``d² = 0`` and
         # ``ι_X(df) = X(f)`` only match in post-composition form. Looping
@@ -257,7 +257,7 @@ class AgreementOnGenerators(Strategy):
     The sub-strategy defaults to :class:`ExpandAndSimplify`; callers
     who need a more specialized per-generator tactic can pass any
     :class:`Strategy`. A :class:`ProofFailure` in the sub-proof on any
-    generator is re-raised, annotated with which generator failed —
+    generator is re-raised, annotated with which generator failed,
     that pointer is usually the shortest path to the missing grading
     declaration or axiom.
     """
@@ -287,8 +287,8 @@ class AgreementOnGenerators(Strategy):
         engine: Optional[ExpansionEngine] = None,
     ) -> ProofChain:
         # Degree well-formedness. The zero operator Integer(0) is
-        # polymorphic in degree — it sits in every graded slot as the
-        # unique element that vanishes — so an equality against it only
+        # polymorphic in degree, it sits in every graded slot as the
+        # unique element that vanishes, so an equality against it only
         # requires the non-zero side to have a well-defined homogeneous
         # degree.
         lhs_is_zero = lhs == Integer(0)
@@ -314,7 +314,7 @@ class AgreementOnGenerators(Strategy):
         generators = self._algebra.generators
         if not generators:
             raise ProofFailure(
-                "Algebra has no generators — cannot apply agreement strategy"
+                "Algebra has no generators, cannot apply agreement strategy"
             )
 
         parent = ProofStep(
@@ -367,7 +367,7 @@ class UnrollToFoundations(Strategy):
     """Meta-strategy: run an inner strategy against a foundational engine.
 
     The wrapped :class:`Strategy` sees an :class:`ExpansionEngine`
-    switched into ``"foundational"`` mode — every theorem-classified
+    switched into ``"foundational"`` mode, every theorem-classified
     :class:`Definition` fires as usual, but the resulting
     :class:`ProofStep` carries the theorem's own sub-proof attached as
     children rather than being taken as given. Axioms still appear as
@@ -431,7 +431,7 @@ class DerivedBracketStrategy:
     cyclic Jacobi check by a universal obstruction: one reduction step
     tagged as a theorem, one expansion of the base bracket on
     ``(Q, Q)``, and a final simplification. If the obstruction
-    collapses to :class:`Integer` ``0`` the proof closes — Jacobi holds
+    collapses to :class:`Integer` ``0`` the proof closes, Jacobi holds
     on every triple, not just the one supplied. Otherwise the residue
     is carried in a :class:`ProofFailure`.
 
@@ -472,7 +472,7 @@ class DerivedBracketStrategy:
         reduced = simplify(obstruction, registry)
 
         chain = ProofChain()
-        # Step 1: apply the derived bracket theorem — the triple Jacobi
+        # Step 1: apply the derived bracket theorem, the triple Jacobi
         # check reduces to the universal obstruction [Q, Q]_base.
         chain.append(
             ProofStep(

@@ -172,7 +172,7 @@ class TestUnclassified:
 
     def test_unclassified_not_raised_if_no_swap_needed(self, reg):
         # If the order is already canonical AND no swap is ever attempted,
-        # we still visit every pair in the bubble sort and query degrees —
+        # we still visit every pair in the bubble sort and query degrees,
         # so even a passthrough sort demands classification.
         x = Symbol("x")
         y = Symbol("y")
@@ -225,7 +225,7 @@ class TestNonCommuting:
         reg.declare(u, NonCommuting())
         reg.declare(t, Graded(degree=1))
         reg.declare(t, NonCommuting())
-        # Product(u, t) — sort order says t before u but NonCommuting blocks swap.
+        # Product(u, t), sort order says t before u but NonCommuting blocks swap.
         expr = Product(u, t)
         out, sign = sort_product(expr, reg)
         assert out == Product(u, t)
@@ -253,7 +253,7 @@ class TestAntiCommuting:
         reg.declare(u, AntiCommuting())
         reg.declare(t, Graded(degree=0))
         reg.declare(t, AntiCommuting())
-        # One swap — sort wants t, u order.
+        # One swap, sort wants t, u order.
         expr = Product(u, t)
         out, sign = sort_product(expr, reg)
         assert out == Product(t, u)
@@ -287,7 +287,7 @@ class TestNegWrappedFactors:
         reg = PropertyRegistry()
         a = Symbol("a")
         reg.declare(a, Graded(degree=0))
-        # Product(Neg(a)) — a single peeled factor; parity bumps to 1.
+        # Product(Neg(a)), a single peeled factor; parity bumps to 1.
         out, sign = sort_product(Product(Neg(a)), reg)
         assert sign.parity() == 1
         # Single-factor product collapses to the lone factor.

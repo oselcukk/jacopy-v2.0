@@ -155,7 +155,7 @@ class TestAlgebroidCartanBundle:
         X = Symbol("X")
         L = algebroid.cartan.lie_derivative(X)
         assert L.d is algebroid.d
-        # The factory is the one stored on the algebroid's Cartan bundle —
+        # The factory is the one stored on the algebroid's Cartan bundle,
         # call it on a fresh field and check the resulting ι carries the
         # bundle tag.
         assert L.iota_factory is not None
@@ -174,7 +174,7 @@ class TestAlgebroidCartanBundle:
 
     def test_d_squared_zero_relation_builds(self, algebroid):
         """``d_E² = 0`` is an :class:`OperatorEquation` on the algebroid
-        Cartan bundle — same relation API as the TM Cartan calculus.
+        Cartan bundle, same relation API as the TM Cartan calculus.
         We don't run it through :meth:`verify` because the equation
         sides disagree on degree (``|d² | = 2`` vs ``|0| = 0``); the
         axiomatic rewrite path in
@@ -189,7 +189,7 @@ class TestAlgebroidCartanBundle:
 
     def test_cartan_magic_relation_builds(self, algebroid):
         """Magic-formula :class:`OperatorEquation` is buildable on the
-        algebroid Cartan bundle — same API as the TM Cartan calculus."""
+        algebroid Cartan bundle, same API as the TM Cartan calculus."""
         X = Derivation("X", degree=0)
         eq = algebroid.cartan.relation("cartan_magic", X=X)
         # LHS is the commutator of d_E with ι_{E,X}; RHS is L_{E,X}.
@@ -197,7 +197,7 @@ class TestAlgebroidCartanBundle:
 
     def test_cartan_magic_verify_closes_on_algebroid(self, algebroid):
         """The magic formula verifies as a :class:`ProofChain` on the
-        algebroid bundle — ``L_{E,X}`` carries its own ``d_E`` and
+        algebroid bundle, ``L_{E,X}`` carries its own ``d_E`` and
         ``ι_E`` factory, so the expansion engine's Cartan rewrite lines
         up operator names on both sides and the residual collapses."""
         X = Symbol("X")
@@ -215,7 +215,7 @@ class TestAlgebroidCartanBundle:
     def test_d_squared_zero_verify_closes_on_algebroid(self, algebroid):
         """``d_E² = 0`` closes on the algebroid because
         :meth:`CartanCalculus.verify` now threads its own ``d`` into the
-        default engine — ``DSquaredZeroDefinition`` gets pinned to
+        default engine, ``DSquaredZeroDefinition`` gets pinned to
         ``d_E`` rather than silently to the TM default."""
         f = Symbol("f")
         reg = PropertyRegistry()
@@ -241,7 +241,7 @@ class TestAlgebroidCartanBundle:
 
     def test_verify_all_closes_on_algebroid(self, algebroid):
         """Every Cartan relation closes on the algebroid bundle in one
-        ``verify_all`` sweep — parity with the TM ``CartanCalculus``.
+        ``verify_all`` sweep, parity with the TM ``CartanCalculus``.
         Vector fields are declared as :class:`Derivation` instances so
         the generator-level Leibniz reductions (``ι_X(df) = X(f)``)
         fire; with plain :class:`Symbol` sections ``lie_lie`` and
@@ -331,7 +331,7 @@ class TestProveAnchorCompatibility:
         assert step.provenance_tag == "axiom"
 
     def test_step_discharges_to_zero(self, algebroid, registry):
-        """The axiom step lands on :class:`Integer` ``0`` — the whole
+        """The axiom step lands on :class:`Integer` ``0``, the whole
         point of citing the axiom is to close out the obstruction
         without running the ambient expansion pipeline."""
         X, Y = Symbol("X"), Symbol("Y")

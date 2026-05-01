@@ -77,7 +77,7 @@ class TestBaseCases:
         assert out == Neg(Act(X, f))
 
     def test_vector_then_function_gives_action(self, reg):
-        """``[X, f]_SN = X(f)`` — antisymmetric partner of the above."""
+        """``[X, f]_SN = X(f)``, antisymmetric partner of the above."""
         X, f = Symbol("X"), Symbol("f")
         out = SchoutenBracket().expand(X, f, reg)
         assert out == Act(X, f)
@@ -178,14 +178,14 @@ class TestWedgeLeibnizSlot2:
 
 
 # --------------------------------------------------------------------- #
-# Bivector self-bracket — the Poisson obstruction shape                 #
+# Bivector self-bracket, the Poisson obstruction shape                 #
 # --------------------------------------------------------------------- #
 
 
 class TestBivectorSelfBracket:
     def test_atomic_bivector_self_bracket_is_opaque(self):
         """A bare ``π`` declared ``Graded(degree=1)`` has no wedge to
-        decompose, so ``[π, π]_SN`` stays as an inert BracketApply —
+        decompose, so ``[π, π]_SN`` stays as an inert BracketApply,
         exactly the shape the derived-bracket machinery consumes as
         the Poisson condition's obstruction."""
         r = PropertyRegistry()
@@ -201,7 +201,7 @@ class TestBivectorSelfBracket:
         """When the bivector is written as ``X ∧ Y`` explicitly, the
         self-bracket recurses through wedge Leibniz into six vector-
         pair Lie brackets (three inner 1-vector pairs, each feeding
-        two outer terms). We don't pin the exact algebraic form here —
+        two outer terms). We don't pin the exact algebraic form here,
         the shape test is that the result is a (non-trivial) Sum whose
         leaves reach the 1-vector operands."""
         X, Y = Symbol("X"), Symbol("Y")
@@ -210,17 +210,17 @@ class TestBivectorSelfBracket:
         descendants = list(out.walk())
         assert any(node is X for node in descendants)
         assert any(node is Y for node in descendants)
-        # No opaque BracketApplies left — everything decomposed.
+        # No opaque BracketApplies left, everything decomposed.
         assert not any(isinstance(n, BracketApply) for n in descendants)
 
 
 # --------------------------------------------------------------------- #
-# Poisson-as-DerivedBracket — Stage 1 end-to-end                        #
+# Poisson-as-DerivedBracket, Stage 1 end-to-end                        #
 # --------------------------------------------------------------------- #
 
 
 class TestPoissonFromDerivedBracket:
-    """``PoissonBracket(π) = DerivedBracket(SN, π, degree_Q=1)`` — with
+    """``PoissonBracket(π) = DerivedBracket(SN, π, degree_Q=1)``, with
     the obstruction ``[π, π]_SN`` as its Jacobi condition.
 
     Per the plan, no dedicated ``PoissonBracket`` class is needed: the
@@ -230,7 +230,7 @@ class TestPoissonFromDerivedBracket:
 
     def test_poisson_jacobi_condition_is_sn_self_bracket(self):
         """The derived-bracket Jacobi condition unpacks to
-        ``[π, π]_SN`` — the canonical Poisson obstruction."""
+        ``[π, π]_SN``, the canonical Poisson obstruction."""
         r = PropertyRegistry()
         pi = Symbol("π")
         r.declare(pi, Graded(degree=1))
@@ -238,7 +238,7 @@ class TestPoissonFromDerivedBracket:
         cond = poisson.jacobi_condition(r)
         assert isinstance(cond, VanishingCondition)
         # Obstruction is the SN self-bracket of π, which stays opaque
-        # for atomic π — still the right typed handle for a proof.
+        # for atomic π, still the right typed handle for a proof.
         assert cond.obstruction == sn.self_bracket(pi, r)
 
     def test_poisson_bracket_degree_is_minus_one(self):
@@ -250,7 +250,7 @@ class TestPoissonFromDerivedBracket:
         assert poisson.degree == Degree.const(-1)
 
     def test_poisson_bracket_of_functions_type_checks(self):
-        """``{f, g}_π`` should construct without error — contents are
+        """``{f, g}_π`` should construct without error, contents are
         deferred to downstream simplification but the construction path
         (through SN.expand on functions / bivectors) must not blow up."""
         r = PropertyRegistry()
@@ -260,7 +260,7 @@ class TestPoissonFromDerivedBracket:
         r.declare(f, Graded(degree=-1))
         r.declare(g, Graded(degree=-1))
         poisson = DerivedBracket(sn, pi, degree_Q=1)
-        # Should not raise. We don't pin the result — concrete π is
+        # Should not raise. We don't pin the result, concrete π is
         # opaque so the inner bracket stays symbolic, which is the
         # right behaviour for the Stage-1 contract.
         result = poisson.expand(f, g, r)

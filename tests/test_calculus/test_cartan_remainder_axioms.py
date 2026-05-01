@@ -152,7 +152,7 @@ class TestTildeCartanRemainderDefinition:
         V = Symbol("V")
         r1 = rule.rewrite(Act(K_tilde(eta, pi1), V))
         r2 = rule.rewrite(Act(K_tilde(eta, pi2), V))
-        # The d̃ heads encode their own π — distinct π's give distinct
+        # The d̃ heads encode their own π, distinct π's give distinct
         # rewritten subtrees.
         assert r1 != r2
 

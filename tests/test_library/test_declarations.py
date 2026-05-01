@@ -121,12 +121,12 @@ class TestRegistryIsolation:
         assert reg_b.get(f, Graded) is None
 
     def test_re_declaring_same_name_on_fresh_symbol_works(self) -> None:
-        """Each call creates a new Symbol instance — no conflict."""
+        """Each call creates a new Symbol instance, no conflict."""
         reg = PropertyRegistry()
         (f1,) = Functions("f", registry=reg)
         # second call: fresh Symbol("f"); but Symbol() is value-equal,
         # so the registry will already have a Graded declaration on
-        # that key — expect ValueError, mirroring PropertyRegistry's
+        # that key, expect ValueError, mirroring PropertyRegistry's
         # duplicate-declaration contract.
         with pytest.raises(ValueError):
             Functions("f", registry=reg)

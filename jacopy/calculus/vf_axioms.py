@@ -1,21 +1,21 @@
 """
-Vector-field axioms — Faz 13.C.
+Vector-field axioms, Faz 13.C.
 
 Two engine-level rewrite rules that turn iterated Lie-derivative shapes
 into named ``L_{[X,Y]_VF}`` atoms and discharge the cyclic Jacobi
 identity for the vector-field Lie bracket:
 
-* :class:`OpCommutatorVfDefinition` — fires on a :class:`Sum` and
+* :class:`OpCommutatorVfDefinition`, fires on a :class:`Sum` and
   collapses any pair ``L_X(L_Y(ω)) − L_Y(L_X(ω))`` (positive-then-
   negated, in any positional order) into ``L_{[X,Y]_VF}(ω)``. The
   operator-commutator-to-vector-field-Lie identity is what lets the
   2f-deep cancellation chain replace iterated derivative pairs by a
   single Lie derivative against a Lie-bracket vector field.
-* :class:`LieVfJacobiDefinition` — fires on a :class:`Sum` containing
+* :class:`LieVfJacobiDefinition`, fires on a :class:`Sum` containing
   three cyclically-permuted ``L_{[X,[Y,Z]_VF]_VF}(ω)`` terms (with the
   same operand ``ω``) and zeros them out. The vector-field Lie
   bracket satisfies the ordinary (un-graded) Jacobi identity, so
-  the cyclic triple is mathematically zero — recognising it as such
+  the cyclic triple is mathematically zero, recognising it as such
   is the engine-level expression of that fact.
 
 Both rules scan the children of a Sum to find the matching pattern;
@@ -47,7 +47,7 @@ from jacopy.proof.expansion import Definition
 
 
 def _strip_neg(expr: Expr) -> Tuple[bool, Expr]:
-    """Return (has_neg, inner) — peel a single :class:`Neg` if present."""
+    """Return (has_neg, inner), peel a single :class:`Neg` if present."""
     if isinstance(expr, Neg):
         return True, expr.arg
     return False, expr
@@ -75,7 +75,7 @@ def _as_lie_outer_inner(
 
 
 # --------------------------------------------------------------------- #
-# Axiom 5 — operator commutator → vector-field Lie bracket               #
+# Axiom 5, operator commutator → vector-field Lie bracket               #
 # --------------------------------------------------------------------- #
 
 
@@ -85,7 +85,7 @@ class OpCommutatorVfDefinition(Definition):
     Scans a :class:`Sum`'s children for a positive ``Act(L_X,
     Act(L_Y, ω))`` paired with its sign-flipped twin ``Neg(Act(L_Y,
     Act(L_X, ω)))``. The two terms are removed and replaced with a
-    single ``Act(L_{[X,Y]_VF}, ω)`` — the named-bracket vector-field
+    single ``Act(L_{[X,Y]_VF}, ω)``, the named-bracket vector-field
     Lie derivative on the same operand.
 
     Arguments may sit in either positional order; the matcher tries
@@ -93,7 +93,7 @@ class OpCommutatorVfDefinition(Definition):
 
     The resulting :class:`~jacopy.calculus.lie_derivative.LieDerivative`
     inherits its construction options from the rule's
-    ``lie_derivative_factory`` parameter — pass a custom factory when
+    ``lie_derivative_factory`` parameter, pass a custom factory when
     the host calculus uses a non-default ``d`` or interior product.
     """
 
@@ -156,7 +156,7 @@ class OpCommutatorVfDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# Axiom 6 — Lie-Jacobi for the vector-field Lie bracket                  #
+# Axiom 6, Lie-Jacobi for the vector-field Lie bracket                  #
 # --------------------------------------------------------------------- #
 
 
@@ -205,7 +205,7 @@ class LieVfJacobiDefinition(Definition):
         self, term: Expr
     ) -> Optional[Tuple[Expr, Expr, Expr, Expr]]:
         """Return ``(X, Y, Z, ω)`` for ``Act(L_{[X,[Y,Z]_VF]_VF}, ω)``,
-        else ``None``. ``Neg``-wrapped variants return ``None`` —
+        else ``None``. ``Neg``-wrapped variants return ``None``,
         Lie-Jacobi is the *positive* cyclic sum.
         """
         if isinstance(term, Neg):

@@ -9,7 +9,7 @@ from jacopy.core.symbolic_degree import Degree
 
 
 def _anticommutator(a, b, registry):
-    """A B + B A — not antisymmetric, used as a custom rule."""
+    """A B + B A, not antisymmetric, used as a custom rule."""
     return Sum(Product(a, b), Product(b, a))
 
 

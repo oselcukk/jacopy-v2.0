@@ -1,5 +1,5 @@
 """
-Operator-equation helper — thin object wrapper around agreement-on-generators.
+Operator-equation helper, thin object wrapper around agreement-on-generators.
 
 The :class:`OperatorEquation` class bundles a left-hand operator, a
 right-hand operator, and the :class:`ExteriorAlgebra` (or any
@@ -35,7 +35,7 @@ class OperatorEquation:
     """Deferred statement ``lhs == rhs`` on an algebra.
 
     Holding the triple ``(lhs, rhs, algebra)`` as data lets callers
-    compose operator equations before attempting any proof — e.g. store
+    compose operator equations before attempting any proof, e.g. store
     a list of Cartan relations and discharge them in a batch. Instances
     are frozen and hashable so they can be keyed in registries of
     "known" / "to-prove" equations.
@@ -48,7 +48,7 @@ class OperatorEquation:
     rhs
         Right operator, of the same degree as ``lhs``.
     algebra
-        Any object exposing a ``generators`` property — the canonical
+        Any object exposing a ``generators`` property, the canonical
         example is :class:`~jacopy.calculus.exterior_algebra.ExteriorAlgebra`.
     """
 

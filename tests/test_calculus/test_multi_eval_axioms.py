@@ -16,7 +16,7 @@ from jacopy.proof.expansion import ExpansionEngine
 
 
 def _expand_and_simplify(engine: ExpansionEngine, expr):
-    """Engine + simplify cascade — flatten nested Sums, drop zeros."""
+    """Engine + simplify cascade, flatten nested Sums, drop zeros."""
     out, _ = engine.expand(expr)
     return simplify(out, PropertyRegistry())
 
@@ -204,7 +204,7 @@ class TestCombinedEngine:
         assert set(out.children) == terms
 
     def test_repeat_kills_one_branch(self):
-        # ω(X + Y, X) — distributes to ω(X, X) + ω(Y, X);
+        # ω(X + Y, X), distributes to ω(X, X) + ω(Y, X);
         # the first vanishes by alternation, leaving ω(Y, X).
         omega = Symbol("ω")
         X, Y = Symbol("X"), Symbol("Y")
@@ -272,7 +272,7 @@ class TestAlternatingCanonicalize:
         assert out == Neg(multi_eval(omega, X, Y, Z))
 
     def test_engine_swap_pair_in_three_args(self):
-        # ω(X, Z, Y) — single inversion (Z, Y) → +Neg → -ω(X, Y, Z).
+        # ω(X, Z, Y), single inversion (Z, Y) → +Neg → -ω(X, Y, Z).
         omega = Symbol("ω")
         X, Y, Z = Symbol("X"), Symbol("Y"), Symbol("Z")
         engine = ExpansionEngine([MultiEvalAlternatingNormalDefinition()])

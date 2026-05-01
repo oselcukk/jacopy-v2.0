@@ -1,14 +1,14 @@
 r"""
-Torsion and curvature of an affine connection — Faz 16.B.
+Torsion and curvature of an affine connection, Faz 16.B.
 
 For an :class:`~jacopy.calculus.connection.AffineConnection` ``∇`` the
 two structural tensors are:
 
-* **Torsion** ``T(∇)(X, Y) := ∇_X Y − ∇_Y X − [X, Y]_VF`` —
+* **Torsion** ``T(∇)(X, Y) := ∇_X Y − ∇_Y X − [X, Y]_VF``,
   antisymmetric in ``(X, Y)``, vanishes for the Levi-Civita
   connection on a Riemannian manifold.
 * **Curvature** ``R(∇)(X, Y) Z := ∇_X ∇_Y Z − ∇_Y ∇_X Z − ∇_{[X,Y]_VF} Z``
-  — antisymmetric in the first two slots, the obstruction to ``∇``
+ , antisymmetric in the first two slots, the obstruction to ``∇``
   having flat parallel transport.
 
 Both shapes are encoded as :class:`~jacopy.core.expr.Expr` nodes
@@ -21,15 +21,15 @@ require (see ``operator_atom_index_opacity.md``).
 
 Two engine rules ship here, the textbook *defining* axioms:
 
-* :class:`TorsionDefinitionDefinition` — rewrites
+* :class:`TorsionDefinitionDefinition`, rewrites
   ``Torsion(∇, X, Y) → ∇_X Y − ∇_Y X − [X, Y]_VF``.
-* :class:`CurvatureDefinitionDefinition` — rewrites
+* :class:`CurvatureDefinitionDefinition`, rewrites
   ``Curvature(∇, X, Y, Z) → ∇_X ∇_Y Z − ∇_Y ∇_X Z − ∇_{[X, Y]_VF} Z``.
 
 Antisymmetry of ``T`` and of ``R``'s first two slots is a
 mathematical *consequence* of these definitions plus
 :class:`~jacopy.algebra.lie_bracket_vf.LieBracketVF`'s antisymmetry,
-not a separate axiom — Faz 16.D's Bianchi closure exercises it
+not a separate axiom, Faz 16.D's Bianchi closure exercises it
 through the LBVF-antisymmetry rule already in the engine bundle.
 """
 
@@ -49,7 +49,7 @@ from jacopy.proof.expansion import Definition
 
 
 class Torsion(Expr):
-    r"""``T(∇)(X, Y)`` — torsion tensor evaluated on two vector fields.
+    r"""``T(∇)(X, Y)``, torsion tensor evaluated on two vector fields.
 
     Children are ``(X, Y)``; the connection slot is parametric. Two
     instances with the same connection and the same arguments compare
@@ -110,7 +110,7 @@ class Torsion(Expr):
 
 
 class Curvature(Expr):
-    r"""``R(∇)(X, Y) Z`` — curvature tensor evaluated on three vector fields.
+    r"""``R(∇)(X, Y) Z``, curvature tensor evaluated on three vector fields.
 
     Children are ``(X, Y, Z)``; the connection slot is parametric.
     The convention here matches Tu/Cattaneo: ``R(X, Y) Z`` is the
@@ -218,7 +218,7 @@ class CurvatureDefinitionDefinition(Definition):
     r"""``R(∇)(X, Y) Z → ∇_X ∇_Y Z − ∇_Y ∇_X Z − ∇_{[X, Y]_VF} Z``.
 
     The textbook curvature definition. The third term ``∇_{[X, Y]_VF} Z``
-    is emitted as ``ConnectionEvalExpr(∇, [X, Y]_VF, Z)`` — the LBVF
+    is emitted as ``ConnectionEvalExpr(∇, [X, Y]_VF, Z)``, the LBVF
     sits in ∇'s X-slot, where the X-linearity / additivity rules walk
     naturally. (LBVF is itself a :class:`Derivation`, so degree-of
     treats it as a vector field, which matches its mathematical role.)
@@ -262,7 +262,7 @@ class CurvatureDefinitionDefinition(Definition):
 
 
 class TorsionCovariantDerivative(Expr):
-    r"""``(∇_U T)(V, W)`` — covariant derivative of the torsion tensor.
+    r"""``(∇_U T)(V, W)``, covariant derivative of the torsion tensor.
 
     Children are ``(U, V, W)``; the connection slot is parametric. The
     underlying mathematical object ``∇_U T`` is itself a ``(1,2)``-tensor;
@@ -337,7 +337,7 @@ class TorsionCovariantDerivative(Expr):
 
 
 class CurvatureCovariantDerivative(Expr):
-    r"""``(∇_U R)(V, W) Z`` — covariant derivative of the curvature tensor.
+    r"""``(∇_U R)(V, W) Z``, covariant derivative of the curvature tensor.
 
     Children are ``(U, V, W, Z)``; the connection slot is parametric.
     The underlying mathematical object ``∇_U R`` is a ``(1,3)``-tensor;
@@ -509,7 +509,7 @@ class CurvatureCovariantDerivativeDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# Torsion / Curvature C∞-bilinearity + antisymmetry — Faz 17.D           #
+# Torsion / Curvature C∞-bilinearity + antisymmetry, Faz 17.D           #
 # --------------------------------------------------------------------- #
 #
 # These rules state the textbook fact that ``T`` and ``R`` are tensors:
@@ -520,8 +520,8 @@ class CurvatureCovariantDerivativeDefinition(Definition):
 # form-degree proof of "T^a is a 2-form" running through the unfolded
 # definition would have to drag the full LBVF C∞-linearity machinery
 # along with it. Adopting these as primitive Definitions keeps the
-# form-degree proof short — Pairing(e^a, T(∇, fU, V)) closes in two
-# rewrites (TorsionXScalarPull → PairingScalarPull) — exactly as the
+# form-degree proof short, Pairing(e^a, T(∇, fU, V)) closes in two
+# rewrites (TorsionXScalarPull → PairingScalarPull), exactly as the
 # Faz 12.B Pairing C∞-linearity rule does for its enclosing pairing.
 #
 # All rules are scoped to a specific :class:`AffineConnection` so two
@@ -601,7 +601,7 @@ class TorsionYLinearityDefinition(Definition):
 
 
 class TorsionXScalarPullDefinition(Definition):
-    r"""``T(∇)(f · X, Y) → f · T(∇)(X, Y)`` — :math:`C^\infty`-linearity in X."""
+    r"""``T(∇)(f · X, Y) → f · T(∇)(X, Y)``, :math:`C^\infty`-linearity in X."""
 
     def __init__(self, conn: AffineConnection) -> None:
         if not isinstance(conn, AffineConnection):
@@ -628,7 +628,7 @@ class TorsionXScalarPullDefinition(Definition):
 
 
 class TorsionYScalarPullDefinition(Definition):
-    r"""``T(∇)(X, f · Y) → f · T(∇)(X, Y)`` — :math:`C^\infty`-linearity in Y."""
+    r"""``T(∇)(X, f · Y) → f · T(∇)(X, Y)``, :math:`C^\infty`-linearity in Y."""
 
     def __init__(self, conn: AffineConnection) -> None:
         if not isinstance(conn, AffineConnection):
@@ -655,7 +655,7 @@ class TorsionYScalarPullDefinition(Definition):
 
 
 class TorsionAntiSymmetryDefinition(Definition):
-    r"""``T(∇)(X, Y) → −T(∇)(Y, X)`` — canonical-order swap on the antisymmetric pair.
+    r"""``T(∇)(X, Y) → −T(∇)(Y, X)``, canonical-order swap on the antisymmetric pair.
 
     Fires on a :class:`Torsion` whose ``(X, Y)`` are out of ``repr``-order.
     After the rewrite the pair is sorted so the rule applies at most once
@@ -751,7 +751,7 @@ class CurvatureYLinearityDefinition(Definition):
 
 
 class CurvatureXScalarPullDefinition(Definition):
-    r"""``R(∇)(f · X, Y) Z → f · R(∇)(X, Y) Z`` — :math:`C^\infty`-linearity in X."""
+    r"""``R(∇)(f · X, Y) Z → f · R(∇)(X, Y) Z``, :math:`C^\infty`-linearity in X."""
 
     def __init__(self, conn: AffineConnection) -> None:
         if not isinstance(conn, AffineConnection):
@@ -778,7 +778,7 @@ class CurvatureXScalarPullDefinition(Definition):
 
 
 class CurvatureYScalarPullDefinition(Definition):
-    r"""``R(∇)(X, f · Y) Z → f · R(∇)(X, Y) Z`` — :math:`C^\infty`-linearity in Y."""
+    r"""``R(∇)(X, f · Y) Z → f · R(∇)(X, Y) Z``, :math:`C^\infty`-linearity in Y."""
 
     def __init__(self, conn: AffineConnection) -> None:
         if not isinstance(conn, AffineConnection):
@@ -805,7 +805,7 @@ class CurvatureYScalarPullDefinition(Definition):
 
 
 class CurvatureXYAntiSymmetryDefinition(Definition):
-    r"""``R(∇)(X, Y) Z → −R(∇)(Y, X) Z`` — canonical-order swap on the antisymmetric pair.
+    r"""``R(∇)(X, Y) Z → −R(∇)(Y, X) Z``, canonical-order swap on the antisymmetric pair.
 
     Fires when ``(X, Y)`` of a :class:`Curvature` are out of
     ``repr``-order. ``Z`` slot is left untouched. Scoped to a specific

@@ -33,7 +33,7 @@ def one_form_registry():
 
 
 # --------------------------------------------------------------------- #
-# invariant_d_one_form — RHS builder                                     #
+# invariant_d_one_form, RHS builder                                     #
 # --------------------------------------------------------------------- #
 
 
@@ -75,7 +75,7 @@ class TestInvariantDOneFormBuilder:
         assert inner2.arg is omega
 
     def test_third_term_is_neg_iota_bracket_omega(self):
-        """``Neg(Act(ι_{[X, Y]}, ω))`` — bracket supplied by the bracket arg."""
+        """``Neg(Act(ι_{[X, Y]}, ω))``, bracket supplied by the bracket arg."""
         omega = Symbol("ω")
         X, Y = Symbol("X"), Symbol("Y")
         out = invariant_d_one_form(omega, X, Y, bracket=lie)
@@ -141,7 +141,7 @@ class TestInvariantDOneFormBuilder:
 
 
 # --------------------------------------------------------------------- #
-# InvariantDOneFormDefinition — construction                             #
+# InvariantDOneFormDefinition, construction                             #
 # --------------------------------------------------------------------- #
 
 
@@ -201,7 +201,7 @@ class TestMatches:
         assert not defn.matches(expr)
 
     def test_rejects_single_interior(self, one_form_registry):
-        """``ι_X(dω)`` alone — only one interior product — does not match."""
+        """``ι_X(dω)`` alone, only one interior product, does not match."""
         reg, omega = one_form_registry
         X = Symbol("X")
         expr = Act(interior(X), Act(default_d, omega))
@@ -345,7 +345,7 @@ class TestEngineIntegration:
         assert step.children == ()
 
     def test_stays_inert_without_registry(self):
-        """Without ``|ω| = 1`` the rule cannot fire — no step produced."""
+        """Without ``|ω| = 1`` the rule cannot fire, no step produced."""
         omega = Symbol("ω")
         X, Y = Symbol("X"), Symbol("Y")
         expr = Act(interior(Y), Act(interior(X), Act(default_d, omega)))

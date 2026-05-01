@@ -1,5 +1,5 @@
 r"""
-Gödel metric — rotating dust universe with closed timelike curves.
+Gödel metric, rotating dust universe with closed timelike curves.
 
 In Gödel's original coordinates ``(t, x, y, z)``:
 
@@ -10,7 +10,7 @@ In Gödel's original coordinates ``(t, x, y, z)``:
 
 Solution of Einstein's equations with rotating dust + cosmological
 constant. Famous for admitting **closed timelike curves** through every
-point — used as a benchmark for causality-violation arguments.
+point, used as a benchmark for causality-violation arguments.
 
 Discovered by Kurt Gödel (1949). The rotation parameter ``ω`` sets the
 angular velocity scale.

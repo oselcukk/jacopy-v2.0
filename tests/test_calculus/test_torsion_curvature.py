@@ -1,4 +1,4 @@
-"""Tests for torsion / curvature tensors — Faz 16.B."""
+"""Tests for torsion / curvature tensors, Faz 16.B."""
 
 from __future__ import annotations
 
@@ -297,7 +297,7 @@ def test_engine_expands_curvature():
 
 
 # --------------------------------------------------------------------- #
-# Torsion C∞-bilinearity + antisymmetry — Faz 17.D                       #
+# Torsion C∞-bilinearity + antisymmetry, Faz 17.D                       #
 # --------------------------------------------------------------------- #
 
 
@@ -378,7 +378,7 @@ def test_torsion_antisymmetry_canonicalizes_pair():
 
 
 def test_torsion_antisymmetry_does_not_loop():
-    """Already in canonical order — rule should not match."""
+    """Already in canonical order, rule should not match."""
     nabla = connection("∇")
     rule = TorsionAntiSymmetryDefinition(nabla)
     Y = Symbol("z")
@@ -396,7 +396,7 @@ def test_torsion_axioms_scoped_to_specific_connection():
 
 
 # --------------------------------------------------------------------- #
-# Curvature C∞-bilinearity + antisymmetry — Faz 17.D                     #
+# Curvature C∞-bilinearity + antisymmetry, Faz 17.D                     #
 # --------------------------------------------------------------------- #
 
 
@@ -467,7 +467,7 @@ def test_curvature_xy_antisymmetry_leaves_z_slot_untouched():
     Y = Symbol("b")
     Z = Symbol("z")  # out of order but Z slot doesn't trigger
     e = Curvature(nabla, X, Y, Z)
-    # X < Y in repr order — rule should not match.
+    # X < Y in repr order, rule should not match.
     assert not rule.matches(e)
 
 
@@ -481,7 +481,7 @@ def test_curvature_axioms_scoped_to_specific_connection():
 
 
 # --------------------------------------------------------------------- #
-# Bracket-parametrized Torsion / Curvature — Q9 / Math 595 algebroid    #
+# Bracket-parametrized Torsion / Curvature, Q9 / Math 595 algebroid    #
 # --------------------------------------------------------------------- #
 
 
@@ -514,7 +514,7 @@ class TestBracketParametrization:
         assert isinstance(out, Sum)
         third = out.children[2]
         assert isinstance(third, Neg)
-        # No more LieBracketVF — should now be a BracketApply on Koszul.
+        # No more LieBracketVF, should now be a BracketApply on Koszul.
         assert isinstance(third.arg, BracketApply)
         assert isinstance(third.arg.bracket, KoszulBracket)
 

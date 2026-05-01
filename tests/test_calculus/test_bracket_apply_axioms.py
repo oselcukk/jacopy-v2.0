@@ -1,4 +1,4 @@
-"""Tests for the BracketApply-side closure axioms — Q9 Stage 9.C."""
+"""Tests for the BracketApply-side closure axioms, Q9 Stage 9.C."""
 
 from __future__ import annotations
 
@@ -66,7 +66,7 @@ class TestBracketApplySumLinearity:
         k2 = KoszulBracket(Anchor(name="ρ2"))
         rule = BracketApplySumLinearityDefinition(k1)
         a, b, c = syms3()
-        # k2 is a different KoszulBracket instance (different anchor) — rule
+        # k2 is a different KoszulBracket instance (different anchor), rule
         # must not fire on it.
         assert not rule.matches(BracketApply(k2, Sum(a, b), c))
 
@@ -110,7 +110,7 @@ class TestBracketApplyNegLinearity:
 
 
 # --------------------------------------------------------------------- #
-# Arg antisymmetry — atom level                                          #
+# Arg antisymmetry, atom level                                          #
 # --------------------------------------------------------------------- #
 
 
@@ -128,7 +128,7 @@ class TestBracketApplyArgAntisymmetry:
         k = koszul()
         a, _, c = syms3()
         rule = BracketApplyArgAntisymmetryDefinition(k)
-        # repr('α') < repr('γ') — already canonical
+        # repr('α') < repr('γ'), already canonical
         assert not rule.matches(BracketApply(k, a, c))
 
     def test_no_match_when_args_equal(self):
@@ -163,7 +163,7 @@ class TestBracketApplyArgAntisymmetry:
 
     def test_graded_symmetric_swap_drops_neg(self):
         # Subclass override: ``pair_swap_sign`` returns +1 (the pair
-        # behaves graded-symmetrically). Then ``[c, a] → +[a, c]`` —
+        # behaves graded-symmetrically). Then ``[c, a] → +[a, c]``,
         # rewrite emits the canonical bracket without an outer Neg.
         class GradedSymPairBracket(CustomBracket):
             def pair_swap_sign(self, a, b, registry=None):
@@ -210,7 +210,7 @@ class TestBracketApplyAntiSymmetry:
         assert out == Integer(0)
 
     def test_skips_when_wrappers_differ(self):
-        # Same bracket pair under different wrappers must not cancel —
+        # Same bracket pair under different wrappers must not cancel,
         # ``[a,b](f) + [b,a](g)`` is not zero.
         k = koszul()
         a, b, _ = syms3()
@@ -257,7 +257,7 @@ class TestBracketApplyJacobi:
 
     def test_inner_anti_sym_variant_collapses(self):
         # ``[A,[C,B]] + [B,[A,C]] + [C,[B,A]]`` is the cyclic with
-        # inner anti-symmetry applied to each — same triple, all signs
+        # inner anti-symmetry applied to each, same triple, all signs
         # net to ``-1``, still cancels.
         k = koszul()
         a, b, c = syms3()
@@ -279,7 +279,7 @@ class TestBracketApplyJacobi:
             BracketApply(k2, b, BracketApply(k2, c, a)),
             BracketApply(k2, c, BracketApply(k2, a, b)),
         )
-        # Wrong bracket — no triple found.
+        # Wrong bracket, no triple found.
         assert not rule.matches(expr)
 
     def test_accepts_higher_degree_bracket(self):

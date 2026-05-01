@@ -17,7 +17,7 @@ from jacopy.proof import (
 
 
 class _EchoStrategy(Strategy):
-    """Minimal strategy for testing strategy substitution — always closes."""
+    """Minimal strategy for testing strategy substitution, always closes."""
 
     name = "echo"
 

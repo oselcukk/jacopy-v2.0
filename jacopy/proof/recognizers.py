@@ -1,10 +1,10 @@
 """
-Pattern recognizers — pure shape inspection, no rewriting.
+Pattern recognizers, pure shape inspection, no rewriting.
 
 A :class:`Recognizer` answers a single question: "is this expression
 an instance of the pattern I care about, and if so, what are its
 pieces?". Recognizers don't rewrite, don't consult definitions, and
-don't build proof steps — they only decompose an expression into the
+don't build proof steps, they only decompose an expression into the
 structural fields a strategy or verifier-API entry point will hand
 off to an actual proof tactic.
 
@@ -19,7 +19,7 @@ expression has the shape they think it does.
 
 Every recognizer exposes :meth:`recognize`, returning either a
 pattern-specific :class:`Match` dataclass or ``None``. No exceptions
-— a non-match is not an error condition.
+, a non-match is not an error condition.
 """
 
 from __future__ import annotations
@@ -67,7 +67,7 @@ class LeibnizMatch:
 
     ``op`` is the derivation being applied; ``factors`` are the
     operands of the inner :class:`Product` in order. ``factors`` is
-    always length ≥ 2 — a single-factor product would not exercise
+    always length ≥ 2, a single-factor product would not exercise
     graded Leibniz.
     """
 
@@ -76,7 +76,7 @@ class LeibnizMatch:
 
 
 class LeibnizRecognizer:
-    """Match ``Act(D, Product(a, b, …))`` — the LHS of a graded Leibniz rule.
+    """Match ``Act(D, Product(a, b, …))``, the LHS of a graded Leibniz rule.
 
     The recognizer does *not* consult :func:`degree_of` or the
     registry; whether ``D`` actually behaves as a graded derivation is
@@ -109,7 +109,7 @@ class AntisymmetryMatch:
 
     ``a`` and ``b`` are the commutator operands in the order they
     appear. An antisymmetry claim is a statement *about* the
-    commutator — asking whether it swaps to a sign-correct form — so
+    commutator, asking whether it swaps to a sign-correct form, so
     the recognizer returns the operands and leaves the sign
     computation to :mod:`jacopy.algebra.commutator`.
     """
@@ -121,7 +121,7 @@ class AntisymmetryMatch:
 class AntisymmetryRecognizer:
     """Match a :class:`Commutator` node posed as an antisymmetry claim.
 
-    Structurally identical to :class:`CommutatorRecognizer` today —
+    Structurally identical to :class:`CommutatorRecognizer` today,
     both entry points return on the same syntactic shape. The two
     recognizers are separate classes because the *intent* differs:
     :class:`CommutatorRecognizer` feeds decomposition tactics that

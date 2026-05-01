@@ -3,7 +3,7 @@
 Every tutorial opens with the same boilerplate: create a few
 :class:`~jacopy.core.expr.Symbol`s and declare each one's grading on a
 :class:`~jacopy.core.registry.PropertyRegistry`. That is two lines of
-ceremony hiding a one-line intent — "these are three vector fields" or
+ceremony hiding a one-line intent, "these are three vector fields" or
 "this is a Poisson bivector". The helpers below bundle the Symbol
 construction with the :class:`~jacopy.core.properties.Graded`
 declaration into a single call that reads like a mathematical
@@ -54,7 +54,7 @@ def Functions(
 
     ``Functions("f g h", registry=reg)`` returns three :class:`Symbol`
     instances, each already carrying :class:`Graded(degree=0)` on
-    ``reg``. Even for a single name, the return is a tuple — unpack
+    ``reg``. Even for a single name, the return is a tuple, unpack
     with ``(f,) = Functions("f", registry=reg)``.
 
     The default ``degree=0`` matches the classical form-grading.
@@ -76,7 +76,7 @@ def VectorFields(
     """Declare one or more vector-field symbols.
 
     Vector fields carry :class:`Graded(degree=0)` in the classical
-    grading convention used by :mod:`jacopy.brackets.lie` — this is
+    grading convention used by :mod:`jacopy.brackets.lie`, this is
     what the Koszul sign machinery needs to expand a Jacobi
     obstruction. The registry footprint is identical to
     :func:`Functions`; the two helpers differ only in the name a
@@ -112,15 +112,15 @@ def Bivector(
     Matches the Schouten–Nijenhuis grading used throughout
     :mod:`jacopy.library.poisson`: a 2-vector carries
     :class:`Graded(degree=1)` (SN-degree ``k - 1`` for a k-vector). A
-    2-vector is anti-symmetric in its covector arguments —
-    ``π(α, β) = -π(β, α)`` — so the helper additionally declares
+    2-vector is anti-symmetric in its covector arguments,
+    ``π(α, β) = -π(β, α)``, so the helper additionally declares
     :class:`Antisymmetric` on the symbol. The declaration is consumed
     by :class:`~jacopy.calculus.antisym_axioms.RegistryAntiSymCanonicalDefinition`
     when the bivector appears as the head of a 2-arg
-    :class:`~jacopy.core.multi_eval.MultiEval` — no per-callsite
+    :class:`~jacopy.core.multi_eval.MultiEval`, no per-callsite
     ``alternating=True`` flag needed.
 
-    Returns the symbol itself — *not* a 1-tuple — because Bivector is
+    Returns the symbol itself, *not* a 1-tuple, because Bivector is
     singular by construction.
     """
     pieces = _parse_names(name)

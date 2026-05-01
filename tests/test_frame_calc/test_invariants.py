@@ -39,7 +39,7 @@ class TestKretschmann:
         assert sp.simplify(K) == 0
 
     def test_schwarzschild_textbook(self) -> None:
-        """Schwarzschild: K = 48 M² / r⁶ — the textbook closed form.
+        """Schwarzschild: K = 48 M² / r⁶, the textbook closed form.
 
         Note: K is FINITE at the horizon r=2M (no real singularity),
         but DIVERGES as r → 0 (genuine curvature singularity).
@@ -53,7 +53,7 @@ class TestKretschmann:
         assert sp.simplify(K - expected) == 0
 
     def test_de_sitter_constant(self) -> None:
-        """de Sitter: K = 8 Λ² / 3 — constant, max-symmetric value."""
+        """de Sitter: K = 8 Λ² / 3, constant, max-symmetric value."""
         F, g = de_sitter()
         R = curvature(levi_civita(g))
         K = kretschmann(R, g)
@@ -145,7 +145,7 @@ class TestCotton:
             cotton(levi_civita(g), g)
 
     def test_signature_is_03(self) -> None:
-        """Cotton tensor has signature (0, 3) — antisymmetric in (a, b)."""
+        """Cotton tensor has signature (0, 3), antisymmetric in (a, b)."""
         x, y, z = sp.symbols("x y z", real=True)
         F = CoordinateFrame([x, y, z])
         g = ComponentMetric(F, sp.eye(3))

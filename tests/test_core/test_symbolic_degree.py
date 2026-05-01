@@ -59,7 +59,7 @@ class TestArithmetic:
     def test_add_collects_like_terms(self):
         a = Degree.var("p")
         s = a + a
-        # 2p — one term with coefficient 2
+        # 2p, one term with coefficient 2
         assert len(s.terms) == 1
         assert s.terms[0][1] == 2
 
@@ -102,7 +102,7 @@ class TestArithmetic:
 
 
 # --------------------------------------------------------------------- #
-# Parity — the Koszul-sign-critical query                               #
+# Parity, the Koszul-sign-critical query                               #
 # --------------------------------------------------------------------- #
 
 

@@ -1,5 +1,5 @@
 r"""
-Kerr metric — rotating vacuum solution.
+Kerr metric, rotating vacuum solution.
 
 In Boyer–Lindquist coordinates ``(t, r, θ, φ)``:
 
@@ -20,7 +20,7 @@ where
 
 Vacuum solution: ``G(∇, g) ≡ 0``. The full pipeline through
 :func:`~jacopy.frame_calc.einstein_tensor` is computationally heavy
-(60+ seconds typical) — running the vacuum check on Kerr is a
+(60+ seconds typical), running the vacuum check on Kerr is a
 deliberate exercise, not a default unit-test target.
 """
 
@@ -62,7 +62,7 @@ def kerr(
     ``g[0, 0].subs(a_sym, 0) == -(1 - 2*M_sym/r)``.
 
     Full vacuum verification (``einstein_tensor.is_vacuum() == True``)
-    is symbolically valid but computationally expensive — see
+    is symbolically valid but computationally expensive, see
     :func:`~jacopy.frame_calc.library.schwarzschild` for a faster
     test target.
     """

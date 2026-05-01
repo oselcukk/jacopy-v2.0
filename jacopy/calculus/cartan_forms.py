@@ -1,5 +1,5 @@
 r"""
-Cartan-form Expr nodes — Faz 17.C.
+Cartan-form Expr nodes, Faz 17.C.
 
 For an :class:`~jacopy.calculus.connection.AffineConnection` ``∇``,
 a (Faz 17.A) :class:`~jacopy.calculus.local_frame.LocalFrame` ``F``,
@@ -16,27 +16,27 @@ and (where relevant) a :class:`~jacopy.calculus.metric.MetricTensor`
 This module ships each as a dedicated :class:`Atom` keyed on its
 parameter tuple, plus the four engine rules that open the eval shape:
 
-* :class:`ConnectionForm` (1-form) — scoped to ``(connection, frame)``
+* :class:`ConnectionForm` (1-form), scoped to ``(connection, frame)``
   with two indices. Eval rule rewrites the
   :class:`~jacopy.calculus.pairing.Pairing` ``⟨ω^a_b, V⟩`` into
   ``⟨e^a, ∇_V X_b⟩``, after which Pairing C∞-linearity (Faz 12.B)
   and ConnectionEval X-linearity (Faz 16.A) carry the proof.
-* :class:`NonMetricityForm` (1-form) — scoped to
+* :class:`NonMetricityForm` (1-form), scoped to
   ``(connection, metric, frame)`` with two indices. Eval rule rewrites
   ``⟨Q_{ab}, V⟩`` into :class:`~jacopy.calculus.non_metricity.NonMetricityEvalExpr`
   applied to ``(V, X_a, X_b)``.
-* :class:`TorsionForm` (2-form) — scoped to ``(connection, frame)``
+* :class:`TorsionForm` (2-form), scoped to ``(connection, frame)``
   with one index. Eval rule rewrites the
   :class:`~jacopy.core.multi_eval.MultiEval` ``T^a(U, V)`` into
   ``⟨e^a, T(∇)(U, V)⟩``.
-* :class:`CurvatureForm` (2-form) — scoped to ``(connection, frame)``
+* :class:`CurvatureForm` (2-form), scoped to ``(connection, frame)``
   with two indices. Eval rule rewrites ``R^a_b(U, V)`` into
   ``⟨e^a, R(∇)(U, V) X_b⟩``.
 
 Convention: 2-form heads carry ``alternating=True`` in their
 :class:`MultiEval` evaluations so the standard alternating-normal /
 repeat-arg-zero engine passes apply automatically. 1-forms route
-through :class:`Pairing` and need no flag — Pairing is bilinear in
+through :class:`Pairing` and need no flag, Pairing is bilinear in
 the ordinary sense.
 
 Each form node is an opaque :class:`Atom`: it has no children, no
@@ -143,7 +143,7 @@ class ConnectionFormDefinition(Definition):
 
     Fires on a :class:`~jacopy.calculus.pairing.Pairing` whose first
     slot is a :class:`ConnectionForm` matching this rule's
-    ``(connection, frame)`` pair. The second slot ``V`` is left alone —
+    ``(connection, frame)`` pair. The second slot ``V`` is left alone,
     Pairing C∞-linearity / Sum / Neg distribution handle non-atomic
     ``V`` before this rule fires (bottom-up walk).
     """

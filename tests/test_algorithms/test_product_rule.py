@@ -50,7 +50,7 @@ class TestLinearity:
     def test_act_on_atom_stays_inert(self):
         d = Derivation("d", degree=1)
         x = Symbol("x")
-        # No rewrite to perform — no registry needed.
+        # No rewrite to perform, no registry needed.
         assert product_rule(d(x)) == Act(d, x)
 
 
@@ -100,7 +100,7 @@ class TestGradedLeibniz:
         )
 
     def test_scalars_carry_no_sign(self, reg):
-        """Scalar factors contribute degree 0 — running parity stays."""
+        """Scalar factors contribute degree 0, running parity stays."""
         d = Derivation("d", degree=1)
         f, a, b = Symbol("f"), Symbol("a"), Symbol("b")
         # f scalar, a,b odd. Running degrees: 0, 0, 1.
@@ -120,7 +120,7 @@ class TestGradedLeibniz:
 
 class TestRecursion:
     def test_nested_act_expands_inner_first(self, reg):
-        """d(e(a*b)) — inner e expanded first, then outer d sees a Sum."""
+        """d(e(a*b)), inner e expanded first, then outer d sees a Sum."""
         d = Derivation("d", degree=0)
         e = Derivation("e", degree=0)
         a, b = Symbol("a"), Symbol("b")
@@ -181,7 +181,7 @@ class TestDegreeErrors:
         reg.declare(alpha, Graded(degree=Degree.var("|α|")))
         # a is already Graded(1) in the fixture.
         a = Symbol("a")
-        # Factors α, a. Running parity before a's split: |α| — symbolic.
+        # Factors α, a. Running parity before a's split: |α|, symbolic.
         with pytest.raises(ValueError, match="symbolic"):
             product_rule(d(Product(alpha, a)), reg)
 

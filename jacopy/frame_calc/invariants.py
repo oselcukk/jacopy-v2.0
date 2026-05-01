@@ -1,5 +1,5 @@
 r"""
-Curvature scalar invariants — Faz 19 Chunk A.
+Curvature scalar invariants, Faz 19 Chunk A.
 
 Coordinate-independent scalars built from Riemann/Ricci by raising
 indices via the metric inverse and contracting all of them away. These
@@ -10,9 +10,9 @@ flatness (Weyl in 4D, Cotton in 3D).
 
 Functions
 ---------
-* :func:`kretschmann` — ``K = R_{abcd} R^{abcd}``
-* :func:`ricci_squared` — ``R_{ab} R^{ab}``
-* :func:`cotton` — 3D Cotton tensor (vanishes iff conformally flat)
+* :func:`kretschmann`, ``K = R_{abcd} R^{abcd}``
+* :func:`ricci_squared`, ``R_{ab} R^{ab}``
+* :func:`cotton`, 3D Cotton tensor (vanishes iff conformally flat)
 
 All functions accept a :class:`~jacopy.frame_calc.component_tensor.ComponentTensor`
 representing Riemann ``(1, 3)`` or Ricci ``(0, 2)`` plus a
@@ -20,7 +20,7 @@ representing Riemann ``(1, 3)`` or Ricci ``(0, 2)`` plus a
 natural index layout is ``R[a, b, c, d]`` with ``a`` upper and
 ``(b, c, d)`` lower, matching the output of
 :func:`~jacopy.frame_calc.curvature.curvature`. This package's Riemann
-has antisymmetry in the **first two lower indices** ``(b, c)`` —
+has antisymmetry in the **first two lower indices** ``(b, c)``,
 non-standard ordering vs. Wald's (last two lower indices). Kretschmann
 and Ricci² are robust under any consistent convention because they
 fully contract; Weyl/Weyl² are deferred pending convention
@@ -136,7 +136,7 @@ def kretschmann(
     Parameters
     ----------
     riemann
-        Riemann curvature tensor of signature ``(1, 3)`` —
+        Riemann curvature tensor of signature ``(1, 3)``,
         ``riemann[a, b, c, d] = R^a{}_{bcd}``. Output of
         :func:`~jacopy.frame_calc.curvature.curvature`.
     g
@@ -244,7 +244,7 @@ def cotton(
     *,
     simplify: bool = True,
 ) -> ComponentTensor:
-    r"""Cotton tensor ``C_{abc}`` — 3D conformal-flatness measure.
+    r"""Cotton tensor ``C_{abc}``, 3D conformal-flatness measure.
 
     .. math::
 
@@ -272,7 +272,7 @@ def cotton(
     ------
     ValueError
         If ``g.frame.dim != 3``. The Cotton tensor is only conformally
-        invariant (and only useful) in 3D — in higher dimensions the
+        invariant (and only useful) in 3D, in higher dimensions the
         Weyl tensor handles conformal flatness.
     """
     from jacopy.frame_calc.ricci import ricci, ricci_scalar

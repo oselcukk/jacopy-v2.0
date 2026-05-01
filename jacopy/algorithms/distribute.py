@@ -6,7 +6,7 @@ preserve factor order on both sides of the sum. This is the crucial
 difference from naive distributivity: expanding ``X * (Y + Z) * W``
 must produce ``(X*Y*W) + (X*Z*W)``, not reorder factors.
 
-Multiple sum factors are expanded left-to-right — expanding the first
+Multiple sum factors are expanded left-to-right, expanding the first
 sum factor yields a Sum whose terms still contain the remaining sum
 factors, and the recursive call on each term takes care of those. This
 is the ordinary multilinear expansion: ``(a+b)*(c+d)`` becomes
@@ -60,7 +60,7 @@ def _distribute_product(factors: Tuple[Expr, ...]) -> Expr:
                 # benefits from a second sweep.
                 terms.append(distribute(sub))
             if not terms:
-                # f was an empty Sum — algebraically zero, so the whole
+                # f was an empty Sum, algebraically zero, so the whole
                 # product is zero. Empty sums shouldn't normally reach
                 # here (smart-ctor collapses them), but handle defensively.
                 from jacopy.core.expr import Zero
@@ -69,7 +69,7 @@ def _distribute_product(factors: Tuple[Expr, ...]) -> Expr:
                 return terms[0]
             # Use Sum.make so nested Sums produced by the recursive
             # distribute() calls on multi-sum products flatten into a
-            # single top-level Sum — ``(a+b)*(c+d)`` should give a
+            # single top-level Sum, ``(a+b)*(c+d)`` should give a
             # flat 4-term sum, not a 2-level tree.
             return Sum.make(*terms)
 

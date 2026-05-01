@@ -8,7 +8,7 @@ for linearity, ``d(?A * ?B) -> d(?A)*?B + ?A*d(?B)`` for Leibniz,
 
 Two wildcard kinds:
 
-* :class:`Wildcard` — a single hole that matches one Expr. It may
+* :class:`Wildcard`, a single hole that matches one Expr. It may
   carry constraints:
 
   - ``type_filter``: a :class:`Property` class the candidate must be
@@ -18,11 +18,11 @@ Two wildcard kinds:
     candidate must be an instance of. Lets a rule say "match only a
     Symbol here", "match any Sum here", and so on.
 
-* :class:`SeqWildcard` — a sequence hole that matches zero or more
+* :class:`SeqWildcard`, a sequence hole that matches zero or more
   consecutive children of a Sum or Product. Multiple per level are
   allowed; matching backtracks over possible splits.
 
-Matching is structural and order-preserving — it does not reorder
+Matching is structural and order-preserving, it does not reorder
 Sum or Product children. Commutative matching is the job of the
 algorithms layer, which canonicalizes expressions before invoking
 :func:`match`.
@@ -75,10 +75,10 @@ class Wildcard(Atom):
 
     Optional constraints:
 
-    * ``type_filter`` — a :class:`Property` class. The target must be
+    * ``type_filter``, a :class:`Property` class. The target must be
       registered as that property in the :class:`PropertyRegistry`
       passed to :func:`match`.
-    * ``expr_type`` — an :class:`Expr` subclass, or a tuple of them.
+    * ``expr_type``, an :class:`Expr` subclass, or a tuple of them.
       The target must be an instance. Evaluated without the registry.
     """
 
@@ -180,7 +180,7 @@ def match(
 
     If ``pattern`` contains type-filtered wildcards, ``registry`` must
     be supplied; otherwise the filter is treated as a failure. This is
-    deliberate — silently ignoring a type filter would mask bugs.
+    deliberate, silently ignoring a type filter would mask bugs.
     """
     bindings: Bindings = {}
     if _match(pattern, target, bindings, registry):
@@ -314,7 +314,7 @@ def _bind_sequence(
 def substitute(pattern: Expr, bindings: Bindings) -> Expr:
     """Replace every wildcard in ``pattern`` with its binding.
 
-    Unbound wildcards are left in place (they're not errors — a rule's
+    Unbound wildcards are left in place (they're not errors, a rule's
     right-hand side may intentionally contain wildcards that don't
     appear on the left). SeqWildcards must be inside a Sum/Product;
     using one elsewhere is rejected at the Expr-building level.
@@ -343,7 +343,7 @@ def substitute(pattern: Expr, bindings: Bindings) -> Expr:
             new_children.append(substitute(child, bindings))
 
     # Rebuild via the same constructor. Smart constructors live on
-    # Sum/Product via `.make()` — but we want structural preservation
+    # Sum/Product via `.make()`, but we want structural preservation
     # here, not simplification. Direct constructor call via _rebuild
     # so types whose __init__ diverges from children (BracketApply
     # carries its bracket outside children) reconstruct correctly.

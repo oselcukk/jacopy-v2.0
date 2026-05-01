@@ -68,7 +68,7 @@ class TestTypeErrors:
 
 class TestRenderExpr:
     def test_symbol(self):
-        # render_expr is symmetric — always returns the ASCII form.
+        # render_expr is symmetric, always returns the ASCII form.
         assert render_expr(Symbol("X")) == to_ascii(Symbol("X"))
 
     def test_greek_passthrough(self):
@@ -194,7 +194,7 @@ class TestRichPath:
         assert "[sub]" not in out
 
     def test_render_chain_does_not_leak_to_stdout(self, capsys):
-        """Regression: render_chain must be pure — no stray stdout write.
+        """Regression: render_chain must be pure, no stray stdout write.
 
         Earlier the recording Console had no explicit ``file`` arg and
         rich writes to stdout by default even when recording, so
@@ -211,7 +211,7 @@ class TestRichPath:
 
 
 # --------------------------------------------------------------------- #
-# Verbosity — applies to both the rich and fallback paths               #
+# Verbosity, applies to both the rich and fallback paths               #
 # --------------------------------------------------------------------- #
 
 

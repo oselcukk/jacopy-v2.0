@@ -1,5 +1,5 @@
 """
-Rich-terminal renderer — coloured, tree-style output for Exprs and
+Rich-terminal renderer, coloured, tree-style output for Exprs and
 ProofChains.
 
 This module leans on the optional ``rich`` package to produce ANSI
@@ -15,12 +15,12 @@ check without re-importing ``rich`` themselves.
 
 Styling is deliberately conservative:
 
-- ``[rule]`` names — bold cyan, since that's the primary scanning
+- ``[rule]`` names, bold cyan, since that's the primary scanning
   anchor when eyeballing a transcript.
-- ``(axiom)`` / ``(theorem)`` provenance tags — yellow / green, so the
+- ``(axiom)`` / ``(theorem)`` provenance tags, yellow / green, so the
   two classification modes stand apart at a glance.
-- Arrow ``→`` — dim, decorative only.
-- Trailing ``— justification`` — dim italic, meta-information.
+- Arrow ``→``, dim, decorative only.
+- Trailing ``, justification``, dim italic, meta-information.
 
 The tree wraps an optional header ``Proof (N steps)`` around the
 chain's top-level steps, with each step's ``children`` becoming nested
@@ -102,7 +102,7 @@ def _step_head(step: ProofStep, verbosity: str = "full"):
     t.append(" → ", style=_STYLE_ARROW)
     t.append(to_ascii(step.after))
     if verbosity == "full" and step.justification:
-        t.append(f"  — {step.justification}", style=_STYLE_JUSTIFY)
+        t.append(f" , {step.justification}", style=_STYLE_JUSTIFY)
     return t
 
 
@@ -111,7 +111,7 @@ def _build_step_tree(
 ):
     # pragma: no cover - rich-only path
     tree = Tree(_step_head(step, verbosity))
-    # Compact mode is a flat table-of-contents — suppress children so
+    # Compact mode is a flat table-of-contents, suppress children so
     # the output stays one-line-per-step regardless of nesting.
     if max_depth > 0 and verbosity != "compact":
         for ch in step.children:
@@ -182,7 +182,7 @@ def render_step(
 ) -> str:
     """Render a :class:`ProofStep` as a coloured tree (or ASCII fallback).
 
-    ``verbosity`` is one of :data:`VERBOSITY_MODES` — ``"full"`` shows
+    ``verbosity`` is one of :data:`VERBOSITY_MODES`, ``"full"`` shows
     rule + tag + before→after + justification + children; ``"summary"``
     drops the justification; ``"compact"`` collapses each step to a
     single ``[rule] (tag)`` line with no children.
@@ -209,7 +209,7 @@ def render_chain(
     false the banner is suppressed. The flag is ignored in the ASCII
     fallback, whose layout does not accommodate a header line.
 
-    ``verbosity`` selects how much of each step is shown —
+    ``verbosity`` selects how much of each step is shown,
     see :data:`VERBOSITY_MODES`.
     """
     if not isinstance(chain, ProofChain):

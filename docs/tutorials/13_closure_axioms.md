@@ -1,6 +1,6 @@
-# 13 — Closure properties & axiom flags
+# 13, Closure properties & axiom flags
 
-Some facts are too structural to derive — every Hamiltonian-invariance
+Some facts are too structural to derive, every Hamiltonian-invariance
 proof on a symplectic form invokes ``dω = 0``, every Poisson-bracket
 calculation invokes ``π(α, β) = −π(β, α)``, every vector-field-equality
 proof on a non-degenerate form peels through ``ι_Y ω = ι_Z ω ⇒ Y = Z``.
@@ -24,11 +24,11 @@ The three flags follow a single recipe:
 | `Antisymmetric` | `RegistryAntiSymCanonicalDefinition` | `π(β, α) → −π(α, β)` (canonical sort) |
 | `NonDegenerate` | `NonDegenerateInteriorEqualityDefinition` | `ι_Y ω − ι_Z ω → Y − Z` |
 
-## `Closed` — `dω = 0` on demand
+## `Closed`, `dω = 0` on demand
 
 Declare the property; layer the rule onto an engine; the engine
 rewrites every `Act(d, ω)` to `0` for the registered form. The
-property carries no internal data — it's a one-bit fact about ``ω``.
+property carries no internal data, it's a one-bit fact about ``ω``.
 
 ```python
 from jacopy.algebra.derivation import Act
@@ -59,9 +59,9 @@ print(f"d(ω) = 0 in {len(chain)} steps: {chain.steps[0].rule}")
 The single named step (`Closed: d(ω) = 0 when ω is declared closed`)
 is the proof artefact: the chain transcript reads as *"because ω is
 closed"*, not as a 50-line ε-δ argument. With `registry=None` the
-rule is a no-op — a safety hatch, not a default.
+rule is a no-op, a safety hatch, not a default.
 
-## `Antisymmetric` — bivectors with a sign rule
+## `Antisymmetric`, bivectors with a sign rule
 
 `Antisymmetric()` flags a binary head whose `MultiEval(head, α, β)`
 swap-pair canonicalises to ``−head(β, α)``. Typical use: a Schouten–
@@ -89,7 +89,7 @@ print(f"rule     : {steps[0].rule}")
 
 The rule fires only once per node (each fire sorts the only
 out-of-order pair) and only when `repr(args[0]) > repr(args[1])`
-— that termination guarantee is what makes it safe to bundle into
+, that termination guarantee is what makes it safe to bundle into
 larger engines.
 
 The cancellation pattern follows immediately: `π(α, β) + π(β, α)`
@@ -103,12 +103,12 @@ expanded, _ = engine2.expand(eq)
 print(f"π(α,β) + π(β,α) → {simplify(expanded, reg2)}")
 ```
 
-## `NonDegenerate` — peeling `ι_(·) ω` off both sides
+## `NonDegenerate`, peeling `ι_(·) ω` off both sides
 
 `NonDegenerate()` encodes the bundle map ``X ↦ ι_X ω`` being
 injective. The paired rule fires on a two-term `Sum` whose children
 are interior products of the *same* form against vector fields with
-opposite signs — exactly the obstruction shape a vector-field
+opposite signs, exactly the obstruction shape a vector-field
 equality produces.
 
 ```python
@@ -149,14 +149,14 @@ reference to a `PropertyRegistry`, and at `matches` time it queries
 that registry for the relevant flag. A few practical consequences:
 
 1. **One rule, every form.** A single `ClosedFormDefinition(registry=reg)`
-   handles every form declared `Closed()` in `reg` — no per-form
+   handles every form declared `Closed()` in `reg`, no per-form
    `Definition` subclass to spell out.
 2. **Pre-declaring opts out.** If you already declared `Graded` /
    `Closed` / `Antisymmetric` on a symbol, the problem wrappers
    (tutorial 14) see those flags and don't re-declare. Pre-declaring
    is the override mechanism.
 3. **`registry=None` is a no-op.** Engines built without a registry
-   keep these rules dormant — a useful safety default for low-level
+   keep these rules dormant, a useful safety default for low-level
    engines that don't want to consume registry context.
 
 ## When the wrapper does it for you
@@ -173,7 +173,7 @@ matching rules into their engines:
 Tutorial 14 walks those wrappers end-to-end. The point of *this*
 tutorial is the layer underneath: when the wrapper isn't a fit (you
 have an almost-symplectic form, a metric, a Riemannian volume…), the
-same property-declaration recipe still works — declare the flag,
+same property-declaration recipe still works, declare the flag,
 layer the rule onto your engine, and the rewrite fires.
 
 ## Closure axioms beyond the form layer
@@ -185,11 +185,11 @@ The same registry-property pattern scales:
 * The `Antisymmetric` flag also drives the SN bivector signs in the
   Koszul-bracket expansion rule.
 * Faz 13's `LieBracketVfAntiSymmetryDefinition` and
-  `LieBracketVfJacobiDefinition` follow the same template — flagged
+  `LieBracketVfJacobiDefinition` follow the same template, flagged
   on the bracket head, rule consumes the flag.
 
 Each "axiom flag" is a one-bit declarative truth about an algebraic
-object that an engine rule cashes in as a rewrite primitive — the
+object that an engine rule cashes in as a rewrite primitive, the
 opposite of the `Definition`-per-instance pattern that dominates
 imperative proof code.
 

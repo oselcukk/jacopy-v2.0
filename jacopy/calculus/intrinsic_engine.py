@@ -3,27 +3,27 @@ Public surface over the intrinsic-formula axioms (Faz 12.A.5).
 
 Three pieces:
 
-* :func:`intrinsic_engine` — bundles the seven Faz 12.A rules
+* :func:`intrinsic_engine`, bundles the seven Faz 12.A rules
   (3 intrinsic + 4 multi-eval helpers) into a single
   :class:`~jacopy.proof.expansion.ExpansionEngine`. Callers who want
   the same plumbing as the Cartan demo notebooks reach for this
   instead of assembling rule lists by hand.
 
-* :class:`IntrinsicFormulaRecognizer` — a pure-shape inspector,
+* :class:`IntrinsicFormulaRecognizer`, a pure-shape inspector,
   mirroring the Faz 7 :mod:`jacopy.proof.recognizers` pattern. Given
   an :class:`~jacopy.core.multi_eval.MultiEval`, it answers "is the
   head an :math:`\iota`, :math:`L`, or :math:`d` applied to a form,
-  and if so what's inside?". Doesn't rewrite — feeds higher-level
+  and if so what's inside?". Doesn't rewrite, feeds higher-level
   tactics the structural fields they need.
 
-* :func:`prove_intrinsic_equivalence` — wraps the
+* :func:`prove_intrinsic_equivalence`, wraps the
   ``Sum(lhs, Neg(rhs)) → simplify`` cycle into a single call that
   returns a :class:`~jacopy.proof.chain.ProofChain` on success or
   raises :class:`~jacopy.proof.strategies.ProofFailure` on residual.
   The intrinsic counterpart of
   :class:`~jacopy.proof.strategies.ExpandAndSimplify`, but driven by
   the seven Faz 12.A rules rather than the package-wide default
-  engine — the latter doesn't carry multi-eval / canonicalize axioms
+  engine, the latter doesn't carry multi-eval / canonicalize axioms
   and so leaves the textbook Cartan obstructions unreduced.
 
 Faz 12.A.5 is *ergonomic*: it adds no new axioms. The four Cartan
@@ -31,7 +31,7 @@ relations that close end-to-end (ιι anti-commute, Cartan magic,
 ``[L_X, ι_Y] = ι_{[X,Y]}``, ι²=0) are exactly the four that already
 closed manually in Faz 12.A.4. The other three (``d²=0``,
 ``[d, L_X]=0``, ``[L_X, L_Y] = L_{[X,Y]}``) are blocked on the
-generic VF-commutator + VF-Jacobi axioms scheduled for Faz 12.A.6 —
+generic VF-commutator + VF-Jacobi axioms scheduled for Faz 12.A.6,
 once those land, the same :func:`prove_intrinsic_equivalence` call
 will close them without any API change at this layer.
 """
@@ -93,7 +93,7 @@ def intrinsic_engine() -> ExpansionEngine:
     * :class:`MultiEvalAlternatingNormalDefinition`   (12.A.4)
 
     Callers are free to extend the returned engine with additional
-    rules — once 12.A.6 lands its VF-commutator and VF-Jacobi axioms,
+    rules, once 12.A.6 lands its VF-commutator and VF-Jacobi axioms,
     a follow-up factory will return the closure-complete bundle.
     """
     return ExpansionEngine(
@@ -116,20 +116,20 @@ def intrinsic_engine_with_closure() -> ExpansionEngine:
     Bundles the seven base rules with three Sum-level closure rules:
 
     * :class:`~jacopy.calculus.closure_axioms.VfActCommutatorDefinition`
-      — folds ``Act(X, Act(Y, f)) − Act(Y, Act(X, f))`` into
+     , folds ``Act(X, Act(Y, f)) − Act(Y, Act(X, f))`` into
       ``Act([X, Y]_VF, f)`` (the post-intrinsic-expansion residue
       shape; the L-specific Faz 13.C rule no longer fires because
       ``Act(L_X, ω)`` has been expanded out).
     * :class:`~jacopy.calculus.closure_axioms.LieBracketVfAntiSymmetryDefinition`
-      — cancels ``[X,Y]_VF(…) + [Y,X]_VF(…)``. :class:`LieBracketVF`
+     , cancels ``[X,Y]_VF(…) + [Y,X]_VF(…)``. :class:`LieBracketVF`
       atoms are opaque, so ``[X,Y]`` and ``[Y,X]`` don't collapse on
       construction; the rule supplies that cancellation when the
       Cartan-residue distribution exposes both orientations together.
     * :class:`~jacopy.calculus.closure_axioms.LieBracketVfJacobiDefinition`
-      — collapses any sign-permuted three-bracket cyclic into ``0``,
+     , collapses any sign-permuted three-bracket cyclic into ``0``,
       regardless of which Cartan relation produced the residue.
     * :class:`~jacopy.calculus.closure_axioms.IotaActAsScalarDefinition`
-      — bridges bare ``Act(D, Act(ι_X, ω))`` (where ``D`` is a plain
+     , bridges bare ``Act(D, Act(ι_X, ω))`` (where ``D`` is a plain
       vector field) into ``Act(D, MultiEval(ω, X))`` so the arity-1
       d-residue ``Y(ι_X ω)`` of 1-form Cartan magic eval-Y reaches
       ``Y(ω(X))``.
@@ -167,12 +167,12 @@ class IntrinsicFormulaMatch:
     """Successful :class:`IntrinsicFormulaRecognizer` result.
 
     Fields:
-      * ``operator`` — ``"interior"``, ``"lie"``, or ``"exterior_d"``.
-      * ``vector_field`` — the ``X`` in :math:`\\iota_X` / :math:`L_X`;
+      * ``operator``, ``"interior"``, ``"lie"``, or ``"exterior_d"``.
+      * ``vector_field``, the ``X`` in :math:`\\iota_X` / :math:`L_X`;
         ``None`` for :math:`d` (which carries no slot).
-      * ``omega`` — the underlying form (``head.arg``).
-      * ``args`` — the multi-eval evaluation slots.
-      * ``alternating`` / ``slot_kind`` — flags carried verbatim from
+      * ``omega``, the underlying form (``head.arg``).
+      * ``args``, the multi-eval evaluation slots.
+      * ``alternating`` / ``slot_kind``, flags carried verbatim from
         the matched :class:`MultiEval`, so a downstream tactic that
         rebuilds doesn't have to reach back into the original node.
     """
@@ -188,7 +188,7 @@ class IntrinsicFormulaMatch:
 class IntrinsicFormulaRecognizer:
     """Recognize ``MultiEval(Act(op, ω), Y_1, …, Y_p)`` for ``op ∈ {ι, L, d}``.
 
-    Pure shape inspection — answers "is this a wrapped intrinsic
+    Pure shape inspection, answers "is this a wrapped intrinsic
     operator applied to a multilinear evaluation, and if so what's
     inside?". No engine, no rewrite. Mirrors the pattern from
     :mod:`jacopy.proof.recognizers`: :meth:`recognize` returns the
@@ -196,7 +196,7 @@ class IntrinsicFormulaRecognizer:
     just the operator label, and both return ``None`` on a non-match.
 
     The recognizer only inspects the *outer* head; nested operators
-    (e.g. ``Act(L_X, Act(ι_Y, ω))``) are not unwrapped — the inner
+    (e.g. ``Act(L_X, Act(ι_Y, ω))``) are not unwrapped, the inner
     ``Act(ι_Y, ω)`` is reported verbatim as ``omega``. That keeps the
     recognizer composable: a caller can re-recognize on the inner
     ``Act`` after the outer rule has fired.
@@ -243,7 +243,7 @@ class IntrinsicFormulaRecognizer:
 
     def classify(self, expr: Expr) -> Optional[str]:
         """Return just the operator label (``"interior"`` / ``"lie"`` /
-        ``"exterior_d"``) or ``None`` — convenience over :meth:`recognize`.
+        ``"exterior_d"``) or ``None``, convenience over :meth:`recognize`.
         """
         match = self.recognize(expr)
         return None if match is None else match.operator
@@ -273,8 +273,8 @@ def prove_intrinsic_equivalence(
     package-wide ``default_engine()`` doesn't carry multi-eval /
     canonicalize axioms, so it leaves textbook Cartan obstructions
     (``ω(X, [Y,Z]_VF) + ω([Y,Z]_VF, X)``-style residues) unreduced.
-    Callers who want the *intrinsic* picture — Cartan magic on a
-    p-form, ι-tower expansion, Koszul d-formula — should reach for
+    Callers who want the *intrinsic* picture, Cartan magic on a
+    p-form, ι-tower expansion, Koszul d-formula, should reach for
     this function. Generic operator-equation work (``L²``, ``d²``,
     bracket Jacobi) still belongs to ``show_equal``.
 
@@ -305,7 +305,7 @@ def prove_intrinsic_equivalence(
     # only see their target shapes after Act has been distributed
     # through Sum / Neg via :mod:`product_rule`; running the engine
     # alone would leave the VF-commutator pair buried under an
-    # ``Act(_, Sum(...))``. Mirrors :class:`ExpandAndSimplify`'s loop —
+    # ``Act(_, Sum(...))``. Mirrors :class:`ExpandAndSimplify`'s loop,
     # cap at 64 iterations to surface non-converging axiom sets.
     current: Expr = obstruction
     for _ in range(64):

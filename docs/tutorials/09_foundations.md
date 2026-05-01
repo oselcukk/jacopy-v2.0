@@ -1,14 +1,14 @@
-# 09 — Foundations
+# 09, Foundations
 
 This final tutorial drops to one question: "*why* is `d² = 0` an
-axiom?" The answer reveals the package's pedagogical backbone —
+axiom?" The answer reveals the package's pedagogical backbone,
 property provenance, efficient vs foundational mode, the
 axiom-vs-theorem classification, and working with custom axiom
 sets. Earlier tutorials gave the brackets and theorems; here we
 look at what ground sits underneath them and how the package
 keeps that ground explicit.
 
-[08 — The unified picture](08_unified_picture.md) tied the
+[08, The unified picture](08_unified_picture.md) tied the
 theorems together; here we drop into the axiom layer that sits
 *beneath* those theorems.
 
@@ -17,10 +17,10 @@ theorems together; here we drop into the axiom layer that sits
 The package carries assertions on two layers:
 
 - **Axiom.** A primitive equation. Example: `d(df) = 0` on
-  0-forms — a generic axiom imposed on the generators of
+  0-forms, a generic axiom imposed on the generators of
   Ω*(M).
 - **Theorem.** A consequence of axioms. Example: `d² = 0` as
-  an operator identity — derived for general-degree forms from
+  an operator identity, derived for general-degree forms from
   `d(df) = 0` + Leibniz via the agreement-on-generators
   argument.
 
@@ -44,11 +44,11 @@ for d in eng.definitions:
 # axiom    | ι_X(df) = X(f)
 ```
 
-The default engine is conservative — it treats everything as an
+The default engine is conservative, it treats everything as an
 axiom. No rule is derived from anything deeper. That's the
 "efficient" mode: short, fast, no proof-substrate behind it.
 
-## `d_squared_mode="theorem"` — derive `d² = 0`
+## `d_squared_mode="theorem"`, derive `d² = 0`
 
 Mark `d² = 0` as a *theorem* by configuring the engine
 explicitly:
@@ -69,7 +69,7 @@ The flag alone doesn't change the proof layer; it just says
 fires in a single step with no sub-proof attached.
 
 `mode="foundational"`: when a theorem-class rule fires, a
-sub-proof is attached on `ProofStep.children` — showing which
+sub-proof is attached on `ProofStep.children`, showing which
 more primitive axiom(s) the rule rests on.
 
 ```python
@@ -106,7 +106,7 @@ fnd.steps[0].children[0].justification
 ```
 
 The same `d² = 0` step lands on the same `after` value (`0`) in
-both modes — but foundational mode also carries the answer to
+both modes, but foundational mode also carries the answer to
 "so where does it come from?". The generator-level axiom
 (`d(df) = 0`) is the *only* primitive input to the argument;
 everything else is the "if it agrees on generators it agrees on
@@ -114,7 +114,7 @@ all of Ω*(M)" extension principle.
 
 ## Custom axiom sets
 
-`default_engine` is a convenience — the actual data is the
+`default_engine` is a convenience, the actual data is the
 `ExpansionEngine.definitions` list. By assembling the list
 yourself you can change the package's axiomatic basis:
 
@@ -126,11 +126,11 @@ yourself you can change the package's axiomatic basis:
 - Inject your own algebraic theory's axioms by writing a
   `Definition` subclass.
 
-The `Definition` API is minimal — `matches(expr)`,
+The `Definition` API is minimal, `matches(expr)`,
 `rewrite(expr)`, plus the optional `theorem_proof_builder()`
 that supplies the sub-proof in foundational mode.
 
-### Axiom class — the shortest path
+### Axiom class, the shortest path
 
 A rule that reduces a `c_zero` symbol to zero. You build your
 own engine with `ExpansionEngine([...])`, disabling default
@@ -155,10 +155,10 @@ expanded, steps = engine.expand(Sum(Symbol("c_zero"), Symbol("x")))
 # steps:     [ProofStep(rule='c_zero := 0 (axiom)', provenance_tag='axiom')]
 ```
 
-Without overriding `theorem_proof_builder`, `is_theorem=False` —
+Without overriding `theorem_proof_builder`, `is_theorem=False`,
 no child step even in foundational mode.
 
-### Theorem class — attach a sub-proof
+### Theorem class, attach a sub-proof
 
 To present the same rule as a theorem, `theorem_proof_builder`
 returns a `ProofChain` builder:
@@ -203,7 +203,7 @@ fnd_steps[0].children[0].rule
 
 Same `Definition`; in efficient mode it fires atomically, in
 foundational mode it attaches a one-step sub-proof. The
-package's own `DSquaredZeroDefinition` works the same way —
+package's own `DSquaredZeroDefinition` works the same way,
 its sub-proof builder cites the `d(df) = 0` generator axiom.
 
 ## Theorem Book structure
@@ -223,11 +223,11 @@ import dataclasses
 
 Five fields:
 
-- `name` — the registry key (e.g. `"poisson_jacobi"`).
-- `statement` — a human-readable claim.
-- `from_axioms` — `Tuple[str, ...]` of atomic axioms it depends on.
-- `proof` — the theorem's canonical `ProofChain`.
-- `notes` — extra context (optional).
+- `name`, the registry key (e.g. `"poisson_jacobi"`).
+- `statement`, a human-readable claim.
+- `from_axioms`, `Tuple[str, ...]` of atomic axioms it depends on.
+- `proof`, the theorem's canonical `ProofChain`.
+- `notes`, extra context (optional).
 
 Querying the singleton registry `theorem_book`:
 
@@ -254,13 +254,13 @@ Seeded theorems are registered at package init time
 does *not* re-prove a theorem; it pulls
 `theorem_book.get(name).proof` and embeds that chain inside a
 larger `ProofChain`. That's the spine of the "single citation,
-many uses" strategy — every new library module registers its
+many uses" strategy, every new library module registers its
 theorems and the Theorem Book grows.
 
-## Property provenance — once more
+## Property provenance, once more
 
 Property tags label themselves as `axiom` or `theorem`. The
-same distinction shows up here on `Definition.is_theorem` —
+same distinction shows up here on `Definition.is_theorem`,
 they're really one backbone: "is this claim primitive, or
 derived from other primitives?", tracked at both the symbol
 level (properties) and the operator level (expansion rules).
@@ -271,7 +271,7 @@ Putting it together:
 |-------|---------|-----------|---------|
 | symbol | `Property.provenance` | `"axiom"` | `"theorem"` |
 | expansion | `Definition.is_theorem` | `False` | `True` |
-| theorem | `Theorem.from_axioms` | atomic strings | — |
+| theorem | `Theorem.from_axioms` | atomic strings |, |
 
 Same philosophy on all three layers: **every claim's source is
 tracked**. When a user asks "which axiom does this rest on?"
@@ -292,12 +292,12 @@ The whole package is built around one architectural decision:
    call generates a citation chain.
 4. **Bracket-level.** Structural theorems like the Derived
    Bracket Theorem share an obstruction inside a "single
-   hypothesis, many consequences" frame — and the package
+   hypothesis, many consequences" frame, and the package
    detects that automatically.
 
 The package was built so that *how do you know?* stays
 answerable from symbol all the way up to theorem. Every
-`ProofChain` is an argument tree — roots in axioms, leaves at
+`ProofChain` is an argument tree, roots in axioms, leaves at
 `Integer(0)`. The pedagogical value follows: a user grasps a
 theorem together with the structure beneath it, not as a
 black box.
@@ -306,17 +306,17 @@ black box.
 
 Nine chapters:
 
-1. [01 — First steps](01_first_steps.md)
-2. [02 — The Jacobi identity](02_jacobi_identity.md)
-3. [03 — Poisson geometry](03_poisson_geometry.md)
-4. [04 — Lie algebroid](04_lie_algebroid.md)
-5. [05 — Cartan calculus](05_cartan_calculus.md)
-6. [06 — Custom bracket](06_custom_bracket.md)
-7. [07 — Derived bracket](07_derived_bracket.md)
-8. [08 — The unified picture](08_unified_picture.md)
-9. **09 — Foundations** ← you are here
+1. [01, First steps](01_first_steps.md)
+2. [02, The Jacobi identity](02_jacobi_identity.md)
+3. [03, Poisson geometry](03_poisson_geometry.md)
+4. [04, Lie algebroid](04_lie_algebroid.md)
+5. [05, Cartan calculus](05_cartan_calculus.md)
+6. [06, Custom bracket](06_custom_bracket.md)
+7. [07, Derived bracket](07_derived_bracket.md)
+8. [08, The unified picture](08_unified_picture.md)
+9. **09, Foundations** ← you are here
 
-From symbol to theorem, axiom to unified picture — at every
+From symbol to theorem, axiom to unified picture, at every
 step we saw what the package can actually deliver, with live
 API examples. From here on the package is a tool: add your own
 brackets, your own theorems, your own axiom sets, and run on

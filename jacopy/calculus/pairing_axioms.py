@@ -1,21 +1,21 @@
 """
-Pairing axioms — Faz 13.B + Faz 17.F.1.6.
+Pairing axioms, Faz 13.B + Faz 17.F.1.6.
 
 Engine-level rewrite rules that promote :class:`Pairing` from a
 structurally inert two-arg node to a participating shape in
 derived-bracket and Cartan-structure proofs:
 
-* :class:`PairingLinearityDefinition` — bilinear distribution over
+* :class:`PairingLinearityDefinition`, bilinear distribution over
   :class:`Sum` in either slot. Distributes the first sum encountered;
   the engine fix-point loop reapplies the rule until both slots are
   fully expanded.
-* :class:`PairingLieLeibnizDefinition` —
+* :class:`PairingLieLeibnizDefinition`,
   ``L_X⟨α, Y⟩ → ⟨L_X α, Y⟩ + ⟨α, L_X Y⟩``. Pairing is a bilinear scalar
   (degree 0), so any degree-0 Lie derivative satisfies this Leibniz.
   Restricting the rule to :class:`LieDerivative` keeps the semantics
-  unambiguous — Sharp/Flat acting on a Pairing has no geometric
+  unambiguous, Sharp/Flat acting on a Pairing has no geometric
   meaning, and a generic match would fire on those shapes.
-* :class:`MultiEvalOneFormPairingBridgeDefinition` (Faz 17.F.1.6) —
+* :class:`MultiEvalOneFormPairingBridgeDefinition` (Faz 17.F.1.6),
   ``MultiEval(α, V) → Pairing(α, V)`` for a one-form ``α`` and a
   vector slot. The wedge alternating expansion in
   :mod:`jacopy.calculus.wedge_axioms` emits arity-1
@@ -46,7 +46,7 @@ from jacopy.proof.expansion import Definition
 
 
 # --------------------------------------------------------------------- #
-# Axiom 3 — Pairing R-linearity in either slot                           #
+# Axiom 3, Pairing R-linearity in either slot                           #
 # --------------------------------------------------------------------- #
 
 
@@ -55,7 +55,7 @@ class PairingLinearityDefinition(Definition):
     ``⟨−A, X⟩ → −⟨A, X⟩``, ``⟨α, −X⟩ → −⟨α, X⟩``.
 
     Single Definition covering both slots and both shapes (Sum and
-    Neg) — the engine's bottom-up walk visits the same Pairing
+    Neg), the engine's bottom-up walk visits the same Pairing
     repeatedly until neither slot holds a Sum/Neg, so one rule
     handles nested distributions and sign extractions without needing
     multiple separate rules.
@@ -77,7 +77,7 @@ class PairingLinearityDefinition(Definition):
         )
 
     def rewrite(self, expr: Expr) -> Expr:
-        # Sum branch — alpha first, engine reapplies on X next pass.
+        # Sum branch, alpha first, engine reapplies on X next pass.
         if isinstance(expr.alpha, Sum):
             return Sum.make(
                 *(Pairing(c, expr.X) for c in expr.alpha.children)
@@ -86,7 +86,7 @@ class PairingLinearityDefinition(Definition):
             return Sum.make(
                 *(Pairing(expr.alpha, c) for c in expr.X.children)
             )
-        # Neg branch — extract the sign so collect_terms can cancel
+        # Neg branch, extract the sign so collect_terms can cancel
         # ``⟨α, A⟩ + ⟨α, −A⟩`` once both pairings reach matching shape.
         if isinstance(expr.alpha, Neg):
             return Neg(Pairing(expr.alpha.arg, expr.X))
@@ -94,12 +94,12 @@ class PairingLinearityDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# Axiom 4 — Pairing-Lie Leibniz                                          #
+# Axiom 4, Pairing-Lie Leibniz                                          #
 # --------------------------------------------------------------------- #
 
 
 class PairingLieLeibnizDefinition(Definition):
-    """``L_X⟨α, Y⟩ → ⟨L_X α, Y⟩ + ⟨α, L_X Y⟩`` — Lie Leibniz on Pairing.
+    """``L_X⟨α, Y⟩ → ⟨L_X α, Y⟩ + ⟨α, L_X Y⟩``, Lie Leibniz on Pairing.
 
     Restricted to :class:`LieDerivative` operators because the bilinear
     Leibniz is meaningful exactly for degree-0 vector field actions on
@@ -128,7 +128,7 @@ class PairingLieLeibnizDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# Faz 17.F.1.6 — MultiEval(α, V) → Pairing(α, V) for one-form α          #
+# Faz 17.F.1.6, MultiEval(α, V) → Pairing(α, V) for one-form α          #
 # --------------------------------------------------------------------- #
 
 
@@ -137,7 +137,7 @@ def _is_degree_one(
 ) -> bool:
     """Safe ``|α| = 1`` check that returns ``False`` on any undecidable case.
 
-    Mirrors the helper in :mod:`jacopy.calculus.wedge_axioms` — kept as a
+    Mirrors the helper in :mod:`jacopy.calculus.wedge_axioms`, kept as a
     module-private copy so the two axiom modules stay independent.
     """
     from jacopy.algebra.derivation import degree_of
@@ -164,7 +164,7 @@ class MultiEvalOneFormPairingBridgeDefinition(Definition):
 
     * head is a :class:`MultiEval`;
     * ``alternating == True`` (a non-alternating arity-1 evaluation is
-      not a pairing — pretending it is would conflate two distinct
+      not a pairing, pretending it is would conflate two distinct
       contracts);
     * ``slot_kind == "vector"`` (covector-slot evaluations belong to
       the bivector branch, not the form-on-vector pairing);

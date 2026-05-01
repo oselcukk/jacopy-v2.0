@@ -106,7 +106,7 @@ class TestEngineMode:
         UnrollToFoundations(capture).prove(
             Symbol("a"), Symbol("a"), engine=foundational,
         )
-        # Same instance — no wrapping when already foundational.
+        # Same instance, no wrapping when already foundational.
         assert capture.seen_engine is foundational
 
 

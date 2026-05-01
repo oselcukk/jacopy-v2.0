@@ -7,7 +7,7 @@ for one-off brackets in tutorials, exploratory proofs, or as the
 workbench for a bracket whose axioms haven't been nailed down yet.
 
 Production brackets with well-characterized properties should still
-get their own subclass — the CustomBracket route stores only the
+get their own subclass, the CustomBracket route stores only the
 expansion callable and a flat set of axiom flags, so richer invariants
 (``expand_definition``, obstruction hooks) aren't available.
 """
@@ -32,7 +32,7 @@ class CustomBracket(GradedBracket):
     name
         Display name.
     expand_fn
-        ``(a, b, registry) → Expr`` — the definitional expansion. The
+        ``(a, b, registry) → Expr``, the definitional expansion. The
         registry argument is always passed, even when the rule ignores
         it, to keep the calling convention uniform with other brackets.
     degree, is_graded_antisymmetric, satisfies_leibniz,
@@ -70,7 +70,7 @@ class CustomBracket(GradedBracket):
         return self._expand_fn(a, b, registry)
 
     def _identity_key(self) -> Any:
-        # Identify custom brackets by their callable too — two
+        # Identify custom brackets by their callable too, two
         # CustomBrackets with the same name but different expansion
         # rules must compare unequal. Python functions compare by
         # identity, which is what we want here (users pass distinct

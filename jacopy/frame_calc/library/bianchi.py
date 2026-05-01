@@ -1,15 +1,15 @@
 r"""
-Bianchi cosmologies — homogeneous but anisotropic models.
+Bianchi cosmologies, homogeneous but anisotropic models.
 
 The Bianchi classification organises spatially homogeneous 3-geometries
 by the Lie algebra structure of their isometry group. Three of the
 most common types in cosmology:
 
-* **Type I** — flat anisotropic; three independent expansion rates
+* **Type I**, flat anisotropic; three independent expansion rates
   ``a(t), b(t), c(t)``. Reduces to flat FRW when ``a = b = c``.
-* **Type V** — open anisotropic; like type I but with hyperbolic
+* **Type V**, open anisotropic; like type I but with hyperbolic
   spatial slices.
-* **Type IX** — closed anisotropic ("Mixmaster"); spatial slices
+* **Type IX**, closed anisotropic ("Mixmaster"); spatial slices
   are 3-spheres. Famous for chaotic dynamics near the Big Bang.
 
 All three live on coordinates ``(t, x, y, z)``; the spatial part
@@ -46,7 +46,7 @@ def bianchi_I(
     *,
     t_sym: Optional[sp.Symbol] = None,
 ) -> Tuple[CoordinateFrame, ComponentMetric]:
-    r"""Bianchi type I — flat anisotropic cosmology.
+    r"""Bianchi type I, flat anisotropic cosmology.
 
     Metric: ``ds² = -dt² + a(t)² dx² + b(t)² dy² + c(t)² dz²``.
 
@@ -82,7 +82,7 @@ def bianchi_V(
     *,
     t_sym: Optional[sp.Symbol] = None,
 ) -> Tuple[CoordinateFrame, ComponentMetric]:
-    r"""Bianchi type V — open anisotropic cosmology.
+    r"""Bianchi type V, open anisotropic cosmology.
 
     Metric: ``ds² = -dt² + a(t)² dx² + e^{2x} (b(t)² dy² + c(t)² dz²)``.
 
@@ -119,7 +119,7 @@ def bianchi_IX(
     *,
     t_sym: Optional[sp.Symbol] = None,
 ) -> Tuple[CoordinateFrame, ComponentMetric]:
-    r"""Bianchi type IX — closed anisotropic cosmology (Mixmaster).
+    r"""Bianchi type IX, closed anisotropic cosmology (Mixmaster).
 
     In Euler-angle coordinates ``(ψ, θ, φ)`` on the 3-sphere, the
     invariant 1-forms are
@@ -131,7 +131,7 @@ def bianchi_IX(
 
     Metric: ``ds² = -dt² + a(t)²(σ¹)² + b(t)²(σ²)² + c(t)²(σ³)²``.
 
-    The Mixmaster universe — chaotic oscillations between
+    The Mixmaster universe, chaotic oscillations between
     ``a, b, c`` near the singularity (Belinski–Khalatnikov–Lifshitz).
     """
     if t_sym is None:
@@ -151,7 +151,7 @@ def bianchi_IX(
     sin_psi, cos_psi = sp.sin(psi), sp.cos(psi)
     sin_th, cos_th = sp.sin(theta), sp.cos(theta)
 
-    # Components against (dψ, dθ, dφ) — each σ^I as a row.
+    # Components against (dψ, dθ, dφ), each σ^I as a row.
     # σ¹: (0, -sinψ, cosψ sinθ)
     # σ²: (0,  cosψ, sinψ sinθ)
     # σ³: (1, 0,    cosθ)

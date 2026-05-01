@@ -5,10 +5,10 @@ The interior product with a vector field ``X`` is the degree ``−1``
 graded anti-derivation on the exterior algebra characterised by
 
 * ``ι_X(f) = 0`` on functions (degree-0 forms),
-* ``ι_X(α)(Y_1, …, Y_{p-1}) = α(X, Y_1, …, Y_{p-1})`` on ``p``-forms —
+* ``ι_X(α)(Y_1, …, Y_{p-1}) = α(X, Y_1, …, Y_{p-1})`` on ``p``-forms,
   i.e. contraction against ``X`` in the first slot,
 * graded Leibniz ``ι_X(α ∧ β) = ι_X(α) ∧ β + (−1)^{|α|} α ∧ ι_X(β)``,
-* ``ι_X ∘ ι_X = 0`` — this is a corollary of form antisymmetry (the
+* ``ι_X ∘ ι_X = 0``, this is a corollary of form antisymmetry (the
   same slot cannot receive ``X`` twice without the form vanishing),
   not an independent axiom.
 
@@ -18,7 +18,7 @@ rewrite and a thin parametrized wrapper for constructing a
 :class:`Derivation` keyed to a specific vector field ``X``.
 
 Unlike :data:`d`, there is no module-level singleton. ``ι_X`` is a
-*family* indexed by the vector field — naming is keyed to ``X``, and
+*family* indexed by the vector field, naming is keyed to ``X``, and
 two interior products for distinct fields are distinct operators.
 Use :func:`interior` to build the operator for a given field.
 """
@@ -35,11 +35,11 @@ from jacopy.core.symbolic_degree import Degree
 
 
 class InteriorProduct(Derivation):
-    """Interior product ``ι_X`` — degree ``−1`` graded anti-derivation.
+    """Interior product ``ι_X``, degree ``−1`` graded anti-derivation.
 
     Carries a reference to the vector field ``X`` (an arbitrary
     :class:`Expr`, typically a :class:`Symbol` declared as ``Graded``
-    degree 0 or higher). Name defaults to ``"ι_{name(X)}"`` — two
+    degree 0 or higher). Name defaults to ``"ι_{name(X)}"``, two
     interior products are equal iff they share both name and degree,
     and the default naming scheme makes that line up with equality of
     ``X``.
@@ -104,7 +104,7 @@ def apply_iota_squared_zero(
     for the interior product: both the element-level
     ``Act(ι_X, Act(ι_X, x))`` and the operator-level
     ``Act(Product(ι_X, ι_X, …), x)`` collapse. The ``target`` argument
-    is required here — interior products are a family, so there is no
+    is required here, interior products are a family, so there is no
     ambient default to apply the rewrite against.
     """
     if expr.is_atom:
@@ -138,7 +138,7 @@ def _degree_is_zero(expr: Expr, registry: Optional[PropertyRegistry]) -> bool:
     """True if ``expr`` is known to be degree 0.
 
     Uses :func:`degree_of` and falls back to ``False`` on any
-    undecidable case — it's safer to leave a rewrite pending than
+    undecidable case, it's safer to leave a rewrite pending than
     apply it on the wrong shape.
     """
     try:
@@ -162,11 +162,11 @@ def apply_iota_axioms(
     * ``Act(ι_X, f) → 0`` whenever ``f`` resolves to degree 0 under
       ``registry`` (ι_X lowers degree by one and Ω^{−1}(M) = 0).
     * ``Act(ι_X, Act(d, f)) → Act(X, f)`` when ``X`` is supplied as a
-      :class:`Derivation` on functions and ``f`` is degree 0 — this
+      :class:`Derivation` on functions and ``f`` is degree 0, this
       is the pairing axiom ``ι_X(df) = X(f)``.
 
     Degrees are checked via :func:`degree_of` against ``registry``.
-    Unknown-degree operands are left alone rather than assumed zero —
+    Unknown-degree operands are left alone rather than assumed zero,
     silently rewriting an ambiguous shape would hide a missing
     grading declaration.
 
@@ -176,11 +176,11 @@ def apply_iota_axioms(
     :class:`ExteriorDerivative`.
 
     ``X`` is optional. Omit it to apply only the ``ι_X(f) = 0``
-    clause — useful when the user's vector field isn't represented as
+    clause, useful when the user's vector field isn't represented as
     a :class:`Derivation` on functions yet but the function-vanishing
     rewrite is still wanted.
 
-    The ``ι_X ∘ ι_X = 0`` rewrite is *not* bundled here — use
+    The ``ι_X ∘ ι_X = 0`` rewrite is *not* bundled here, use
     :func:`apply_iota_squared_zero` when that is wanted, either before
     or after this pass.
     """
@@ -197,7 +197,7 @@ def apply_iota_axioms(
         rebuilt = expr
     if isinstance(rebuilt, Act) and _is_iota_on(rebuilt.op, target):
         inner = rebuilt.arg
-        # ι_X(df) = X(f) — exact 1-form pairing.
+        # ι_X(df) = X(f), exact 1-form pairing.
         if (
             X is not None
             and isinstance(inner, Act)

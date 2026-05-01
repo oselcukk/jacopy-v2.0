@@ -8,9 +8,9 @@ immutable frozen dataclasses so they can be cached and hashed.
 
 Every property carries a :class:`Provenance` tag:
 
-* :attr:`Provenance.AXIOM` — declared by the user or library, taken as
+* :attr:`Provenance.AXIOM`, declared by the user or library, taken as
   given for the purposes of proofs.
-* :attr:`Provenance.DERIVED` — obtained from other properties via an
+* :attr:`Provenance.DERIVED`, obtained from other properties via an
   algorithm. A :class:`ProofRef` records which rule produced it, so
   the unroll mode can re-derive it from axioms.
 
@@ -21,8 +21,8 @@ Jacobi on the Lie bracket).
 
 Concrete property subclasses here are deliberately generic: anything
 that's used across many layers (scalar, grading, symmetry). More
-specialised properties — vector fields, differential forms, specific
-brackets — will live alongside the modules that introduce them.
+specialised properties, vector fields, differential forms, specific
+brackets, will live alongside the modules that introduce them.
 """
 
 from __future__ import annotations
@@ -51,7 +51,7 @@ class ProofRef:
     """Lightweight pointer to a derivation.
 
     At this stage a proof reference only records the rule name and a
-    tuple of *source specifiers* — each a string naming a property-type
+    tuple of *source specifiers*, each a string naming a property-type
     or axiom that was consumed. Later phases will link to a full
     :class:`ProofTree`; this keeps the core layer independent of the
     proof layer.
@@ -105,7 +105,7 @@ class Property:
 
 @dataclass(frozen=True)
 class Scalar(Property):
-    """Expression is a scalar — it commutes with everything.
+    """Expression is a scalar, it commutes with everything.
 
     Scalars are the neutral case in the Koszul sign rule: swapping a
     scalar past anything never produces a sign.
@@ -116,7 +116,7 @@ class Scalar(Property):
 class Graded(Property):
     """Expression has a degree in the ambient grading.
 
-    The degree is a :class:`Degree` — concrete (``Degree.const(2)``) or
+    The degree is a :class:`Degree`, concrete (``Degree.const(2)``) or
     symbolic (``Degree.var("|α|")``). Plain ``int`` is accepted and
     coerced. The degree is later consumed by the Koszul sign
     machinery: swapping two graded objects of degrees ``|a|``, ``|b|``
@@ -155,29 +155,29 @@ class GradedAntisymmetric(Property):
 
 @dataclass(frozen=True)
 class Closed(Property):
-    """Form ``ω`` satisfies ``dω = 0`` — declarative closedness.
+    """Form ``ω`` satisfies ``dω = 0``, declarative closedness.
 
     Attached to a form via :meth:`PropertyRegistry.declare`. When the
     :class:`~jacopy.calculus.closed_axioms.ClosedFormDefinition` rule
     is loaded into an engine, ``Act(d, ω)`` collapses to ``0`` for any
-    ``ω`` carrying this property — no inline ``DOmegaClosed``
+    ``ω`` carrying this property, no inline ``DOmegaClosed``
     :class:`~jacopy.proof.expansion.Definition` reproduction needed in
     notebook code (the 2a/2b pattern from the Faz 12 gap log).
 
     The property is type-agnostic about *why* ``ω`` is closed (an
     explicit symplectic 2-form, an exact form, a cohomology class
-    representative, …) — it just states the fact.
+    representative, …), it just states the fact.
     """
 
 
 @dataclass(frozen=True)
 class NonDegenerate(Property):
-    """Form ``ω`` is non-degenerate — ``ι_(·)ω: VF → 1-form`` is injective.
+    """Form ``ω`` is non-degenerate, ``ι_(·)ω: VF → 1-form`` is injective.
 
     Declarative analogue of :class:`Closed`: the wrapper or caller
     asserts the structural fact, and the
     :class:`~jacopy.calculus.nondegenerate_axioms.NonDegenerateInteriorEqualityDefinition`
-    engine rule consumes it as a term-rewriting primitive — the
+    engine rule consumes it as a term-rewriting primitive, the
     obstruction ``ι_Y ω − ι_Z ω`` collapses to ``Y − Z`` whenever ``ω``
     carries this property.
 
@@ -190,13 +190,13 @@ class NonDegenerate(Property):
 
 @dataclass(frozen=True)
 class Poisson(Property):
-    """Bivector ``π`` satisfies ``[π, π]_SN = 0`` — Poisson condition.
+    """Bivector ``π`` satisfies ``[π, π]_SN = 0``, Poisson condition.
 
     Declarative analogue of :class:`Closed` / :class:`NonDegenerate`:
     the wrapper or caller asserts the Schouten-Nijenhuis self-bracket
     vanishes, and downstream engine rules (e.g. the tilde-d squared
     axiom in :mod:`jacopy.calculus.tilde.aux_axioms`) consume this
-    as a primitive — ``d̃² V`` collapses to ``0`` whenever ``π``
+    as a primitive, ``d̃² V`` collapses to ``0`` whenever ``π``
     carries this property.
 
     A bivector that is both ``Antisymmetric`` and ``Poisson`` is the
@@ -213,7 +213,7 @@ class Poisson(Property):
 class NonCommuting(Property):
     """Expression has no a-priori commutativity law.
 
-    The default for generic expressions — :class:`Product` is already
+    The default for generic expressions, :class:`Product` is already
     non-commutative at the core level; this property is the explicit,
     registered counterpart for algorithms that want to assert the
     absence of commutativity rather than infer it from silence.
@@ -225,7 +225,7 @@ class AntiCommuting(Property):
     """Expression anti-commutes past other ``AntiCommuting`` factors.
 
     Satisfies ``a * b = - b * a`` at the element level. This is the
-    ungraded version — :class:`GradedCommutative` is the right choice
+    ungraded version, :class:`GradedCommutative` is the right choice
     when signs depend on degrees.
     """
 

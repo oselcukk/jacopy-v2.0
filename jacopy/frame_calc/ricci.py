@@ -1,5 +1,5 @@
 r"""
-Ricci tensor + Ricci scalar — Stage F.
+Ricci tensor + Ricci scalar, Stage F.
 
 The Ricci tensor is the contraction of the Riemann curvature on
 the upper index against the second lower index:
@@ -194,7 +194,7 @@ def ricci(
         Ric = −(1/R₀²) g
         ricci_scalar = −2/R₀²
 
-    Schwarzschild's vacuum identity ``G_{ab} = 0`` is unaffected —
+    Schwarzschild's vacuum identity ``G_{ab} = 0`` is unaffected,
     both ``Ric`` and ``½ R g`` flip sign together in the definition
     of the Einstein tensor.
     """
@@ -213,9 +213,9 @@ def ricci_from_curvature(
     r"""Build the Ricci tensor by contracting an existing curvature.
 
     Avoids recomputing the curvature when the caller already has it.
-    Contracts ``R^c_{acb}`` — i.e. position 0 (upper) with position 2
+    Contracts ``R^c_{acb}``, i.e. position 0 (upper) with position 2
     (the second lower index). The ``optimized`` flag is propagated
-    forward — if the input curvature was built optimized, set
+    forward, if the input curvature was built optimized, set
     ``optimized=True`` here too to skip the per-entry derivation
     trace.
     """

@@ -6,7 +6,7 @@ A :class:`DiracStructure` pins down the data of a Dirac subbundle
 
 * **maximally isotropic** with respect to the canonical symmetric
   pairing ``⟨(X, α), (Y, β)⟩ = ½(ι_X β + ι_Y α)``, and
-* **involutive** — ``[Γ(L), Γ(L)]_C ⊂ Γ(L)`` — with respect to the
+* **involutive**, ``[Γ(L), Γ(L)]_C ⊂ Γ(L)``, with respect to the
   Courant bracket of the ambient :class:`CourantAlgebroid`.
 
 The wrapper does not model subbundle membership symbolically (no
@@ -20,23 +20,23 @@ machinery for ``a ∈ Γ(L)`` as a proposition); what it does do is:
 
 Seeded theorems:
 
-* ``dirac_isotropy`` — isotropy is definitional on ``L``; the chain is a
+* ``dirac_isotropy``, isotropy is definitional on ``L``; the chain is a
   single axiom-tagged step on the generic section ``(X, α)``.
-* ``dirac_involutivity`` — involutivity is definitional on ``L``; the
+* ``dirac_involutivity``, involutivity is definitional on ``L``; the
   chain records the axiom on the generic section pairs.
 
 Convenience factories:
 
-* :func:`poisson_dirac` — graph of ``π♯ : T*M → TM`` for a Poisson
+* :func:`poisson_dirac`, graph of ``π♯ : T*M → TM`` for a Poisson
   bivector, ``L_π = {(π♯ α, α)}``.
-* :func:`presymplectic_dirac` — graph of ``ω♭ : TM → T*M`` for a closed
+* :func:`presymplectic_dirac`, graph of ``ω♭ : TM → T*M`` for a closed
   2-form, ``L_ω = {(X, ω♭ X)}``.
 
 Both factories only record the subbundle name / generator; the isotropy
 and involutivity axioms remain axioms on the Dirac wrapper. Proving
 ``dω = 0 ⇒ L_ω`` is Dirac (or ``[π, π] = 0 ⇒ L_π`` is Dirac) is a
 separate theorem that slots in naturally here but is out of scope for
-Stage D — both special cases inherit the axiom-step proofs on this
+Stage D, both special cases inherit the axiom-step proofs on this
 wrapper.
 """
 
@@ -62,7 +62,7 @@ from jacopy.proof.step import ProofStep
 
 
 class DiracStructure:
-    """``L ⊂ TM ⊕ T*M`` — a Dirac subbundle of a Courant algebroid.
+    """``L ⊂ TM ⊕ T*M``, a Dirac subbundle of a Courant algebroid.
 
     Parameters
     ----------
@@ -71,7 +71,7 @@ class DiracStructure:
         pairing (``ι``) are read from it.
     subbundle
         Symbolic name for the Dirac subbundle ``L``. Carried for
-        display only — the wrapper does not model section membership.
+        display only, the wrapper does not model section membership.
     name
         Optional display name; defaults to ``f"Dirac({subbundle})"``.
 
@@ -81,7 +81,7 @@ class DiracStructure:
     ``½(ι_X β + ι_Y α)``; its diagonal ``⟨a, a⟩ = ι_X α`` is the
     single-section isotropy obstruction exposed by
     :meth:`isotropy_obstruction`. Full bilinear isotropy follows from
-    the diagonal via polarisation — downstream callers who need the
+    the diagonal via polarisation, downstream callers who need the
     bilinear form can cite :meth:`pairing` directly.
 
     Involutivity is definitional on ``L`` and therefore represented as
@@ -148,7 +148,7 @@ class DiracStructure:
         )
 
     def isotropy_obstruction(self, a: SectionPair) -> Expr:
-        """``⟨a, a⟩ = ι_X α`` — the self-pairing of a single section.
+        """``⟨a, a⟩ = ι_X α``, the self-pairing of a single section.
 
         Isotropy on ``L`` asserts this vanishes for every ``a ∈ Γ(L)``.
         Polarisation lifts the vanishing of the diagonal to vanishing
@@ -186,7 +186,7 @@ class DiracStructure:
                 Integer(0),
                 rule="DiracIsotropyAxiom",
                 justification=(
-                    f"⟨a, a⟩ = ι_X α = 0 on {self._name} — Dirac "
+                    f"⟨a, a⟩ = ι_X α = 0 on {self._name}, Dirac "
                     f"isotropy axiom on the subbundle {self._subbundle._repr_inner()}."
                 ),
                 provenance_tag="axiom",
@@ -232,7 +232,7 @@ class DiracStructure:
 
         Same shape as :meth:`prove_isotropy`: a single ``axiom``-tagged
         step whose before-term is the placeholder involutivity symbol
-        and whose after-term is ``Integer(0)`` — the citation form of
+        and whose after-term is ``Integer(0)``, the citation form of
         "``[a, b]_C ∈ Γ(L)`` on a Dirac subbundle".
         """
         if not isinstance(a, SectionPair) or not isinstance(b, SectionPair):
@@ -247,7 +247,7 @@ class DiracStructure:
                 Integer(0),
                 rule="DiracInvolutivityAxiom",
                 justification=(
-                    f"[a, b]_C ∈ Γ({self._subbundle._repr_inner()}) — "
+                    f"[a, b]_C ∈ Γ({self._subbundle._repr_inner()}), "
                     f"Dirac involutivity axiom on {self._name}."
                 ),
                 provenance_tag="axiom",
@@ -279,7 +279,7 @@ def poisson_dirac(
 
     For a Poisson bivector ``π``, ``L_π = {(π♯ α, α) : α ∈ T*M}`` is a
     Dirac structure iff ``[π, π]_{SN} = 0`` (i.e. iff ``π`` satisfies
-    Jacobi). The factory records the subbundle name only — isotropy and
+    Jacobi). The factory records the subbundle name only, isotropy and
     involutivity ride through the Dirac wrapper's axiom steps the same
     way the generic case does. Downstream code that needs the
     ``[π,π] = 0 ⇒ L_π`` Dirac implication should compose this with
@@ -388,7 +388,7 @@ def _build_dirac_involutivity_theorem() -> Theorem:
             "Involutivity is the second defining axiom of a Dirac "
             "structure; the chain is a one-step axiom citation. "
             "Subbundle membership is not modelled symbolically, so the "
-            "obstruction is surfaced as a placeholder symbol — the "
+            "obstruction is surfaced as a placeholder symbol, the "
             "axiom step maps it to 0 as the definitional citation."
         ),
     )

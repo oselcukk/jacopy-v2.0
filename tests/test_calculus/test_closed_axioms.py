@@ -49,7 +49,7 @@ class TestClosedProperty:
 
 
 # --------------------------------------------------------------------- #
-# ClosedFormDefinition — match logic                                     #
+# ClosedFormDefinition, match logic                                     #
 # --------------------------------------------------------------------- #
 
 
@@ -79,15 +79,15 @@ class TestClosedFormDefinitionMatches:
         reg.declare(omega, Closed())
         rule = ClosedFormDefinition(registry=reg)
         X = Derivation("X", 0)
-        # ι_X(ω) — interior product, not d
+        # ι_X(ω), interior product, not d
         assert not rule.matches(Act(interior(X), omega))
-        # L_X(ω) — Lie derivative
+        # L_X(ω), Lie derivative
         assert not rule.matches(Act(lie_derivative(X), omega))
 
     def test_no_match_when_only_subterm_closed(self):
         # Closed declared on ω, but the expression is d(ω + η) with η
         # not declared. Equality checks the *whole* arg, so a Sum
-        # containing a closed form doesn't itself look closed —
+        # containing a closed form doesn't itself look closed,
         # downstream linearity rules can split it first.
         reg = PropertyRegistry()
         omega = Symbol("ω")

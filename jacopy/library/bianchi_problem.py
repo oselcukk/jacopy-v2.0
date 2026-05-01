@@ -1,5 +1,5 @@
 r"""
-Bianchi-identity problem wrapper — Faz 16.D.
+Bianchi-identity problem wrapper, Faz 16.D.
 
 A :class:`BianchiProblem` is a thin bundle that pairs an
 :class:`~jacopy.calculus.connection.AffineConnection` ``∇`` with a
@@ -23,11 +23,11 @@ carrying every axiom a Bianchi-identity proof typically cites:
 The wrapper also exposes a small algebra of cyclic-sum constructors
 for the textbook Bianchi shapes:
 
-* :meth:`cyclic_sum` — generic ``cycl_{U,V,W} f(U,V,W)`` over a
+* :meth:`cyclic_sum`, generic ``cycl_{U,V,W} f(U,V,W)`` over a
   3-permutation, ``cycl_{U,V,W,Z} f(U,V,W,Z)`` over a fixed last slot,
-* :meth:`first_bianchi_lhs` / :meth:`first_bianchi_rhs` —
+* :meth:`first_bianchi_lhs` / :meth:`first_bianchi_rhs`,
   ``cycl R(U,V)W`` and ``cycl[(∇_U T)(V,W) + T(T(U,V),W)]``,
-* :meth:`second_bianchi_lhs` / :meth:`second_bianchi_rhs` —
+* :meth:`second_bianchi_lhs` / :meth:`second_bianchi_rhs`,
   ``cycl (∇_U R)(V,W)Z`` and ``cycl R(U, T(V,W)) Z``.
 
 :meth:`prove_first_bianchi` and :meth:`prove_second_bianchi` expand
@@ -91,7 +91,7 @@ from jacopy.proof.step import ProofStep
 def cyclic_sum_3(
     factory: Callable[..., Expr], a: Expr, b: Expr, c: Expr
 ) -> Expr:
-    r"""``factory(a,b,c) + factory(b,c,a) + factory(c,a,b)`` — 3-cycle.
+    r"""``factory(a,b,c) + factory(b,c,a) + factory(c,a,b)``, 3-cycle.
 
     The standard cyclic sum used in Bianchi I.
     """
@@ -111,7 +111,7 @@ def cyclic_sum_3_fixed_last(
 ) -> Expr:
     r"""``factory(a,b,c,last) + factory(b,c,a,last) + factory(c,a,b,last)``.
 
-    The cyclic sum over the first three slots with a fixed final slot —
+    The cyclic sum over the first three slots with a fixed final slot,
     used in Bianchi II where ``Z`` is held fixed across the cycle.
     """
     return Sum.make(
@@ -157,7 +157,7 @@ class BianchiProofResult:
 
 
 class BianchiProblem:
-    """``(∇, registry)`` — Bianchi-identity problem bundle.
+    """``(∇, registry)``, Bianchi-identity problem bundle.
 
     Parameters
     ----------
@@ -201,7 +201,7 @@ class BianchiProblem:
 
     def _build_engine(self) -> ExpansionEngine:
         rules = [
-            # Definition unfolds first — turns Torsion/Curvature into
+            # Definition unfolds first, turns Torsion/Curvature into
             # ∇-commutator + bracket terms (LBVF or BracketApply
             # depending on whether the connection has a custom bracket).
             TorsionCovariantDerivativeDefinition(self._conn),
@@ -227,7 +227,7 @@ class BianchiProblem:
         (Q9 ``koszul_connection``) the same definitions emit
         :class:`~jacopy.brackets.base.BracketApply` headed by that
         bracket, and the engine swaps in the
-        :mod:`jacopy.calculus.bracket_apply_axioms` parallel — same
+        :mod:`jacopy.calculus.bracket_apply_axioms` parallel, same
         five rule shapes (Sum/Neg-linearity, atom-antisym,
         Sum-antisym, cyclic Jacobi) but matching the opaque bracket
         node instead of the LBVF atom. The two rule sets are mutually

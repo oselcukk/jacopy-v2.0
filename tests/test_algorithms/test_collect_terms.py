@@ -47,7 +47,7 @@ class TestNested:
 
     def test_inside_product(self):
         x, y = Symbol("x"), Symbol("y")
-        # Product is a barrier — Sum-of-Sum only merges within a Sum.
+        # Product is a barrier, Sum-of-Sum only merges within a Sum.
         inner = Sum(x, x)
         expr = Product(inner, y)
         out = collect_terms(expr)

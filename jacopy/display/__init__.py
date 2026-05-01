@@ -1,10 +1,10 @@
 """Rendering helpers for :class:`~jacopy.core.expr.Expr` trees and
 :class:`~jacopy.proof.chain.ProofChain` / :class:`~jacopy.proof.step.ProofStep`.
 
-Stage A — pure-stdlib renderers:
+Stage A, pure-stdlib renderers:
 
-- :mod:`jacopy.display.ascii` — terminal-friendly plain text.
-- :mod:`jacopy.display.latex` — paper-quality LaTeX math snippets and
+- :mod:`jacopy.display.ascii`, terminal-friendly plain text.
+- :mod:`jacopy.display.latex`, paper-quality LaTeX math snippets and
   ``align*`` bodies for proof transcripts.
 """
 

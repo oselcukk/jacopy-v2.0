@@ -125,7 +125,7 @@ class TestOptimizedNoTraces:
 
 
 class TestDefaultModeStillHasTraces:
-    """Verify default mode is unaffected — backward compatibility."""
+    """Verify default mode is unaffected, backward compatibility."""
 
     def test_levi_civita_default_has_traces(self) -> None:
         F, g = schwarzschild()
@@ -151,7 +151,7 @@ class TestDefaultModeStillHasTraces:
 
 
 # --------------------------------------------------------------------- #
-# Optimized mode performance — Schwarzschild full pipeline               #
+# Optimized mode performance, Schwarzschild full pipeline               #
 # --------------------------------------------------------------------- #
 
 

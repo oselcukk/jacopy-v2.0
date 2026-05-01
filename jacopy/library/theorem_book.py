@@ -1,5 +1,5 @@
 """
-Theorem Book — central registry of proven theorems.
+Theorem Book, central registry of proven theorems.
 
 A :class:`Theorem` pairs a human-readable statement with the underlying
 :class:`~jacopy.proof.chain.ProofChain`, the axiom list it depends on,
@@ -40,7 +40,7 @@ class Theorem:
         Human-readable mathematical statement, e.g. ``"d ∘ d = 0"``.
     from_axioms
         Tuple of axiom labels the proof depends on. Purely descriptive
-        — not cross-validated against the proof itself, because axioms
+       , not cross-validated against the proof itself, because axioms
         surface through the expansion engine's ``theorem/axiom``
         classification rather than a name list.
     proof
@@ -49,7 +49,7 @@ class Theorem:
         ``UnrollToFoundations``) or by a dedicated helper such as
         :meth:`jacopy.calculus.cartan.CartanCalculus.verify`.
     notes
-        Optional exposition — context, equivalent formulations, caveats.
+        Optional exposition, context, equivalent formulations, caveats.
     """
 
     name: str
@@ -77,7 +77,7 @@ class TheoremBook:
     """Ordered registry of :class:`Theorem` records keyed by name.
 
     Insertion order is preserved so :meth:`names` / :meth:`__iter__`
-    return results in the order theorems were added — useful when
+    return results in the order theorems were added, useful when
     rendering a "table of results" page. Duplicate names raise instead
     of silently overwriting, because registering the same theorem twice
     usually indicates two library modules disagreeing on the canonical
@@ -104,7 +104,7 @@ class TheoremBook:
     def replace(self, theorem: Theorem) -> None:
         """Register ``theorem``, overwriting any existing entry with the same name.
 
-        Use sparingly — the default :meth:`add` path refuses overwrites
+        Use sparingly, the default :meth:`add` path refuses overwrites
         so registration conflicts surface immediately. ``replace`` is
         for deliberate cases where a later library stage supplies a
         tighter proof than an earlier stub.
@@ -126,7 +126,7 @@ class TheoremBook:
     def remove(self, name: str) -> None:
         """Remove the theorem registered under ``name``.
 
-        Provided mostly for test isolation — production library modules
+        Provided mostly for test isolation, production library modules
         should not unregister their own theorems at runtime.
         """
         if name not in self._theorems:
@@ -152,6 +152,6 @@ class TheoremBook:
 
 #: Process-wide default :class:`TheoremBook`. Library modules register
 #: their theorems here at import time; downstream callers look up
-#: results via :meth:`TheoremBook.get`. Kept empty at Stage A — seeding
+#: results via :meth:`TheoremBook.get`. Kept empty at Stage A, seeding
 #: is the responsibility of the library stages that produce the proofs.
 theorem_book = TheoremBook()

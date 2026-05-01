@@ -139,7 +139,7 @@ class TestMatchCompound:
         assert b == {"A": Symbol("x"), "B": Symbol("y")}
 
     def test_order_sensitive(self):
-        """Structural, order-preserving matching — non-commutative."""
+        """Structural, order-preserving matching, non-commutative."""
         pattern = Symbol("x") * Wildcard("A")
         # Target starts with y, not x.
         target = Symbol("y") * Symbol("z")
@@ -264,14 +264,14 @@ class TestSeqWildcard:
 
     def test_too_few_children(self):
         pattern = Sum(Wildcard("A"), SeqWildcard("mid"), Wildcard("B"))
-        # Only one child — can't match two non-seq wildcards even with empty mid.
+        # Only one child, can't match two non-seq wildcards even with empty mid.
         target = Sum(Symbol("x"))
-        # Wait — Sum(x) collapses via make but we used constructor directly.
+        # Wait, Sum(x) collapses via make but we used constructor directly.
         # It has one child here.
         assert match(pattern, target) is None
 
     def test_two_seq_wildcards_split(self):
-        """Multiple SeqWildcards per level are allowed — backtracks over splits.
+        """Multiple SeqWildcards per level are allowed, backtracks over splits.
 
         Leftmost-shortest-first: the first SeqWildcard consumes 0 elements,
         the middle non-seq takes one, the second SeqWildcard takes the rest.

@@ -106,7 +106,7 @@ class TestConstruction:
 
 
 # --------------------------------------------------------------------- #
-# Factories — L_{H,X} carries d_H in its bundle slot                      #
+# Factories, L_{H,X} carries d_H in its bundle slot                      #
 # --------------------------------------------------------------------- #
 
 
@@ -136,7 +136,7 @@ class TestFactories:
 
 
 class TestCartanClosure:
-    """Smoke tests — the five Cartan relations close on the twisted bundle.
+    """Smoke tests, the five Cartan relations close on the twisted bundle.
 
     The bundle treats ``d_H`` as a fresh degree-+1 derivation with
     ``d_H² = 0``; instantiating a :class:`TwistedCartanBundle` is the
@@ -212,7 +212,7 @@ class TestIsolation:
     def test_twisted_d_does_not_match_untwisted_d_squared_zero(self, bundle):
         """A twisted ``d_H`` is a separate instance from the TM default,
         so the TM-pinned ``DSquaredZeroDefinition(target=d)`` does not fire
-        on ``d_H²`` — the twisted bundle brings its own pin."""
+        on ``d_H²``, the twisted bundle brings its own pin."""
         from jacopy.algebra.derivation import Act
         from jacopy.core.expr import Symbol as S
         from jacopy.proof.expansion import DSquaredZeroDefinition

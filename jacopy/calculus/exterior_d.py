@@ -5,24 +5,24 @@ Exterior derivative ``d``.
 ``Ω*(M)`` with
 
 * degree ``+1``,
-* graded Leibniz: ``d(α ∧ β) = dα ∧ β + (−1)^{|α|} α ∧ dβ`` — inherited
+* graded Leibniz: ``d(α ∧ β) = dα ∧ β + (−1)^{|α|} α ∧ dβ``, inherited
   automatically from :class:`Derivation` + :mod:`product_rule` because
   this module's ``d`` has degree 1,
 * idempotent on squares: ``d² = 0``.
 
 The axiom ``d(f) = df`` on functions is *not* a rewrite in this
 module: there is no separate ``OneForm`` / ``df`` Expr node. Instead,
-``Act(d, f)`` is already the canonical syntactic form of ``df`` —
+``Act(d, f)`` is already the canonical syntactic form of ``df``,
 the :class:`Act` node stays inert when its argument is a 0-form atom
 (:func:`product_rule` only expands Leibniz on multi-factor
 :class:`Product` operands), so ``d(f)`` *is* ``df`` under the
 package's expression-tree convention. Anything a caller might do
-with ``df`` — apply ``ι_X``, wedge with another form, feed into a
-Cartan relation — lands on the same :class:`Act` node.
+with ``df``, apply ``ι_X``, wedge with another form, feed into a
+Cartan relation, lands on the same :class:`Act` node.
 
 The ``d² = 0`` axiom is encoded here as a bottom-up rewrite,
 :func:`apply_d_squared_zero`, that zeros out every subtree whose head
-is a double application of ``d`` — either the element-level
+is a double application of ``d``, either the element-level
 ``d(d(x))`` shape or the operator-level composition ``(d ∘ d)(x)``
 sitting as a ``Product`` on the left of an :class:`Act`. The plan
 calls for *both* an axiomatic form and a theorem form (the latter
@@ -31,7 +31,7 @@ derivations); only the axiom form lives here. The theorem form
 belongs in the Faz 7 proof layer.
 
 The module exposes a shared singleton :data:`d`. Users who need a
-distinct-named exterior derivative — e.g. a Lie-algebroid ``d_E`` —
+distinct-named exterior derivative, e.g. a Lie-algebroid ``d_E``,
 construct their own :class:`ExteriorDerivative` instance.
 """
 
@@ -45,13 +45,13 @@ from jacopy.core.registry import PropertyRegistry
 
 
 class ExteriorDerivative(Derivation):
-    """Exterior derivative — degree ``+1`` graded anti-derivation.
+    """Exterior derivative, degree ``+1`` graded anti-derivation.
 
     Structurally a :class:`Derivation` with a fixed degree of 1; the
     Koszul sign machinery in :mod:`product_rule` is what delivers the
     anti-derivation behaviour. The only operator-specific axiom beyond
     that is ``d² = 0``, which is applied by :func:`apply_d_squared_zero`
-    rather than baked into Leibniz expansion — keeping the two
+    rather than baked into Leibniz expansion, keeping the two
     concerns separable means a proof can unfold Leibniz first and
     close with ``d² = 0`` afterwards, matching how the identity is
     typically stated.
@@ -105,8 +105,8 @@ def apply_d_squared_zero(
 
     Recognised shapes:
 
-    * ``Act(d, Act(d, x))`` — the element-level statement ``d(d(x)) = 0``.
-    * ``Act(Product(d, d, ...), x)`` — the operator-level statement
+    * ``Act(d, Act(d, x))``, the element-level statement ``d(d(x)) = 0``.
+    * ``Act(Product(d, d, ...), x)``, the operator-level statement
       ``(d ∘ d ∘ ...)(x) = 0``. Trailing operators in the composition
       are irrelevant once the leading ``d²`` is known to vanish.
 
@@ -116,7 +116,7 @@ def apply_d_squared_zero(
 
     When ``target`` is omitted, the module singleton :data:`d` is used.
     Passing an explicit instance lets the caller target a specific
-    variant — e.g. apply ``d_E² = 0`` while leaving a plain ``d²`` in
+    variant, e.g. apply ``d_E² = 0`` while leaving a plain ``d²`` in
     place if the two coexist in the same expression.
 
     ``registry`` is accepted for API symmetry with other passes; the

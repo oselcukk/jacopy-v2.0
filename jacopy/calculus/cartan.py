@@ -2,8 +2,8 @@
 Cartan calculus framework.
 
 :class:`CartanCalculus` bundles the four ingredients of a concrete
-Cartan calculus — exterior derivative ``d``, Lie-derivative factory
-``L``, interior-product factory ``ι``, and vector-field bracket — and
+Cartan calculus, exterior derivative ``d``, Lie-derivative factory
+``L``, interior-product factory ``ι``, and vector-field bracket, and
 exposes the five canonical relations as reusable
 :class:`OperatorEquation` objects:
 
@@ -75,7 +75,7 @@ class CartanCalculus:
     interior
         Factory ``X → ι_X``.
     vector_bracket
-        Bracket on vector fields — ``L_{[X, Y]}`` uses
+        Bracket on vector fields, ``L_{[X, Y]}`` uses
         ``vector_bracket(X, Y)`` to name the bracket of two fields.
 
     The factories are kept as callables (rather than pre-instantiated
@@ -206,10 +206,10 @@ class CartanCalculus:
 
         ``mode`` picks the engine flavour:
 
-        * ``"efficient"`` — standard :func:`default_engine` in efficient
+        * ``"efficient"``, standard :func:`default_engine` in efficient
           mode. Theorem-classified definitions fire as single-step
           rewrites.
-        * ``"foundational"`` — wraps the sub-strategy in
+        * ``"foundational"``, wraps the sub-strategy in
           :class:`UnrollToFoundations`, so every theorem unrolls to its
           axiomatic proof in the transcript.
 
@@ -233,7 +233,7 @@ class CartanCalculus:
             # Pass this calculus' own ``d`` so definitions pinned to an
             # :class:`ExteriorDerivative` target (``DSquaredZero`` and
             # ``IotaOnExactOneForm``) fire on bundle-specific operators
-            # like a Lie-algebroid ``d_E`` — not just the TM default.
+            # like a Lie-algebroid ``d_E``, not just the TM default.
             eff_engine = default_engine(
                 registry=registry, d=self._d, mode=mode
             )
@@ -258,7 +258,7 @@ class CartanCalculus:
 
         Returns a ``{name: ProofChain}`` mapping. If any relation
         fails, the :class:`ProofFailure` is raised immediately with
-        the offending relation name annotated — the mapping is partial
+        the offending relation name annotated, the mapping is partial
         on failure, not merged with error objects, so downstream
         callers don't have to disambiguate.
         """

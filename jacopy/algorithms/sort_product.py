@@ -1,7 +1,7 @@
 """
 Graded-commutative sorting of Product factors.
 
-A :class:`Product` in the core layer is non-commutative — factor order is
+A :class:`Product` in the core layer is non-commutative, factor order is
 preserved verbatim. Many proofs need the *graded-commutative* reading
 instead: adjacent factors may be swapped, each swap producing a Koszul
 sign ``(-1)^{|a||b|}``. :func:`sort_product` performs that re-ordering
@@ -10,7 +10,7 @@ caller can inspect it (even when the sign is symbolic like
 ``(-1)^{|α||β|}``).
 
 Every factor must be registered as :class:`Scalar` or :class:`Graded`.
-Scalars sort to the front and contribute no sign — they commute with
+Scalars sort to the front and contribute no sign, they commute with
 everything in the Koszul rule. Graded factors sort by a stable
 structural key and contribute ``|a||b|`` per swap. Unclassified factors
 raise :class:`ValueError`; the fix is to declare their grading, not to
@@ -19,8 +19,8 @@ silently paper over the missing information.
 The sign is returned as a *polynomial in the degree variables*. Call
 :meth:`Degree.parity` to collapse to ``0``/``1`` when the parity is
 decidable; use :func:`apply_sign` to fold a decidable sign into an
-:class:`Expr` directly. When the parity is symbolic — as in
-Schouten/Courant Jacobi proofs — the Degree polynomial is the right
+:class:`Expr` directly. When the parity is symbolic, as in
+Schouten/Courant Jacobi proofs, the Degree polynomial is the right
 thing to keep.
 """
 
@@ -50,7 +50,7 @@ def _peel_neg(factor: Expr) -> Tuple[Expr, int]:
     """Strip leading :class:`Neg` wrappers, returning ``(inner, parity)``.
 
     A :class:`Neg` node has the same degree as its argument and the same
-    commutativity behaviour — it is a pure scalar sign in front of the
+    commutativity behaviour, it is a pure scalar sign in front of the
     factor. Pulling it out lets the rest of :func:`sort_product` run on
     the bare factor (which the registry knows how to grade) and fold the
     accumulated sign back into the Koszul exponent at the end. Double
@@ -72,7 +72,7 @@ def _explode_factor(factor: Expr) -> Tuple[List[Expr], int]:
     directly; a :class:`Neg` between the outer and inner product acts
     as a barrier that flatten leaves alone. :func:`sort_product` needs
     to see bare factors for registry lookup, so we handle the
-    flatten-through-Neg case here inline — recursing through both
+    flatten-through-Neg case here inline, recursing through both
     sides until every emitted factor is a non-Product, non-Neg atom
     (or at worst a composite node that the registry has explicitly
     graded).
@@ -89,7 +89,7 @@ def _explode_factor(factor: Expr) -> Tuple[List[Expr], int]:
 
 
 def _is_scalar(factor: Expr, registry: PropertyRegistry) -> bool:
-    # Numeric literals are always scalars — they commute with
+    # Numeric literals are always scalars, they commute with
     # everything and carry no grading. Declaring Scalar on every
     # Integer(k) would be noise.
     if isinstance(factor, (Integer, Rational)):
@@ -103,8 +103,8 @@ def _degree_of(factor: Expr, registry: PropertyRegistry) -> Degree:
     Scalars have degree ``0``; :class:`Graded` factors carry their own
     Degree. A :class:`Derivation` used as an operator factor carries
     its grading intrinsically. Compound factors that aren't directly
-    registered — ``Act(d, f)``, ``Act(ι_X, ω)``, nested ``Product``
-    operator chains, ``Pairing``, ``BracketApply`` — delegate to
+    registered, ``Act(d, f)``, ``Act(ι_X, ω)``, nested ``Product``
+    operator chains, ``Pairing``, ``BracketApply``, delegate to
     :func:`jacopy.algebra.derivation.degree_of`, which walks the tree
     and resolves ``|Act(D, x)| = |D| + |x|`` and friends. Anything
     that still can't be classified raises with a hint about the
@@ -117,7 +117,7 @@ def _degree_of(factor: Expr, registry: PropertyRegistry) -> Degree:
     prop = registry.get(factor, Graded)
     if prop is not None:
         return prop.degree
-    # Compound factor — delegate to the algebra-layer walker. It
+    # Compound factor, delegate to the algebra-layer walker. It
     # handles Act / Product / Neg / Pairing / BracketApply by
     # recursing into children and summing degrees.
     from jacopy.algebra.derivation import degree_of
@@ -150,12 +150,12 @@ def _swap_behavior(
     The commutativity law between the pair governs whether the swap is
     permitted and, if so, the Koszul exponent it contributes:
 
-    * Either factor carries :class:`Scalar` — free swap, no sign.
-    * Either factor carries :class:`NonCommuting` — swap forbidden.
-    * Both carry :class:`AntiCommuting` — swap produces a flat ``-1``
+    * Either factor carries :class:`Scalar`, free swap, no sign.
+    * Either factor carries :class:`NonCommuting`, swap forbidden.
+    * Both carry :class:`AntiCommuting`, swap produces a flat ``-1``
       (parity delta ``1``).
     * Both carry :class:`GradedCommutative`, or both are
-      :class:`Graded` (the implicit Koszul default) — swap produces
+      :class:`Graded` (the implicit Koszul default), swap produces
       ``(-1)^{|a||b|}``.
     """
     if _is_scalar(a, registry) or _is_scalar(b, registry):
@@ -209,14 +209,14 @@ def sort_product(
 
     # Up-front classification check so an unclassified factor is
     # reported even when it happens to already be in canonical
-    # position — missing a grading is a modelling error, not a perf issue.
+    # position, missing a grading is a modelling error, not a perf issue.
     for f in factors:
         _degree_of(f, registry)
     sign_exp = Degree.const(neg_parity)
     n = len(factors)
     # Bubble sort: stable enough for our size, and each swap's sign
     # contribution is easy to track. A NonCommuting pair blocks the
-    # swap entirely — the factors stay adjacent in whatever order they
+    # swap entirely, the factors stay adjacent in whatever order they
     # started, and later passes can still re-run the sort after the
     # blocker is removed.
     for i in range(n):
@@ -241,7 +241,7 @@ def apply_sign(expr: Expr, sign_exp: Degree) -> Expr:
     """Fold a decidable sign exponent into the expression.
 
     Returns ``expr`` for even parity, ``Neg(expr)`` for odd. Raises
-    :class:`ValueError` when parity depends on unknown variables — the
+    :class:`ValueError` when parity depends on unknown variables, the
     caller should keep the :class:`Degree` around in that case (or
     eventually wrap in a ``(-1)^{…}`` node once the package has one).
     """

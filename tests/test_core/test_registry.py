@@ -368,7 +368,7 @@ class TestAxioms:
                 pass
 
     def test_orthogonal_to_strict(self):
-        """strict filters by provenance, axioms filters by type — stackable."""
+        """strict filters by provenance, axioms filters by type, stackable."""
         reg = PropertyRegistry(strict_axioms_only=True)
         x = Symbol("x")
         reg.declare(x, Scalar())  # axiom

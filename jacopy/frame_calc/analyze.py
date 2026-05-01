@@ -1,5 +1,5 @@
 r"""
-One-shot ``analyze_metric`` helper — Faz 19 Chunk C.4.
+One-shot ``analyze_metric`` helper, Faz 19 Chunk C.4.
 
 Composes the 6-line standard workflow
 
@@ -15,7 +15,7 @@ Composes the 6-line standard workflow
 into a single :func:`analyze_metric` call returning a dict of all the
 useful results plus :func:`~jacopy.frame_calc.kretschmann` for
 singularity characterization. Drop a metric matrix in, get every
-standard scalar / tensor out — useful for one-off testing where the
+standard scalar / tensor out, useful for one-off testing where the
 full workflow is overkill to retype.
 """
 

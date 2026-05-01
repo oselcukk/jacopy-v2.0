@@ -2,10 +2,10 @@
 
 Covers:
 
-* :class:`WedgeMultiEvalAlternatingDefinition` — full ``S_p``
+* :class:`WedgeMultiEvalAlternatingDefinition`, full ``S_p``
   alternating expansion of a wedge of one-forms evaluated on ``p``
   vector fields.
-* :class:`MultiEvalOneFormPairingBridgeDefinition` — arity-1
+* :class:`MultiEvalOneFormPairingBridgeDefinition`, arity-1
   ``MultiEval(α, V)`` with a one-form ``α`` rewrites to ``Pairing(α, V)``.
 
 Plus an end-to-end engine fix-point regression that composes the two
@@ -108,7 +108,7 @@ class TestWedgeAlternatingMatch:
         assert not rule.matches(m)
 
     def test_non_one_form_factor_skipped(self):
-        # α has degree 1 but β's degree is unknown — guard says no.
+        # α has degree 1 but β's degree is unknown, guard says no.
         reg = PropertyRegistry()
         a = Symbol("α")
         b = Symbol("β")
@@ -198,7 +198,7 @@ class TestBridgeMatch:
 
     def test_covector_slot_skipped(self):
         # MultiEval(π, α) with slot_kind="covector" is the bivector
-        # branch — bridging to a Pairing(π, α) would conflate two
+        # branch, bridging to a Pairing(π, α) would conflate two
         # contracts. Bridge stays out.
         reg, [a] = _one_form_registry("α")
         bridge = MultiEvalOneFormPairingBridgeDefinition(registry=reg)
@@ -206,7 +206,7 @@ class TestBridgeMatch:
         assert not bridge.matches(m)
 
     def test_non_one_form_head_skipped(self):
-        # 0-form head — degree mismatch.
+        # 0-form head, degree mismatch.
         reg = PropertyRegistry()
         f = Symbol("f")
         reg.declare(f, Graded(Degree.const(0)))

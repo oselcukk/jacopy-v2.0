@@ -1,5 +1,5 @@
 r"""
-Non-degeneracy axiom — Faz 12.B #9.
+Non-degeneracy axiom, Faz 12.B #9.
 
 Engine rewrite that consumes the
 :class:`~jacopy.core.properties.NonDegenerate` registry property: a
@@ -18,7 +18,7 @@ The rule is registry-aware (mirrors
 :class:`~jacopy.calculus.closed_axioms.ClosedFormDefinition`): the
 registry is supplied at construction time, the rule queries it on
 ``matches``. Passing ``registry=None`` makes the rule a permanent
-no-op — useful for engines that don't have a registry context.
+no-op, useful for engines that don't have a registry context.
 """
 
 from __future__ import annotations

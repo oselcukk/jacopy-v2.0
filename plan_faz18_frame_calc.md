@@ -1,9 +1,9 @@
-# Faz 18 — `jacopy.frame_calc`
+# Faz 18, `jacopy.frame_calc`
 
 > Frame-component differential geometry calculations: given a frame
 > + metric (and optionally a connection), compute Christoffel
 > symbols / torsion / curvature / Ricci tensor / Ricci scalar /
-> Einstein tensor — with **step-by-step derivation transcripts**
+> Einstein tensor, with **step-by-step derivation transcripts**
 > bridged through `ProofChain`.
 
 ## Goal
@@ -23,7 +23,7 @@ geometric quantity through frame-component formulas:
 `jacopy.frame_calc` exposes these as **mechanical computations**
 that the user can run, inspect step by step, and embed into
 larger proofs. The module is **not** about re-proving the
-underlying identities — those are taken as given.
+underlying identities, those are taken as given.
 
 ## Architecture
 
@@ -43,7 +43,7 @@ The module supports the same API at two levels:
 
 Both modes share the same `Frame`, `ComponentMetric`,
 `LeviCivita`, etc. classes. The mode is determined by the frame
-type and metric input — the user never explicitly picks "concrete
+type and metric input, the user never explicitly picks "concrete
 vs symbolic".
 
 ### SymPy as opt-in dependency
@@ -75,12 +75,12 @@ performed (`"Substitute g_{ab} = ..."`), and the simplifications.
 Same visual language as Cartan magic / Bianchi proofs in the
 rest of the package.
 
-### Frame compatibility — the key invariant
+### Frame compatibility, the key invariant
 
 All three frame types (`CoordinateFrame`, `Tetrad`,
 `AbstractFrame`) implement the same `Frame` protocol. Higher-level
 code (`ComponentMetric.inverse()`, `LeviCivita`, `Curvature`,
-`Ricci`, …) is **frame-agnostic** — it goes through the protocol
+`Ricci`, …) is **frame-agnostic**, it goes through the protocol
 and never branches on frame type.
 
 This invariant is what lets us start with `CoordinateFrame` (Stage
@@ -98,7 +98,7 @@ class Frame(Protocol):
         """Display names for the frame indices, e.g. ('t', 'r', 'θ', 'φ')."""
 
     def derivative(self, expr, a: int) -> Expr:
-        """The action `e_a(expr)` — a function-on-manifold derivation.
+        """The action `e_a(expr)`, a function-on-manifold derivation.
 
         - CoordinateFrame: returns SymPy ∂expr/∂x^a.
         - Tetrad: returns e_a^μ ∂expr/∂x^μ via vielbein.
@@ -121,7 +121,7 @@ etc. depend on. As long as a frame implements `derivative` and
 
 ## Stages
 
-### Stage A — Frame infrastructure (`CoordinateFrame`-first)
+### Stage A, Frame infrastructure (`CoordinateFrame`-first)
 
 **Files:**
 - `jacopy/frame_calc/__init__.py`
@@ -130,7 +130,7 @@ etc. depend on. As long as a frame implements `derivative` and
 **Deliverables:**
 
 ```python
-# Protocol (informal — duck-typed, not strict ABC)
+# Protocol (informal, duck-typed, not strict ABC)
 class Frame:
     dim: int
     name: str
@@ -152,7 +152,7 @@ class CoordinateFrame(Frame):
         return sp.Integer(0)   # coordinate frames are torsion-free
 
 class AbstractFrame(Frame):
-    """Stage A stub. Full implementation in Stage A.2 — see below."""
+    """Stage A stub. Full implementation in Stage A.2, see below."""
     # at Stage A: defined as a placeholder so type checks pass and
     # downstream modules can import it without breaking.
     def derivative(self, expr, a: int):
@@ -161,7 +161,7 @@ class AbstractFrame(Frame):
         raise NotImplementedError("AbstractFrame populated at Stage A.2")
 
 class Tetrad(Frame):
-    """Stage B — left as a placeholder import-ably in Stage A."""
+    """Stage B, left as a placeholder import-ably in Stage A."""
     def derivative(self, *_):
         raise NotImplementedError("Tetrad populated at Stage B")
     def gamma(self, *_):
@@ -177,13 +177,13 @@ class Tetrad(Frame):
 
 **Compatibility note:** `CoordinateFrame` returns SymPy types from
 `derivative` / `gamma`. `AbstractFrame` (Stage A.2) will return
-`jacopy.core.expr.Expr` types instead — wrapped in a thin
+`jacopy.core.expr.Expr` types instead, wrapped in a thin
 `FrameDerivativeExpr` / `GammaExpr` if needed. Higher-level code
 needs to handle both, so we'll route everything through a uniform
 `as_sympy(expr) → sp.Expr` and `as_jacopy(expr) → Expr` adapter
 once Stage A.2 lands.
 
-### Stage A.2 — `AbstractFrame` implementation
+### Stage A.2, `AbstractFrame` implementation
 
 **Files:**
 - `jacopy/frame_calc/abstract_frame.py`
@@ -232,7 +232,7 @@ as needed so downstream formulas stay frame-agnostic.
 - `frame.gamma(0, 1, 2)` returns the table value or a `GammaExpr`
   if absent.
 
-### Stage B — `Tetrad` implementation
+### Stage B, `Tetrad` implementation
 
 **Files:**
 - `jacopy/frame_calc/tetrad.py`
@@ -267,7 +267,7 @@ class Tetrad(Frame):
 - Schwarzschild orthonormal tetrad → diagonal Minkowski `g_{ab}`.
 - `γ` reduces to 0 when vielbein is identity.
 
-### Stage C — Component tensors
+### Stage C, Component tensors
 
 **Files:**
 - `jacopy/frame_calc/component_tensor.py`
@@ -292,7 +292,7 @@ class ComponentTensor:
 class ComponentMetric(ComponentTensor):
     """A (0, 2) symmetric metric `g_{ab}`."""
     def __init__(self, frame: Frame, matrix: sp.Matrix):
-        # Verify shape, symmetry (best-effort — abstract entries skip check)
+        # Verify shape, symmetry (best-effort, abstract entries skip check)
         super().__init__(frame, sp.Array(matrix), signature=(0, 2))
 
     def inverse(self) -> "ComponentMetricInverse":
@@ -312,7 +312,7 @@ class ComponentMetricInverse(ComponentTensor):
 class ComponentConnection(ComponentTensor):
     """A connection given by Christoffel symbols `Γ^a_{bc}`.
 
-    Stored as a (1, 2) tensor of shape (dim, dim, dim) — index ordering: [a, b, c].
+    Stored as a (1, 2) tensor of shape (dim, dim, dim), index ordering: [a, b, c].
     """
 ```
 
@@ -321,7 +321,7 @@ class ComponentConnection(ComponentTensor):
 - `ComponentMetric` accepts symmetric matrices; raises on
   non-symmetric (concrete entries only).
 
-### Stage D — Levi-Civita / Koszul
+### Stage D, Levi-Civita / Koszul
 
 **Files:**
 - `jacopy/frame_calc/levi_civita.py`
@@ -386,7 +386,7 @@ shortens to 5 steps.
 - AbstractFrame: `Γ^e_{ab}` returned as symbolic combinator over
   `e_a(g_{bc})` and `γ^d_{bc}` opaque atoms.
 
-### Stage E — Torsion + curvature
+### Stage E, Torsion + curvature
 
 **Files:**
 - `jacopy/frame_calc/torsion.py`
@@ -423,7 +423,7 @@ class CurvatureTensor(ComponentTensor):
   curvature has too many entries to assert exhaustively).
 - Torsion-free check: `torsion(levi_civita(g)).is_zero()` is True.
 
-### Stage F — Ricci / scalar / Einstein
+### Stage F, Ricci / scalar / Einstein
 
 **Files:**
 - `jacopy/frame_calc/ricci.py`
@@ -456,7 +456,7 @@ def einstein_tensor(connection: ComponentConnection, g: ComponentMetric) -> Comp
   constant → `G_{tt}` matches Friedmann equation form.
 - Minkowski → `Ric = 0`, `R = 0`, `G = 0`.
 
-### Stage G — `ProofChain` bridge
+### Stage G, `ProofChain` bridge
 
 **Files:**
 - `jacopy/frame_calc/proof_bridge.py`
@@ -482,7 +482,7 @@ def derivation_to_proof_chain(steps: list[FrameCalcStep]) -> ProofChain:
 - `chain_to_latex_document` round-trips through a Christoffel chain.
 - `display_chain(LC.derivation_chain(...))` works in Jupyter.
 
-### Stage H — Concrete metric fixtures
+### Stage H, Concrete metric fixtures
 
 **Files:**
 - `jacopy/frame_calc/library/__init__.py`
@@ -500,7 +500,7 @@ def minkowski(signature: str = "−+++") -> tuple[CoordinateFrame, ComponentMetr
 def schwarzschild(M_sym: sp.Symbol | None = None) -> tuple[CoordinateFrame, ComponentMetric]:
     """Schwarzschild metric in (t, r, θ, φ) coordinates.
 
-    Returns the frame and the metric — the user composes
+    Returns the frame and the metric, the user composes
     `levi_civita(g)`, `einstein_tensor(...)`, etc. on top.
     """
 
@@ -516,11 +516,11 @@ def frw(a_func: sp.Function, k: int = 0) -> tuple[CoordinateFrame, ComponentMetr
 - Each fixture works end-to-end: `g → LC → curvature → ricci → einstein`.
 - Vacuum / non-vacuum assertions match textbook expectations.
 
-### Stage I — Tutorial 25
+### Stage I, Tutorial 25
 
 **Files:**
 - `docs/tutorials/25_frame_calc.md`
-- `docs/tutorials/_build_notebooks.py` — append `TUTORIAL_25`
+- `docs/tutorials/_build_notebooks.py`, append `TUTORIAL_25`
 
 **Tutorial outline:**
 
@@ -532,13 +532,13 @@ def frw(a_func: sp.Function, k: int = 0) -> tuple[CoordinateFrame, ComponentMetr
 5. **Curvature, Ricci, Einstein.** Pipeline `g → LC → R → Ric → R → G`.
 6. **Vacuum check.** Schwarzschild `G == 0`.
 7. **Going abstract.** Same pipeline on `AbstractFrame` with
-   user-supplied `γ` table — outputs symbolic results.
-8. **Going to a tetrad.** `Tetrad(coord_frame, vielbein)` —
+   user-supplied `γ` table, outputs symbolic results.
+8. **Going to a tetrad.** `Tetrad(coord_frame, vielbein)`,
    orthonormal Schwarzschild example.
 9. **What's next.** Bridge to existing `LeviCivitaProblem` (Faz 19?
    future seeded theorem on operator-level Levi-Civita uniqueness).
 
-### Stage J — Test suite
+### Stage J, Test suite
 
 **Files:**
 - `tests/test_frame_calc/test_coordinate_frame.py`
@@ -560,11 +560,11 @@ zero cases, Schwarzschild for non-zero, FRW for time-dependent).
 
 ## Dependencies on the rest of jacopy
 
-- `jacopy.core.expr.Expr` — for opaque atoms in abstract mode
+- `jacopy.core.expr.Expr`, for opaque atoms in abstract mode
   (`FrameDerivativeExpr`, `GammaExpr`, opaque `g_inv` symbols).
 - `jacopy.proof.chain.ProofChain` and
-  `jacopy.proof.step.ProofStep` — for the bridge layer.
-- `jacopy.display.chain_to_latex_document` — for paper output.
+  `jacopy.proof.step.ProofStep`, for the bridge layer.
+- `jacopy.display.chain_to_latex_document`, for paper output.
 - No dependency on the bracket / Cartan / Bianchi machinery.
   `frame_calc` is a sibling, not a dependent.
 
@@ -584,25 +584,25 @@ from jacopy.frame_calc.library import (
 )
 ```
 
-`jacopy/__init__.py` does **not** re-export these — keeps the
+`jacopy/__init__.py` does **not** re-export these, keeps the
 top-level namespace small. Users opt in by importing
 `jacopy.frame_calc`.
 
 ## Order of work (suggested)
 
-1. **Stage A** — `CoordinateFrame` + `Frame` protocol stubs.
-2. **Stage A.2** — `AbstractFrame` + opaque atoms.
-3. **Stage C** — `ComponentMetric` + inverse.
-4. **Stage D** — `LeviCivita` (largest single deliverable).
-5. **Stage G** — bridge to `ProofChain` (so we have rendering ready).
-6. **Stage E** — torsion + curvature.
-7. **Stage F** — Ricci / scalar / Einstein.
-8. **Stage H** — concrete fixtures (uses everything; final integration test).
-9. **Stage B** — `Tetrad` (after Stages D-F land — needs robust
+1. **Stage A**, `CoordinateFrame` + `Frame` protocol stubs.
+2. **Stage A.2**, `AbstractFrame` + opaque atoms.
+3. **Stage C**, `ComponentMetric` + inverse.
+4. **Stage D**, `LeviCivita` (largest single deliverable).
+5. **Stage G**, bridge to `ProofChain` (so we have rendering ready).
+6. **Stage E**, torsion + curvature.
+7. **Stage F**, Ricci / scalar / Einstein.
+8. **Stage H**, concrete fixtures (uses everything; final integration test).
+9. **Stage B**, `Tetrad` (after Stages D-F land, needs robust
    abstract-frame plumbing first).
-10. **Stage I + J** — tutorial + final test pass.
+10. **Stage I + J**, tutorial + final test pass.
 
-Stage B (Tetrad) deliberately late — the math is tractable but
+Stage B (Tetrad) deliberately late, the math is tractable but
 the design pressure on the `Frame` protocol is highest. Once
 `AbstractFrame` and `CoordinateFrame` both work end-to-end through
 Stages C-F, `Tetrad` lands as a third frame type that follows the
@@ -614,16 +614,16 @@ When implementing Stage A with `CoordinateFrame` only, take care
 that the design **doesn't accidentally depend on SymPy semantics**
 in ways that break for `AbstractFrame`:
 
-- ✅ `Frame.derivative` returns "something Expr-like" — can be SymPy
+- ✅ `Frame.derivative` returns "something Expr-like", can be SymPy
   Expr or jacopy `Expr`. Use `as_jacopy(x)` / `as_sympy(x)` adapters
   at boundaries.
 - ✅ `Frame.gamma` returns 0 for coordinate frames; opaque atom for
-  abstract. Both are valid downstream — formulas just contract
+  abstract. Both are valid downstream, formulas just contract
   symbolically.
 - ✅ `ComponentMetric.inverse()` for coordinate frame uses
   `sp.Matrix.inv()`. For abstract frame, returns wrapper with
   opaque `g_inv` symbols. Higher-level code only uses
-  `metric.inverse()[a, b]` — never inspects the underlying type.
+  `metric.inverse()[a, b]`, never inspects the underlying type.
 - ✅ Simplification: `LeviCivita` calls `sp.simplify(...)` only when
   every contributing term is a SymPy expression (concrete frame).
   For mixed / abstract, leaves the result un-simplified.
@@ -640,7 +640,7 @@ in ways that break for `AbstractFrame`:
    - Lean toward (A) for simplicity; reconsider if proof bridges need (B).
 
 2. **Index gymnastics:** raise / lower indices via `g`?
-   - Stage C deliberately skips this — the boxed formulas don't
+   - Stage C deliberately skips this, the boxed formulas don't
      require general index gymnastics. Add at the end if a tutorial
      wants `g_{ab} V^b` operations.
 
@@ -650,7 +650,7 @@ in ways that break for `AbstractFrame`:
 
 4. **Tetrad → AbstractFrame conversion:** if user gives a Tetrad
    with abstract `e_a^μ`, should it auto-promote to AbstractFrame?
-   - Stage B decides. Likely not — keep them separate types.
+   - Stage B decides. Likely not, keep them separate types.
 
 ## Out of scope for Faz 18
 
@@ -693,7 +693,7 @@ Practical schedule: 4-5 weeks of focused work.
   a publication-ready LaTeX block showing each step of the Koszul
   formula as it specialises to `Γ^t_{tr}`.
 - The same pipeline works on `AbstractFrame` with symbolic `g_{ab}`
-  and `γ^a_{bc}` — every formula closes symbolically with opaque
+  and `γ^a_{bc}`, every formula closes symbolically with opaque
   atoms.
 - 25th tutorial in the test suite (`tests/test_docs/test_notebooks.py`)
   passes.

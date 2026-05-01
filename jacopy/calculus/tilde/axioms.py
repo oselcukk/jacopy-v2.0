@@ -1,10 +1,10 @@
 r"""
-Tilde-calculus defining axioms — Faz 14.B.
+Tilde-calculus defining axioms, Faz 14.B.
 
 Three engine rewrite rules realise the defining identities of the
 tilde operators introduced in :mod:`jacopy.calculus.tilde.operators`:
 
-* :class:`TildeIotaSwapDefinition` — bridge axiom
+* :class:`TildeIotaSwapDefinition`, bridge axiom
   ``ι̃_ω V → ι_V ω``. The swap rewrites a tilde-interior application
   into a standard interior-product application against the indexing
   form. Unconditional: the registry-aware corner case
@@ -13,13 +13,13 @@ tilde operators introduced in :mod:`jacopy.calculus.tilde.operators`:
   (Faz 14.D); engine ordering must register the auxiliary rule first
   so it fires on the pre-swap shape.
 
-* :class:`TildeExteriorDLichnerowiczDefinition` — Lichnerowicz
+* :class:`TildeExteriorDLichnerowiczDefinition`, Lichnerowicz
   identity ``d̃ V → [π, V]_SN``. Instance-bound to a specific Poisson
   bivector ``π`` so that two unrelated tilde-d operators (e.g. on
   separate Poisson manifolds in the same proof) don't accidentally
   cross-pollute.
 
-* :class:`TildeLieMagicDefinition` — tilde Cartan magic
+* :class:`TildeLieMagicDefinition`, tilde Cartan magic
   ``L̃_ω V → d̃(ι̃_ω V) + ι̃_ω(d̃ V)``. The right-hand side reuses the
   same ``π`` and ``ω`` instances stored on the matched
   :class:`~jacopy.calculus.tilde.operators.TildeLieDerivative`, so the
@@ -29,7 +29,7 @@ tilde operators introduced in :mod:`jacopy.calculus.tilde.operators`:
 
 All three rules are :class:`Definition` subclasses ready to register on
 an :class:`~jacopy.proof.expansion.ExpansionEngine`. They do not
-themselves close any of the six tilde Cartan relations — they only
+themselves close any of the six tilde Cartan relations, they only
 unfold the operators by their definitions. Closure relies on the
 auxiliary axioms in :mod:`jacopy.calculus.tilde.aux_axioms` plus the
 ambient SN / Sharp / Koszul-bracket rules already in the proof engine.
@@ -56,12 +56,12 @@ from jacopy.proof.expansion import Definition
 
 
 class TildeIotaSwapDefinition(Definition):
-    r"""``ι̃_ω V → ι_V ω`` — defining identity of the tilde interior product.
+    r"""``ι̃_ω V → ι_V ω``, defining identity of the tilde interior product.
 
     Fires on ``Act(TildeInteriorProduct(ω), V)`` for any ``V``,
     rewriting it to ``Act(InteriorProduct(V), ω)``. The form ``ω``
     becomes the operand of the standard interior product and ``V``
-    becomes its indexing vector field — this is the role-swap that
+    becomes its indexing vector field, this is the role-swap that
     distinguishes the tilde calculus from the ordinary one.
 
     The rule is registry-free; the corner case where ``V`` is a
@@ -95,7 +95,7 @@ class TildeIotaSwapDefinition(Definition):
 
 
 class TildeExteriorDLichnerowiczDefinition(Definition):
-    r"""``d̃ V → [π, V]_SN`` — Lichnerowicz definition of the tilde-d.
+    r"""``d̃ V → [π, V]_SN``, Lichnerowicz definition of the tilde-d.
 
     Scoped to a specific Poisson bivector ``π``: matches only when the
     outer head is a :class:`TildeExteriorDerivative` whose
@@ -140,7 +140,7 @@ class TildeExteriorDLichnerowiczDefinition(Definition):
 
 
 class TildeLieMagicDefinition(Definition):
-    r"""``L̃_ω V → d̃(ι̃_ω V) + ι̃_ω(d̃ V)`` — tilde Cartan magic formula.
+    r"""``L̃_ω V → d̃(ι̃_ω V) + ι̃_ω(d̃ V)``, tilde Cartan magic formula.
 
     Scoped to a Poisson bivector ``π``: matches only when the outer
     head is a :class:`TildeLieDerivative` whose

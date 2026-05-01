@@ -4,11 +4,11 @@ Lie derivative ``L_X``.
 The Lie derivative along a vector field ``X`` is the degree ``0``
 graded derivation on the exterior algebra. Two standard definitions:
 
-* **Flow definition (axiom mode ``"flow"``)** — ``L_X(ω) = d/dt|_0 φ_t^* ω``
+* **Flow definition (axiom mode ``"flow"``)**, ``L_X(ω) = d/dt|_0 φ_t^* ω``
   where ``φ_t`` is the flow of ``X``. Cartan's magic formula then
   becomes a *theorem*:
   ``L_X = d ∘ ι_X + ι_X ∘ d``.
-* **Cartan definition (axiom mode ``"cartan"``)** — take the magic
+* **Cartan definition (axiom mode ``"cartan"``)**, take the magic
   formula itself as the definition:
   ``L_X := d ∘ ι_X + ι_X ∘ d``.
   Cartan's magic formula is then a tautology.
@@ -19,7 +19,7 @@ but follows from the derivation structure of ``d`` and ``ι_X`` in
 Cartan mode). The :class:`LieDerivative` instance records which mode
 it was constructed under via :attr:`definition`.
 
-As with the interior product there is no global singleton — ``L_X``
+As with the interior product there is no global singleton, ``L_X``
 is a family indexed by the vector field ``X``. Use :func:`lie_derivative`
 to build one. The class is a :class:`Derivation` of degree 0 so
 :mod:`product_rule` handles its Leibniz behaviour directly; the Cartan
@@ -39,7 +39,7 @@ from jacopy.core.expr import Expr, Sum
 from jacopy.core.registry import PropertyRegistry
 
 
-#: Type alias — a callable ``X -> ι_X`` that builds an
+#: Type alias, a callable ``X -> ι_X`` that builds an
 #: :class:`InteriorProduct` for a given vector field. Used by
 #: :class:`LieDerivative` to remember which interior-product factory its
 #: Cartan expansion should use (so algebroid bundles get ``ι_{E,X}``
@@ -48,18 +48,18 @@ IotaFactory = Callable[[Expr], InteriorProduct]
 
 
 # Supported axiomatic definitions. Kept as a tuple of literals rather
-# than an Enum — there are exactly two options and the strings serve
+# than an Enum, there are exactly two options and the strings serve
 # as both the API-facing choice and the internal key.
 DEFINITIONS = ("flow", "cartan")
 
 
 class LieDerivative(Derivation):
-    """Lie derivative ``L_X`` — degree ``0`` graded derivation.
+    """Lie derivative ``L_X``, degree ``0`` graded derivation.
 
     Carries the vector field ``X`` and the axiomatic definition mode
     (``"flow"`` or ``"cartan"``). Equality / hash reduce to
     :class:`Derivation`'s structural ``(name, degree)`` key, so two
-    Lie derivatives are equal iff their display names match — the
+    Lie derivatives are equal iff their display names match, the
     default name includes ``X`` which makes that line up with equality
     of the vector field.
     """
@@ -108,7 +108,7 @@ class LieDerivative(Derivation):
 
         When non-``None`` the Cartan expansion driven by the expansion
         engine uses this ``d`` in place of the default :mod:`exterior_d`
-        singleton — this is how a Lie-algebroid ``L_{E,X}`` keeps its
+        singleton, this is how a Lie-algebroid ``L_{E,X}`` keeps its
         ``d_E`` glued to its own bundle instead of falling back to the
         ambient manifold ``d``.
         """
@@ -157,7 +157,7 @@ def cartan_expansion(
 ) -> Expr:
     """Return ``d ∘ ι_X + ι_X ∘ d`` as an :class:`Expr`.
 
-    The shape is a :class:`Sum` of two :class:`Product` compositions —
+    The shape is a :class:`Sum` of two :class:`Product` compositions,
     the form that :func:`jacopy.algebra.derivation.compose` produces.
     Applying this to an operand gives the magic formula's RHS; for
     ``definition="cartan"`` it *is* the definition of ``L_X``, and for
@@ -168,7 +168,7 @@ def cartan_expansion(
     pass an explicit instance when the caller needs to share the same
     interior-product object elsewhere in the expression (equality on
     ``Derivation`` is structural, so a freshly-constructed one still
-    compares equal to any other built with the same name and degree —
+    compares equal to any other built with the same name and degree,
     but sharing makes intent clearer in proof output).
     """
     dop = default_d if d is None else d
@@ -192,7 +192,7 @@ def cartan_obstruction(
     Zero-*expression* (i.e. the result :class:`simplify`'s down to
     :class:`Integer` ``0``) iff Cartan's magic formula holds for this
     ``L``, ``X``, and ``arg``. The helper is registry-accepting even
-    though the shape itself is registry-free — expanding and
+    though the shape itself is registry-free, expanding and
     simplifying downstream will need the registry for the Koszul
     signs in :mod:`product_rule`, so keeping the argument here keeps
     the whole obstruction flow registry-aware.

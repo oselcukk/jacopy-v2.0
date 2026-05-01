@@ -1,4 +1,4 @@
-"""jacopy — graded algebra and bracket calculus with step-by-step proofs."""
+"""jacopy, graded algebra and bracket calculus with step-by-step proofs."""
 
 from jacopy.core.expr import (
     Expr,

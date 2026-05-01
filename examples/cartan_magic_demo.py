@@ -5,7 +5,7 @@ display layer (terminal tree + ASCII + LaTeX). The three demos form a
 progression from trivial element-level rewriting to a genuine
 operator-level proof on an exterior algebra.
 
-Demo 1 — *Cartan's magic formula, element-level*, efficient mode::
+Demo 1, *Cartan's magic formula, element-level*, efficient mode::
 
     L_X(ω) == (d ∘ ι_X + ι_X ∘ d)(ω)
 
@@ -14,7 +14,7 @@ Closed by :func:`jacopy.proof.show_equal`: definition-level unfold of
 rule, canonicalize. Three steps. Fast, but circular: the rule that
 fires *is* the formula being proved.
 
-Demo 2 — *d² = 0*, foundational mode::
+Demo 2, *d² = 0*, foundational mode::
 
     d(d(f)) == 0
 
@@ -22,15 +22,15 @@ Default engine with ``d_squared_mode="theorem"`` classifies ``d² = 0``
 as a theorem; foundational mode attaches its generator-axiom sub-proof
 as a child step. Shows the axiom/theorem distinction in the tree.
 
-Demo 3 — *Cartan's magic formula, operator-level*::
+Demo 3, *Cartan's magic formula, operator-level*::
 
     [d, ι_X] = L_X    (as an equation of operators on Ω*(M))
 
 Closed by :class:`CartanCalculus.verify`, which routes through
 :class:`AgreementOnGenerators`: both sides must have the same degree
 and agree on each generator of the supplied exterior algebra. The
-proof is fundamentally reshaped — degree check + per-generator
-sub-proofs — instead of element-level simplify. Run twice, once in
+proof is fundamentally reshaped, degree check + per-generator
+sub-proofs, instead of element-level simplify. Run twice, once in
 efficient mode and once in foundational mode, to expose the
 :class:`UnrollToFoundations` wrapper.
 
@@ -65,8 +65,8 @@ def _section(title: str) -> None:
 
 
 def demo_cartan_magic() -> None:
-    """``L_X(ω) == (d∘ι_X + ι_X∘d)(ω)`` — one-liner via the default engine."""
-    _section("Demo 1 — Cartan's magic formula (efficient mode)")
+    """``L_X(ω) == (d∘ι_X + ι_X∘d)(ω)``, one-liner via the default engine."""
+    _section("Demo 1, Cartan's magic formula (efficient mode)")
 
     # A degree-0 vector field and a differential form on the same manifold.
     # The Lie derivative is built in the Cartan definition so the expansion
@@ -98,8 +98,8 @@ def demo_cartan_magic() -> None:
 
 
 def demo_d_squared_zero() -> None:
-    """``d(d(f)) == 0`` under foundational mode — sub-proof gets attached."""
-    _section("Demo 2 — d² = 0 (foundational mode, theorem classification)")
+    """``d(d(f)) == 0`` under foundational mode, sub-proof gets attached."""
+    _section("Demo 2, d² = 0 (foundational mode, theorem classification)")
 
     f = Symbol("f")
     lhs = Act(d, Act(d, f))
@@ -137,7 +137,7 @@ def demo_d_squared_zero() -> None:
 
 
 def demo_cartan_magic_operator_level() -> None:
-    """``[d, ι_X] = L_X`` as an operator equation — AgreementOnGenerators.
+    """``[d, ι_X] = L_X`` as an operator equation, AgreementOnGenerators.
 
     This is the *non-trivial* closure of Cartan's magic formula: the
     identity is stated between operators (not between their evaluations
@@ -146,7 +146,7 @@ def demo_cartan_magic_operator_level() -> None:
     verification are shown, so the effect of the foundational unroll
     is visible.
     """
-    _section("Demo 3 — Cartan's magic formula, operator-level")
+    _section("Demo 3, Cartan's magic formula, operator-level")
 
     # Build a concrete Cartan-calculus bundle and a minimal
     # exterior algebra with one 0-form generator f (and its
@@ -184,7 +184,7 @@ def demo_cartan_magic_operator_level() -> None:
 
     # -- foundational mode ----------------------------------------- #
     # Wire d² = 0 as a theorem so the foundational unroll has
-    # something to expand under the per-generator sub-proof — on
+    # something to expand under the per-generator sub-proof, on
     # generator ``df`` the proof hits ι_X(d(df)) which fires d² = 0.
     foundational_engine = default_engine(
         registry=reg, mode="foundational", d_squared_mode="theorem"
@@ -200,7 +200,7 @@ def demo_cartan_magic_operator_level() -> None:
     )
     print(render_chain(chain_fnd))
 
-    # Per-generator sub-proof inspection — makes the shape explicit
+    # Per-generator sub-proof inspection, makes the shape explicit
     # even when the tree renderer wraps lines.
     print("\n--- shape of the efficient-mode proof")
     root = chain_eff.steps[0]
@@ -215,7 +215,7 @@ def demo_cartan_magic_operator_level() -> None:
     print(
         "\n  Note: efficient and foundational trees are identical here\n"
         "  because the (A + B) - (A + B) cancellation in ExpandAndSimplify\n"
-        "  reaches 0 without any theorem-classified rule firing — d² = 0\n"
+        "  reaches 0 without any theorem-classified rule firing, d² = 0\n"
         "  is never invoked, so there's nothing for UnrollToFoundations\n"
         "  to unroll. The mode only shows a visible difference when a\n"
         "  theorem step is actually reached (cf. Demo 2)."

@@ -24,7 +24,7 @@ class TestLieRescalingMatches:
         assert rule.matches(expr)
 
     def test_matches_three_factor_product(self):
-        # L_{g·f·X}(ω) — leading two folded into f.
+        # L_{g·f·X}(ω), leading two folded into f.
         rule = LieRescalingDefinition()
         g, f, X, omega = Symbol("g"), Symbol("f"), Symbol("X"), Symbol("ω")
         expr = Act(lie_derivative(Product(g, f, X)), omega)
@@ -39,7 +39,7 @@ class TestLieRescalingMatches:
     def test_no_match_non_lie_derivative_op(self):
         rule = LieRescalingDefinition()
         f, X, omega = Symbol("f"), Symbol("X"), Symbol("ω")
-        # ι_{f·X}(ω) — also not handled here.
+        # ι_{f·X}(ω), also not handled here.
         expr = Act(interior(Product(f, X)), omega)
         assert not rule.matches(expr)
 

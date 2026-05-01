@@ -1,5 +1,5 @@
 r"""
-Bridge from frame-calc step records to ProofChain — Stage G.
+Bridge from frame-calc step records to ProofChain, Stage G.
 
 The Faz 18 stages D / E / F record per-entry derivation traces as
 lists of step records (:class:`KoszulStep`, :class:`CurvatureStep`,
@@ -17,12 +17,12 @@ Mechanics
 Each frame-calc step's ``.expression`` field is a SymPy expression
 (or ``None`` for narration-only steps). To embed those into
 :class:`~jacopy.proof.step.ProofStep`'s ``before`` / ``after`` slots
-— which require jacopy :class:`~jacopy.core.expr.Expr` — we wrap
+, which require jacopy :class:`~jacopy.core.expr.Expr`, we wrap
 them in :class:`~jacopy.frame_calc.symbolic_atoms.SymPyAtom` opaque
 atoms.
 
 The resulting :class:`ProofStep`s carry ``provenance_tag="computation"``
-— a Stage-G addition to :data:`ProofStep._VALID_TAGS` that signals
+, a Stage-G addition to :data:`ProofStep._VALID_TAGS` that signals
 "this is a calculational step, not an axiom or theorem citation".
 The display layer renders it identically to axiom/theorem steps.
 """
@@ -126,7 +126,7 @@ def steps_to_proof_chain(
 
 
 # --------------------------------------------------------------------- #
-# Display registration — runs at import time                            #
+# Display registration, runs at import time                            #
 # --------------------------------------------------------------------- #
 
 

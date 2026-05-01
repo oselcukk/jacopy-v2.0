@@ -1,4 +1,4 @@
-# 01 — First steps
+# 01, First steps
 
 This tutorial walks through building a symbolic expression in
 `jacopy`, declaring properties, and simplifying. By the end you'll
@@ -11,7 +11,7 @@ canonicalise them with `simplify`.
 
 A symbol is built with `Symbol(name)`; integer literals via
 `Integer(n)`; the standard Python operators `+`, `*`, `-` produce
-`Sum`, `Product`, `Neg` under the hood — so `x + y` returns the
+`Sum`, `Product`, `Neg` under the hood, so `x + y` returns the
 exact same object as `Sum(x, y)`.
 
 ```python
@@ -33,7 +33,7 @@ immutable. Two structurally identical expressions compare equal via
 ## Declaring properties (`PropertyRegistry`)
 
 By default symbols carry no algebraic content. Relationships are
-declared **externally** through a `PropertyRegistry` — that's what
+declared **externally** through a `PropertyRegistry`, that's what
 lets the same symbol be reused in different contexts (with
 different degrees, for example).
 
@@ -70,18 +70,18 @@ alpha, beta = Forms("α β", degree=1, registry=reg2)  # Graded(degree=1)
 pi = Bivector("π", registry=reg2)              # Graded(degree=1), SN-grading
 ```
 
-Even a single name returns a tuple — `(f,) = Functions("f", ...)`;
+Even a single name returns a tuple, `(f,) = Functions("f", ...)`;
 `Bivector` is the lone exception, returning the symbol directly.
 
-## `simplify` — canonical form
+## `simplify`, canonical form
 
 The `simplify(expr, registry)` pipeline runs:
 
-1. `flatten` — merges nested `Sum` / `Product` nodes.
-2. `canonicalize` — pushes `Neg` through sums, collects signs.
-3. `distribute` — opens `Sum`s inside `Product`s when needed.
-4. `sort_product` — orders factors by registered properties.
-5. `collect_terms` — combines like terms (`x + x → 2x`, etc.).
+1. `flatten`, merges nested `Sum` / `Product` nodes.
+2. `canonicalize`, pushes `Neg` through sums, collects signs.
+3. `distribute`, opens `Sum`s inside `Product`s when needed.
+4. `sort_product`, orders factors by registered properties.
+5. `collect_terms`, combines like terms (`x + x → 2x`, etc.).
 
 ```python
 from jacopy.algorithms.simplify import simplify
@@ -99,10 +99,10 @@ passes run (flatten + canonicalize + constant arithmetic).
 
 The `display` layer offers three rendering paths:
 
-- `to_ascii(expr)` — plain text, suitable for monospace terminals.
-- `to_latex(expr)` — LaTeX string; renders directly via
+- `to_ascii(expr)`, plain text, suitable for monospace terminals.
+- `to_latex(expr)`, LaTeX string; renders directly via
   `LatexDisplay` in Jupyter.
-- `print_expr(expr)` — coloured tree if `rich` is installed,
+- `print_expr(expr)`, coloured tree if `rich` is installed,
   ASCII fallback otherwise.
 
 ```python

@@ -106,7 +106,7 @@ class TestViews:
         assert direct == via_db
 
     def test_via_hamiltonian_shape(self):
-        """``{f, g}_π = X_f(g)`` — an :class:`Act` of ``X_f`` on ``g``."""
+        """``{f, g}_π = X_f(g)``, an :class:`Act` of ``X_f`` on ``g``."""
         pi = Symbol("π")
         f, g = Symbol("f"), Symbol("g")
         P = PoissonBracket(pi)
@@ -132,7 +132,7 @@ class TestViews:
             P.via_hamiltonian("f", Symbol("g"))  # type: ignore[arg-type]
 
     def test_bivector_eval_shape(self):
-        """``{f, g}_π = π(df, dg)`` — alternating covector MultiEval."""
+        """``{f, g}_π = π(df, dg)``, alternating covector MultiEval."""
         from jacopy.calculus.exterior_d import d as default_d
         from jacopy.core.multi_eval import MultiEval
 
@@ -203,7 +203,7 @@ class TestViews:
 
 class TestJacobi:
     def test_jacobi_obstruction_matches_sn_self_bracket(self, registry):
-        """The Poisson Jacobi obstruction is ``[π, π]_SN`` — for atomic
+        """The Poisson Jacobi obstruction is ``[π, π]_SN``, for atomic
         ``π`` it stays opaque."""
         pi = Symbol("π")
         P = PoissonBracket(pi)
@@ -234,7 +234,7 @@ class TestJacobi:
         assert first.after.bracket is sn
 
     def test_prove_jacobi_reduction_final_is_obstruction(self, registry):
-        """Chain ends on ``[π, π]_SN``, not on zero — discharging the
+        """Chain ends on ``[π, π]_SN``, not on zero, discharging the
         obstruction is the caller's job (the Poisson hypothesis)."""
         pi = Symbol("π")
         f, g, h = Symbol("f"), Symbol("g"), Symbol("h")
@@ -269,7 +269,7 @@ class TestSeededTheorem:
 
 
 # --------------------------------------------------------------------- #
-# Stage B.2 — form-level (Koszul) view                                  #
+# Stage B.2, form-level (Koszul) view                                  #
 # --------------------------------------------------------------------- #
 
 
@@ -291,7 +291,7 @@ class TestKoszulViews:
 
     def test_koszul_classical_uses_sharp_as_anchor(self):
         """Classical :class:`KoszulBracket` built with the manifold's
-        ``Sharp(π)`` — the relaxed anchor type (``Derivation`` rather
+        ``Sharp(π)``, the relaxed anchor type (``Derivation`` rather
         than strictly ``Anchor``) is what unlocks this path."""
         pi = Symbol("π")
         P = PoissonBracket(pi)
@@ -300,7 +300,7 @@ class TestKoszulViews:
         assert K.anchor is P.sharp
 
     def test_koszul_expand_shape_is_three_term_sum(self, registry):
-        """Expansion should be a :class:`Sum` of three Koszul pieces —
+        """Expansion should be a :class:`Sum` of three Koszul pieces,
         ``L_{π^♯(α)} β``, ``−L_{π^♯(β)} α``, ``−d⟨π^♯(α), β⟩``. We
         don't probe the exact operator identities beyond counting the
         top-level summands; the structural agreement with
@@ -316,7 +316,7 @@ class TestKoszulViews:
 
     def test_koszul_expand_matches_classical_structurally(self, registry):
         """The two views share the same ``Sharp(π)`` anchor by
-        construction, so their Exprs are *structurally* equal — this
+        construction, so their Exprs are *structurally* equal, this
         is what makes :meth:`prove_koszul_equivalence` close in one
         reflexive step."""
         pi = Symbol("π")
@@ -341,7 +341,7 @@ class TestProveKoszulEquivalence:
         assert len(chain) >= 1
 
     def test_closes_in_one_reflexive_step(self, registry):
-        """Both Koszul views emit the same Expr — no rewrites needed,
+        """Both Koszul views emit the same Expr, no rewrites needed,
         :func:`prove_equivalence` reports a single ``reflexive`` step."""
         pi = Symbol("π")
         alpha, beta = Symbol("α"), Symbol("β")
@@ -373,7 +373,7 @@ class TestSeededKoszulTheorem:
 
 
 # --------------------------------------------------------------------- #
-# Stage B.3 — form-level (Koszul) Jacobi reduction ProofChain            #
+# Stage B.3, form-level (Koszul) Jacobi reduction ProofChain            #
 # --------------------------------------------------------------------- #
 
 
@@ -400,7 +400,7 @@ class TestKoszulJacobiCondition:
 
     def test_obstruction_matches_function_level(self, koszul_registry):
         """Form-level and function-level Jacobi share the same
-        ``[π, π]_SN`` universal obstruction — ``acting_on`` doesn't
+        ``[π, π]_SN`` universal obstruction, ``acting_on`` doesn't
         alter ``[Q, Q]_base`` on a DerivedBracket."""
         pi = Symbol("π")
         P = PoissonBracket(pi)
@@ -442,7 +442,7 @@ class TestProveKoszulJacobiReduction:
 
     def test_final_is_shared_obstruction(self, koszul_registry):
         """The chain terminates at the same ``[π, π]_SN`` the
-        function-level reduction lands on — one hypothesis discharges
+        function-level reduction lands on, one hypothesis discharges
         both views."""
         pi = Symbol("π")
         alpha, beta, gamma = Symbol("α"), Symbol("β"), Symbol("γ")
@@ -460,7 +460,7 @@ class TestProveKoszulJacobiReduction:
 
     def test_first_step_starts_on_cyclic_sum(self, koszul_registry):
         """The reduction begins on the cyclic Jacobi Sum built from the
-        form-level derived bracket — not the function-level one, so the
+        form-level derived bracket, not the function-level one, so the
         inner BracketApply nodes carry ``koszul_derived``'s name."""
         pi = Symbol("π")
         alpha, beta, gamma = Symbol("α"), Symbol("β"), Symbol("γ")

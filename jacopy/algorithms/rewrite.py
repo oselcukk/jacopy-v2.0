@@ -7,10 +7,10 @@ a guard predicate, and substitutes into the rhs.
 
 Rules compose via small strategies:
 
-* :func:`apply_once_at_root` — try each rule at the root exactly once.
-* :func:`apply_bottomup` — rewrite children first, then the node.
-* :func:`apply_topdown` — rewrite the node first, then the new children.
-* :func:`normalize` — iterate a strategy until a fixed point.
+* :func:`apply_once_at_root`, try each rule at the root exactly once.
+* :func:`apply_bottomup`, rewrite children first, then the node.
+* :func:`apply_topdown`, rewrite the node first, then the new children.
+* :func:`normalize`, iterate a strategy until a fixed point.
 
 Strategies here are deliberately simple. The "no reordering" stance from
 :mod:`jacopy.core.wildcards` is preserved: if a rule wants commutative
@@ -107,7 +107,7 @@ def apply_bottomup(
 ) -> Expr:
     """Rewrite children first, then the node itself, once.
 
-    A single bottom-up pass. No fixed-point iteration — use
+    A single bottom-up pass. No fixed-point iteration, use
     :func:`normalize` when a rule set may cascade.
     """
     if not expr.is_atom:
@@ -156,7 +156,7 @@ def normalize(
 
     ``strategy`` selects the per-iteration pass: ``"bottomup"`` or
     ``"topdown"``. Non-converging rule sets raise :class:`RuntimeError`
-    rather than looping silently — catching divergence early is more
+    rather than looping silently, catching divergence early is more
     useful than hanging a proof.
     """
     if strategy == "bottomup":

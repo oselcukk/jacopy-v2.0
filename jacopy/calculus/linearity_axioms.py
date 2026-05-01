@@ -1,13 +1,13 @@
 """
-Operator R-linearity axioms — supplementary expansion rules.
+Operator R-linearity axioms, supplementary expansion rules.
 
 Two engine-level rewrite rules that distribute :class:`LieDerivative`
 and :class:`ExteriorDerivative` over :class:`Sum` (and :class:`Neg`)
 in their *argument* slot:
 
-* :class:`LieDerivativeArgLinearityDefinition` —
+* :class:`LieDerivativeArgLinearityDefinition`,
   ``L_X(a + b + …) → L_X(a) + L_X(b) + …``
-* :class:`ExteriorDerivativeLinearityDefinition` —
+* :class:`ExteriorDerivativeLinearityDefinition`,
   ``d(a + b + …) → d(a) + d(b) + …``
 
 Both operators are :math:`\\mathbb{R}`-linear by definition; the rules
@@ -41,7 +41,7 @@ from jacopy.proof.expansion import Definition
 def _distribute_over_sum_or_neg(op: Expr, arg: Expr) -> Expr:
     """Build ``Sum(Act(op, c) for c in arg)`` (or ``Neg(Act(op, x))``).
 
-    Centralised so the two rules below stay structurally identical —
+    Centralised so the two rules below stay structurally identical,
     the only thing that varies is which operator class they target.
     """
     if isinstance(arg, Neg):
@@ -61,12 +61,12 @@ def _distribute_over_sum_or_neg(op: Expr, arg: Expr) -> Expr:
 
 
 class LieDerivativeArgLinearityDefinition(Definition):
-    """``L_X(a + b + …) → L_X(a) + L_X(b) + …`` — Lie derivative is
+    """``L_X(a + b + …) → L_X(a) + L_X(b) + …``, Lie derivative is
     R-linear in its argument.
 
     Fires on ``Act(LieDerivative, Sum)`` and ``Act(LieDerivative,
     Neg)``. Works for both ``"cartan"`` and ``"flow"`` mode Lie
-    derivatives — the linearity holds independently of the defining
+    derivatives, the linearity holds independently of the defining
     formula, since :math:`L_X` is a derivation in either presentation.
 
     Scope is intentionally broad: any :class:`LieDerivative` whose
@@ -94,7 +94,7 @@ class LieDerivativeArgLinearityDefinition(Definition):
 
 
 class ExteriorDerivativeLinearityDefinition(Definition):
-    """``d(a + b + …) → d(a) + d(b) + …`` — exterior derivative is
+    """``d(a + b + …) → d(a) + d(b) + …``, exterior derivative is
     R-linear.
 
     Fires on ``Act(ExteriorDerivative, Sum)`` and

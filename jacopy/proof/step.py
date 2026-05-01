@@ -3,15 +3,15 @@ Single proof step.
 
 A :class:`ProofStep` records one rewrite: ``before`` is the expression
 before the rule fired, ``after`` is the expression after, and ``rule``
-/ ``justification`` name what was applied and why. Steps nest — a
+/ ``justification`` name what was applied and why. Steps nest, a
 strategy that decomposes its work into sub-proofs records them under
 :attr:`children`, which lets the transcript be rendered at any
 verbosity level by choosing how deep to unfold each step.
 
 The class is deliberately thin: no checks beyond type validation on
 ``before`` / ``after``, no automatic semantic interpretation of
-``rule``. The proof-validity invariant — that ``after`` actually
-follows from ``before`` under ``rule`` — is the responsibility of
+``rule``. The proof-validity invariant, that ``after`` actually
+follows from ``before`` under ``rule``, is the responsibility of
 whatever code constructed the step. This keeps the data type a pure
 record that tracers, strategies, and display modules can all share
 without coupling.
@@ -39,10 +39,10 @@ class ProofStep:
     #: Recognised provenance tags. ``None`` means the step carries no
     #: provenance claim (e.g. a structural rewrite like ``product-rule``).
     #:
-    #: * ``"axiom"`` — primitive equation accepted as input.
-    #: * ``"theorem"`` — derived from other primitives; foundational
+    #: * ``"axiom"``, primitive equation accepted as input.
+    #: * ``"theorem"``, derived from other primitives; foundational
     #:   mode can recover the sub-proof.
-    #: * ``"computation"`` — a frame-component / numerical-symbolic
+    #: * ``"computation"``, a frame-component / numerical-symbolic
     #:   step (typically Stage G of :mod:`jacopy.frame_calc`); not a
     #:   citation but a calculation. Carries the same paper-grade
     #:   render path as axiom / theorem.
@@ -105,7 +105,7 @@ class ProofStep:
     def provenance_tag(self) -> Optional[str]:
         """Classification of this step: ``"axiom"``, ``"theorem"``, or ``None``.
 
-        Set by the expansion engine when a :class:`Definition` fires — the
+        Set by the expansion engine when a :class:`Definition` fires, the
         tag records whether the rewrite was taken axiomatically or whether
         it's derivable, which :class:`UnrollToFoundations` reads to decide
         whether to attach a sub-proof.
@@ -127,7 +127,7 @@ class ProofStep:
             f"{self._before._repr_inner()} → {self._after._repr_inner()}"
         )
         if self._justification:
-            head = f"{head}  — {self._justification}"
+            head = f"{head} , {self._justification}"
         lines = [head]
         if max_depth > 0 and self._children:
             for ch in self._children:

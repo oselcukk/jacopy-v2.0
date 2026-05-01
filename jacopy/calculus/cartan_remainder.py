@@ -20,7 +20,7 @@ separate engine rule in :mod:`jacopy.calculus.cartan_remainder_axioms`
 
 Like :class:`~jacopy.calculus.interior.InteriorProduct` and
 :class:`~jacopy.calculus.lie_derivative.LieDerivative` there is no
-module-level singleton — Cartan remainders are a family indexed by the
+module-level singleton, Cartan remainders are a family indexed by the
 underlying vector field. Use :func:`K` to construct them.
 """
 
@@ -33,14 +33,14 @@ from jacopy.core.expr import Expr
 
 
 class CartanRemainder(Derivation):
-    """``K_V`` — degree-0 Cartan-remainder operator on forms.
+    """``K_V``, degree-0 Cartan-remainder operator on forms.
 
     Carries the indexing vector field ``V`` on :attr:`vector_field`.
     The defining identity ``K_V := −L_V + d ∘ ι_V`` is realised as an
     engine rewrite (Faz 15.B); this class is the inert atom that the
     rewrite recognises.
 
-    Equality is structural over ``(name, degree, vector_field)`` — two
+    Equality is structural over ``(name, degree, vector_field)``, two
     Cartan remainders with the same ``V`` and the default name compare
     equal. Custom ``name`` overrides participate in the equality key.
     """

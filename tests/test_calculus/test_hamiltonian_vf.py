@@ -232,7 +232,7 @@ class TestEquivalenceCondition:
         assert "X_f" in cond.name
 
     def test_obstruction_matches_symplectic_obstruction(self):
-        """The equivalence bridge reuses the symplectic obstruction —
+        """The equivalence bridge reuses the symplectic obstruction,
         vanishing there is exactly the musical-isomorphism condition."""
         f = Symbol("f")
         pi = Symbol("π")
@@ -263,8 +263,8 @@ class TestProveEquivalence:
     """Musical bridge closes the symplectic obstruction to ``0`` when a
     :class:`MusicalCompatibility` axiom declares ``ω`` and ``π`` as
     mutual musical inverses. The chain must fire the four registered
-    rules — iota→flat, X_f → −π♯(df), Neg linearity, and compatibility
-    — and land on an :class:`Integer` ``0`` residual under simplify.
+    rules, iota→flat, X_f → −π♯(df), Neg linearity, and compatibility
+   , and land on an :class:`Integer` ``0`` residual under simplify.
     """
 
     @pytest.fixture

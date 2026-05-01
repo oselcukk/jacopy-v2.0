@@ -1,5 +1,5 @@
 r"""
-Curvature tensor from a connection — Stage E.
+Curvature tensor from a connection, Stage E.
 
 The Riemann curvature tensor of a connection ``∇`` has frame
 components
@@ -17,7 +17,7 @@ The five terms split as: two **derivative** terms, two **product**
 terms (Christoffel-on-Christoffel contractions), and one **structure
 constant** term (zero for coordinate frames).
 
-The result is antisymmetric in the lower index pair ``(b, c)`` —
+The result is antisymmetric in the lower index pair ``(b, c)``,
 ``R^a_{bcd} = -R^a_{cbd}``.
 """
 
@@ -66,7 +66,7 @@ class CurvatureStep:
 
 
 class CurvatureTensor(ComponentTensor):
-    r"""``(1, 3)`` tensor ``R^a_{bcd}`` — Riemann curvature.
+    r"""``(1, 3)`` tensor ``R^a_{bcd}``, Riemann curvature.
 
     Antisymmetric in ``(b, c)``: ``R^a_{bcd} = -R^a_{cbd}``. Stage E
     exploits this for a ~2× speedup; Stage F's Ricci contraction
@@ -74,7 +74,7 @@ class CurvatureTensor(ComponentTensor):
     :meth:`ComponentTensor.contract`.
 
     Per-entry derivation traces accessible via
-    :meth:`derivation_steps` — unavailable in optimized mode.
+    :meth:`derivation_steps`, unavailable in optimized mode.
     """
 
     __slots__ = ("_derivations", "_optimized")
@@ -206,7 +206,7 @@ def curvature(
                     + Γ^e_{cd} Γ^a_{be} - Γ^e_{bd} Γ^a_{ce}
                     - γ^e_{bc} Γ^a_{ed}
 
-    Antisymmetry in ``(b, c)`` is exploited — only ``b < c`` is
+    Antisymmetry in ``(b, c)`` is exploited, only ``b < c`` is
     computed (``b == c`` is identically zero); ``b > c`` filled via
     sign flip.
 

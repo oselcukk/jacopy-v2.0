@@ -1,5 +1,5 @@
 """
-Property registry — the binding between expressions and their properties.
+Property registry, the binding between expressions and their properties.
 
 The registry answers two questions:
 
@@ -12,19 +12,19 @@ The registry answers two questions:
 
 Three ways to attach a property:
 
-* :meth:`declare` — exact expression → property. Highest priority.
-* :meth:`declare_for_class` — every instance of an :class:`Expr`
+* :meth:`declare`, exact expression → property. Highest priority.
+* :meth:`declare_for_class`, every instance of an :class:`Expr`
   subclass carries the property. Subclasses inherit via MRO.
-* :meth:`declare_for_predicate` — any expression matching a
+* :meth:`declare_for_predicate`, any expression matching a
   user-supplied predicate carries the property. Checked last, in
   registration order.
 
 Two scoping mechanisms support the foundational / custom proof modes:
 
-* :meth:`scope` — rolls back every mutation inside the block on exit.
+* :meth:`scope`, rolls back every mutation inside the block on exit.
   Useful for hypothetical experiments and bracketing a proof inside a
   temporary declaration.
-* :meth:`axioms` — narrows the visible property types to a whitelist.
+* :meth:`axioms`, narrows the visible property types to a whitelist.
   Within the block, any property whose type is not in the whitelist
   looks as if it had never been declared. This is how the ``custom``
   axiom mode from plan.md is implemented.
@@ -62,7 +62,7 @@ class PropertyRegistry:
     An expression or class may hold multiple *distinct* property types,
     but at most one of any given property-type from the same source
     (exact / class / predicate). Duplicate declarations at the same
-    source raise :class:`ValueError` — the intended fix is an explicit
+    source raise :class:`ValueError`, the intended fix is an explicit
     :meth:`retract`.
     """
 
@@ -115,7 +115,7 @@ class PropertyRegistry:
 
         Exact-expression declarations still take priority over class-based
         ones. An explicit :meth:`retract` on a particular expression does
-        NOT remove the class-based fallback — it only clears an exact
+        NOT remove the class-based fallback, it only clears an exact
         binding.
         """
         if not (isinstance(cls, type) and issubclass(cls, Expr)):
@@ -146,7 +146,7 @@ class PropertyRegistry:
         """Attach ``prop`` to every expression satisfying ``predicate``.
 
         Predicates are matched in registration order; the first matching
-        entry whose property type is being queried wins. Use sparingly —
+        entry whose property type is being queried wins. Use sparingly,
         a badly-written predicate is the usual way to silently poison a
         registry.
         """
@@ -181,7 +181,7 @@ class PropertyRegistry:
         """Return the property of type ``prop_cls`` on ``expr``, or ``None``.
 
         Lookup cascades: exact → class (MRO) → predicate. The first
-        hit — after applying visibility filters — is returned.
+        hit, after applying visibility filters, is returned.
         """
         # 1. Exact.
         prop: Optional[Property] = self._props.get(expr, {}).get(prop_cls)
@@ -259,7 +259,7 @@ class PropertyRegistry:
         """Narrow the visible property types to ``allowed`` during the block.
 
         Within the block, :meth:`get` returns ``None`` for any property
-        whose type is not in ``allowed`` — as if it had not been
+        whose type is not in ``allowed``, as if it had not been
         declared. Complements :attr:`strict_axioms_only`, which filters
         by provenance rather than type.
 

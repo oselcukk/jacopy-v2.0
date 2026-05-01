@@ -2,24 +2,24 @@
 Built-in diagnostic rules for :func:`jacopy.proof.diagnostics.diagnose`.
 
 Each rule is a pure tree-walk on the residual :class:`Expr` plus the
-context (registry, engine). When it recognises a *stalled shape* — a
+context (registry, engine). When it recognises a *stalled shape*, a
 subtree that a well-wired proof pipeline should have rewritten but
-didn't — it emits one or more :class:`DiagnosticHint`. Rules are
+didn't, it emits one or more :class:`DiagnosticHint`. Rules are
 intentionally independent: catching the same stall via two rules is
 fine, the dispatcher de-dupes by ``(category, location)``.
 
 The catalogue below is seeded from the five modelling gaps closed in
-the Cartan ``verify()`` closure pass — every gap there corresponds to
+the Cartan ``verify()`` closure pass, every gap there corresponds to
 a rule that would have flagged the residual before the fix landed:
 
-* ``stalled-d-squared`` / ``stalled-iota-squared`` —
+* ``stalled-d-squared`` / ``stalled-iota-squared``,
   ``Act(d, Act(d, x))`` survived despite ``d² = 0``.
-* ``stalled-act-over-zero`` — ``Act(op, 0)`` should annihilate.
-* ``stalled-act-over-neg-op`` — ``Act(Neg(op), x)`` should peel.
-* ``unreduced-iota-on-df`` — ``ι_V(d(f))`` where ``V`` is a sum or
+* ``stalled-act-over-zero``, ``Act(op, 0)`` should annihilate.
+* ``stalled-act-over-neg-op``, ``Act(Neg(op), x)`` should peel.
+* ``unreduced-iota-on-df``, ``ι_V(d(f))`` where ``V`` is a sum or
   product of derivations the narrow
   :class:`IotaOnExactOneFormDefinition` pre-B.2 wouldn't match.
-* ``unclassified-factor`` — a :class:`Product` factor with neither a
+* ``unclassified-factor``, a :class:`Product` factor with neither a
   registered grading nor an intrinsic :class:`Derivation.degree`.
 
 Registration happens at import time, so simply importing this module
@@ -53,7 +53,7 @@ def _is_derivation_combination(expr: Expr) -> bool:
     This is the same predicate that ``IotaOnExactOneFormDefinition``
     uses post-B.2 to decide whether a vector-field argument is eligible
     for ``ι_V(df) = V(f)``. Keeping a local copy lets the diagnostic
-    layer stay independent of the expansion-engine definitions — the
+    layer stay independent of the expansion-engine definitions, the
     hint can still fire even when the caller swapped out the iota
     definition for a custom one.
     """
@@ -103,7 +103,7 @@ def stalled_d_squared(
     registry: Optional[PropertyRegistry],
     engine: Optional[ExpansionEngine],
 ) -> Iterable[DiagnosticHint]:
-    """``Act(D, Act(D, x))`` with the same ``D`` and odd degree — ``D² = 0``.
+    """``Act(D, Act(D, x))`` with the same ``D`` and odd degree, ``D² = 0``.
 
     Fires for any graded derivation of odd degree applied twice, so
     exterior ``d`` is the common case but an algebroid ``d_ρ`` or a
@@ -127,7 +127,7 @@ def stalled_d_squared(
         yield DiagnosticHint(
             category="stalled-d-squared",
             message=(
-                f"{outer_op._repr_inner()} applied twice — an odd "
+                f"{outer_op._repr_inner()} applied twice, an odd "
                 "derivation should square to zero"
             ),
             location=node,
@@ -144,7 +144,7 @@ def stalled_act_over_zero(
     registry: Optional[PropertyRegistry],
     engine: Optional[ExpansionEngine],
 ) -> Iterable[DiagnosticHint]:
-    """``Act(op, 0)`` — every graded derivation kills zero."""
+    """``Act(op, 0)``, every graded derivation kills zero."""
     for node in residual.walk():
         if not isinstance(node, Act):
             continue
@@ -152,7 +152,7 @@ def stalled_act_over_zero(
             yield DiagnosticHint(
                 category="stalled-act-over-zero",
                 message=(
-                    f"{node.op._repr_inner()} applied to 0 — linearity "
+                    f"{node.op._repr_inner()} applied to 0, linearity "
                     "gives 0 regardless of the operator"
                 ),
                 location=node,
@@ -169,7 +169,7 @@ def stalled_act_over_neg_op(
     registry: Optional[PropertyRegistry],
     engine: Optional[ExpansionEngine],
 ) -> Iterable[DiagnosticHint]:
-    """``Act(Neg(op), x) = -Act(op, x)`` — sign should peel outward."""
+    """``Act(Neg(op), x) = -Act(op, x)``, sign should peel outward."""
     for node in residual.walk():
         if not isinstance(node, Act):
             continue
@@ -194,7 +194,7 @@ def unreduced_iota_on_df(
     registry: Optional[PropertyRegistry],
     engine: Optional[ExpansionEngine],
 ) -> Iterable[DiagnosticHint]:
-    """``Act(ι_V, Act(d, f))`` — should fire ``ι_V(df) = V(f)`` when V is
+    """``Act(ι_V, Act(d, f))``, should fire ``ι_V(df) = V(f)`` when V is
     a derivation-combination.
 
     Detection is structural: the outer operator must itself be a
@@ -247,7 +247,7 @@ def _symbol_leaves_in_vector_field(expr: Expr) -> list:
 
     ``_is_derivation_combination`` only accepts :class:`Derivation` atoms
     and Sum/Product/Neg composites of them. Anything else at a leaf
-    position — a bare :class:`Symbol`, most commonly — breaks pairing
+    position, a bare :class:`Symbol`, most commonly, breaks pairing
     rules like ``ι_V(df) = V(f)`` and ``L_V(f) = V(f)``. This helper
     surfaces those offending leaves so the diagnostic can name them.
     """
@@ -271,7 +271,7 @@ def symbol_vector_field(
 
     The pairing rules ``ι_V(df) = V(f)`` and ``L_V(f) = V(f)`` only fire
     when the vector field is a :class:`Derivation` (or Sum/Product/Neg
-    composite of Derivations) — bare Symbols don't carry the action
+    composite of Derivations), bare Symbols don't carry the action
     semantics that make ``V(f)`` meaningful. This is easy to trip on
     when prototyping: ``Symbol("X")`` looks indistinguishable from
     ``Derivation("X", degree=0)`` in a printed residual, but only the
@@ -294,7 +294,7 @@ def symbol_vector_field(
         offenders = _symbol_leaves_in_vector_field(vf)
         if not offenders:
             continue
-        # De-duplicate preserving first-seen order — the bracket
+        # De-duplicate preserving first-seen order, the bracket
         # ``X*Y − Y*X`` visits each Symbol twice, and the hint should
         # name each offender once.
         seen_offenders: set = set()
@@ -316,7 +316,7 @@ def symbol_vector_field(
             ),
             location=node,
             suggestion=(
-                f"rebuild {names} as Derivation(\"...\", degree=0) — "
+                f"rebuild {names} as Derivation(\"...\", degree=0), "
                 "Symbol is a bare name; Derivation carries the action "
                 "semantics the pairing rules key on"
             ),

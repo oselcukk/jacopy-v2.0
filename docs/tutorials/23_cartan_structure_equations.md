@@ -1,4 +1,4 @@
-# 23 — Cartan structure equations
+# 23, Cartan structure equations
 
 The two **Cartan structure equations** are the index-laden,
 form-valued companions to the torsion / curvature definitions of
@@ -11,12 +11,12 @@ R^a_b = dω^a_b  + Σ_c ω^a_c ∧ ω^c_b         (Cartan II)
 ```
 
 where ``ω^a_b(∇)`` is the **connection 1-form**, ``T^a(∇)`` the
-**torsion 2-form**, and ``R^a_b(∇)`` the **curvature 2-form** —
+**torsion 2-form**, and ``R^a_b(∇)`` the **curvature 2-form**,
 all bound to the choice of frame.
 
 `CartanStructureProblem(∇, F)` is the wrapper that proves both
 identities mechanically. It bundles 24 engine rules across seven
-phases — torsion / curvature unfolding, connection axioms, frame
+phases, torsion / curvature unfolding, connection axioms, frame
 decomposition, indexed-sum machinery, wedge expansion, intrinsic
 ``d``, and frame duality. This tutorial walks the wrapper and the
 two proofs.
@@ -67,7 +67,7 @@ print(f"engine rules   : {len(prob.engine.definitions)}")
 ```
 
 The 24-rule engine has a per-problem `PropertyRegistry` declaring
-`FrameCovector` and `ConnectionForm` as degree 1 — required because
+`FrameCovector` and `ConnectionForm` as degree 1, required because
 the wedge alternating expansion and the arity-1 MultiEval-Pairing
 bridge consult the registry before firing.
 
@@ -86,10 +86,10 @@ print(f"Cartan I RHS : {rhs1}")
 ```
 
 The bound dummy ``b`` in `rhs1` is freshly minted on each call as a
-bound `FrameIndex` — caller-supplied `upper_a` (`"a"`) is the only
+bound `FrameIndex`, caller-supplied `upper_a` (`"a"`) is the only
 free index in the result.
 
-## `prove_first_cartan` — Cartan I
+## `prove_first_cartan`, Cartan I
 
 ```
 T^a(U, V) = (de^a)(U, V) + Σ_b (ω^a_b ∧ e^b)(U, V)
@@ -110,11 +110,11 @@ Kronecker contractions and pairing duality collapsing the
 
 The `_expand_to_canonical` loop runs `engine + simplify` to a
 fix-point; `simplify` includes the `sort_product` pass that puts
-`Product` factors in a canonical order — Cartan I residues need
+`Product` factors in a canonical order, Cartan I residues need
 this because the rewrites produce factors in different orders that
 have to align before `Sum` cancellation can fire.
 
-## `prove_second_cartan` — Cartan II
+## `prove_second_cartan`, Cartan II
 
 ```
 R^a_b(U, V) = (dω^a_b)(U, V) + Σ_c (ω^a_c ∧ ω^c_b)(U, V)
@@ -128,7 +128,7 @@ print(f"Cartan II : ok={res2.ok}, steps={len(res2.steps)}")
 ~54 steps. Same machinery: curvature-form opening, frame
 decomposition, Y-Leibniz, connection-form decomposition,
 intrinsic ``d`` on ``ω^a_b``, wedge expansion. The structural
-similarity to Cartan I is intentional — both equations are
+similarity to Cartan I is intentional, both equations are
 shadows of the same abstract identity.
 
 ## When to use `CartanStructureProblem`
@@ -141,17 +141,17 @@ The wrapper is your default entry point for any
 * you want the proof transcript to read in the textbook order
   (frame decomposition → Y-Leibniz → connection-form
   decomposition → wedge expansion → duality);
-* you need both equations on the same `(∇, F)` — the wrapper's
+* you need both equations on the same `(∇, F)`, the wrapper's
   engine handles both without rebuilding.
 
 Skip it when:
 
-* you only need a coordinate-free identity (no frame in sight) —
+* you only need a coordinate-free identity (no frame in sight),
   reach for `BianchiProblem` (tutorial 20) or
   `prove_intrinsic_equivalence` (tutorial 15).
 * the connection has a custom bracket (Q9 Koszul mode): the
   wrapper auto-detects this and swaps in
-  `KoszulExteriorDIntrinsicDefinition` — no caller action needed,
+  `KoszulExteriorDIntrinsicDefinition`, no caller action needed,
   but the proof transcript is *longer* (anchor-pulled Cartan-d
   shapes) than the standard case.
 
@@ -172,10 +172,10 @@ the specific shape, not a hand-tuned engine.
   ``T^a = de^a + Σ_b ω^a_b ∧ e^b`` (I) and
   ``R^a_b = dω^a_b + Σ_c ω^a_c ∧ ω^c_b`` (II) on a connection +
   frame.
-* `ConnectionForm`, `TorsionForm`, `CurvatureForm` — the three
+* `ConnectionForm`, `TorsionForm`, `CurvatureForm`, the three
   inert form atoms; their definitions live in the
   `cartan_forms` engine rules.
-* `CartanStructureProblem(∇, F)` — 24-rule engine bundling
+* `CartanStructureProblem(∇, F)`, 24-rule engine bundling
   torsion / curvature unfolding, connection axioms, frame
   decomposition, indexed-sum machinery, wedge expansion,
   intrinsic ``d``, frame duality.

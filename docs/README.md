@@ -2,12 +2,12 @@
 
 `jacopy` ships with 25 tutorials, paired `.md` (for reading) and
 `.ipynb` (for running). The tutorials are the primary documentation
-— there is no separate API reference (the tutorials cover every
+, there is no separate API reference (the tutorials cover every
 public class). Pick the path that matches what you came for.
 
 ## Three reading paths
 
-### 🧭 Practitioner — "I want to solve a textbook problem"
+### 🧭 Practitioner, "I want to solve a textbook problem"
 
 For someone who wants to *use* the package: prove a Jacobi
 identity, close a Bianchi identity, verify a Cartan structure
@@ -15,11 +15,11 @@ equation. Skip the deep machinery.
 
 | Step | Tutorial | What you get |
 |---|---|---|
-| 1 | [01 — First steps](tutorials/01_first_steps.md) | `Expr`, registry, simplify |
-| 2 | [02 — Jacobi identity](tutorials/02_jacobi_identity.md) | One-line `prove_jacobi` |
-| 3 | [03 — Poisson geometry](tutorials/03_poisson_geometry.md) | `PoissonBracket`, three views |
-| 4 | [11 — Publication-ready output](tutorials/11_publication_output.md) | LaTeX / TikZ render |
-| 5 | [14 — Problem wrappers](tutorials/14_problem_wrappers.md) | The four user-facing wrappers |
+| 1 | [01, First steps](tutorials/01_first_steps.md) | `Expr`, registry, simplify |
+| 2 | [02, Jacobi identity](tutorials/02_jacobi_identity.md) | One-line `prove_jacobi` |
+| 3 | [03, Poisson geometry](tutorials/03_poisson_geometry.md) | `PoissonBracket`, three views |
+| 4 | [11, Publication-ready output](tutorials/11_publication_output.md) | LaTeX / TikZ render |
+| 5 | [14, Problem wrappers](tutorials/14_problem_wrappers.md) | The four user-facing wrappers |
 | 6 | Pick by topic ↓ |
 
 Then jump to the tutorial that matches your geometry:
@@ -28,7 +28,7 @@ Then jump to the tutorial that matches your geometry:
 - Courant / Dirac → [19](tutorials/19_courant_family.md)
 - Derivator identities → [18](tutorials/18_derivator_identities.md)
 
-### 📚 Depth-first — "I want to understand how the engine works"
+### 📚 Depth-first, "I want to understand how the engine works"
 
 For someone who wants to learn what's *underneath* the API:
 expansion engines, axiom flags, intrinsic engines, the Phase 13
@@ -44,7 +44,7 @@ machinery.
 | 16 | [Phase 13 deep dive](tutorials/16_phase_13_deep_dive.md) | `[π,π]_SN` without seeded theorem |
 | 17 | [Tilde calculus](tutorials/17_tilde_calculus.md) | Dual Cartan picture |
 
-### 🔧 Topical / reference — "I'm stuck on X"
+### 🔧 Topical / reference, "I'm stuck on X"
 
 For someone debugging a residue or extending the engine.
 

@@ -1,4 +1,4 @@
-# 24 — Writing your own Problem wrapper
+# 24, Writing your own Problem wrapper
 
 You've now seen six **Problem wrappers**: `SymplecticProblem`,
 `KoszulProblem`, `BianchiProblem`, `KoszulConnectionProblem`,
@@ -7,26 +7,26 @@ You've now seen six **Problem wrappers**: `SymplecticProblem`,
 
 * **constructor** taking the geometric data + an optional registry;
 * **auto-declaration** of structural axioms on the registry;
-* **engine assembly** — pre-bundled `ExpansionEngine` carrying every
+* **engine assembly**, pre-bundled `ExpansionEngine` carrying every
   rule needed for the wrapper's target proofs;
-* **builder methods** — convenience constructors for the operators
+* **builder methods**, convenience constructors for the operators
   / brackets / forms specific to the wrapper;
-* **prover methods** — `prove_*` entry points that close the
+* **prover methods**, `prove_*` entry points that close the
   wrapper's defining identities mechanically.
 
 This tutorial walks the recipe. You'll write a wrapper for a
 hypothetical *almost-symplectic* manifold (a non-degenerate but
-*not* closed 2-form ``ω``) — the exercise illustrates every
+*not* closed 2-form ``ω``), the exercise illustrates every
 moving part without overlapping any existing wrapper.
 
 This tutorial covers:
 
 1. The five-step recipe.
-2. A worked example — `AlmostSymplecticProblem(ω, X, Y)`.
-3. Picking your axioms — when registry flags fit, when a
+2. A worked example, `AlmostSymplecticProblem(ω, X, Y)`.
+3. Picking your axioms, when registry flags fit, when a
    `Definition` subclass is the right tool.
-4. Assembling the engine — order, idempotency, loop avoidance.
-5. Adding seeded theorems — when the proof is one citation step.
+4. Assembling the engine, order, idempotency, loop avoidance.
+5. Adding seeded theorems, when the proof is one citation step.
 
 ## The five-step recipe
 
@@ -34,7 +34,7 @@ This tutorial covers:
 |---|---|---|
 | 1 | Pick the geometric data the wrapper carries | Frame the API |
 | 2 | Auto-declare structural axioms on the registry | Closure flags fire when needed |
-| 3 | Assemble the engine — register every rule | Single dispatch point |
+| 3 | Assemble the engine, register every rule | Single dispatch point |
 | 4 | Write builder + prover methods | Match the textbook idiom |
 | 5 | (optional) Add seeded theorems for citations | One-step proof shortcuts |
 
@@ -42,7 +42,7 @@ The wrappers in `library/` all follow this. Read
 `library/symplectic.py` (~200 lines) end to end if you want a
 template smaller than `KoszulProblem` (~1100 lines).
 
-## Worked example — almost-symplectic manifold
+## Worked example, almost-symplectic manifold
 
 An **almost-symplectic** form ``ω`` is non-degenerate but not
 necessarily closed (``dω ≠ 0``). The natural object on
@@ -52,7 +52,7 @@ you lose ``L_X ω = 0 ⇔ X`` Hamiltonian, but you keep the
 **vector-field equality** ``ι_X ω = ι_Y ω ⇒ X = Y`` (non-
 degeneracy) and the bilinear pairing on functions.
 
-### Step 1 — pick the data
+### Step 1, pick the data
 
 ```python
 from typing import Optional, Tuple
@@ -61,7 +61,7 @@ from jacopy.core.properties import Graded, NonDegenerate
 from jacopy.core.registry import PropertyRegistry
 
 class AlmostSymplecticProblem:
-    """`(ω, registry)` — non-degenerate (but not closed) 2-form bundle."""
+    """`(ω, registry)`, non-degenerate (but not closed) 2-form bundle."""
 
     __slots__ = ("_omega", "_registry", "_engine", "_name")
 
@@ -81,11 +81,11 @@ class AlmostSymplecticProblem:
         self._name     = name or f"AlmostSymplecticProblem({omega._repr_inner()})"
 ```
 
-### Step 2 — auto-declare structural axioms
+### Step 2, auto-declare structural axioms
 
 `SymplecticProblem` declares both `Closed(ω)` and
 `NonDegenerate(ω)`. Our almost-symplectic version drops
-`Closed(ω)` — that's the whole point.
+`Closed(ω)`, that's the whole point.
 
 ```python
     def _declare_axioms(self) -> None:
@@ -101,9 +101,9 @@ pre-declared `Closed(ω)` (lying about `ω` for a different proof),
 we don't fight them. Pre-declaring is the documented escape
 hatch for every wrapper in `library/`.
 
-### Step 3 — assemble the engine
+### Step 3, assemble the engine
 
-Layer the relevant rules onto `default_engine(registry=…)` —
+Layer the relevant rules onto `default_engine(registry=…)`,
 that's the standard pattern. For almost-symplectic, we want
 non-degeneracy interior-equality but **not** the closed-form rule.
 
@@ -124,11 +124,11 @@ from jacopy.proof.expansion import ExpansionEngine, default_engine
 
 **Order matters**: definitions before linearity, frame-scoped
 rules before generic ones. `default_engine` already gets that
-right — adding your new rules to the *end* is almost always safe;
+right, adding your new rules to the *end* is almost always safe;
 adding to the front (`[your_rule, *base.definitions]`) is the
 escape hatch when a generic rule masks your specific one.
 
-### Step 4 — builder + prover methods
+### Step 4, builder + prover methods
 
 ```python
 from jacopy.algebra.derivation import Act
@@ -156,11 +156,11 @@ from jacopy.proof.simplify_chain import prove_equivalence
 ```
 
 `prove_vector_field_equality` is the ergonomic counterpart to
-`SymplecticProblem.prove_vector_field_equality` — the wrapper hides
+`SymplecticProblem.prove_vector_field_equality`, the wrapper hides
 the fact that *the proof itself* is just one engine step (the
 non-degeneracy rule fires once on the difference).
 
-### Step 5 — (optional) seeded theorem
+### Step 5, (optional) seeded theorem
 
 If your wrapper has an identity that should appear as a
 **single citation step** in a proof transcript, register a
@@ -182,35 +182,35 @@ theorem_book.register(_build_almost_symplectic_volume_theorem())
 `SymplecticProblem` registers `poisson_jacobi`,
 `poisson_koszul_equivalence`, `poisson_koszul_jacobi`;
 `CourantAlgebroid` registers `courant_jacobi_twist` and
-`courant_dorfman_bridge`. The pattern is consistent — the seeded
+`courant_dorfman_bridge`. The pattern is consistent, the seeded
 theorem becomes the proof artefact when a wrapper-level prover
 emits a single citation.
 
 Skip this step entirely if every proof in your wrapper is genuine
-engine arithmetic — seeded theorems are for **identities you
+engine arithmetic, seeded theorems are for **identities you
 don't want to re-derive every time**.
 
-## Picking your axioms — flags vs definitions
+## Picking your axioms, flags vs definitions
 
 Two ways to wire structural facts into the engine:
 
 | Mechanism | When | Cost |
 |---|---|---|
 | Registry flag (`Closed`, `NonDegenerate`, `Poisson`, `Antisymmetric`) | Property is a **boolean fact** about a single object | A flag declaration + a registry-aware `Definition` instance |
-| Custom `Definition` subclass | Property is a **rewrite shape** — non-trivial input/output pattern matching | A new class implementing `matches` / `rewrite` |
+| Custom `Definition` subclass | Property is a **rewrite shape**, non-trivial input/output pattern matching | A new class implementing `matches` / `rewrite` |
 
 **Prefer flags** when you can: declarative, opt-out via
 pre-declaration, single rule fires per object. Reach for a custom
 `Definition` when the rewrite shape doesn't fit the
-"one-bit-fact" pattern — the §3.1.5 derivator-shaped axioms in
+"one-bit-fact" pattern, the §3.1.5 derivator-shaped axioms in
 `tilde/closure_axioms.py` are good examples.
 
 If your "axiom" is really a **theorem** (a derivable identity),
 register it as a seeded `Theorem` (step 5) rather than a
-`Definition` — the proof artefact reads as a citation, not a
+`Definition`, the proof artefact reads as a citation, not a
 rewrite.
 
-## Assembling the engine — order, idempotency, loops
+## Assembling the engine, order, idempotency, loops
 
 Three rules of thumb:
 
@@ -240,7 +240,7 @@ shows up immediately.
 | `library/symplectic.py` | The smallest non-trivial wrapper |
 | `library/courant_algebroid.py` | Wrapper with seeded theorems + bridge identity |
 | `library/bianchi_problem.py` | Wrapper with custom proof loop (`_expand_to_canonical`) |
-| `library/koszul_problem.py` | The largest wrapper — multi-engine + canonicalize_indices pre-pass |
+| `library/koszul_problem.py` | The largest wrapper, multi-engine + canonicalize_indices pre-pass |
 | `library/cartan_structure.py` | Index-laden wrapper with per-problem registry |
 
 When you're stuck, **read the wrapper closest to your shape**.

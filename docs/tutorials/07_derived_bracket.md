@@ -1,20 +1,20 @@
-# 07 — Derived bracket
+# 07, Derived bracket
 
 The mathematical heart of the package: starting from a single
 bracket and a chosen *generator*, an entire bracket family arises
-automatically. This construction — the **derived bracket** —
+automatically. This construction, the **derived bracket**,
 defines `{a, b}_Q := [[a, Q]_base, b]_base`. The Leibniz axiom
 holds *regardless* of what `Q` is; antisymmetry and Jacobi reduce
 to a single equation, `[Q, Q]_base = 0`. The Poisson, Koszul, and
-Courant brackets are all instances of this construction — the
+Courant brackets are all instances of this construction, the
 Derived Bracket Theorem is proved once and applied to each by a
 single citation.
 
-[06 — Custom bracket](06_custom_bracket.md) showed how to plug
+[06, Custom bracket](06_custom_bracket.md) showed how to plug
 your own rule into the generic `GradedBracket` skeleton. Here the
-rule is built automatically — you just pick `(base, Q)`.
+rule is built automatically, you just pick `(base, Q)`.
 
-## The construction — `{a, b}_Q := [[a, Q]_base, b]_base`
+## The construction, `{a, b}_Q := [[a, Q]_base, b]_base`
 
 ```python
 from jacopy.brackets.derived import DerivedBracket, derived_bracket
@@ -30,10 +30,10 @@ lie = LieBracket()
 
 d = DerivedBracket(lie, Q, degree_Q=1)
 d.name           # '{·,·}_Q'
-d.degree         # Degree.const(-1) — formula |Q| − 2
+d.degree         # Degree.const(-1), formula |Q| − 2
 d.satisfies_leibniz          # True  (universal)
 d.is_graded_antisymmetric    # True  (recorded as a theorem result)
-d.satisfies_graded_jacobi    # None  (conditional — depends on [Q,Q]_base = 0)
+d.satisfies_graded_jacobi    # None  (conditional, depends on [Q,Q]_base = 0)
 ```
 
 `d.satisfies_graded_jacobi` reports `None`: not unconditionally
@@ -41,7 +41,7 @@ d.satisfies_graded_jacobi    # None  (conditional — depends on [Q,Q]_base = 0)
 condition by reducing `[Q, Q]_base` to zero.
 
 The degree formula: `|{·,·}_Q| = |Q| − 2`. Without
-`degree_Q`, the default is 0 — which makes the derived bracket
+`degree_Q`, the default is 0, which makes the derived bracket
 shift by `−2`, generally not meaningful. Live examples cluster
 around `degree_Q=1` (Poisson, Koszul, Courant).
 
@@ -49,9 +49,9 @@ around `degree_Q=1` (Poisson, Koszul, Courant).
 
 To *see* the two-stage expansion you have two faces:
 
-- `expand(a, b, registry)` — the full expansion; both inner and
+- `expand(a, b, registry)`, the full expansion; both inner and
   outer `[·, ·]_base` nodes are resolved.
-- `expand_definition(a, b, registry)` — the definition's *surface*:
+- `expand_definition(a, b, registry)`, the definition's *surface*:
   the outer and inner `BracketApply` are kept inert as two
   layers.
 
@@ -67,26 +67,26 @@ d.expand_definition(a, b, reg)
 # [·,·]([·,·](a, Q), b)
 ```
 
-`expand_definition` is meant for proof presentation — "here is
+`expand_definition` is meant for proof presentation, "here is
 the canonical form of the derived bracket"; `expand` is what
 feeds into the simplify pipeline.
 
-## Jacobi obstruction — the universal reduction
+## Jacobi obstruction, the universal reduction
 
 The Derived Bracket Theorem: graded Jacobi for `{·,·}_Q` holds
 on **every** triple if and only if a *single* expression
 vanishes: `[Q, Q]_base`. This is the same mathematical argument
-for every derived bracket in the package — the theorem is proved
+for every derived bracket in the package, the theorem is proved
 once and flows as a citation to every instantiation.
 
 The API exposes three faces:
 
 ```python
 d.jacobi_obstruction(reg)
-# ((Q * Q) + (-(Q * Q)))  — full expansion through the base bracket
+# ((Q * Q) + (-(Q * Q))) , full expansion through the base bracket
 
 d.jacobi_obstruction_raw()
-# [·,·](Q, Q)              — base bracket inert, for display
+# [·,·](Q, Q)             , base bracket inert, for display
 
 d.jacobi_condition(reg)
 # VanishingCondition(obstruction=..., name='Jacobi condition on {·,·}_Q')
@@ -100,11 +100,11 @@ Lie base, `[Q, Q] = Q*Q − Q*Q → 0` falls out immediately:
 d.jacobi_condition(reg).holds(reg)   # True
 ```
 
-## `prove_jacobi` — `DerivedBracketStrategy` dispatch
+## `prove_jacobi`, `DerivedBracketStrategy` dispatch
 
 `jacopy.proof.verifier.prove_jacobi` picks a path based on the
 bracket type. For a `DerivedBracket` it dispatches automatically
-to `DerivedBracketStrategy` — a three-step chain:
+to `DerivedBracketStrategy`, a three-step chain:
 
 1. `DerivedBracketTheorem` (theorem step): the triple cyclic
    Jacobi sum reduces to the universal obstruction `[Q, Q]_base`.
@@ -129,14 +129,14 @@ chain.steps[-1].after         # 0
 If the obstruction can't be reduced to zero (e.g. the base
 bracket has no rewrite that resolves `[Q, Q]`),
 `DerivedBracketStrategy` returns the residual through
-`ProofFailure` — the theorem's condition is not met.
+`ProofFailure`, the theorem's condition is not met.
 
-## `acting_on` — Koszul equivalence
+## `acting_on`, Koszul equivalence
 
 On a Poisson manifold the classical Koszul bracket lives on
 1-forms and produces the three-term formula. The same structure
 falls out of a derived bracket built on the Schouten–Nijenhuis
-base — provided you supply `acting_on=π^♯` (or a generic anchor
+base, provided you supply `acting_on=π^♯` (or a generic anchor
 `ρ`).
 
 When `acting_on` is supplied, `expand` automatically emits the
@@ -171,7 +171,7 @@ verification of "the classical Koszul bracket is the
 (`π^♯`)".
 
 If `acting_on=None` (default), the canonical
-`{a,b}_Q = [[a,Q],b]` path is preserved — no silent rewriting.
+`{a,b}_Q = [[a,Q],b]` path is preserved, no silent rewriting.
 The anchor also enters the identity key:
 `DerivedBracket(sn, π, degree_Q=1, acting_on=Anchor("ρ1"))` is a
 *different* bracket from the same construction with
@@ -182,11 +182,11 @@ The anchor also enters the identity key:
 `DerivedBracket(sn, π, degree_Q=1)` *is* the derived construction
 of the Poisson bracket. Calling `prove_jacobi` through the
 generic dispatcher reduces the obstruction to `[·,·]_SN(π, π)`,
-which surfaces as a `ProofFailure` — the honest mathematical
+which surfaces as a `ProofFailure`, the honest mathematical
 diagnosis: the Poisson hypothesis `[π, π]_SN = 0` is *not* a
 generic simplify rule, it must be carried as an explicit
 assumption. For production use, prefer the
-`jacopy.library.poisson.PoissonBracket` wrapper — it surfaces
+`jacopy.library.poisson.PoissonBracket` wrapper, it surfaces
 the seeded theorem `poisson_jacobi` as a single-step citation:
 
 ```python
@@ -208,11 +208,11 @@ theorem_book.get("poisson_jacobi").from_axioms
 # ('Derived Bracket Theorem', '[π, π]_SN = 0 (Poisson hypothesis)')
 ```
 
-[03 — Poisson geometry](03_poisson_geometry.md) lays out the
+[03, Poisson geometry](03_poisson_geometry.md) lays out the
 three-view presentation of the same path; here we just flag
 that the derived construction sits underneath Poisson.
 
-## H-twist — the Courant bracket's conditional Jacobi
+## H-twist, the Courant bracket's conditional Jacobi
 
 The same reduction lands on a different equation for another
 bracket family. The H-twisted Courant bracket
@@ -238,7 +238,7 @@ CourantBracket().jacobi_condition(reg).name
 # 'Courant Jacobi (untwisted, vacuous)'
 ```
 
-`CourantBracket` itself is *not* a `DerivedBracket` subclass —
+`CourantBracket` itself is *not* a `DerivedBracket` subclass,
 operands are section pairs (TM ⊕ T*M) and the half-and-half
 expansion (with the Dorfman bridge) is treated separately. But
 its presentation of conditional Jacobi is identical to the
@@ -254,12 +254,12 @@ package around one theorem:
 |---------|------|---|-----------|
 | Poisson (`{f,g}_π`) | `sn` | `π` | `[π, π]_SN = 0` |
 | Koszul classical | `sn` + `acting_on=π^♯` | `π` | (same) |
-| Courant (H-twisted) | — | — | `dH = 0` |
+| Courant (H-twisted) |, |, | `dH = 0` |
 | generic | any | chosen | `[Q, Q]_base = 0` |
 
 ## Next step
 
 The closing piece that turns the table above into a single
 mathematical picture: how `DerivedBracket` + `CartanCalculus` +
-`TheoremBook` + `ProofChain` are used together —
-[08 — Unified picture](08_unified_picture.md) (Stage D).
+`TheoremBook` + `ProofChain` are used together,
+[08, Unified picture](08_unified_picture.md) (Stage D).

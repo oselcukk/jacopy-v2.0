@@ -2,7 +2,7 @@ r"""
 LaTeX renderer for :class:`~jacopy.core.expr.Expr` trees and
 :class:`~jacopy.proof.step.ProofStep` / :class:`~jacopy.proof.chain.ProofChain`.
 
-The output is raw LaTeX math — no ``$…$`` delimiters — so the caller
+The output is raw LaTeX math, no ``$…$`` delimiters, so the caller
 chooses the surrounding environment. :func:`chain_to_latex` wraps a
 :class:`ProofChain` in an ``align*`` body; individual expressions come
 out as atomic math snippets ready to splice into equations, tables, or
@@ -12,7 +12,7 @@ Name sanitising handles the Unicode glyphs that appear naturally in
 the package (``ι_X``, ``ω``, ``α``, ``♭``, ``Θ``) by translating them
 to standard LaTeX commands (``\iota_X``, ``\omega``, ``\alpha``,
 ``\flat``, ``\Theta``). Multi-character subscripts are automatically
-braced — ``X_ab`` becomes ``X_{ab}`` — so the sanitiser's output is
+braced, ``X_ab`` becomes ``X_{ab}``, so the sanitiser's output is
 pdfLaTeX-safe without the caller having to pre-format names.
 
 Dispatch is MRO-based: the most specific registered class for
@@ -138,7 +138,7 @@ def latex_name(name: str) -> str:
     pdfLaTeX's "Double subscript" error), replaces Unicode mathematical
     glyphs with their standard LaTeX commands, then braces multi-
     character subscripts so ``X_ab`` renders as ``X_{ab}``. Single-
-    character subscripts (``X_f``) are left alone — LaTeX handles them
+    character subscripts (``X_f``) are left alone, LaTeX handles them
     without braces.
     """
     if not isinstance(name, str):
@@ -370,7 +370,7 @@ def _escape_text(text: str) -> str:
     strings routinely carry Unicode math glyphs (``ι``, ``ω``, ``∘``)
     copied from operator names. pdfLaTeX with the default input encoding
     chokes on them. Wrapping each translated glyph in ``\\ensuremath{…}``
-    flips to math mode locally — the surrounding text stays in textmode,
+    flips to math mode locally, the surrounding text stays in textmode,
     and the output is UTF-8-free for the LaTeX kernel.
 
     Order matters: escape the LaTeX-special ASCII chars first (so
@@ -434,7 +434,7 @@ def step_to_latex(step: ProofStep) -> str:
 def chain_to_latex(chain: ProofChain) -> str:
     r"""Render a :class:`ProofChain` as an ``\begin{align*}…\end{align*}`` block.
 
-    Nested sub-proofs are not expanded inline — strategies that want a
+    Nested sub-proofs are not expanded inline, strategies that want a
     rich tree rendering should iterate the steps themselves and compose
     the output. This keeps the ``align*`` body flat and copy-pasteable
     into a paper or notes document.
@@ -480,7 +480,7 @@ def chain_to_latex_document(
 ) -> str:
     r"""Wrap :func:`chain_to_latex` in a full ``\documentclass`` document.
 
-    The result is a pdfLaTeX-ready ``article`` document — the caller can
+    The result is a pdfLaTeX-ready ``article`` document, the caller can
     write it to disk and run ``pdflatex file.tex`` without further
     massaging. ``preamble_extras`` is spliced between the default
     ``amsmath``/``amssymb`` block and ``\begin{document}`` so
@@ -488,7 +488,7 @@ def chain_to_latex_document(
 
     ``title`` / ``author``, when non-empty, trigger a ``\title``/
     ``\author`` / ``\maketitle`` block. Empty strings are treated as
-    "no title" — the chain just renders on a blank page.
+    "no title", the chain just renders on a blank page.
     """
     if not isinstance(chain, ProofChain):
         raise TypeError("chain_to_latex_document: expected a ProofChain")
@@ -521,7 +521,7 @@ def _tikz_escape(text: str) -> str:
 
     TikZ nodes inside ``$…$`` inherit math mode, which is what we want
     for expressions. The label text comes straight from
-    :func:`to_latex` — math-mode safe already. Rule labels are text,
+    :func:`to_latex`, math-mode safe already. Rule labels are text,
     run through :func:`_escape_text`.
     """
     return _escape_text(text)
@@ -539,7 +539,7 @@ def chain_to_tikz(
     ``n + 1`` nodes for ``n`` steps. Arrows are labelled with the
     rule name (provenance tag in parentheses when present).
 
-    The output is a ``tikzpicture`` environment — paste it into any
+    The output is a ``tikzpicture`` environment, paste it into any
     LaTeX document that loads the ``tikz`` package. For a standalone
     file wrapping this, see :func:`chain_to_tikz_document`.
 
@@ -556,7 +556,7 @@ def chain_to_tikz(
         )
     lines = [f"\\begin{{tikzpicture}}[node distance={node_distance}]"]
     # Emit n+1 nodes: e0, e1, ..., en. Each step's ``before`` is the
-    # prior node's expression, which we already emitted — so only emit
+    # prior node's expression, which we already emitted, so only emit
     # the first ``before`` plus every ``after``.
     first = chain.steps[0].before
     lines.append(f"\\node[draw, rectangle] (e0) {{${to_latex(first)}$}};")

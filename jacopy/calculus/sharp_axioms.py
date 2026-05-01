@@ -1,15 +1,15 @@
 """
-Sharp axioms — Faz 13.A.
+Sharp axioms, Faz 13.A.
 
 Two engine-level rewrite rules that promote ``π^♯`` from a tensorial
 :class:`~jacopy.calculus.musical.Sharp` atom to a fully usable building
 block in derived-bracket / Schouten-Nijenhuis proofs:
 
-* :class:`SharpLinearityDefinition` — ``π^♯(A + B + …) → π^♯(A) + π^♯(B) + …``.
+* :class:`SharpLinearityDefinition`, ``π^♯(A + B + …) → π^♯(A) + π^♯(B) + …``.
   Sharp is :math:`\\mathbb{R}`-linear; the rewrite makes that linearity a
   named axiom step in the transcript instead of a silent product-rule
   side effect.
-* :class:`SharpOnExactDefinition` — ``π^♯(df) → X_f``. Names the
+* :class:`SharpOnExactDefinition`, ``π^♯(df) → X_f``. Names the
   composition ``π^♯ ∘ d`` on a 0-form as a Hamiltonian vector field, so
   later steps can reason about ``X_f`` as an opaque
   :class:`~jacopy.algebra.derivation.Derivation` atom rather than the
@@ -20,7 +20,7 @@ The first rule has structural overlap with
 distributes any ``Act(D, Sum(...))``), but registering it as an explicit
 :class:`Definition` is what gives the resulting transcript a labelled
 "Sharp R-linearity" step instead of a generic "product-rule"
-justification — important for the 2f-deep / 2g-deep notebooks where
+justification, important for the 2f-deep / 2g-deep notebooks where
 each axiom application must be visible.
 """
 
@@ -47,12 +47,12 @@ def _is_degree_zero(
 
 
 # --------------------------------------------------------------------- #
-# Axiom 1 — π^♯ R-linearity over Sum                                     #
+# Axiom 1, π^♯ R-linearity over Sum                                     #
 # --------------------------------------------------------------------- #
 
 
 class SharpLinearityDefinition(Definition):
-    """``π^♯(A + B + …) → π^♯(A) + π^♯(B) + …`` — Sharp is R-linear.
+    """``π^♯(A + B + …) → π^♯(A) + π^♯(B) + …``, Sharp is R-linear.
 
     Scoped to a specific :class:`~jacopy.calculus.musical.Sharp`
     instance so that two distinct bivectors' sharps coexisting in a
@@ -83,12 +83,12 @@ class SharpLinearityDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# Axiom 1b — π^♯ Neg-linearity                                           #
+# Axiom 1b, π^♯ Neg-linearity                                           #
 # --------------------------------------------------------------------- #
 
 
 class SharpNegLinearityDefinition(Definition):
-    """``π^♯(Neg(A)) → Neg(π^♯(A))`` — Sharp commutes with Neg.
+    """``π^♯(Neg(A)) → Neg(π^♯(A))``, Sharp commutes with Neg.
 
     Sibling of :class:`SharpLinearityDefinition`: the Sum-distribution
     rule does not fire on a bare ``Neg`` argument, but the residue from
@@ -119,18 +119,18 @@ class SharpNegLinearityDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# Axiom 2 — π^♯(df) → X_f                                                #
+# Axiom 2, π^♯(df) → X_f                                                #
 # --------------------------------------------------------------------- #
 
 
 class SharpOnExactDefinition(Definition):
-    """``π^♯(df) → X_f`` — Hamiltonian vector field naming.
+    """``π^♯(df) → X_f``, Hamiltonian vector field naming.
 
     Fires on the shape ``Act(π^♯, Act(d, f))`` whenever ``f`` resolves
     to degree 0 in the registry. The rewrite produces a fresh
     :class:`~jacopy.calculus.hamiltonian_vf.HamiltonianVectorField`
     atom carrying ``f`` and the bivector inherited from this rule's
-    target Sharp — downstream rules see a clean degree-0 operator and
+    target Sharp, downstream rules see a clean degree-0 operator and
     can reason about ``X_f`` without descending through the Sharp/d
     composition.
 

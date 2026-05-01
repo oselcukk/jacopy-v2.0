@@ -95,7 +95,7 @@ class TestRegistryAntiSymRewrite:
         reg.declare(pi, Antisymmetric())
         rule = RegistryAntiSymCanonicalDefinition(registry=reg)
         a, b = Symbol("a"), Symbol("b")
-        # Even with alternating=True the rule still rewrites — it
+        # Even with alternating=True the rule still rewrites, it
         # produces the same canonical form as the alt-flag rule.
         expr = multi_eval(pi, b, a, alternating=True, slot_kind="vector")
         out = rule.rewrite(expr)

@@ -223,7 +223,7 @@ class TestHamiltonianAccessor:
 
 
 # --------------------------------------------------------------------- #
-# prove_hamiltonian_invariance — L_{X_f} ω = 0                          #
+# prove_hamiltonian_invariance, L_{X_f} ω = 0                          #
 # --------------------------------------------------------------------- #
 
 
@@ -278,7 +278,7 @@ class TestProveEquivalence:
 
 
 # --------------------------------------------------------------------- #
-# prove_hamiltonian_equality — Y = X_h modulo non-degeneracy            #
+# prove_hamiltonian_equality, Y = X_h modulo non-degeneracy            #
 # --------------------------------------------------------------------- #
 
 
@@ -390,7 +390,7 @@ class TestProveVectorFieldEquality:
 
     def test_fails_for_genuinely_distinct_vfs(self, omega, f, reg):
         """ι_Y ω - ι_Z ω peels to Y - Z; if those don't simplify the
-        chain raises ProofFailure. The rule does what it should — it
+        chain raises ProofFailure. The rule does what it should, it
         encodes injectivity, not magical agreement of distinct VFs."""
         from jacopy.algebra.derivation import Derivation
         from jacopy.proof.strategies import ProofFailure

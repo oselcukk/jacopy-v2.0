@@ -38,7 +38,7 @@ class TestReissnerNordstromConstruction:
 
 class TestReissnerNordstromPhysics:
     def test_not_vacuum(self) -> None:
-        """RN is NOT vacuum — has EM stress-energy."""
+        """RN is NOT vacuum, has EM stress-energy."""
         F, g = reissner_nordstrom()
         G = einstein_tensor(levi_civita(g), g)
         assert not G.is_vacuum()

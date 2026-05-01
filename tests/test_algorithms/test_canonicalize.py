@@ -246,7 +246,7 @@ class TestNested:
         assert r == Sum(Neg(x), Neg(y)) or r == Sum(Neg(y), Neg(x))
 
     def test_neg_of_sum_cancels_across_signs(self):
-        """X − (X − Y) → Y — the whole point of distributing Neg
+        """X − (X − Y) → Y, the whole point of distributing Neg
         through Sum."""
         x, y = Symbol("x"), Symbol("y")
         r = canonicalize(Sum(x, Neg(Sum(x, Neg(y)))))

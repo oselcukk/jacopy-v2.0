@@ -8,15 +8,15 @@ are:
 
 * ``[·,·]_E`` is graded-antisymmetric, satisfies graded Jacobi, and is
   a Leibniz derivation in each slot (the bracket itself carries those
-  axiom flags — the wrapper does not re-derive them);
-* **anchor compatibility** — ``ρ([X, Y]_E) = [ρ(X), ρ(Y)]_{TM}`` —
+  axiom flags, the wrapper does not re-derive them);
+* **anchor compatibility**, ``ρ([X, Y]_E) = [ρ(X), ρ(Y)]_{TM}``,
   which is *not* implied by the bracket's own axioms and is surfaced
   here as :meth:`LieAlgebroid.anchor_compatibility_obstruction` /
   :meth:`anchor_compatibility_condition` /
   :meth:`prove_anchor_compatibility`.
 
 On top of the data bundle the wrapper exposes an algebroid
-:class:`~jacopy.calculus.cartan.CartanCalculus` — the exterior
+:class:`~jacopy.calculus.cartan.CartanCalculus`, the exterior
 derivative ``d_E`` on ``Λ*E*``, the algebroid Lie derivative ``L_{E,X}``,
 and interior product ``ι_{E,X}`` factories, all wired to ``bracket`` as
 the vector bracket. The five Cartan relations (``d² = 0``, magic formula,
@@ -25,7 +25,7 @@ they do on ``TM``, so :meth:`cartan` is the hook by which downstream
 code verifies any of them on the algebroid.
 
 The seeded theorem :data:`THEOREM_LIE_ALGEBROID_ANCHOR_COMPAT` records
-the anchor compatibility as a one-step axiomatic chain — on a Lie
+the anchor compatibility as a one-step axiomatic chain, on a Lie
 algebroid that identity is part of the *definition*, not something you
 prove from simpler parts, so the chain cites the axiom directly.
 """
@@ -56,13 +56,13 @@ from jacopy.proof.step import ProofStep
 
 
 class LieAlgebroid:
-    """``(E, [·,·]_E, ρ)`` — a Lie algebroid over a manifold.
+    """``(E, [·,·]_E, ρ)``, a Lie algebroid over a manifold.
 
     Parameters
     ----------
     bundle
         Symbolic name of the vector bundle ``E``. Carried for display
-        only — the algebra lives in the bracket and anchor.
+        only, the algebra lives in the bracket and anchor.
     bracket
         :class:`~jacopy.brackets.base.GradedBracket` on sections of
         ``E``. Graded-antisymmetric, Jacobi, Leibniz assumed (flags on
@@ -80,7 +80,7 @@ class LieAlgebroid:
     Notes
     -----
     The wrapper deliberately *does not* take ``E`` itself as an
-    algebraic object — sections are introduced on demand as
+    algebraic object, sections are introduced on demand as
     :class:`~jacopy.core.expr.Expr` operands when a caller invokes
     :meth:`anchor_compatibility_obstruction` or feeds an ``X`` into
     :attr:`cartan`. ``bundle`` is a naming handle only.
@@ -121,7 +121,7 @@ class LieAlgebroid:
         self._bracket = bracket
         self._anchor = anchor
         self._vector_bracket = vector_bracket
-        # Algebroid exterior derivative ``d_E`` — a fresh degree-+1
+        # Algebroid exterior derivative ``d_E``, a fresh degree-+1
         # derivation named to distinguish it from the ambient ``d`` on
         # TM. Callers who want to verify ``d_E² = 0`` on concrete
         # algebras do so through :attr:`cartan`.
@@ -150,7 +150,7 @@ class LieAlgebroid:
             # ``d_E`` and ``ι_{E,·}`` factory so that the expansion engine's
             # Cartan rewrite produces ``d_E ∘ ι_{E,X} + ι_{E,X} ∘ d_E``
             # instead of the TM default ``d ∘ ι_X + ι_X ∘ d``. Without this
-            # the algebroid magic formula residual can't close — the two
+            # the algebroid magic formula residual can't close, the two
             # sides use mismatched operator names.
             return lie_derivative(
                 X,
@@ -196,7 +196,7 @@ class LieAlgebroid:
 
     @property
     def cartan(self) -> CartanCalculus:
-        """Algebroid Cartan bundle — ``(d_E, L_{E,·}, ι_{E,·}, [·,·]_E)``.
+        """Algebroid Cartan bundle, ``(d_E, L_{E,·}, ι_{E,·}, [·,·]_E)``.
 
         Same :class:`CartanCalculus` API as the ``TM`` one. The factories
         name their outputs with the bundle tag so ``L_{E,X}`` and
@@ -217,7 +217,7 @@ class LieAlgebroid:
         Y: Expr,
         registry: Optional[PropertyRegistry] = None,
     ) -> Expr:
-        """``ρ([X, Y]_E) − [ρ(X), ρ(Y)]_{TM}`` — the axiom as an Expr.
+        """``ρ([X, Y]_E) − [ρ(X), ρ(Y)]_{TM}``, the axiom as an Expr.
 
         Thin forwarder to
         :func:`~jacopy.calculus.anchor.bracket_compatibility_obstruction`
@@ -259,7 +259,7 @@ class LieAlgebroid:
         :class:`ProofChain`.
 
         On a Lie algebroid, ``ρ([X, Y]_E) = [ρ(X), ρ(Y)]_{TM}`` is part
-        of the *definition* — there is nothing to prove from simpler
+        of the *definition*, there is nothing to prove from simpler
         parts; the chain has a single ``axiom``-tagged step that
         discharges the obstruction directly. Callers that want to
         expand both sides and watch the cancellation happen should
@@ -277,7 +277,7 @@ class LieAlgebroid:
                 Integer(0),
                 rule="LieAlgebroidAnchorCompat",
                 justification=(
-                    f"ρ([X, Y]_E) = [ρ(X), ρ(Y)]_{{TM}} — Lie algebroid "
+                    f"ρ([X, Y]_E) = [ρ(X), ρ(Y)]_{{TM}}, Lie algebroid "
                     f"anchor compatibility axiom on {self._name}"
                 ),
                 provenance_tag="axiom",
@@ -327,7 +327,7 @@ def _build_lie_algebroid_anchor_compat_theorem() -> Theorem:
 
     Generic witness: ``E`` a symbolic bundle with LieBracket ``[·,·]_E``
     and anchor ``ρ`` into the standard ``TM``-Lie bracket. The proof
-    chain is a single ``axiom``-tagged step — the Lie algebroid
+    chain is a single ``axiom``-tagged step, the Lie algebroid
     definition postulates compatibility, and the theorem record
     catalogues it as a citable result.
     """

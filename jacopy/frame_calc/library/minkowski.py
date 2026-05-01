@@ -7,7 +7,7 @@ The 4D Minkowski metric in Cartesian coordinates ``(t, x, y, z)``:
 
     ds^2 = -dt^2 + dx^2 + dy^2 + dz^2.
 
-Christoffel symbols, Ricci, Einstein tensor — all identically zero.
+Christoffel symbols, Ricci, Einstein tensor, all identically zero.
 """
 
 from __future__ import annotations

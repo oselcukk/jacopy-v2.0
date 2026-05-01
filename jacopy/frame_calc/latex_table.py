@@ -1,5 +1,5 @@
 r"""
-Paper-grade LaTeX table render — Faz 19 Chunk C.5.
+Paper-grade LaTeX table render, Faz 19 Chunk C.5.
 
 Render a :class:`~jacopy.frame_calc.component_tensor.ComponentTensor`
 as a LaTeX ``align*`` block (or full document) listing only the
@@ -234,7 +234,7 @@ def _canonical_index(
     ``Ric_{ab}`` and ``Ric_{ba}`` (or both ``Γ^a_{bc}`` and
     ``Γ^a_{cb}``).
     """
-    # Symmetric (0, 2) tensors: g, Ric, G — sort the two lower indices.
+    # Symmetric (0, 2) tensors: g, Ric, G, sort the two lower indices.
     if isinstance(
         tensor, (ComponentMetric, ComponentMetricInverse, RicciTensor, EinsteinTensor)
     ):

@@ -1,5 +1,5 @@
 r"""
-Local frames + dual coframes — Faz 17.A.
+Local frames + dual coframes, Faz 17.A.
 
 A *local frame* :math:`(X_a)` is an ordered tuple of vector fields whose
 values span the tangent space at every point in the chart's domain.
@@ -14,26 +14,26 @@ The Cartan structure equations are mechanised on top of this data
 (see :class:`~jacopy.library.cartan_structure.CartanStructureProblem`).
 This module ships the smallest piece of it:
 
-* :class:`FrameIndex` — an index atom, ``free`` (an outer hypothesis
+* :class:`FrameIndex`, an index atom, ``free`` (an outer hypothesis
   variable) or ``bound`` (an :class:`IndexedSum` dummy in 17.E).
-* :class:`KroneckerDelta` — the index-pair node ``δ^a_b``. Auto-collapses
+* :class:`KroneckerDelta`, the index-pair node ``δ^a_b``. Auto-collapses
   to :data:`~jacopy.core.expr.One` when both indices are *free* and
   carry the same name; bound-index reductions are left for the
   :class:`IndexedSum` contraction rule (17.E).
-* :class:`LocalFrame` — library wrapper bundling a frame name, an
+* :class:`LocalFrame`, library wrapper bundling a frame name, an
   optional dimension, a vector-field display symbol, and a coframe
   display symbol. Used as a factory for :class:`FrameVectorField` and
   :class:`FrameCovector` instances.
-* :class:`FrameVectorField` — a :class:`~jacopy.algebra.derivation.Derivation`
+* :class:`FrameVectorField`, a :class:`~jacopy.algebra.derivation.Derivation`
   subclass tagged with ``(frame_name, idx)`` so it interoperates with
   every existing engine pass that already speaks ``Derivation``
   (∇, Lie, interior, Pairing, …).
-* :class:`FrameCovector` — an :class:`Atom` for the dual basis 1-form.
-* :class:`FramePairingDualityDefinition` — the engine rule
+* :class:`FrameCovector`, an :class:`Atom` for the dual basis 1-form.
+* :class:`FramePairingDualityDefinition`, the engine rule
   ``⟨e^a, X_b⟩ → δ^a_b`` scoped to a specific frame so two frames in
   the same proof never cross-fire.
 
-The duality axiom is the only engine rule introduced here — all other
+The duality axiom is the only engine rule introduced here, all other
 machinery (Pairing C∞-linearity, Sum/Neg distribution, …) is reused
 unchanged from Faz 12-13.
 """
@@ -129,7 +129,7 @@ class KroneckerDelta(Expr):
     r"""The index-pair node :math:`\delta^i_j` over :class:`FrameIndex`.
 
     Auto-simplifies to :data:`~jacopy.core.expr.One` in the constructor
-    when both indices are *free* and carry the same name — this
+    when both indices are *free* and carry the same name, this
     captures the ``δ^a_a = 1`` reduction at a free contraction without
     needing an extra engine pass. Bound-index δ's stay inert; their
     reduction (``Σ_b δ^a_b · f(b) → f(a)``) is the
@@ -201,7 +201,7 @@ class FrameVectorField(Derivation):
     """Frame basis vector field ``X_a`` from a :class:`LocalFrame`.
 
     Subclasses :class:`Derivation` (degree 0) so every existing pass
-    that walks ``Derivation`` shapes — ∇, ι, L, Pairing — picks the
+    that walks ``Derivation`` shapes, ∇, ι, L, Pairing, picks the
     frame VFs up automatically. Equality includes the *frame name* so
     that two frames sharing only their VF symbol stay distinguishable.
     """
@@ -313,7 +313,7 @@ class FrameCovector(Atom):
 class LocalFrame:
     """Library wrapper bundling a frame's identity and display symbols.
 
-    The frame is uniquely identified by ``name``; ``dim`` is optional —
+    The frame is uniquely identified by ``name``; ``dim`` is optional,
     when ``None``, the frame is treated as having a *symbolic*
     dimension, which is the mode Faz 17 uses for its proofs. Two
     :class:`LocalFrame` instances with the same ``(name, dim,

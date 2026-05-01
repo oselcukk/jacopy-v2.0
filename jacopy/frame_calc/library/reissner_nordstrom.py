@@ -1,5 +1,5 @@
 r"""
-Reissner–Nordström metric — static, spherically symmetric charged black hole.
+Reissner–Nordström metric, static, spherically symmetric charged black hole.
 
 In Schwarzschild-like coordinates ``(t, r, θ, φ)`` with mass ``M`` and
 electric charge ``Q``:
@@ -10,7 +10,7 @@ electric charge ``Q``:
          + r^2\,d\theta^2 + r^2 \sin^2\theta\,d\varphi^2,
     \qquad f(r) = 1 - \frac{2M}{r} + \frac{Q^2}{r^2}.
 
-**Not vacuum** — the Einstein tensor matches the stress-energy of the
+**Not vacuum**, the Einstein tensor matches the stress-energy of the
 electromagnetic field of a point charge:
 ``G_{ab} = 8\pi T^{(EM)}_{ab}``. Reduces to Schwarzschild when ``Q → 0``.
 """

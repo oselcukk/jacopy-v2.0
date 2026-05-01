@@ -14,7 +14,7 @@ Section 3.1.5 of the question text specialises this to the (Poisson)
 manifold setting where ``φ`` is a Cartan-style operator (``L_V``,
 ``ι_V``, ``d``, or their tildes) and ``[·, ·]_E`` is the Koszul or Lie
 bracket. The six identities (1)/(2)/(3) and their tilde duals
-(1')/(2')/(3') are *symbolic* statements about specific derivators —
+(1')/(2')/(3') are *symbolic* statements about specific derivators,
 this helper produces those as plain Sum/Neg/BracketApply trees so the
 proof engine can rewrite them.
 
@@ -60,7 +60,7 @@ def derivator(
     Parameters
     ----------
     phi
-        Operator whose derivator on ``bracket`` is being formed —
+        Operator whose derivator on ``bracket`` is being formed,
         typically a :class:`~jacopy.algebra.derivation.Derivation`
         atom, or a composition Expr that the engine can apply through
         :class:`~jacopy.algebra.derivation.Act`.
@@ -70,7 +70,7 @@ def derivator(
     u, v
         Bracket operands.
     registry
-        Currently unused — accepted for API parity with the other
+        Currently unused, accepted for API parity with the other
         Section 3.1.5 helpers (``derivator``, ``K``, ``K̃``) so callers
         can pass a registry uniformly. May be threaded through future
         signed variants.
@@ -79,7 +79,7 @@ def derivator(
     -------
     Expr
         A :class:`Sum` of three :class:`BracketApply` /
-        :class:`Act` terms — the inert derivator expression. The proof
+        :class:`Act` terms, the inert derivator expression. The proof
         engine evaluates it by expanding each term against its operator
         and bracket axioms.
     """
@@ -116,9 +116,9 @@ def prove_derivator_identity(
     """Prove ``lhs == rhs`` by evaluating both on a ``p``-tuple.
 
     The Section 3.1.5 derivator identities equate two operator-valued
-    expressions on either the form side (``slot_kind="vector"`` —
+    expressions on either the form side (``slot_kind="vector"``,
     evaluate against vector fields) or the multivector side
-    (``slot_kind="covector"`` — evaluate against 1-forms). This driver
+    (``slot_kind="covector"``, evaluate against 1-forms). This driver
     wraps both sides under ``MultiEval(_, *eval_args, slot_kind=...)``
     and delegates to
     :func:`~jacopy.calculus.intrinsic_engine.prove_intrinsic_equivalence`
@@ -129,7 +129,7 @@ def prove_derivator_identity(
     Mirrors :func:`~jacopy.calculus.tilde.intrinsic_engine.prove_tilde_cartan_relation`
     on the form side: the two functions differ only in the default
     ``slot_kind`` and the audience of axioms each engine is expected to
-    carry. A single 3.1.5 proof typically threads both — the
+    carry. A single 3.1.5 proof typically threads both, the
     multivector-side identities (1')/(2')/(3') reach for the tilde
     engine, the form-side (1)/(2)/(3) for the standard one.
 
@@ -148,7 +148,7 @@ def prove_derivator_identity(
         the tilde defining axioms (so a ``K̃_η V`` chain reaches the
         standard side via :class:`TildeIotaSwapDefinition`).
     eval_args
-        Tuple of expressions against which both sides are evaluated —
+        Tuple of expressions against which both sides are evaluated,
         vector fields when ``slot_kind="vector"``, 1-forms when
         ``slot_kind="covector"``.
     slot_kind
@@ -157,7 +157,7 @@ def prove_derivator_identity(
         wrap and routes the engine to the appropriate intrinsic rules.
     alternating
         Whether the :class:`MultiEval` wrap is graded-antisymmetric in
-        its argument slots. Defaults to ``True`` — the convention every
+        its argument slots. Defaults to ``True``, the convention every
         Cartan / Koszul evaluation in this codebase uses.
     registry
         Optional :class:`PropertyRegistry` plumbed through to the

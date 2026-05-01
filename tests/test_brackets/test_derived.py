@@ -48,7 +48,7 @@ class TestConstruction:
         assert d.degree_Q == Degree.const(1)
         # Degree formula: |Q| − 2.
         assert d.degree == Degree.const(-1)
-        # Jacobi is conditional on [Q, Q] = 0 — reported as None.
+        # Jacobi is conditional on [Q, Q] = 0, reported as None.
         assert d.satisfies_graded_jacobi is None
         # Leibniz and antisymmetry hold by the derived-bracket theorem.
         assert d.satisfies_leibniz
@@ -138,7 +138,7 @@ class TestExpansion:
         assert isinstance(node, BracketApply)
         assert node.bracket is d
         # Expand via the node's own method and via the bracket directly
-        # — they must match.
+        #, they must match.
         assert node.expand(reg) == d.expand(a, b, reg)
 
 
@@ -159,7 +159,7 @@ class TestJacobiObstruction:
 
     def test_obstruction_simplifies_to_zero_for_lie_base(self, reg):
         """Lie base: [Q, Q] = Q*Q − Q*Q → 0. So any derived bracket
-        over the Lie bracket automatically satisfies Jacobi — this is
+        over the Lie bracket automatically satisfies Jacobi, this is
         the reason odd-degree commutators of a degree-1 derivation
         automatically give Jacobi-satisfying derived brackets."""
         lie = LieBracket()
@@ -179,21 +179,21 @@ class TestJacobiObstruction:
 
 
 # --------------------------------------------------------------------- #
-# Derived bracket theorem — [Q,Q]=0 ⟹ Jacobi                            #
+# Derived bracket theorem, [Q,Q]=0 ⟹ Jacobi                            #
 # --------------------------------------------------------------------- #
 
 
 class TestDerivedBracketTheorem:
     """Plan-required: ``[Q, Q]_base = 0 ⟺ derived bracket has Jacobi``.
 
-    The *universal* form of this theorem — that the Jacobi obstruction
-    reduces to the single expression ``[Q, Q]_base`` — is covered by
+    The *universal* form of this theorem, that the Jacobi obstruction
+    reduces to the single expression ``[Q, Q]_base``, is covered by
     :class:`TestJacobiObstruction` above. This class verifies the
     structural 3-argument expansion: each cyclic term of the derived
     bracket's graded Jacobi is a doubly-nested derived bracket
     application. Closing the full operand-level simplification on the
     expanded form requires sign-aware sorting of Neg-wrapped Products
-    — that capability is earmarked for the Faz 7 proof layer, not for
+   , that capability is earmarked for the Faz 7 proof layer, not for
     simplify.
     """
 
@@ -212,7 +212,7 @@ class TestDerivedBracketTheorem:
         assert len(obs.children) == 3
         for term in obs.children:
             # All parities are zero here (degree-0 operands), so no Neg
-            # wrappers — each term is a bare BracketApply.
+            # wrappers, each term is a bare BracketApply.
             assert isinstance(term, BracketApply)
             assert term.bracket is d
             # Outer: d(x, inner); inner is also a derived-bracket app.
@@ -284,7 +284,7 @@ class TestActingOn:
             )
 
     def test_accepts_musical_sharp_as_anchor(self):
-        """``Sharp`` is a ``Derivation`` too — any ``Derivation`` works."""
+        """``Sharp`` is a ``Derivation`` too, any ``Derivation`` works."""
         from jacopy.calculus.musical import sharp
         pi = Symbol("π")
         sh = sharp(pi)
@@ -336,7 +336,7 @@ class TestActingOn:
         assert default_expanded == manual
 
     def test_different_acting_on_distinguishes_brackets(self):
-        """Anchor participates in identity — two derived brackets with
+        """Anchor participates in identity, two derived brackets with
         different anchors are distinct."""
         pi = Symbol("π")
         d1 = DerivedBracket(sn, pi, degree_Q=1, acting_on=Anchor("ρ1"))

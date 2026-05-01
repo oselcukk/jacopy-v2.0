@@ -1,5 +1,5 @@
 r"""
-Closed-form axiom — Faz 12.B #7.
+Closed-form axiom, Faz 12.B #7.
 
 Engine rewrite that consumes the :class:`~jacopy.core.properties.Closed`
 registry property: any ``Act(d, ω)`` where the registry declares
@@ -11,7 +11,7 @@ The rule is registry-aware (mirrors
 :class:`~jacopy.proof.expansion.IotaOnZeroFormDefinition` and friends):
 the registry is supplied at construction time, the rule queries it on
 ``matches``. Passing ``registry=None`` makes the rule a permanent
-no-op — useful for engines that don't have a registry context.
+no-op, useful for engines that don't have a registry context.
 """
 
 from __future__ import annotations
@@ -44,7 +44,7 @@ class ClosedFormDefinition(Definition):
         ])
 
     With ``registry=None`` (the default), :meth:`matches` always
-    returns ``False`` — the rule is dormant. Callers who want this
+    returns ``False``, the rule is dormant. Callers who want this
     rule active must explicitly pass a registry.
     """
 

@@ -13,7 +13,7 @@ complementary views of ``{f, g}_π``:
 * the universal **Jacobi obstruction** ``[π, π]_SN`` as a
   :class:`~jacopy.brackets.derived.VanishingCondition`.
 
-The Poisson Jacobi identity reduces to a single equation on ``π`` —
+The Poisson Jacobi identity reduces to a single equation on ``π``,
 the Derived Bracket Theorem says Jacobi on ``{·, ·}_π`` holds iff
 ``[π, π]_SN = 0``. This module records that reduction as the seeded
 theorem :data:`THEOREM_POISSON_JACOBI` in the package-wide
@@ -50,7 +50,7 @@ from jacopy.proof.verifier import prove_equivalence
 
 
 class PoissonBracket:
-    """``{·, ·}_π`` — the Poisson bracket of a bivector ``π``.
+    """``{·, ·}_π``, the Poisson bracket of a bivector ``π``.
 
     Parameters
     ----------
@@ -66,15 +66,15 @@ class PoissonBracket:
 
     Notes
     -----
-    The class is deliberately thin — every computation delegates into
+    The class is deliberately thin, every computation delegates into
     :class:`~jacopy.brackets.derived.DerivedBracket` or
     :func:`~jacopy.calculus.hamiltonian_vf.hamiltonian_vf`. The value
     it adds is naming the bracket (``PoissonBracket.from_bivector(π)``
     reads better than constructing the derived bracket directly at call
     sites) and bundling the three equivalent views so they stay in
     sync. The Jacobi reduction is surfaced as
-    :meth:`prove_jacobi_reduction` — a single-step chain asserting the
-    Derived Bracket Theorem — rather than as a ``prove_jacobi`` that
+    :meth:`prove_jacobi_reduction`, a single-step chain asserting the
+    Derived Bracket Theorem, rather than as a ``prove_jacobi`` that
     would require ``[π, π]_SN`` to collapse under :func:`simplify`
     (which it doesn't, for atomic ``π``).
     """
@@ -145,7 +145,7 @@ class PoissonBracket:
 
     @property
     def sharp(self) -> Sharp:
-        """``π^♯`` — the musical map ``T*M → TM`` induced by the bivector."""
+        """``π^♯``, the musical map ``T*M → TM`` induced by the bivector."""
         return self._sharp
 
     @property
@@ -153,7 +153,7 @@ class PoissonBracket:
         """Form-level derived bracket ``DerivedBracket(sn, π, acting_on=π^♯)``.
 
         This is the shape the library uses when evaluating ``{·, ·}_π``
-        on 1-forms — the anchor lifts the forms to vector fields via
+        on 1-forms, the anchor lifts the forms to vector fields via
         ``π^♯`` and the expansion emits the classical Koszul three-term
         formula.
         """
@@ -182,7 +182,7 @@ class PoissonBracket:
         g: Expr,
         registry: Optional[PropertyRegistry] = None,
     ) -> Expr:
-        """``{f, g}_π = [[f, π]_SN, g]_SN`` — the derived form."""
+        """``{f, g}_π = [[f, π]_SN, g]_SN``, the derived form."""
         return self._derived.expand(f, g, registry)
 
     def via_hamiltonian(
@@ -190,7 +190,7 @@ class PoissonBracket:
         f: Expr,
         g: Expr,
     ) -> Expr:
-        """``{f, g}_π = X_f(g)`` — the Hamiltonian form.
+        """``{f, g}_π = X_f(g)``, the Hamiltonian form.
 
         Returns an :class:`Act` of
         :class:`~jacopy.calculus.hamiltonian_vf.HamiltonianVectorField`
@@ -214,7 +214,7 @@ class PoissonBracket:
         *,
         d: Optional["ExteriorDerivative"] = None,  # type: ignore[name-defined]
     ) -> Expr:
-        r"""``{f, g}_π = π(df, dg)`` — the bivector-evaluation view.
+        r"""``{f, g}_π = π(df, dg)``, the bivector-evaluation view.
 
         Returns ``MultiEval(π, d(f), d(g), slot_kind="covector",
         alternating=True)``. The ``alternating=True`` flag arms the
@@ -222,7 +222,7 @@ class PoissonBracket:
         canonicalisation and the
         :class:`~jacopy.calculus.multi_eval_axioms.MultiEvalRepeatArgZeroDefinition`
         zero-rule on this node, so swapping ``f`` and ``g`` introduces
-        a sign and ``π(df, df) = 0`` collapses on its own — no inline
+        a sign and ``π(df, df) = 0`` collapses on its own, no inline
         antisymmetry axiom needed.
 
         Composes with :class:`~jacopy.calculus.multi_eval_scalar_axioms.MultiEvalScalarPullDefinition`
@@ -240,7 +240,7 @@ class PoissonBracket:
             override).
         d
             Optional :class:`~jacopy.calculus.exterior_d.ExteriorDerivative`
-            override — use a bundle-specific ``d_E`` when this Poisson
+            override, use a bundle-specific ``d_E`` when this Poisson
             bracket lives on a Lie algebroid.
         """
         # Late import: ``calculus`` depends on this module's siblings,
@@ -271,7 +271,7 @@ class PoissonBracket:
     ) -> Expr:
         """``{α, β}_π = L_{π^♯(α)} β − L_{π^♯(β)} α − d⟨π^♯(α), β⟩``.
 
-        The form-level view of the Poisson bracket — the classical
+        The form-level view of the Poisson bracket, the classical
         Koszul three-term formula on 1-forms, produced through the
         :attr:`koszul_derived` bracket so the anchor ``π^♯`` is fixed to
         this bivector.
@@ -298,7 +298,7 @@ class PoissonBracket:
         :class:`Expr` outputs are structurally equal and
         :func:`~jacopy.proof.verifier.prove_equivalence` closes the
         chain in a single reflexive step. The value isn't the depth of
-        the proof — it is having the classical/derived agreement
+        the proof, it is having the classical/derived agreement
         recorded as a citable :class:`ProofChain` on this specific
         ``(α, β)`` triple.
         """
@@ -316,7 +316,7 @@ class PoissonBracket:
         self,
         registry: Optional[PropertyRegistry] = None,
     ) -> Expr:
-        """``[π, π]_SN`` — the Poisson condition as an :class:`Expr`."""
+        """``[π, π]_SN``, the Poisson condition as an :class:`Expr`."""
         return self._derived.jacobi_obstruction(registry)
 
     def jacobi_condition(
@@ -341,13 +341,13 @@ class PoissonBracket:
 
         Returns a :class:`ProofChain` whose single top-level step cites
         the Derived Bracket Theorem: the cyclic Jacobi sum rewrites to
-        ``[π, π]_SN``. The chain does *not* discharge the obstruction —
+        ``[π, π]_SN``. The chain does *not* discharge the obstruction,
         for atomic ``π`` it stays opaque, and the caller is expected to
         supply ``[π, π]_SN = 0`` as a hypothesis (that is the defining
         property of a Poisson bivector). Callers that have a concrete
         ``π`` whose self-bracket simplifies to zero should use
         :class:`~jacopy.proof.strategies.DerivedBracketStrategy` via
-        :func:`jacopy.proof.verifier.prove_jacobi` instead — that path
+        :func:`jacopy.proof.verifier.prove_jacobi` instead, that path
         closes the ProofChain all the way to :class:`Integer` ``0``.
         """
         return self._prove_jacobi_reduction_chain(
@@ -358,11 +358,11 @@ class PoissonBracket:
         self,
         registry: Optional[PropertyRegistry] = None,
     ) -> VanishingCondition:
-        """Form-level Jacobi condition — same ``[π, π]_SN`` obstruction.
+        """Form-level Jacobi condition, same ``[π, π]_SN`` obstruction.
 
         The universal obstruction only depends on ``(base, Q)``, so this
         condition wraps the same :class:`Expr` as :meth:`jacobi_condition`
-        — the ``π^♯`` anchor in :attr:`koszul_derived` doesn't shift it.
+       , the ``π^♯`` anchor in :attr:`koszul_derived` doesn't shift it.
         What differs from the function-level condition is the *name*,
         which is keyed to the Koszul view for display / theorem-book
         citations.
@@ -382,7 +382,7 @@ class PoissonBracket:
     ) -> ProofChain:
         """Reduce triple Koszul Jacobi ``(α, β, γ)`` to ``[π, π]_SN``.
 
-        Form-level counterpart of :meth:`prove_jacobi_reduction` — same
+        Form-level counterpart of :meth:`prove_jacobi_reduction`, same
         Derived Bracket Theorem citation, same ``[π, π]_SN`` obstruction,
         just driven by the :attr:`koszul_derived` bracket so the Jacobi
         sum is written on 1-form operands lifted through ``π^♯``. The
@@ -455,7 +455,7 @@ def poisson_bracket(
     degree_bivector: DegreeLike = 1,
     name: Optional[str] = None,
 ) -> PoissonBracket:
-    """Build ``{·, ·}_π`` — mirror of :meth:`PoissonBracket.from_bivector`."""
+    """Build ``{·, ·}_π``, mirror of :meth:`PoissonBracket.from_bivector`."""
     return PoissonBracket(pi, degree_bivector=degree_bivector, name=name)
 
 
@@ -476,7 +476,7 @@ def _build_poisson_jacobi_theorem() -> Theorem:
     ``(f, g, h)`` so the theorem record is concrete.
 
     The theorem's ``from_axioms`` lists the Derived Bracket Theorem and
-    the hypothesis ``[π, π]_SN = 0`` — together they close the
+    the hypothesis ``[π, π]_SN = 0``, together they close the
     conditional chain into an unconditional Jacobi identity on
     ``{·, ·}_π``.
     """
@@ -526,8 +526,8 @@ def _build_poisson_koszul_equivalence_theorem() -> Theorem:
 
     Both :attr:`PoissonBracket.koszul_derived` and
     :attr:`PoissonBracket.koszul_classical` emit the same
-    :class:`Expr` — they share the ``Sharp(π)`` anchor by construction
-    — so the proof closes in a single reflexive step. The seeded
+    :class:`Expr`, they share the ``Sharp(π)`` anchor by construction
+   , so the proof closes in a single reflexive step. The seeded
     record fixes generic symbols ``(π, α, β)`` as a concrete witness;
     downstream callers produce their own chain on the concrete operands
     they care about via :meth:`PoissonBracket.prove_koszul_equivalence`.
@@ -562,7 +562,7 @@ def _build_poisson_koszul_equivalence_theorem() -> Theorem:
     )
 
 
-#: The Poisson–Koszul equivalence theorem — the form-level counterpart
+#: The Poisson–Koszul equivalence theorem, the form-level counterpart
 #: of :data:`THEOREM_POISSON_JACOBI`. Seeded into
 #: :data:`~jacopy.library.theorem_book.theorem_book` at import time.
 THEOREM_POISSON_KOSZUL_EQUIVALENCE = _build_poisson_koszul_equivalence_theorem()
@@ -579,8 +579,8 @@ def _build_poisson_koszul_jacobi_theorem() -> Theorem:
     Koszul Jacobi sum on ``(α, β, γ)`` (1-forms, lifted through ``π^♯``)
     reduces to the *same* universal obstruction ``[π, π]_SN``. The
     structural identity ``koszul_derived.jacobi_obstruction ==
-    derived.jacobi_obstruction`` — the ``acting_on`` anchor doesn't
-    shift the ``[Q, Q]_base`` on a DerivedBracket — is what lets this
+    derived.jacobi_obstruction``, the ``acting_on`` anchor doesn't
+    shift the ``[Q, Q]_base`` on a DerivedBracket, is what lets this
     record share its Poisson hypothesis with the function-level
     theorem.
     """
@@ -611,8 +611,8 @@ def _build_poisson_koszul_jacobi_theorem() -> Theorem:
         notes=(
             "Form-level analogue of poisson_jacobi. The Koszul view's "
             "Jacobi obstruction coincides with the SN self-bracket "
-            "[π, π]_SN — anchor ``acting_on=Sharp(π)`` reshapes the "
-            "expansion but leaves [Q, Q]_base untouched — so one "
+            "[π, π]_SN, anchor ``acting_on=Sharp(π)`` reshapes the "
+            "expansion but leaves [Q, Q]_base untouched, so one "
             "Poisson hypothesis discharges both views at once."
         ),
     )

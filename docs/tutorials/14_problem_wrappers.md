@@ -1,7 +1,7 @@
-# 14 — Solving textbook problems with Problem wrappers
+# 14, Solving textbook problems with Problem wrappers
 
 The lower-level pieces of `jacopy` (`Symbol`, `BracketApply`,
-`prove_equivalence`, `default_engine`) give you everything you need —
+`prove_equivalence`, `default_engine`) give you everything you need,
 *if* you're willing to wire each problem from scratch: declare every
 grading, register every defining relation, layer every closure axiom
 on the engine. For one-off experiments that's fine. For a textbook's
@@ -25,8 +25,8 @@ You then ask the wrapper for proofs through `prove_*` methods. Each
 returns a `ProofChain` you can inspect, render, or feed into the
 diagnostic / publication helpers from tutorials 10 and 11.
 
-This tutorial walks through the two main wrappers — `SymplecticProblem`
-(form-side) and `KoszulProblem` (Poisson form-bracket side) — on
+This tutorial walks through the two main wrappers, `SymplecticProblem`
+(form-side) and `KoszulProblem` (Poisson form-bracket side), on
 problems lifted from §2 of the question bank.
 
 ## Setting up a `SymplecticProblem`
@@ -51,13 +51,13 @@ print(prob)
 ```
 
 The wrapper auto-declares `Closed(ω)` and `NonDegenerate(ω)` on the
-registry — this is the symplectic problem statement, not a separate
+registry, this is the symplectic problem statement, not a separate
 hypothesis you need to remember to assert. It also creates one
 `HamiltonianVectorField` per function (`X_f`, `X_g`) with the defining
 relation `ι_{X_f} ω = −df` baked into the engine (`sign="-"` is the
 default; pass `sign="+"` for the textbook convention).
 
-## Question 2a — Hamiltonian invariance
+## Question 2a, Hamiltonian invariance
 
 The first canonical problem on a symplectic form: the symplectic form
 is preserved under the Hamiltonian flow, `L_{X_f} ω = 0`. With the
@@ -85,15 +85,15 @@ Every step has a named rule (`L_X := d∘ι_X + ι_X∘d`,
 `Closed: d(ω) = 0`, `d² = 0`, …) so you can read the proof end-to-end
 and spot exactly where each axiom enters.
 
-## Question 2c — Hamiltonian equality
+## Question 2c, Hamiltonian equality
 
 A more involved problem: prove the bracket `{f,g}_ω` defines a
 Hamiltonian via `[X_f, X_g] = X_{\{f,g\}}`. The wrapper exposes two
-helpers that close this kind of question — `prove_vector_field_equality`
+helpers that close this kind of question, `prove_vector_field_equality`
 (reduces to `Y = Z` via non-degeneracy) and `prove_hamiltonian_equality`
 (closes `ι_Y ω = ±dh` directly).
 
-The simplest demonstration is the trivial reflexive case — prove that
+The simplest demonstration is the trivial reflexive case, prove that
 each Hamiltonian equals itself as a vector field:
 
 ```python
@@ -106,7 +106,7 @@ That's a 3-step closure: the obstruction `ι_{X_f} ω − ι_{X_f} ω` peels
 through the `NonDegenerate` rule to `X_f − X_f`, then `simplify`
 collapses it to `0`. The non-trivial use is when `Y` is e.g. a Lie
 bracket of two Hamiltonians and you want to recognise it as a third
-Hamiltonian — same call, different operands.
+Hamiltonian, same call, different operands.
 
 ## Setting up a `KoszulProblem`
 
@@ -140,7 +140,7 @@ print("output:", kprob.bracket_expansion_rule.rewrite(raw))
 ```
 
 The rewrite recovers the classical Koszul formula
-`L_{π^♯α} β − L_{π^♯β} α − d⟨π^♯α, β⟩` term by term — useful when you
+`L_{π^♯α} β − L_{π^♯β} α − d⟨π^♯α, β⟩` term by term, useful when you
 want to reduce a `[α,β]_K` expression by hand without committing to a
 full proof closure.
 
@@ -148,15 +148,15 @@ full proof closure.
 
 The wrapper is a convenience, not a wall. Three escape hatches:
 
-1. **The pre-wired engine is exposed as `prob.engine`** — feed it to
+1. **The pre-wired engine is exposed as `prob.engine`**, feed it to
    `prove_equivalence(..., engine=prob.engine)` to drive arbitrary
    equalities under the wrapper's axiom set. Useful when the
    problem you want to close isn't one of the named `prove_*`
    helpers.
-2. **The hamiltonians are accessible via `prob.hamiltonian(f)`** — you
+2. **The hamiltonians are accessible via `prob.hamiltonian(f)`**, you
    can build expressions with them (e.g. `Act(X_f, omega)`) and pass
    them to a strategy directly.
-3. **The wrapper never overrides existing registry declarations** —
+3. **The wrapper never overrides existing registry declarations**,
    if you've already declared `Graded` / `Scalar` / `Closed` on the
    relevant operands, the wrapper sees them and stays out of the
    way. Pre-declaring is the way to override the wrapper's default
@@ -175,7 +175,7 @@ The naming convention is consistent across the library:
 | `CartanStructureProblem` | `(connection, frame)` for Cartan I/II | (Q7 / Q9) |
 | `KoszulConnectionProblem` | facade over the three above for Koszul connections | `library/koszul_connection_problem.py` |
 
-Each follows the same pattern — `__init__` validates inputs and
+Each follows the same pattern, `__init__` validates inputs and
 declares structural axioms on the registry, properties expose the
 underlying objects, and `prove_*` methods drive closures via a
 pre-built engine. Tutorial 24 (in the backlog) walks through writing
@@ -185,9 +185,9 @@ your own following the same recipe.
 
 * Problem wrappers bundle `(structure, designated operands, registry,
   engine)` so you don't re-wire the same axioms across every question.
-* `SymplecticProblem` covers form-side problems on `(M, ω)` —
+* `SymplecticProblem` covers form-side problems on `(M, ω)`,
   Hamiltonian invariance, vector-field equality, Hamiltonian equality.
-* `KoszulProblem` covers Poisson form-bracket problems —
+* `KoszulProblem` covers Poisson form-bracket problems,
   `[α, β]_K` expansion, tilde calculus, derivator engines.
 * Wrappers don't override existing declarations; they fill in the
   *structural* axioms (Closed / NonDegenerate / Antisymmetric) when

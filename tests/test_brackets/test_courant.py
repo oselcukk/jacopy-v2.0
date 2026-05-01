@@ -59,7 +59,7 @@ class TestAxiomFlags:
         assert C.degree == Degree.const(0)
 
     def test_graded_antisymmetric(self):
-        """Courant is skew — this is the defining difference from Dorfman."""
+        """Courant is skew, this is the defining difference from Dorfman."""
         C = CourantBracket()
         assert C.is_graded_antisymmetric is True
 
@@ -69,7 +69,7 @@ class TestAxiomFlags:
         assert C.satisfies_leibniz is False
 
     def test_jacobi_is_conditional(self):
-        """Jacobi reported as None (conditional) — the H-twisted case
+        """Jacobi reported as None (conditional), the H-twisted case
         needs dH = 0 and the untwisted case is cleaner at the proof
         layer than as an unconditional flag."""
         C = CourantBracket()
@@ -97,7 +97,7 @@ class TestUntwistedExpansion:
         assert out.vector == LieBracket().expand(X, Y)
 
     def test_form_part_has_three_terms(self):
-        """L_X β − L_Y α − ½ d(ι_X β − ι_Y α) — three terms in the Sum."""
+        """L_X β − L_Y α − ½ d(ι_X β − ι_Y α), three terms in the Sum."""
         C = CourantBracket()
         X, Y = Symbol("X"), Symbol("Y")
         alpha, beta = Symbol("α"), Symbol("β")
@@ -131,7 +131,7 @@ class TestUntwistedExpansion:
         assert out.form.children[2] == expected
 
     def test_form_part_uses_half_rational(self):
-        """The coefficient on the Cartan correction is a Rational(1, 2) —
+        """The coefficient on the Cartan correction is a Rational(1, 2),
         not an Integer, not a float."""
         C = CourantBracket()
         out = C.expand(

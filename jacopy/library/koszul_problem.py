@@ -7,11 +7,11 @@ form inventory, a registry, and a pre-configured
 :class:`ExpansionEngine` carrying every axiom a Koszul-bracket
 problem typically cites:
 
-* :class:`SharpLinearityDefinition` — ``π^♯(A + B) → π^♯(A) + π^♯(B)``,
-* :class:`SharpOnExactDefinition` — ``π^♯(df) → X_f``,
-* :class:`RegistryAntiSymCanonicalDefinition` — registry-driven
+* :class:`SharpLinearityDefinition`, ``π^♯(A + B) → π^♯(A) + π^♯(B)``,
+* :class:`SharpOnExactDefinition`, ``π^♯(df) → X_f``,
+* :class:`RegistryAntiSymCanonicalDefinition`, registry-driven
   canonicalization of ``π(α, β)``,
-* :class:`KoszulBracketExpansionDefinition` — Cartan-style expansion
+* :class:`KoszulBracketExpansionDefinition`, Cartan-style expansion
   of ``[α, β]_K`` for any pair of forms (the engine will fire on a
   :class:`BracketApply` whose bracket is this problem's Koszul
   bracket),
@@ -121,7 +121,7 @@ from jacopy.proof.expansion import Definition, ExpansionEngine, default_engine
 
 
 # --------------------------------------------------------------------- #
-# Engine rule — [α, β]_K → Cartan expansion                             #
+# Engine rule, [α, β]_K → Cartan expansion                             #
 # --------------------------------------------------------------------- #
 
 
@@ -154,7 +154,7 @@ class KoszulBracketExpansionDefinition(Definition):
 
 
 class KoszulProblem:
-    """``(π, ρ = π^♯, K = [·,·]_K, {α_i})`` — Koszul-bracket problem bundle.
+    """``(π, ρ = π^♯, K = [·,·]_K, {α_i})``, Koszul-bracket problem bundle.
 
     Parameters
     ----------
@@ -230,7 +230,7 @@ class KoszulProblem:
         # giving each multivector its SN-degree (0 for a scalar function,
         # 1 for a vector field, 2 for a bivector, ...). The wrapper auto-
         # declares ``Graded(degree=k)`` if the operand has no Graded
-        # property yet — symmetric to ``Antisymmetric`` on ``π`` but for
+        # property yet, symmetric to ``Antisymmetric`` on ``π`` but for
         # the tilde operands.
         mv_tuple: Tuple[Tuple[Expr, int], ...] = (
             () if multivectors is None else tuple(multivectors)
@@ -288,7 +288,7 @@ class KoszulProblem:
         engine.register(bracket_rule)
         # Tilde calculus auxiliary axioms (Faz 14.D) register *before*
         # the defining axioms (Faz 14.B). The auxiliaries are
-        # specificity shortcuts — each one's match condition is a strict
+        # specificity shortcuts, each one's match condition is a strict
         # subset of a defining axiom (Aux-1/2 narrow swap; Aux-3 narrows
         # magic; Aux-4/5 narrow Lichnerowicz). Engine ordering picks the
         # first matching rule, so registering the specific ones first
@@ -400,7 +400,7 @@ class KoszulProblem:
     def tilde_aux_rules(self) -> Tuple[Definition, ...]:
         r"""The five Faz 14.D auxiliary rules in registration order.
 
-        Order: ``(iota0, iota_sq, lie0, d_func, d_sq)`` —
+        Order: ``(iota0, iota_sq, lie0, d_func, d_sq)``,
         :class:`TildeIotaOnZeroVectorDefinition`,
         :class:`TildeIotaSquaredZeroDefinition`,
         :class:`TildeLieOnZeroVectorDefinition`,
@@ -416,7 +416,7 @@ class KoszulProblem:
 
         Bundle (in match order):
 
-        * the three Faz 14.E.1 intrinsic rules (ι̃, L̃, d̃) — each one
+        * the three Faz 14.E.1 intrinsic rules (ι̃, L̃, d̃), each one
           unfolds an operator-on-multivector head wrapped in a
           ``slot_kind="covector"`` :class:`MultiEval`,
         * the four MultiEval helpers (Faz 12.A.0/12.A.4),
@@ -445,7 +445,7 @@ class KoszulProblem:
         # TildeDOfFunction) are *not* registered here: each one
         # competes with the intrinsic-formula rules at the operator
         # level and races with the d̃/L̃ intrinsic expansion when the
-        # operand is a MultiEval-derived scalar — registering them on
+        # operand is a MultiEval-derived scalar, registering them on
         # the proof engine breaks the Cartan-magic closure (Aux-4
         # rewrites the post-Aux-6 ``d̃(V(ω))`` into ``-X_{V(ω)}``,
         # blocking syntactic equality with the d̃-intrinsic-derived
@@ -488,9 +488,9 @@ class KoszulProblem:
         * :class:`KoszulBracketExpansionDefinition` for this problem
         * :class:`SharpLinearityDefinition` and
           :class:`SharpOnExactDefinition`
-        * :class:`CartanRemainderDefinition` —
+        * :class:`CartanRemainderDefinition`,
           ``K_V ω → −L_V ω + d ι_V ω``
-        * :class:`TildeCartanRemainderDefinition` —
+        * :class:`TildeCartanRemainderDefinition`,
           ``K̃_η V → −L̃_η V + d̃ ι̃_η V``
         * the three tilde defining axioms (swap / Lichnerowicz / magic)
           plus the Poisson-gated d̃² aux rule, so a ``K̃_η V`` chain
@@ -527,7 +527,7 @@ class KoszulProblem:
             self._sharp, registry=self._registry
         )
         engine.register(me_ham_rule)
-        # Faz 15.C — §3.1.5 form-side identity (3) closure rules.
+        # Faz 15.C, §3.1.5 form-side identity (3) closure rules.
         # Order: vf-Leibniz on Pairing first (opens scalar pairings into
         # standard-shape sums), then Poisson commutator (opens
         # ι_[π,W]_SN(ω) shapes), then Pairing→MultiEval bridge (unifies
@@ -551,7 +551,7 @@ class KoszulProblem:
             self._sharp, registry=self._registry
         )
         engine.register(me_bivector_antisym_rule)
-        # Faz 15.C — identity (1) closure: permissive VF-commutator pair
+        # Faz 15.C, identity (1) closure: permissive VF-commutator pair
         # finder + LieBracketVF antisymmetry. The pair finder folds bare
         # ``Symbol`` vfs (which the original closure rule rejects) into
         # ``LieBracketVF`` atoms; the antisymmetry rule canonicalizes
@@ -568,7 +568,7 @@ class KoszulProblem:
         # MultiEval, the Jacobi rule collapses each cyclic triple to 0.
         lbvf_jacobi_rule = LieBracketVfJacobiDefinition()
         engine.register(lbvf_jacobi_rule)
-        # AtomSlotLift — opens opaque atom slots (LieDerivative.vector_field,
+        # AtomSlotLift, opens opaque atom slots (LieDerivative.vector_field,
         # LieBracketVF.X/.Y, etc.) so the SharpOnExact / SnBracketOfFunction
         # rewrites can reach inside. The inner engine carries only the
         # canonicalization rules to keep the lift terminating; the main
@@ -599,7 +599,7 @@ class KoszulProblem:
         r"""Multivector-side engine for Section 3.1.5 derivator identities.
 
         Extends :meth:`tilde_intrinsic_engine` with both Cartan-remainder
-        rules and the full family of Faz 15.C closure axioms — the dual
+        rules and the full family of Faz 15.C closure axioms, the dual
         identities (1')/(2')/(3') need the same Pairing-Leibniz +
         Poisson-commutator + commutator-pair-finder + Jacobi machinery
         as the form side, just routed through the tilde-intrinsic
@@ -616,7 +616,7 @@ class KoszulProblem:
                 self._sharp, registry=self._registry, d=self._d
             )
         )
-        # Form-side Cartan intrinsics — the dual identities reduce
+        # Form-side Cartan intrinsics, the dual identities reduce
         # ``ι̃_α(V)`` shapes to scalar pairings then flip arity-1
         # covector evaluations to vector-slot ones, where the
         # form-side ``L_X`` magic and ``d``-arity-1 rules close them.
@@ -664,7 +664,7 @@ class KoszulProblem:
         engine.register(lbvf_antisym_rule)
         lbvf_jacobi_rule = LieBracketVfJacobiDefinition()
         engine.register(lbvf_jacobi_rule)
-        # Faz 15.C — multivector-side dual closures: SN→VF for 1-vfs,
+        # Faz 15.C, multivector-side dual closures: SN→VF for 1-vfs,
         # ι̃-act-as-scalar bridge for LieBracketVF, arity-1 covector
         # pairing flip. Together these route the (3') residue through
         # the form-side intrinsic Cartan-magic / d-arity-1 rules.
@@ -696,7 +696,7 @@ class KoszulProblem:
         engine.register(hvf_inner_normalize_rule)
         sn_neg_rule = SnBracketNegLinearityDefinition()
         engine.register(sn_neg_rule)
-        # Faz 15.C — (1') closure: tilde-Lie Lichnerowicz on a 1-vector
+        # Faz 15.C, (1') closure: tilde-Lie Lichnerowicz on a 1-vector
         # plus SN-bracket Sum-distribution. The Lichnerowicz rewrite
         # emits a three-term Sum into a SN-bracket slot; the Sum
         # linearity then peels each summand into its own bracket so the
@@ -771,7 +771,7 @@ class KoszulProblem:
         lhs, rhs
             Operator-valued expressions whose equality is to be shown.
         eval_args
-            Tuple of expressions to evaluate against — vector fields
+            Tuple of expressions to evaluate against, vector fields
             for ``side="form"``, 1-forms for ``side="multivector"``.
         side
             ``"form"`` (default) routes through
@@ -794,7 +794,7 @@ class KoszulProblem:
                 "KoszulProblem.prove_derivator side must be "
                 "'form' or 'multivector'"
             )
-        # Pre-pass — canonicalize operator-atom index slots before the
+        # Pre-pass, canonicalize operator-atom index slots before the
         # MultiEval wrap. The engine's bottom-up walk treats those
         # slots as opaque (see operator_atom_index_opacity memo); the
         # pass expands K̃/K-remainder atoms there and distributes any
@@ -835,7 +835,7 @@ class KoszulProblem:
         return BracketApply(self._koszul, alpha, beta)
 
     def tilde_d(self) -> TildeExteriorDerivative:
-        r"""``d̃ = [π, ·]_SN`` — the Lichnerowicz differential bound to ``π``.
+        r"""``d̃ = [π, ·]_SN``, the Lichnerowicz differential bound to ``π``.
 
         Returns a fresh :class:`TildeExteriorDerivative` instance; structural
         equality on the class makes it compare equal to any other
@@ -845,7 +845,7 @@ class KoszulProblem:
         return TildeExteriorDerivative(self._pi)
 
     def tilde_interior(self, omega: Expr) -> TildeInteriorProduct:
-        r"""``ι̃_ω`` — form-indexed contraction on multivectors.
+        r"""``ι̃_ω``, form-indexed contraction on multivectors.
 
         ``omega`` is a 1-form; the engine's :class:`TildeIotaSwapDefinition`
         will rewrite ``Act(ι̃_ω, V) → Act(ι_V, ω)``.
@@ -857,7 +857,7 @@ class KoszulProblem:
         return TildeInteriorProduct(omega)
 
     def tilde_lie(self, omega: Expr) -> TildeLieDerivative:
-        r"""``L̃_ω = d̃∘ι̃_ω + ι̃_ω∘d̃`` — tilde Lie derivative bound to ``π``.
+        r"""``L̃_ω = d̃∘ι̃_ω + ι̃_ω∘d̃``, tilde Lie derivative bound to ``π``.
 
         The form parameter ``omega`` is the indexing 1-form; the bivector
         is the problem's ``π``. The engine's :class:`TildeLieMagicDefinition`
@@ -868,7 +868,7 @@ class KoszulProblem:
         return TildeLieDerivative(omega, self._pi)
 
     def assume_poisson(self) -> None:
-        r"""Declare ``[π, π]_SN = 0`` on the registry — Poisson condition.
+        r"""Declare ``[π, π]_SN = 0`` on the registry, Poisson condition.
 
         Idempotent: calling this on a problem whose ``π`` already carries
         :class:`Poisson` is a no-op, so callers can invoke it freely from
@@ -881,7 +881,7 @@ class KoszulProblem:
     def bracket_expansion(self, alpha: Expr, beta: Expr) -> Expr:
         r"""Cartan expansion of ``[α, β]_K`` as a :class:`Sum` node.
 
-        Skips the inert :class:`BracketApply` shape — equivalent to
+        Skips the inert :class:`BracketApply` shape, equivalent to
         feeding :meth:`bracket` through the engine, but cheaper when
         the caller wants the expanded form directly (e.g. as the RHS
         of a manually authored proof step).

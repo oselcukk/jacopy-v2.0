@@ -1,30 +1,30 @@
-# 06 — Custom bracket
+# 06, Custom bracket
 
 Earlier tutorials worked with the brackets shipped in the package:
 `LieBracket`, `sn`, `KoszulBracket`, `CourantBracket`… When the
 user wants to insert their own definition rule (an expansion
-function) as a bracket — without writing a full `GradedBracket`
-subclass — `jacopy.brackets.custom.CustomBracket` is the entry
+function) as a bracket, without writing a full `GradedBracket`
+subclass, `jacopy.brackets.custom.CustomBracket` is the entry
 point. This tutorial covers (a) the minimum data profile of
 `CustomBracket`, (b) declaring its axiom profile through flags,
 (c) the path `prove_jacobi` follows on this kind of bracket, and
 (d) when to graduate from `CustomBracket` to a `GradedBracket`
 subclass.
 
-[05 — Cartan calculus](05_cartan_calculus.md) covered the
+[05, Cartan calculus](05_cartan_calculus.md) covered the
 operator-level relations of stock brackets; here we step back and
 define a bracket of our own at the symbol level.
 
-## The minimum profile — two arguments
+## The minimum profile, two arguments
 
 `CustomBracket(name, expand_fn, *, degree, is_graded_antisymmetric,
 satisfies_leibniz, satisfies_graded_jacobi)`. Required fields are
-just the name and the expand callable — everything else has
+just the name and the expand callable, everything else has
 sensible defaults (degree 0, antisymmetric, Leibniz, Jacobi).
 
 `expand_fn` has a fixed signature: `(a, b, registry) → Expr`. The
 registry is passed on every call even when the rule doesn't need
-it — so the call shape stays uniform across brackets.
+it, so the call shape stays uniform across brackets.
 
 ```python
 from jacopy.brackets.custom import CustomBracket
@@ -57,7 +57,7 @@ expects:
 | `satisfies_leibniz` | Leibniz on the second slot | `True` |
 | `satisfies_graded_jacobi` | graded Jacobi | `True` / `False` / `None` |
 
-`None` is a third option — *conditional Jacobi*. `DerivedBracket`
+`None` is a third option, *conditional Jacobi*. `DerivedBracket`
 is the canonical example; if your custom bracket's Jacobi depends
 on a separate condition (e.g. `[Q,Q]_base = 0`), set the flag to
 `None` and let the proof layer pick the right strategy.
@@ -74,12 +74,12 @@ B_asym.is_graded_antisymmetric, B_asym.satisfies_graded_jacobi
 # (False, False)
 ```
 
-## `prove_jacobi` — the generic dispatch path
+## `prove_jacobi`, the generic dispatch path
 
 A `CustomBracket` is not a `DerivedBracket`; `prove_jacobi`
 dispatches it onto the generic `GradedBracket` path. That path:
 
-1. `graded_jacobi_obstruction(a, b, c, registry)` — the triple
+1. `graded_jacobi_obstruction(a, b, c, registry)`, the triple
    cyclic sum `(−1)^{|a||c|}[a,[b,c]] + …`.
 2. Expands every bracket node through `expand_fn` (the
    `bracket-expand` step).
@@ -140,16 +140,16 @@ B.leibniz_obstruction(a, b, c, reg)
 # ([·,·](a, (b * c)) + (-([·,·](a, b) * c)) + (-(b * [·,·](a, c))))
 ```
 
-Each is an `Expr` — running `simplify(..., reg)` on it tests
+Each is an `Expr`, running `simplify(..., reg)` on it tests
 whether the rule satisfies that axiom. If parity is undecidable
 (`None`), it raises `ValueError` and you need to narrow the
 operand degrees. The early failure at the symbolic level is by
-design — catching it here is cheaper than at proof-layer time.
+design, catching it here is cheaper than at proof-layer time.
 
 ## `_identity_key` and equality
 
 Two `CustomBracket`s compare equal only when they share the
-*same* expand callable. Python function identity is used — two
+*same* expand callable. Python function identity is used, two
 different `lambda`s with identical names and degrees are still
 distinct brackets:
 
@@ -183,6 +183,6 @@ or a `Theorem` registered against `theorem_book`, subclass
 
 `CustomBracket` exposes a rule but does not extract a *structure*.
 A derived bracket, by contrast, picks a single "generator" `Q`
-and builds the upstairs bracket axioms automatically — Poisson,
+and builds the upstairs bracket axioms automatically, Poisson,
 Koszul, and Courant brackets are all instances of this
-construction. [07 — Derived bracket](07_derived_bracket.md).
+construction. [07, Derived bracket](07_derived_bracket.md).

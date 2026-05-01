@@ -42,7 +42,7 @@ class TestLatexTableBasics:
 
 class TestLatexTableSchwarzschild:
     def test_christoffel_listing(self) -> None:
-        """Schwarzschild Christoffel rendering — verify a known entry."""
+        """Schwarzschild Christoffel rendering, verify a known entry."""
         F, g = schwarzschild()
         LC = levi_civita(g)
         out = to_latex_table(LC)

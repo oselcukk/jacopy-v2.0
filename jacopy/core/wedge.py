@@ -1,5 +1,5 @@
 r"""
-Wedge product Expr node — the graded-antisymmetric counterpart of
+Wedge product Expr node, the graded-antisymmetric counterpart of
 :class:`~jacopy.core.expr.Product`.
 
 In differential geometry the wedge ``α ∧ β`` is distinct from a plain
@@ -13,14 +13,14 @@ the two semantics from leaking into one another.
 Earlier stages (Faz 17.E.4) deferred the dedicated Wedge node on the
 basis that wedges that surface inside an :class:`IndexedSum` body
 already behave like a structural product for the rules that fire
-there. That deferral is local — the moment Cartan I/II structure
+there. That deferral is local, the moment Cartan I/II structure
 equations expose ``α ∧ β`` to a :class:`~jacopy.core.multi_eval.MultiEval`
 and ask "what is its action on two vector fields?", a real Wedge node
 is needed: the alternating expansion ``(α ∧ β)(U, V) = α(U)·β(V) −
 α(V)·β(U)`` cannot be derived from Product semantics without further
 input. So Faz 17.F.1.5 introduces this node.
 
-The Expr node itself is purely structural — the action axiom
+The Expr node itself is purely structural, the action axiom
 ``MultiEval(Wedge(α₁, …, α_p), X_1, …, X_p) → det[α_i(X_j)]`` lives in
 :mod:`jacopy.calculus.wedge_axioms`. Smart-constructor handling here
 covers only the trivial identities a Product would (associativity,
@@ -40,7 +40,7 @@ class Wedge(Expr):
     r"""n-ary wedge product ``α_1 ∧ α_2 ∧ … ∧ α_p``.
 
     Children are stored in the order given. No graded reordering is
-    applied at construction — that requires degree information and
+    applied at construction, that requires degree information and
     lives in :mod:`jacopy.algorithms.sort_product` (or a dedicated
     wedge-sort pass added when needed).
 

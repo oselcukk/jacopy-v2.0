@@ -1,4 +1,4 @@
-"""Tests for OperatorEquation — the object wrapper around prove_operator_equation."""
+"""Tests for OperatorEquation, the object wrapper around prove_operator_equation."""
 
 import pytest
 

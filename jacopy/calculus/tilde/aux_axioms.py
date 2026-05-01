@@ -1,34 +1,34 @@
 r"""
-Tilde-calculus auxiliary axioms — Faz 14.D.
+Tilde-calculus auxiliary axioms, Faz 14.D.
 
 Five engine rewrite rules that close the gap between the three
 defining-axiom rules in :mod:`jacopy.calculus.tilde.axioms` and the
 six tilde Cartan relations on a 0-vector ``f`` and a 1-vector ``X``.
 Each rule mirrors a standard Cartan-side identity:
 
-* :class:`TildeIotaOnZeroVectorDefinition` — ``ι̃_ω f → 0`` for ``f``
+* :class:`TildeIotaOnZeroVectorDefinition`, ``ι̃_ω f → 0`` for ``f``
   registered as ``Graded(degree=0)``. Splits the 0-vector corner case
   out of the unconditional :class:`TildeIotaSwapDefinition` so the
   engine transcript shows it as a labelled step instead of a generic
   swap-then-cancel chain.
 
-* :class:`TildeIotaSquaredZeroDefinition` — ``ι̃_ω(ι̃_ω V) → 0``. The
+* :class:`TildeIotaSquaredZeroDefinition`, ``ι̃_ω(ι̃_ω V) → 0``. The
   ``η = ω`` special case of the anti-commute relation
   ``ι̃_ω ι̃_η + ι̃_η ι̃_ω = 0`` (relation 1 in §3.1.3); follows from the
   fact that ``ι̃_ω`` is a degree-(-1) derivation. Rule fires only when
   the two interior heads carry the *same* form.
 
-* :class:`TildeLieOnZeroVectorDefinition` — ``L̃_ω f → π^♯(ω)(f)``.
+* :class:`TildeLieOnZeroVectorDefinition`, ``L̃_ω f → π^♯(ω)(f)``.
   Mathematically ``L̃_ω f = X_ω(f)`` where ``X_ω = π^♯(ω)`` is the
   anchor of ``ω``; expressed as a nested ``Act(Act(Sharp(π), ω), f)``
   so existing Sharp / pairing rules pick the result up downstream.
 
-* :class:`TildeDOfFunctionDefinition` — ``d̃ f → −π^♯(df)`` for
+* :class:`TildeDOfFunctionDefinition`, ``d̃ f → −π^♯(df)`` for
   ``f`` degree 0. The Lichnerowicz definition ``[π, f]_SN`` collapses
   via SN base cases to ``−X_f``; this rule shortcuts the multi-step
   derivation to a single named step.
 
-* :class:`TildeDSquaredPoissonDefinition` — ``d̃² V → 0`` when ``π``
+* :class:`TildeDSquaredPoissonDefinition`, ``d̃² V → 0`` when ``π``
   carries the :class:`~jacopy.core.properties.Poisson` flag. Consumes
   the declarative bit set by
   :meth:`~jacopy.library.koszul_problem.KoszulProblem.assume_poisson`.
@@ -70,12 +70,12 @@ def _is_degree_zero(
 
 
 # --------------------------------------------------------------------- #
-# Aux-1 — ι̃_ω f → 0   (f degree 0)                                      #
+# Aux-1, ι̃_ω f → 0   (f degree 0)                                      #
 # --------------------------------------------------------------------- #
 
 
 class TildeIotaOnZeroVectorDefinition(Definition):
-    r"""``ι̃_ω f → 0`` — tilde interior product annihilates 0-vectors.
+    r"""``ι̃_ω f → 0``, tilde interior product annihilates 0-vectors.
 
     Fires on ``Act(TildeInteriorProduct(ω), f)`` whenever ``f`` resolves
     to degree 0 in the registry. The standard interior product ``ι_f ω``
@@ -105,12 +105,12 @@ class TildeIotaOnZeroVectorDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# Aux-2 — ι̃_ω(ι̃_ω V) → 0                                                #
+# Aux-2, ι̃_ω(ι̃_ω V) → 0                                                #
 # --------------------------------------------------------------------- #
 
 
 class TildeIotaSquaredZeroDefinition(Definition):
-    r"""``ι̃_ω(ι̃_ω V) → 0`` — squared tilde interior product vanishes.
+    r"""``ι̃_ω(ι̃_ω V) → 0``, squared tilde interior product vanishes.
 
     The ``η = ω`` special case of the anti-commute relation
     ``ι̃_ω ι̃_η + ι̃_η ι̃_ω = 0``; follows from ``ι̃_ω`` being a graded
@@ -139,19 +139,19 @@ class TildeIotaSquaredZeroDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# Aux-3 — L̃_ω f → π^♯(ω)(f)   (f degree 0)                              #
+# Aux-3, L̃_ω f → π^♯(ω)(f)   (f degree 0)                              #
 # --------------------------------------------------------------------- #
 
 
 class TildeLieOnZeroVectorDefinition(Definition):
-    r"""``L̃_ω f → (π^♯(ω))(f)`` — tilde Lie derivative of a function.
+    r"""``L̃_ω f → (π^♯(ω))(f)``, tilde Lie derivative of a function.
 
     Scoped to a Poisson bivector ``π``: matches only when the outer
     head is a :class:`TildeLieDerivative` whose
     :attr:`~jacopy.calculus.tilde.operators.TildeLieDerivative.bivector`
     equals ``π``, and the operand is degree 0.
 
-    The rewrite emits ``Act(Act(Sharp(π), ω), f)`` — i.e. the anchor
+    The rewrite emits ``Act(Act(Sharp(π), ω), f)``, i.e. the anchor
     ``π^♯(ω)`` (a vector field) acting on ``f`` (a function). Existing
     Sharp axioms (Faz 13.A) and ordinary derivation rules then take
     over; downstream proofs do not need to know this short-circuit
@@ -201,12 +201,12 @@ class TildeLieOnZeroVectorDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# Aux-4 — d̃ f → −π^♯(df)   (f degree 0)                                 #
+# Aux-4, d̃ f → −π^♯(df)   (f degree 0)                                 #
 # --------------------------------------------------------------------- #
 
 
 class TildeDOfFunctionDefinition(Definition):
-    r"""``d̃ f → −π^♯(df)`` — Lichnerowicz of a function shortcut.
+    r"""``d̃ f → −π^♯(df)``, Lichnerowicz of a function shortcut.
 
     Scoped to a Poisson bivector ``π`` (and an exterior derivative
     ``d``): matches only when the outer head is a
@@ -265,12 +265,12 @@ class TildeDOfFunctionDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# Aux-5 — d̃² V → 0   (π Poisson)                                         #
+# Aux-5, d̃² V → 0   (π Poisson)                                         #
 # --------------------------------------------------------------------- #
 
 
 class TildeDSquaredPoissonDefinition(Definition):
-    r"""``d̃² V → 0`` — tilde-d squared vanishes when ``π`` is Poisson.
+    r"""``d̃² V → 0``, tilde-d squared vanishes when ``π`` is Poisson.
 
     Scoped to a Poisson bivector ``π``: matches ``Act(d̃_π, Act(d̃_π, V))``
     only when the registry marks ``π`` with
@@ -281,7 +281,7 @@ class TildeDSquaredPoissonDefinition(Definition):
     Equivalent to the Jacobi identity ``[π, π]_SN = 0`` collapsed to a
     single rewrite: without the flag the rule is a strict no-op, so a
     proof script that omits ``assume_poisson()`` will see the engine
-    *not* close ``d̃²``-shaped obstructions — exactly the behaviour
+    *not* close ``d̃²``-shaped obstructions, exactly the behaviour
     desired when checking whether a candidate ``π`` is Poisson at all.
     """
 
@@ -325,7 +325,7 @@ class TildeDSquaredPoissonDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# Aux-6 — Act(D, Act(ι̃_ω, V)) → Act(D, MultiEval(V, ω))   (V deg 1)      #
+# Aux-6, Act(D, Act(ι̃_ω, V)) → Act(D, MultiEval(V, ω))   (V deg 1)      #
 # --------------------------------------------------------------------- #
 
 
@@ -352,7 +352,7 @@ class TildeIotaActAsScalarDefinition(Definition):
     :class:`~jacopy.calculus.tilde.intrinsic_axioms.TildeDIntrinsicDefinition`
     (``(d̃ f)(η) = π^♯(η)·f``) produces residues like
     ``Act(Act(Sharp(π), η), Act(ι̃_ω, V))`` where the inner
-    ``Act(ι̃_ω, V)`` is bare — no enclosing MultiEval — so the iota
+    ``Act(ι̃_ω, V)`` is bare, no enclosing MultiEval, so the iota
     intrinsic can't reach it. Without this bridge the tilde Cartan-magic
     relation ``L̃_ω V = (d̃ ι̃_ω + ι̃_ω d̃) V``, evaluated at a single
     1-form, leaves a residue ``π^♯(η)(ι̃_ω V) − π^♯(η)(V(ω))``.

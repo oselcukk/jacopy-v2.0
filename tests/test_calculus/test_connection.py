@@ -1,4 +1,4 @@
-"""Tests for the affine-connection module — Faz 16.A."""
+"""Tests for the affine-connection module, Faz 16.A."""
 
 from __future__ import annotations
 
@@ -291,7 +291,7 @@ def test_engine_drives_full_expansion():
     e = nabla.eval(Sum(X, Y), Sum(Product(f, Z), W))
     final, steps = engine.expand(e)
     # Should contain four ConnectionEvalExpr's worth of terms after
-    # full distribution: ∇_X(f·Z), ∇_X(W), ∇_Y(f·Z), ∇_Y(W) — and
+    # full distribution: ∇_X(f·Z), ∇_X(W), ∇_Y(f·Z), ∇_Y(W), and
     # each f·Z further distributes to X(f)·Z + f·∇_X Z. So six
     # leaves total.
     leaves = list(final.find(lambda n: isinstance(n, ConnectionEvalExpr)))
@@ -300,7 +300,7 @@ def test_engine_drives_full_expansion():
 
 
 # --------------------------------------------------------------------- #
-# ConnectionXScalarPullDefinition — Faz 17.D                             #
+# ConnectionXScalarPullDefinition, Faz 17.D                             #
 # --------------------------------------------------------------------- #
 
 
@@ -339,7 +339,7 @@ def test_x_scalar_pull_does_not_match_singleton_product():
     nabla = connection("∇")
     rule = ConnectionXScalarPullDefinition(nabla)
     X, Y = Symbol("X"), Symbol("Y")
-    # Single-factor product — there's no scalar to pull.
+    # Single-factor product, there's no scalar to pull.
     e = nabla.eval(X, Y)
     assert not rule.matches(e)
 

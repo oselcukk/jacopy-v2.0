@@ -1,24 +1,24 @@
 r"""
-Frame protocol + the three frame implementations — Stage A.
+Frame protocol + the three frame implementations, Stage A.
 
 A *frame* is a basis ``(e_1, …, e_n)`` of vector fields on (an open
 set of) a manifold, together with the dual coframe ``(e^1, …, e^n)``
 of 1-forms. In `frame_calc` a :class:`Frame` is *not* an :class:`Expr`
-— it is a wrapper exposing two operations downstream code consumes:
+, it is a wrapper exposing two operations downstream code consumes:
 
-* **Frame derivative** ``e_a(f)`` — the action of the frame vector
+* **Frame derivative** ``e_a(f)``, the action of the frame vector
   field ``e_a`` on a function ``f``.
 * **Lie bracket structure constants** ``γ^a_{bc}`` from
   ``[e_b, e_c] = γ^a_{bc} e_a``.
 
 Three concrete frames implement the protocol:
 
-* :class:`CoordinateFrame` — ``e_a = ∂/∂x^a``. Frame derivative
+* :class:`CoordinateFrame`, ``e_a = ∂/∂x^a``. Frame derivative
   is SymPy partial differentiation; structure constants are zero.
   This is the Stage A focus.
-* :class:`AbstractFrame` — ``e_a`` opaque, ``γ^a_{bc}`` either
+* :class:`AbstractFrame`, ``e_a`` opaque, ``γ^a_{bc}`` either
   user-supplied or left as opaque atoms. Stage A.2.
-* :class:`Tetrad` — ``e_a = e_a^μ ∂/∂x^μ`` defined by a vielbein
+* :class:`Tetrad`, ``e_a = e_a^μ ∂/∂x^μ`` defined by a vielbein
   matrix on top of a coordinate frame. Stage B.
 
 Stage A defines the protocol and a fully-working
@@ -26,7 +26,7 @@ Stage A defines the protocol and a fully-working
 :class:`NotImplementedError` until their stages land.
 
 The protocol is **duck-typed** rather than a strict
-:class:`abc.ABC` — Python's structural typing keeps the interface
+:class:`abc.ABC`, Python's structural typing keeps the interface
 informal, and downstream code only ever calls the two methods.
 """
 
@@ -122,7 +122,7 @@ class Frame:
 
 
 # --------------------------------------------------------------------- #
-# CoordinateFrame — Stage A                                             #
+# CoordinateFrame, Stage A                                             #
 # --------------------------------------------------------------------- #
 
 
@@ -150,7 +150,7 @@ class CoordinateFrame(Frame):
     The :meth:`derivative` of a SymPy expression is just
     :func:`sympy.diff` on the corresponding coordinate symbol.
     Higher-level callers (``levi_civita``, ``curvature``, …) treat
-    the result as a SymPy expression — they don't need to know
+    the result as a SymPy expression, they don't need to know
     the frame is coordinate.
     """
 
@@ -229,7 +229,7 @@ class CoordinateFrame(Frame):
 
 
 # --------------------------------------------------------------------- #
-# AbstractFrame — Stage A.2 stub                                        #
+# AbstractFrame, Stage A.2 stub                                        #
 # --------------------------------------------------------------------- #
 
 
@@ -237,7 +237,7 @@ class AbstractFrame(Frame):
     r"""Abstract frame with user-supplied (or opaque) ``γ^a_{bc}``.
 
     Stage A.2 deliverable. Used when the metric components and frame
-    structure are kept symbolic — every derivative becomes an opaque
+    structure are kept symbolic, every derivative becomes an opaque
     :class:`~jacopy.frame_calc.symbolic_atoms.FrameDerivativeExpr` and
     every uncovered structure constant becomes a
     :class:`~jacopy.frame_calc.symbolic_atoms.GammaExpr`. Higher-level
@@ -261,7 +261,7 @@ class AbstractFrame(Frame):
 
     Notes
     -----
-    Two distinct :class:`AbstractFrame` instances are *not* equal —
+    Two distinct :class:`AbstractFrame` instances are *not* equal,
     each ``derivative`` / ``gamma`` call keys on ``id(self)``, so two
     abstract frames inside the same expression stay distinct. This
     matches the way Cartan calculus's :class:`LocalFrame` distinguishes
@@ -326,11 +326,11 @@ class AbstractFrame(Frame):
         :class:`~jacopy.frame_calc.symbolic_atoms.FrameDerivativeExpr`.
 
         ``expr`` must be a :class:`~jacopy.core.expr.Expr`. The body
-        is preserved verbatim — substitutions inside it still fire
+        is preserved verbatim, substitutions inside it still fire
         through the standard :meth:`Expr.substitute_atom` traversal.
         """
         self._check_index("derivative", a)
-        # Local import: symbolic_atoms imports Expr but not Frame — no cycle.
+        # Local import: symbolic_atoms imports Expr but not Frame, no cycle.
         from jacopy.frame_calc.symbolic_atoms import FrameDerivativeExpr
         from jacopy.core.expr import Expr as _Expr
 
@@ -362,7 +362,7 @@ class AbstractFrame(Frame):
 
 
 # --------------------------------------------------------------------- #
-# Tetrad — Stage B stub                                                  #
+# Tetrad, Stage B stub                                                  #
 # --------------------------------------------------------------------- #
 
 

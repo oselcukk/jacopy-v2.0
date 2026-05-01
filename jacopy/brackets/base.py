@@ -4,22 +4,22 @@ Graded bracket framework.
 A graded bracket is a bilinear operation ``[·, ·]`` on a graded module.
 Each bracket carries:
 
-* a ``degree`` — shifts total grade by this amount: ``|[a, b]| = |a| + |b| + degree``.
-* ``is_graded_antisymmetric`` — whether ``[a, b] = −(−1)^{|a||b|} [b, a]`` holds.
-* ``satisfies_leibniz`` — whether ``[a, b*c] = [a, b]*c + (−1)^{|a||b|} b*[a, c]`` holds.
-* ``satisfies_graded_jacobi`` — whether the graded Jacobi identity holds
+* a ``degree``, shifts total grade by this amount: ``|[a, b]| = |a| + |b| + degree``.
+* ``is_graded_antisymmetric``, whether ``[a, b] = −(−1)^{|a||b|} [b, a]`` holds.
+* ``satisfies_leibniz``, whether ``[a, b*c] = [a, b]*c + (−1)^{|a||b|} b*[a, c]`` holds.
+* ``satisfies_graded_jacobi``, whether the graded Jacobi identity holds
   (``True``, ``False``, or ``None`` for *conditional* brackets like the
   derived bracket, whose Jacobi is controlled by a separate condition).
 
 Brackets are *not* Exprs: they are Python-level operators. Applying a
 bracket to two Exprs builds an inert :class:`BracketApply` node in the
-expression tree — analogous to :class:`jacopy.algebra.derivation.Act`.
+expression tree, analogous to :class:`jacopy.algebra.derivation.Act`.
 The expansion (turning the opaque ``B(a, b)`` node into its defining
 formula) is done by :meth:`GradedBracket.expand`, which subclasses
 implement.
 
 The module also exposes *axiom obstruction* helpers. These return the
-Expr that the corresponding axiom claims is zero — feed it to
+Expr that the corresponding axiom claims is zero, feed it to
 ``simplify`` / ``canonicalize`` to check the axiom on concrete inputs.
 Mutating the tree to ``0`` is the certificate that the axiom holds;
 leaving a non-trivial remainder exposes the counterexample.
@@ -47,7 +47,7 @@ class BracketApply(Expr):
     Carries a reference to the :class:`GradedBracket` instance so the
     :func:`expand_bracket` algorithm (and :meth:`expand`) can delegate
     back to the bracket's expansion rule. The bracket itself is not an
-    Expr — treating it as such would invite accidental structural
+    Expr, treating it as such would invite accidental structural
     comparisons between two different brackets that happen to share a
     name or degree.
     """
@@ -81,7 +81,7 @@ class BracketApply(Expr):
 
     @property
     def children(self) -> Tuple[Expr, ...]:
-        # The bracket reference is not a child — children are Expr
+        # The bracket reference is not a child, children are Expr
         # operands only. Tree walks (walk, find, pattern match) see a
         # binary node.
         return (self._a, self._b)
@@ -231,7 +231,7 @@ class GradedBracket(ABC):
         """Return the definitional expansion of ``[a, b]``.
 
         Subclasses implement this with their concrete formula. The
-        expansion is purely syntactic — it does not invoke simplify /
+        expansion is purely syntactic, it does not invoke simplify /
         canonicalize; the caller pipes the result through whichever
         reductions they need.
         """
@@ -373,7 +373,7 @@ def expand_bracket(
     """Expand a single :class:`BracketApply` via its bracket's rule.
 
     Matches the :func:`jacopy.algebra.commutator.expand_commutator`
-    pattern — a standalone function that the rewrite layer can plug in
+    pattern, a standalone function that the rewrite layer can plug in
     as a rule, plus a :meth:`BracketApply.expand` convenience method.
     """
     return node.expand(registry)

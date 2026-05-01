@@ -41,7 +41,7 @@ class TestIotaSwap:
         X = Symbol("X")
         omega = Symbol("ω")
         rule = TildeIotaSwapDefinition()
-        # Standard ι_X(ω) — not the tilde shape.
+        # Standard ι_X(ω), not the tilde shape.
         assert not rule.matches(Act(InteriorProduct(X), omega))
 
     def test_no_match_on_atom(self):
@@ -106,7 +106,7 @@ class TestExteriorDLichnerowicz:
         pi2 = Symbol("π2")
         V = Symbol("V")
         rule = TildeExteriorDLichnerowiczDefinition(pi1)
-        # Same V, but tilde-d for a different bivector — must not match.
+        # Same V, but tilde-d for a different bivector, must not match.
         assert not rule.matches(Act(tilde_d(pi2), V))
 
     def test_no_match_on_standard_d(self):
@@ -165,7 +165,7 @@ class TestLieMagic:
         pi2 = Symbol("π2")
         V = Symbol("V")
         rule = TildeLieMagicDefinition(pi1)
-        # Same form, but L̃ for a different bivector — must not match.
+        # Same form, but L̃ for a different bivector, must not match.
         assert not rule.matches(Act(tilde_lie(omega, pi2), V))
 
     def test_no_match_on_standard_lie(self):
@@ -226,7 +226,7 @@ class TestEngineIntegration:
         )
         out, steps = engine.expand(Act(tilde_lie(omega, pi), X))
         # After the fix-point: both sides of the magic Sum have been
-        # rewritten — neither tilde-d nor tilde-iota survives.
+        # rewritten, neither tilde-d nor tilde-iota survives.
         assert "L̃_ω V" in steps[0].rule
         assert any("ι̃_ω V" in s.rule for s in steps)
         assert any("d̃ V" in s.rule for s in steps)

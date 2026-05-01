@@ -1,4 +1,4 @@
-"""Tests for Cartan-form Expr nodes — Faz 17.C."""
+"""Tests for Cartan-form Expr nodes, Faz 17.C."""
 
 from __future__ import annotations
 
@@ -356,7 +356,7 @@ def test_torsion_form_definition_arity_check():
     U = Derivation("U")
     V = Derivation("V")
     W = Derivation("W")
-    # Arity 3 — does not match.
+    # Arity 3, does not match.
     me = MultiEval(T, U, V, W)
     assert not rule.matches(me)
 

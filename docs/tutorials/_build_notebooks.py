@@ -2,8 +2,8 @@
 
 Each tutorial pairs a ``NN_topic.md`` with an executable ``NN_topic.ipynb``.
 Rather than maintain two copies by hand, the notebook sources live here
-as Python dicts — one ``(markdown cells, code cells)`` tuple per
-tutorial — and :func:`build_all` serialises them to ``.ipynb`` via
+as Python dicts, one ``(markdown cells, code cells)`` tuple per
+tutorial, and :func:`build_all` serialises them to ``.ipynb`` via
 :mod:`nbformat`.
 
 Run::
@@ -61,10 +61,10 @@ TUTORIAL_01: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 01 — First steps\n\n"
+        "# 01, First steps\n\n"
         "Companion notebook to [01_first_steps.md](01_first_steps.md). "
         "Building a symbolic expression in `jacopy`, declaring properties, "
-        "and simplifying — the basics.",
+        "and simplifying, the basics.",
     ),
     (
         "markdown",
@@ -90,7 +90,7 @@ TUTORIAL_01: list[tuple[str, str]] = [
     (
         "markdown",
         "## Declaring properties (`PropertyRegistry`)\n\n"
-        "Properties — degree, scalarity, graded antisymmetry, … — are "
+        "Properties, degree, scalarity, graded antisymmetry, …, are "
         "declared **externally** on symbols. That's what lets the same "
         "symbol be reused in different contexts (different degrees, "
         "different algebras).",
@@ -107,8 +107,8 @@ TUTORIAL_01: list[tuple[str, str]] = [
     (
         "markdown",
         "### Role-driven shortcuts\n\n"
-        "For common patterns — functions, vector fields, forms, bivectors "
-        "— `jacopy.library.declarations` exposes `Functions`, "
+        "For common patterns, functions, vector fields, forms, bivectors "
+        ", `jacopy.library.declarations` exposes `Functions`, "
         "`VectorFields`, `Forms`, `Bivector` helpers. Each collapses "
         "`Symbol(...)` plus the matching `reg.declare(...)` into a single "
         "call.",
@@ -125,7 +125,7 @@ TUTORIAL_01: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `simplify` — canonical form\n\n"
+        "## `simplify`, canonical form\n\n"
         "The `simplify(expr, registry)` pipeline: flatten → canonicalize → "
         "distribute → flatten → sort_product → collect_terms. With a "
         "registry the registered properties (commutativity, degree) are "
@@ -167,7 +167,7 @@ TUTORIAL_02: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 02 — The Jacobi identity\n\n"
+        "# 02, The Jacobi identity\n\n"
         "Companion notebook to [02_jacobi_identity.md](02_jacobi_identity.md). "
         "Closing the Jacobi identity for a Lie bracket in a single "
         "`prove_jacobi` call.",
@@ -177,7 +177,7 @@ TUTORIAL_02: list[tuple[str, str]] = [
         "## The Lie bracket and three vector fields\n\n"
         "`jacopy.brackets.lie.lie` is the module-level singleton for the "
         "standard manifold Lie bracket. The three vector fields are "
-        "declared with the `VectorFields` helper — each gets "
+        "declared with the `VectorFields` helper, each gets "
         "`Graded(degree=0)` attached, which is what the Jacobi expansion "
         "consults for sign rules.",
     ),
@@ -191,7 +191,7 @@ TUTORIAL_02: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `prove_jacobi` — does the obstruction vanish?\n\n"
+        "## `prove_jacobi`, does the obstruction vanish?\n\n"
         "The graded Jacobi identity:\n"
         "\n"
         "$$[X,[Y,Z]] + (-1)^{|X||Y|+|X||Z|}[Y,[Z,X]] + (-1)^{|Y||Z|+|X||Z|}[Z,[X,Y]] = 0$$\n"
@@ -250,7 +250,7 @@ TUTORIAL_03: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 03 — Poisson geometry\n\n"
+        "# 03, Poisson geometry\n\n"
         "Companion notebook to [03_poisson_geometry.md](03_poisson_geometry.md). "
         "Three equivalent views of the Poisson bracket on a symplectic "
         "manifold (derived, Hamiltonian, Koszul) plus the Jacobi proof "
@@ -258,11 +258,11 @@ TUTORIAL_03: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Symplectic manifold — `(ω, π, ♭, ♯)` bundle\n\n"
+        "## Symplectic manifold, `(ω, π, ♭, ♯)` bundle\n\n"
         "`SymplecticManifold(ω, bivector=π)` keeps the form, the inverse "
         "bivector, the musical maps, and the `MusicalCompatibility` "
         "axiom together in one object. On the registry `ω` is a 2-form "
-        "and `π` is a 2-vector with SN-degree 1 — the `Bivector` helper "
+        "and `π` is a 2-vector with SN-degree 1, the `Bivector` helper "
         "handles that automatically.",
     ),
     (
@@ -281,7 +281,7 @@ TUTORIAL_03: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `PoissonBracket` — three equivalent views\n\n"
+        "## `PoissonBracket`, three equivalent views\n\n"
         "Functions live at SN-shifted degree `−1`; the `Functions` "
         "helper takes the `degree=-1` kwarg for this context.",
     ),
@@ -294,7 +294,7 @@ TUTORIAL_03: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "### View 1 — the derived bracket\n\n"
+        "### View 1, the derived bracket\n\n"
         "`{f, g}_π = [[f, π]_SN, g]_SN`.",
     ),
     (
@@ -303,7 +303,7 @@ TUTORIAL_03: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "### View 2 — the Hamiltonian vector field\n\n"
+        "### View 2, the Hamiltonian vector field\n\n"
         "`{f, g}_π = X_f(g)`. On a symplectic manifold this is "
         "equivalent to `ι_{X_f} ω + df = 0`; "
         "`prove_hamiltonian_equivalence` closes that in five steps using "
@@ -321,10 +321,10 @@ TUTORIAL_03: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "### View 3 — the Koszul three-term formula\n\n"
+        "### View 3, the Koszul three-term formula\n\n"
         "On 1-forms `{α, β}_π = L_{π♯(α)} β − L_{π♯(β)} α − "
         "d⟨π♯(α), β⟩`. The classical Koszul bracket and the derived "
-        "bracket are *structurally equal* on this operand type — "
+        "bracket are *structurally equal* on this operand type, "
         "`prove_koszul_equivalence` records that in a single reflexive "
         "step.",
     ),
@@ -338,11 +338,11 @@ TUTORIAL_03: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `[π, π]_SN = 0` — the single condition\n\n"
+        "## `[π, π]_SN = 0`, the single condition\n\n"
         "The Derived Bracket Theorem reduces Jacobi for `{·, ·}_π` to "
         "one condition: `[π, π]_SN = 0`. The three-input reduction "
         "chain reaches the obstruction in a single `DerivedBracketTheorem` "
-        "step; for atomic `π` the obstruction stays opaque — the Jacobi "
+        "step; for atomic `π` the obstruction stays opaque, the Jacobi "
         "identity closes once the Poisson hypothesis is supplied.",
     ),
     (
@@ -356,9 +356,9 @@ TUTORIAL_03: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Theorem Book — the seeded theorem\n\n"
+        "## Theorem Book, the seeded theorem\n\n"
         "The library carries this reduction as a ready `Theorem` entry "
-        "under `poisson_jacobi` — downstream code wires the result "
+        "under `poisson_jacobi`, downstream code wires the result "
         "through a single citation.",
     ),
     (
@@ -372,7 +372,7 @@ TUTORIAL_03: list[tuple[str, str]] = [
         "markdown",
         "## Next step\n\n"
         "The Lie algebroid framework applies the same derivation "
-        "strategy to a bracket living on a vector bundle — "
+        "strategy to a bracket living on a vector bundle, "
         "[04_lie_algebroid.md](04_lie_algebroid.md).",
     ),
 ]
@@ -382,7 +382,7 @@ TUTORIAL_04: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 04 — Lie algebroid\n\n"
+        "# 04, Lie algebroid\n\n"
         "Companion notebook to [04_lie_algebroid.md](04_lie_algebroid.md). "
         "The `(E, [·,·]_E, ρ)` triple as a single object, anchor "
         "compatibility as a separate axiom, and the algebroid Cartan "
@@ -411,7 +411,7 @@ TUTORIAL_04: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Anchor compatibility — a separate axiom\n\n"
+        "## Anchor compatibility, a separate axiom\n\n"
         "`ρ([X, Y]_E) = [ρ(X), ρ(Y)]_{TM}` is part of the Lie algebroid "
         "**definition**; the bracket's own axioms do not entail it. "
         "Three presentations: an obstruction (Expr), a condition "
@@ -454,7 +454,7 @@ TUTORIAL_04: list[tuple[str, str]] = [
     (
         "markdown",
         "## Seeded theorem\n\n"
-        "The compatibility axiom is registered in `theorem_book` — "
+        "The compatibility axiom is registered in `theorem_book`, "
         "downstream theorems (algebroid Cartan, Courant–Dorfman bridge) "
         "cite it in a single step.",
     ),
@@ -478,7 +478,7 @@ TUTORIAL_05: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 05 — Cartan calculus\n\n"
+        "# 05, Cartan calculus\n\n"
         "Companion notebook to [05_cartan_calculus.md](05_cartan_calculus.md). "
         "The five Cartan relations as `OperatorEquation`s, the "
         "axiom/theorem split for `d² = 0`, live verification of the "
@@ -487,7 +487,7 @@ TUTORIAL_05: list[tuple[str, str]] = [
     (
         "markdown",
         "## The bundle\n\n"
-        "`CartanCalculus(d, L, ι, [·,·])` — four ingredients in one "
+        "`CartanCalculus(d, L, ι, [·,·])`, four ingredients in one "
         "object.",
     ),
     (
@@ -532,7 +532,7 @@ TUTORIAL_05: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `d² = 0` — axiom mode vs theorem mode\n\n"
+        "## `d² = 0`, axiom mode vs theorem mode\n\n"
         "The plain helper `apply_d_squared_zero` always rewrites to "
         "`0`. The default engine with "
         "`d_squared_mode=\"theorem\"` and foundational mode records "
@@ -554,7 +554,7 @@ TUTORIAL_05: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## All five relations — live proof via `verify`\n\n"
+        "## All five relations, live proof via `verify`\n\n"
         "`cartan_magic` closes in a single step in both modes on "
         "`ExteriorAlgebra((f,))`; the other four close at the "
         "generator level via `AgreementOnGenerators` + "
@@ -575,11 +575,11 @@ TUTORIAL_05: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `invariant_d` — theorem derived from magic + lie_iota\n\n"
-        "`dω(X, Y) = X(ω(Y)) − Y(ω(X)) − ω([X, Y])` — the Koszul-Cartan "
+        "## `invariant_d`, theorem derived from magic + lie_iota\n\n"
+        "`dω(X, Y) = X(ω(Y)) − Y(ω(X)) − ω([X, Y])`, the Koszul-Cartan "
         "invariant formula for 1-forms. `InvariantDOneFormDefinition`'s "
         "default classification is `\"theorem\"` (in contrast to "
-        "`d²=0`'s `\"axiom\"`) — the formula falls out naturally from "
+        "`d²=0`'s `\"axiom\"`), the formula falls out naturally from "
         "magic + lie_iota.",
     ),
     (
@@ -592,7 +592,7 @@ TUTORIAL_05: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Twisted Cartan bundle — `d_H = d + H∧`\n\n"
+        "## Twisted Cartan bundle, `d_H = d + H∧`\n\n"
         "For a closed 3-form `H`, the H-twisted exterior derivative "
         "`d_H` carries the Cartan calculus through the same five "
         "relations. The `TwistedCartanBundle(H)` wrapper builds `d_H` "
@@ -618,7 +618,7 @@ TUTORIAL_05: list[tuple[str, str]] = [
     (
         "markdown",
         "## Next step\n\n"
-        "Building your own bracket + the Jacobi test — "
+        "Building your own bracket + the Jacobi test, "
         "[06_custom_bracket.md](06_custom_bracket.md) (Stage C).",
     ),
 ]
@@ -628,7 +628,7 @@ TUTORIAL_06: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 06 — Custom bracket\n\n"
+        "# 06, Custom bracket\n\n"
         "Companion notebook to [06_custom_bracket.md](06_custom_bracket.md). "
         "Define your own rule with `CustomBracket`, declare an axiom "
         "profile via flags, and test it through `prove_jacobi`'s "
@@ -636,7 +636,7 @@ TUTORIAL_06: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Minimum profile — the commutator rule\n\n"
+        "## Minimum profile, the commutator rule\n\n"
         "`CustomBracket(name, expand_fn, *, degree=..., "
         "is_graded_antisymmetric=..., satisfies_leibniz=..., "
         "satisfies_graded_jacobi=...)`. The `expand_fn` signature is "
@@ -675,7 +675,7 @@ TUTORIAL_06: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `prove_jacobi` — generic dispatch\n\n"
+        "## `prove_jacobi`, generic dispatch\n\n"
         "For the commutator rule the chain is bracket-expand → "
         "simplify → 0. A wrong / asymmetric rule leaves a residual "
         "and raises `ProofFailure`.",
@@ -718,7 +718,7 @@ TUTORIAL_06: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Equality — callable identity\n\n"
+        "## Equality, callable identity\n\n"
         "Two `CustomBracket`s compare equal only if they share the "
         "same `expand_fn` callable.",
     ),
@@ -732,7 +732,7 @@ TUTORIAL_06: list[tuple[str, str]] = [
     (
         "markdown",
         "## Next step\n\n"
-        "Generator-based automatic bracket construction — "
+        "Generator-based automatic bracket construction, "
         "[07_derived_bracket.md](07_derived_bracket.md).",
     ),
 ]
@@ -742,7 +742,7 @@ TUTORIAL_07: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 07 — Derived bracket\n\n"
+        "# 07, Derived bracket\n\n"
         "Companion notebook to [07_derived_bracket.md](07_derived_bracket.md). "
         "The construction `{a, b}_Q := [[a, Q]_base, b]_base`, Jacobi "
         "reduced to a single equation (`[Q, Q]_base = 0`), Koszul "
@@ -751,7 +751,7 @@ TUTORIAL_07: list[tuple[str, str]] = [
     (
         "markdown",
         "## The construction\n\n"
-        "`DerivedBracket(base, Q, degree_Q=...)` — pick a degree-1 `Q` "
+        "`DerivedBracket(base, Q, degree_Q=...)`, pick a degree-1 `Q` "
         "on a Lie base. `|{·,·}_Q| = |Q| − 2 = −1`. Leibniz is "
         "universal; antisymmetry / Jacobi are conditional (flag=None).",
     ),
@@ -776,8 +776,8 @@ TUTORIAL_07: list[tuple[str, str]] = [
     (
         "markdown",
         "## Two-faced expansion\n\n"
-        "`expand` — both inner and outer base layers resolved; "
-        "`expand_definition` — both layers kept as inert "
+        "`expand`, both inner and outer base layers resolved; "
+        "`expand_definition`, both layers kept as inert "
         "`BracketApply` nodes.",
     ),
     (
@@ -790,7 +790,7 @@ TUTORIAL_07: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Jacobi obstruction — three faces\n\n"
+        "## Jacobi obstruction, three faces\n\n"
         "A single condition: `[Q, Q]_base = 0`. On a Lie base it's "
         "trivial (`Q*Q − Q*Q`).",
     ),
@@ -804,14 +804,14 @@ TUTORIAL_07: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `prove_jacobi` — `DerivedBracketStrategy`\n\n"
+        "## `prove_jacobi`, `DerivedBracketStrategy`\n\n"
         "Auto-dispatched on bracket type. Three steps: "
         "`DerivedBracketTheorem` → `base-bracket-expand` → `simplify`.",
     ),
     (
         "code",
         "from jacopy.proof.verifier import prove_jacobi\n\n"
-        "# a, b already declared Graded(0) above — add c.\n"
+        "# a, b already declared Graded(0) above, add c.\n"
         "c = Symbol('c')\n"
         "reg.declare(c, Graded(degree=0))\n\n"
         "chain = prove_jacobi(d, a, b, c, registry=reg)\n"
@@ -822,7 +822,7 @@ TUTORIAL_07: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `acting_on` — Koszul equivalence\n\n"
+        "## `acting_on`, Koszul equivalence\n\n"
         "SN base + π generator + anchor ρ: `expand` auto-emits the "
         "Koszul three-term form. Structurally equal to "
         "`KoszulBracket(ρ).expand`.",
@@ -849,11 +849,11 @@ TUTORIAL_07: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Poisson-as-derived — the library wrapper\n\n"
+        "## Poisson-as-derived, the library wrapper\n\n"
         "Mathematically `DerivedBracket(sn, π, degree_Q=1)` is the "
         "Poisson bracket. The generic `prove_jacobi` reduces the "
         "obstruction to `[·,·]_SN(π, π)` and surfaces it as an "
-        "honest `ProofFailure` — the Poisson hypothesis "
+        "honest `ProofFailure`, the Poisson hypothesis "
         "`[π, π]_SN = 0` must be carried as an explicit assumption. "
         "`PoissonBracket.prove_jacobi_reduction` closes it in one "
         "step via the seeded theorem citation.",
@@ -876,7 +876,7 @@ TUTORIAL_07: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## H-twist — the Courant conditional Jacobi\n\n"
+        "## H-twist, the Courant conditional Jacobi\n\n"
         "`CourantBracket(background_H=H)`: Jacobi ⟺ `dH = 0`. The "
         "untwisted default (`H=None`) is vacuous.",
     ),
@@ -896,7 +896,7 @@ TUTORIAL_07: list[tuple[str, str]] = [
     (
         "markdown",
         "## Next step\n\n"
-        "Stage D: the unified picture + foundations — "
+        "Stage D: the unified picture + foundations, "
         "[08_unified_picture.md](08_unified_picture.md).",
     ),
 ]
@@ -906,9 +906,9 @@ TUTORIAL_08: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 08 — The unified picture\n\n"
+        "# 08, The unified picture\n\n"
         "Companion notebook to [08_unified_picture.md](08_unified_picture.md). "
-        "A single hypothesis `[π, π]_SN = 0` — same obstruction at both "
+        "A single hypothesis `[π, π]_SN = 0`, same obstruction at both "
         "the function and form levels. Theorem Book citation chain. "
         "A parallel: `dH = 0`.",
     ),
@@ -916,7 +916,7 @@ TUTORIAL_08: list[tuple[str, str]] = [
         "markdown",
         "## One hypothesis, two faces\n\n"
         "`jacobi_condition` and `koszul_jacobi_condition` point to the "
-        "same `Expr` — only the display name differs.",
+        "same `Expr`, only the display name differs.",
     ),
     (
         "code",
@@ -934,7 +934,7 @@ TUTORIAL_08: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Function vs form — meeting at the same obstruction",
+        "## Function vs form, meeting at the same obstruction",
     ),
     (
         "code",
@@ -952,7 +952,7 @@ TUTORIAL_08: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## The classical–derived bridge — the `reflexive` step\n\n"
+        "## The classical–derived bridge, the `reflexive` step\n\n"
         "The package's expand rules bring both sides to the same Expr "
         "tree; Koszul equivalence closes structurally.",
     ),
@@ -963,7 +963,7 @@ TUTORIAL_08: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Seeded theorems — the citation chain",
+        "## Seeded theorems, the citation chain",
     ),
     (
         "code",
@@ -980,7 +980,7 @@ TUTORIAL_08: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `dH = 0` — the same pattern on the Courant side",
+        "## `dH = 0`, the same pattern on the Courant side",
     ),
     (
         "code",
@@ -1010,14 +1010,14 @@ TUTORIAL_09: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 09 — Foundations\n\n"
+        "# 09, Foundations\n\n"
         "Companion notebook to [09_foundations.md](09_foundations.md). "
         "Axiom vs theorem classification, efficient vs foundational "
         "mode, and `d² = 0` derived from the generator-level axiom.",
     ),
     (
         "markdown",
-        "## Default engine — every rule is an axiom",
+        "## Default engine, every rule is an axiom",
     ),
     (
         "code",
@@ -1029,7 +1029,7 @@ TUTORIAL_09: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `d_squared_mode=\"theorem\"` — reclassify",
+        "## `d_squared_mode=\"theorem\"`, reclassify",
     ),
     (
         "code",
@@ -1041,7 +1041,7 @@ TUTORIAL_09: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Efficient vs foundational — same step, different sub-proof\n\n"
+        "## Efficient vs foundational, same step, different sub-proof\n\n"
         "Efficient mode carries no children; foundational mode attaches "
         "a generator-level citation when a theorem-class rule fires.",
     ),
@@ -1074,7 +1074,7 @@ TUTORIAL_09: list[tuple[str, str]] = [
     (
         "markdown",
         "## What does the sub-proof say?\n\n"
-        "The foundational sub-proof's only input is `d(df) = 0` — "
+        "The foundational sub-proof's only input is `d(df) = 0`, "
         "the generic axiom the package treats as primitive. `d² = 0` "
         "extends from it at every form degree.",
     ),
@@ -1086,7 +1086,7 @@ TUTORIAL_09: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Custom Definition — axiom class\n\n"
+        "## Custom Definition, axiom class\n\n"
         "`ExpansionEngine([YourDef()])` lets you assemble your own "
         "axiom set and run the engine on it. Below: a single rule "
         "that drives a `c_zero` symbol to zero.",
@@ -1110,7 +1110,7 @@ TUTORIAL_09: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Custom Definition — theorem class\n\n"
+        "## Custom Definition, theorem class\n\n"
         "Override `theorem_proof_builder` and the same rule becomes a "
         "theorem; foundational mode attaches the sub-proof.",
     ),
@@ -1168,7 +1168,7 @@ TUTORIAL_09: list[tuple[str, str]] = [
     (
         "markdown",
         "## Three provenance layers\n\n"
-        "Property (symbol), Definition (expansion), Theorem — all "
+        "Property (symbol), Definition (expansion), Theorem, all "
         "three carry the `axiom`/`theorem` distinction. "
         "`Theorem.from_axioms` lands a single citation inside a "
         "paper-style proof.",
@@ -1193,9 +1193,9 @@ TUTORIAL_10: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 10 — Diagnostics & proof debugging\n\n"
+        "# 10, Diagnostics & proof debugging\n\n"
         "Companion notebook to [10_diagnostics.md](10_diagnostics.md). "
-        "What to do when `prove_equivalence` raises `ProofFailure` — "
+        "What to do when `prove_equivalence` raises `ProofFailure`, "
         "read the residual, inspect the diagnostic report, extend the "
         "rule catalogue.",
     ),
@@ -1244,7 +1244,7 @@ TUTORIAL_10: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "The exception message is two-tier — a one-line summary "
+        "The exception message is two-tier, a one-line summary "
         "(`ExpandAndSimplify left residual ...`) followed by the "
         "structured `DiagnosticReport` block. The summary tells you "
         "*that* the proof stalled; the report tells you *why* the "
@@ -1255,7 +1255,7 @@ TUTORIAL_10: list[tuple[str, str]] = [
         "## Reading the report\n\n"
         "`ProofFailure.report` is a `DiagnosticReport` (or `None`). It "
         "carries `report.residual` (the surviving `Expr`) and a list of "
-        "`DiagnosticHint`s — each with `category`, `message`, "
+        "`DiagnosticHint`s, each with `category`, `message`, "
         "`location`, and `suggestion` fields.",
     ),
     (
@@ -1279,7 +1279,7 @@ TUTORIAL_10: list[tuple[str, str]] = [
         "## Calling `diagnose()` directly\n\n"
         "You don't need a `ProofFailure` to use the diagnostic layer. "
         "`diagnose(expr, registry=...)` runs the full rule catalogue "
-        "against any expression — useful for inspecting intermediate "
+        "against any expression, useful for inspecting intermediate "
         "terms.",
     ),
     (
@@ -1324,7 +1324,7 @@ TUTORIAL_10: list[tuple[str, str]] = [
         "markdown",
         "## Adding your own rule\n\n"
         "A rule is `(expr, registry, engine) → Iterable[DiagnosticHint]`. "
-        "Register it with `@register_rule` — it joins the catalogue "
+        "Register it with `@register_rule`, it joins the catalogue "
         "immediately, no engine wiring needed because diagnostics are "
         "read-only on the residual tree.",
     ),
@@ -1366,7 +1366,7 @@ TUTORIAL_10: list[tuple[str, str]] = [
         "directly on any `Expr`.\n"
         "* Built-in catalogue covers d² / ι² stalls, `Act` linearity "
         "gaps, unreduced iota-on-df, and unclassified factors.\n"
-        "* Extend the catalogue with `@register_rule` — pure tree-walk "
+        "* Extend the catalogue with `@register_rule`, pure tree-walk "
         "function, no engine plumbing.",
     ),
 ]
@@ -1376,7 +1376,7 @@ TUTORIAL_11: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 11 — Publication-ready output\n\n"
+        "# 11, Publication-ready output\n\n"
         "Companion notebook to "
         "[11_publication_output.md](11_publication_output.md). "
         "`chain_to_latex` / `chain_to_tikz` and their `_document` "
@@ -1386,7 +1386,7 @@ TUTORIAL_11: list[tuple[str, str]] = [
     (
         "markdown",
         "## A worked chain\n\n"
-        "Tiny but real proof: `d(d(ω)) == 0`. Two steps — enough to "
+        "Tiny but real proof: `d(d(ω)) == 0`. Two steps, enough to "
         "exercise the renderers without flooding the output.",
     ),
     (
@@ -1411,7 +1411,7 @@ TUTORIAL_11: list[tuple[str, str]] = [
     (
         "markdown",
         "## Inline LaTeX\n\n"
-        "`chain_to_latex(chain)` returns a `gather*` block — one math "
+        "`chain_to_latex(chain)` returns a `gather*` block, one math "
         "row per step, wrapped in `\\allowdisplaybreaks\\scriptsize` "
         "so long chains page-break properly. Paste straight into any "
         "`.tex` source that loads `amsmath`.",
@@ -1424,7 +1424,7 @@ TUTORIAL_11: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "Each row uses `\\to` (not `=`) — explicit rewriting direction. "
+        "Each row uses `\\to` (not `=`), explicit rewriting direction. "
         "The `\\quad \\text{[rule] (provenance)}` annotation reads as the "
         "step's justification.",
     ),
@@ -1457,8 +1457,8 @@ TUTORIAL_11: list[tuple[str, str]] = [
         "markdown",
         "## TikZ diagram\n\n"
         "`chain_to_tikz` renders the same chain as a vertical "
-        "`tikzpicture`. Each `before`/`after` becomes a boxed node — "
-        "`n + 1` nodes for `n` steps — with arrows labelled by rule "
+        "`tikzpicture`. Each `before`/`after` becomes a boxed node, "
+        "`n + 1` nodes for `n` steps, with arrows labelled by rule "
         "name and provenance tag.",
     ),
     (
@@ -1485,21 +1485,21 @@ TUTORIAL_11: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "`node_distance` tunes vertical spacing — bump it up when "
+        "`node_distance` tunes vertical spacing, bump it up when "
         "expression labels crowd each other.",
     ),
     (
         "markdown",
         "## Round-trip to PDF (optional)\n\n"
         "Both `_document` outputs compile with any LaTeX engine. The "
-        "cell below is illustrative — skip executing it unless "
+        "cell below is illustrative, skip executing it unless "
         "`pdflatex` is on your PATH.",
     ),
     (
         "code",
         "import shutil\n\n"
         "if shutil.which(\"pdflatex\") is None:\n"
-        "    print(\"pdflatex not found on PATH — skipping the round-trip demo.\")\n"
+        "    print(\"pdflatex not found on PATH, skipping the round-trip demo.\")\n"
         "else:\n"
         "    import subprocess, tempfile\n"
         "    from pathlib import Path\n"
@@ -1514,13 +1514,13 @@ TUTORIAL_11: list[tuple[str, str]] = [
     (
         "markdown",
         "## Summary\n\n"
-        "* Four helpers — two inline (`chain_to_latex`, "
+        "* Four helpers, two inline (`chain_to_latex`, "
         "`chain_to_tikz`), two standalone (`chain_to_latex_document`, "
         "`chain_to_tikz_document`).\n"
         "* Inline: paste into existing `.tex`. Standalone: write + "
         "`pdflatex`.\n"
         "* `title` / `author` / `preamble_extras` are kwargs on the "
-        "`_document` variants — empty strings produce a body-only "
+        "`_document` variants, empty strings produce a body-only "
         "document.\n"
         "* Nested sub-proofs flatten in both renderers; compose by hand "
         "if you want a tree.",
@@ -1532,7 +1532,7 @@ TUTORIAL_14: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 14 — Solving textbook problems with Problem wrappers\n\n"
+        "# 14, Solving textbook problems with Problem wrappers\n\n"
         "Companion notebook to "
         "[14_problem_wrappers.md](14_problem_wrappers.md). The wrapper "
         "layer (`SymplecticProblem`, `KoszulProblem`, `BianchiProblem`, "
@@ -1545,7 +1545,7 @@ TUTORIAL_14: list[tuple[str, str]] = [
         "## Setting up a `SymplecticProblem`\n\n"
         "Three inputs: the symplectic form `ω`, the functions you want "
         "as Hamiltonians, and a registry. Everything else is auto-wired "
-        "— `Closed(ω)` and `NonDegenerate(ω)` are declared on the "
+        ", `Closed(ω)` and `NonDegenerate(ω)` are declared on the "
         "registry, `X_f`/`X_g` are built with their defining relation "
         "`ι_{X_f} ω = ±df` registered on the engine.",
     ),
@@ -1564,7 +1564,7 @@ TUTORIAL_14: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Question 2a — Hamiltonian invariance\n\n"
+        "## Question 2a, Hamiltonian invariance\n\n"
         "The canonical first question on a symplectic form: "
         "`L_{X_f} ω = 0`. Cartan magic + closed form + d² = 0 close "
         "this in eight named steps.",
@@ -1579,17 +1579,17 @@ TUTORIAL_14: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "Every step has a named rule — `L_X := d∘ι_X + ι_X∘d`, "
-        "`Closed: d(ω) = 0`, `d² = 0`, ... — so the chain reads end-to-"
+        "Every step has a named rule, `L_X := d∘ι_X + ι_X∘d`, "
+        "`Closed: d(ω) = 0`, `d² = 0`, ..., so the chain reads end-to-"
         "end as the textbook computation.",
     ),
     (
         "markdown",
-        "## Question 2c — Hamiltonian equality\n\n"
+        "## Question 2c, Hamiltonian equality\n\n"
         "Two helpers close the family: `prove_vector_field_equality` "
         "(reduces `Y = Z` via non-degeneracy) and "
         "`prove_hamiltonian_equality` (closes `ι_Y ω = ±dh`). The "
-        "simplest demonstration is the reflexive case — each Hamiltonian "
+        "simplest demonstration is the reflexive case, each Hamiltonian "
         "equals itself.",
     ),
     (
@@ -1604,7 +1604,7 @@ TUTORIAL_14: list[tuple[str, str]] = [
         "through the `NonDegenerate` rule to `X_f − X_f`, which "
         "`simplify` collapses to `0`. The non-trivial use is when `Y` "
         "is a Lie bracket of two Hamiltonians and you want it "
-        "recognised as a third Hamiltonian — same call, different "
+        "recognised as a third Hamiltonian, same call, different "
         "operands.",
     ),
     (
@@ -1629,7 +1629,7 @@ TUTORIAL_14: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "The bracket-expansion rule is exposed directly — useful when "
+        "The bracket-expansion rule is exposed directly, useful when "
         "you want to reduce a `[α,β]_K` expression by hand without "
         "running a full proof closure.",
     ),
@@ -1649,12 +1649,12 @@ TUTORIAL_14: list[tuple[str, str]] = [
         "markdown",
         "## When to step outside the wrapper\n\n"
         "The wrapper is a convenience, not a wall.\n\n"
-        "1. **`prob.engine` is the pre-wired engine** — feed it to "
+        "1. **`prob.engine` is the pre-wired engine**, feed it to "
         "`prove_equivalence(..., engine=prob.engine)` to drive any "
         "equality under the wrapper's axiom set.\n"
         "2. **`prob.hamiltonian(f)` returns the registered "
-        "Hamiltonian** — build expressions with it directly.\n"
-        "3. **The wrapper never overrides existing declarations** — "
+        "Hamiltonian**, build expressions with it directly.\n"
+        "3. **The wrapper never overrides existing declarations**, "
         "pre-declaring is the way to opt out of a default convention.",
     ),
     (
@@ -1664,7 +1664,7 @@ TUTORIAL_14: list[tuple[str, str]] = [
         "from jacopy.calculus.exterior_d import d\n"
         "from jacopy.core.expr import Integer\n"
         "from jacopy.proof import prove_equivalence\n\n"
-        "# d(d(f)) = 0 — the engine knows d² = 0 because the wrapper\n"
+        "# d(d(f)) = 0, the engine knows d² = 0 because the wrapper\n"
         "# inherited it from default_engine.\n"
         "chain = prove_equivalence(\n"
         "    Act(d, Act(d, f)), Integer(0),\n"
@@ -1679,9 +1679,9 @@ TUTORIAL_14: list[tuple[str, str]] = [
         "|---|---|\n"
         "| `SymplecticProblem` | `(M, ω, π?, {f_i}, registry, engine)` |\n"
         "| `KoszulProblem` | `(π, ρ = π^♯, K, {α_i})` + tilde calculus |\n"
-        "| `BianchiProblem` | `(connection, registry)` — T̃-Bianchi I/II |\n"
-        "| `CartanFormPropertyProblem` | `(connection, frame)` — §3.1.6 |\n"
-        "| `CartanStructureProblem` | `(connection, frame)` — Cartan I/II |\n"
+        "| `BianchiProblem` | `(connection, registry)`, T̃-Bianchi I/II |\n"
+        "| `CartanFormPropertyProblem` | `(connection, frame)`, §3.1.6 |\n"
+        "| `CartanStructureProblem` | `(connection, frame)`, Cartan I/II |\n"
         "| `KoszulConnectionProblem` | facade over the three above |\n\n"
         "Each `__init__` validates inputs + declares structural axioms; "
         "properties expose the underlying objects; `prove_*` methods "
@@ -1693,13 +1693,13 @@ TUTORIAL_14: list[tuple[str, str]] = [
         "* Problem wrappers bundle `(structure, designated operands, "
         "registry, engine)` so you don't re-wire axioms every "
         "question.\n"
-        "* `SymplecticProblem` covers form-side problems — Hamiltonian "
+        "* `SymplecticProblem` covers form-side problems, Hamiltonian "
         "invariance, vector-field equality, Hamiltonian equality.\n"
-        "* `KoszulProblem` covers Poisson form-bracket problems — "
+        "* `KoszulProblem` covers Poisson form-bracket problems, "
         "`[α, β]_K` expansion, tilde calculus, derivator engines.\n"
         "* The pre-built engine (`prob.engine`) is exposed for "
         "closures outside the named helpers.\n"
-        "* Wrappers never override existing registry declarations — "
+        "* Wrappers never override existing registry declarations, "
         "pre-declaring is the override mechanism.",
     ),
 ]
@@ -1709,7 +1709,7 @@ TUTORIAL_12: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 12 — The Schouten–Nijenhuis bracket\n\n"
+        "# 12, The Schouten–Nijenhuis bracket\n\n"
         "Companion notebook to "
         "[12_schouten_nijenhuis.md](12_schouten_nijenhuis.md). "
         "`[·,·]_SN` extends the Lie bracket to multivector fields with "
@@ -1721,7 +1721,7 @@ TUTORIAL_12: list[tuple[str, str]] = [
         "## Shifted grading\n\n"
         "Functions are SN-degree `−1`, vector fields are SN-degree `0`, "
         "bivectors are SN-degree `1`. Use `Graded(degree=...)` to "
-        "declare these — **not `Scalar()`**, which the SN engine reads "
+        "declare these, **not `Scalar()`**, which the SN engine reads "
         "as `degree=0` (i.e. a 1-vector).",
     ),
     (
@@ -1741,10 +1741,10 @@ TUTORIAL_12: list[tuple[str, str]] = [
         "`sn.expand(a, b, registry)` returns the closed form when both "
         "operands are atomic and SN-degrees are concrete integers in "
         "{−1, 0}. These are the characterising rules:\n\n"
-        "* `[X, Y]_SN = X*Y − Y*X` — the Lie bracket on 1-vectors.\n"
-        "* `[f, g]_SN = 0` — `C^∞` is commutative.\n"
-        "* `[f, X]_SN = −X(f)` — graded antisymmetric of the next.\n"
-        "* `[X, f]_SN = X(f)` — vectors act as derivations on functions.",
+        "* `[X, Y]_SN = X*Y − Y*X`, the Lie bracket on 1-vectors.\n"
+        "* `[f, g]_SN = 0`, `C^∞` is commutative.\n"
+        "* `[f, X]_SN = −X(f)`, graded antisymmetric of the next.\n"
+        "* `[X, f]_SN = X(f)`, vectors act as derivations on functions.",
     ),
     (
         "code",
@@ -1774,7 +1774,7 @@ TUTORIAL_12: list[tuple[str, str]] = [
         "markdown",
         "## Atomic higher-order multivectors stay opaque\n\n"
         "A bare `Symbol` declared `Graded(degree=1)` plays the role of "
-        "an atomic bivector — there's no wedge to peel, so SN can't "
+        "an atomic bivector, there's no wedge to peel, so SN can't "
         "descend. Rather than raise, `expand` returns the inert "
         "`BracketApply` node. That handle is exactly what makes "
         "`[π, π]_SN = 0` a usable hypothesis.",
@@ -1792,7 +1792,7 @@ TUTORIAL_12: list[tuple[str, str]] = [
         "`PoissonBracket(π)` exposes the same obstruction via "
         "`jacobi_obstruction()` and the textbook statement via "
         "`jacobi_condition()`. The killer move is "
-        "`prove_jacobi_reduction(f, g, h)` — the cyclic Jacobi sum "
+        "`prove_jacobi_reduction(f, g, h)`, the cyclic Jacobi sum "
         "collapses to `[·,·]_SN(π, π)` in **one** proof step (the "
         "Derived Bracket Theorem).",
     ),
@@ -1812,11 +1812,11 @@ TUTORIAL_12: list[tuple[str, str]] = [
         "markdown",
         "## When SN stays inert\n\n"
         "Three situations:\n\n"
-        "1. **Atomic higher-order multivector** — useful opacity, the "
+        "1. **Atomic higher-order multivector**, useful opacity, the "
         "handle drives the proof.\n"
-        "2. **Symbolic SN-degree** — if any operand has a non-integer "
+        "2. **Symbolic SN-degree**, if any operand has a non-integer "
         "`Graded` degree, the wedge-Leibniz parity can't be decided.\n"
-        "3. **Forms** — `sn.expand(α, π)` for a form `α` is **not "
+        "3. **Forms**, `sn.expand(α, π)` for a form `α` is **not "
         "defined**. SN is the multivector-only bracket; the form-level "
         "operation is the Koszul bracket via "
         "`DerivedBracket(sn, π, acting_on=Sharp(π))` (tutorial 7).",
@@ -1824,11 +1824,11 @@ TUTORIAL_12: list[tuple[str, str]] = [
     (
         "markdown",
         "## Summary\n\n"
-        "* `sn = SchoutenBracket()` — graded Lie bracket of degree 0 in "
+        "* `sn = SchoutenBracket()`, graded Lie bracket of degree 0 in "
         "the shifted grading `|X| = k − 1`.\n"
         "* Four base cases close on 1-vector / function pairs; wedge "
         "Leibniz climbs into `Product`s.\n"
-        "* Atomic higher multivectors return an opaque `BracketApply` — "
+        "* Atomic higher multivectors return an opaque `BracketApply`, "
         "`sn.self_bracket(π)` is the universal Poisson obstruction.\n"
         "* `PoissonBracket.prove_jacobi_reduction` collapses the "
         "cyclic Jacobi sum to that obstruction in one step.",
@@ -1840,17 +1840,17 @@ TUTORIAL_13: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 13 — Closure properties & axiom flags\n\n"
+        "# 13, Closure properties & axiom flags\n\n"
         "Companion notebook to "
         "[13_closure_axioms.md](13_closure_axioms.md). The three "
         "closure flags (`Closed`, `Antisymmetric`, `NonDegenerate`) "
         "are declarative facts on the registry that paired engine "
-        "rules cash in as rewrite primitives — no per-form "
+        "rules cash in as rewrite primitives, no per-form "
         "`Definition` subclass needed.",
     ),
     (
         "markdown",
-        "## `Closed` — `dω = 0` on demand\n\n"
+        "## `Closed`, `dω = 0` on demand\n\n"
         "Declare the property; layer `ClosedFormDefinition` onto the "
         "default engine; `Act(d, ω)` rewrites to `0` for every "
         "registered form.",
@@ -1881,12 +1881,12 @@ TUTORIAL_13: list[tuple[str, str]] = [
         "markdown",
         "The single named step *is* the proof artefact: the chain "
         "transcript reads as \"because ω is closed\". With "
-        "`registry=None` the rule is dormant — a safety hatch, not a "
+        "`registry=None` the rule is dormant, a safety hatch, not a "
         "default.",
     ),
     (
         "markdown",
-        "## `Antisymmetric` — bivectors with a sign rule\n\n"
+        "## `Antisymmetric`, bivectors with a sign rule\n\n"
         "`Antisymmetric()` flags a binary head whose `MultiEval(head, "
         "α, β)` swap-pair canonicalises to `-head(β, α)`. Typical use: "
         "a Schouten–Nijenhuis bivector `π` whose pairing should sort "
@@ -1924,11 +1924,11 @@ TUTORIAL_13: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `NonDegenerate` — peeling `ι_(·) ω` off both sides\n\n"
+        "## `NonDegenerate`, peeling `ι_(·) ω` off both sides\n\n"
         "`NonDegenerate()` encodes injectivity of the bundle map "
         "`X ↦ ι_X ω`. The paired rule fires on a two-term `Sum` "
         "whose children are interior products of the *same* form "
-        "against vector fields with opposite signs — exactly the "
+        "against vector fields with opposite signs, exactly the "
         "obstruction shape a vector-field equality produces.",
     ),
     (
@@ -1960,7 +1960,7 @@ TUTORIAL_13: list[tuple[str, str]] = [
         "stores a `PropertyRegistry`, at `matches` time it queries "
         "that registry for the relevant flag. Practical consequences:\n\n"
         "1. **One rule, every form.** A single `ClosedFormDefinition` "
-        "handles every form declared `Closed()` — no per-form "
+        "handles every form declared `Closed()`, no per-form "
         "`Definition` subclass.\n"
         "2. **Pre-declaring opts out.** Problem wrappers (tutorial 14) "
         "see existing flags and don't re-declare.\n"
@@ -1981,8 +1981,8 @@ TUTORIAL_13: list[tuple[str, str]] = [
     (
         "markdown",
         "## Summary\n\n"
-        "* Three closure properties — `Closed`, `Antisymmetric`, "
-        "`NonDegenerate` — each paired with a single registry-aware "
+        "* Three closure properties, `Closed`, `Antisymmetric`, "
+        "`NonDegenerate`, each paired with a single registry-aware "
         "engine rule.\n"
         "* Rules constructed with `registry=` keyword; `None` is a "
         "no-op default.\n"
@@ -1999,7 +1999,7 @@ TUTORIAL_15: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 15 — The intrinsic engine\n\n"
+        "# 15, The intrinsic engine\n\n"
         "Companion notebook to "
         "[15_intrinsic_engine.md](15_intrinsic_engine.md). "
         "`intrinsic_engine()` bundles the textbook expansions of "
@@ -2011,7 +2011,7 @@ TUTORIAL_15: list[tuple[str, str]] = [
         "markdown",
         "## The base bundle\n\n"
         "Seven rules: three intrinsic operator expansions plus four "
-        "`MultiEval` helpers. Match order matters — operator-specific "
+        "`MultiEval` helpers. Match order matters, operator-specific "
         "rules fire before head-linearity scans the wrapper.",
     ),
     (
@@ -2026,7 +2026,7 @@ TUTORIAL_15: list[tuple[str, str]] = [
         "markdown",
         "## `prove_intrinsic_equivalence` on `ι² = 0`\n\n"
         "Vector fields are constructed via `Derivation(name, 0)` "
-        "(degree 0) — the intrinsic rules look for that shape rather "
+        "(degree 0), the intrinsic rules look for that shape rather "
         "than a generic `Symbol` with a `Graded` declaration.",
     ),
     (
@@ -2069,7 +2069,7 @@ TUTORIAL_15: list[tuple[str, str]] = [
         "markdown",
         "## Closure-complete bundle\n\n"
         "`intrinsic_engine_with_closure()` adds four 12.A.6 rules "
-        "that fold post-expansion residues — VF-commutator, bracket "
+        "that fold post-expansion residues, VF-commutator, bracket "
         "antisymmetry / Jacobi, the iota-as-scalar 1-form bridge. "
         "Together they close `[L_X, ι_Y] ω = ι_{[X,Y]_VF} ω` and "
         "`d² = 0` on 1- / 2-forms.",
@@ -2092,10 +2092,10 @@ TUTORIAL_15: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `IntrinsicFormulaRecognizer` — shape inspection\n\n"
+        "## `IntrinsicFormulaRecognizer`, shape inspection\n\n"
         "Pure-shape inspection of `MultiEval(Act(op, ω), Y_1, …)`: "
         "given an expression, returns the operator label, the form, "
-        "the vector field (if any), and the eval slots — without "
+        "the vector field (if any), and the eval slots, without "
         "running any rewriting. Use it when you want to *dispatch* "
         "on shape without committing to a closure.",
     ),
@@ -2116,26 +2116,26 @@ TUTORIAL_15: list[tuple[str, str]] = [
         "Y_1, …)` shapes, when you want the textbook intrinsic-"
         "formula transcript.\n\n"
         "**Don't use it for:** generic operator-equation work (raw "
-        "`L²`, `d²` without multi-eval) — that belongs to "
+        "`L²`, `d²` without multi-eval), that belongs to "
         "`prove_equivalence` with `default_engine`. Problem-specific "
         "axioms belong in the closure-axiom layer (tutorial 13) or a "
         "problem wrapper (tutorial 14).\n\n"
         "**Known failure mode:** `d²` and `[L_X, L_Y]` on a 3-form or "
-        "higher don't close — the 12.A.6 closure axioms are "
+        "higher don't close, the 12.A.6 closure axioms are "
         "calibrated for 1- / 2-forms. Tutorial 10 walks the "
         "diagnostic surface for those residues.",
     ),
     (
         "markdown",
         "## Summary\n\n"
-        "* `intrinsic_engine()` — 7 base rules: 3 intrinsic operator "
+        "* `intrinsic_engine()`, 7 base rules: 3 intrinsic operator "
         "expansions + 4 multi-eval helpers.\n"
-        "* `intrinsic_engine_with_closure()` — adds 4 closure rules "
+        "* `intrinsic_engine_with_closure()`, adds 4 closure rules "
         "to fold post-expansion residues; closes `[L_X, ι_Y] ω`, "
         "`d² = 0`, `[L_X, L_Y] ω` on 1- / 2-forms.\n"
-        "* `prove_intrinsic_equivalence` — runs the engine to "
+        "* `prove_intrinsic_equivalence`, runs the engine to "
         "fix-point, returns a `ProofChain`.\n"
-        "* `IntrinsicFormulaRecognizer` — pure-shape inspector for "
+        "* `IntrinsicFormulaRecognizer`, pure-shape inspector for "
         "intrinsic-operator multi-evals, no rewriting.",
     ),
 ]
@@ -2145,17 +2145,17 @@ TUTORIAL_16: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 16 — Phase 13 deep dive: the `[π, π]_SN` obstruction\n\n"
+        "# 16, Phase 13 deep dive: the `[π, π]_SN` obstruction\n\n"
         "Companion notebook to "
         "[16_phase_13_deep_dive.md](16_phase_13_deep_dive.md). Phase "
         "13 closes the cyclic Poisson Jacobi sum to `[·,·]_SN(π, π)` "
-        "*without* citing the seeded `poisson_jacobi` theorem — using "
+        "*without* citing the seeded `poisson_jacobi` theorem, using "
         "only engine-level rewrite axioms. This walks the machinery: "
         "`LieBracketVF` atom + the four rewrite rules.",
     ),
     (
         "markdown",
-        "## `LieBracketVF` — Lie bracket of vector fields as an atom\n\n"
+        "## `LieBracketVF`, Lie bracket of vector fields as an atom\n\n"
         "`[X, Y]_VF` is an opaque `Derivation` subclass with structural "
         "identity over `(X, Y)`. Why opaque: after the operator-"
         "commutator fold, downstream Cartan rules need a single "
@@ -2181,7 +2181,7 @@ TUTORIAL_16: list[tuple[str, str]] = [
         "## The vector-field axioms (Faz 13.C)\n\n"
         "`OpCommutatorVfDefinition` folds the operator commutator: "
         "`L_X(L_Y(ω)) − L_Y(L_X(ω)) → L_{[X,Y]_VF}(ω)`. Order-"
-        "permissive on the Sum's children — the upstream pipeline "
+        "permissive on the Sum's children, the upstream pipeline "
         "doesn't have to canonicalise first.",
     ),
     (
@@ -2205,7 +2205,7 @@ TUTORIAL_16: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "The match is structural — a positive `Act(L_X, Act(L_Y, ω))` "
+        "The match is structural, a positive `Act(L_X, Act(L_Y, ω))` "
         "paired with its sign-flipped twin `Neg(Act(L_Y, Act(L_X, "
         "ω)))`. `LieVfJacobiDefinition` is the same kind of matcher "
         "one level up: three cyclically-permuted `Act(L_{[X,[Y,Z]_VF]"
@@ -2214,11 +2214,11 @@ TUTORIAL_16: list[tuple[str, str]] = [
     (
         "markdown",
         "## Function-side closure (2g-deep, end-to-end)\n\n"
-        "Two axioms in `jacopy.calculus.poisson_axioms` — "
+        "Two axioms in `jacopy.calculus.poisson_axioms`, "
         "`PoissonAsHamiltonianDefinition` (rewrites `{f, g}_π → "
         "X_f(g)` for a *pinned* `DerivedBracket`) and "
         "`HamiltonianCyclicSnFormulaDefinition` (collapses cyclic "
-        "`Act(X_a, Act(X_b, c))` to `[·,·]_SN(π, π)`) — close the "
+        "`Act(X_a, Act(X_b, c))` to `[·,·]_SN(π, π)`), close the "
         "cyclic Poisson Jacobi sum end-to-end.",
     ),
     (
@@ -2255,7 +2255,7 @@ TUTORIAL_16: list[tuple[str, str]] = [
     (
         "markdown",
         "Seven steps: six `PoissonAsHamiltonian` rewrites (each cyclic "
-        "term `{f, {g, h}}` peels twice — outer then inner — into "
+        "term `{f, {g, h}}` peels twice, outer then inner, into "
         "`X_f(X_g(h))`) plus one `HamiltonianCyclicSn` collapse to "
         "`−[·,·]_SN(π, π)`. The leading `Neg` is the sign carried in "
         "from `graded_jacobi_obstruction`'s shape, not a sign error.",
@@ -2263,21 +2263,21 @@ TUTORIAL_16: list[tuple[str, str]] = [
     (
         "markdown",
         "## Form-side asymmetry (2f-deep)\n\n"
-        "The form-side chain — cyclic Koszul Jacobi on three 1-forms "
-        "— closes through `SnBivectorFormulaDefinition` (Faz 13.D), "
+        "The form-side chain, cyclic Koszul Jacobi on three 1-forms "
+        ", closes through `SnBivectorFormulaDefinition` (Faz 13.D), "
         "but doesn't reach a clean `[·,·]_SN(π, π)` residue without "
         "extra bookkeeping. After Cartan-layer expansion of "
         "`{α, β}_K = L_{π^♯α}β − L_{π^♯β}α − d⟨π^♯α, β⟩` and operator-"
         "commutator folding, three pieces remain:\n\n"
-        "1. **Named-bracket cyclic** `Σ_cyc L_{[π^♯·, π^♯·]_VF}(·)` — "
+        "1. **Named-bracket cyclic** `Σ_cyc L_{[π^♯·, π^♯·]_VF}(·)`, "
         "what `SnBivectorFormulaDefinition` rewrites.\n"
-        "2. **Iterated Lie tails** `L_{π^♯·}(L_{π^♯·}(·))` — separate "
+        "2. **Iterated Lie tails** `L_{π^♯·}(L_{π^♯·}(·))`, separate "
         "cancellation pass.\n"
-        "3. **`d⟨·, ·⟩` residues** from the Koszul third term — "
+        "3. **`d⟨·, ·⟩` residues** from the Koszul third term, "
         "don't enter the SN handle directly.\n\n"
         "(2) and (3) are the bookkeeping burden. They cancel "
         "algebraically but need user-driven simplification or extra "
-        "rules. The function-side chain doesn't have this burden — "
+        "rules. The function-side chain doesn't have this burden, "
         "the `Act(X_f, X_g(h))` shape absorbs everything into a "
         "single iterated derivation. The asymmetry is structural: "
         "1-forms carry more Cartan-layer machinery than functions.",
@@ -2291,7 +2291,7 @@ TUTORIAL_16: list[tuple[str, str]] = [
         "| Step-by-step `LieBracketVF` fold transcript | This tutorial's two-axiom engine, function-side |\n"
         "| Custom derived bracket without a seeded theorem | Pin a `DerivedBracket`, layer the same axioms |\n"
         "| Form-side cancellation with the 3-form pairing | Faz 13.D `SnBivectorFormulaDefinition` + manual residue work |\n\n"
-        "Default workflow stays at the seeded-theorem level — "
+        "Default workflow stays at the seeded-theorem level, "
         "`prove_jacobi_reduction` is shorter and reads as \"by the "
         "Derived Bracket Theorem\". The deeper machinery sits "
         "*underneath* that one-line citation, ready when the seed "
@@ -2300,7 +2300,7 @@ TUTORIAL_16: list[tuple[str, str]] = [
     (
         "markdown",
         "## Summary\n\n"
-        "* `LieBracketVF(X, Y)` — opaque `Derivation` atom, kept "
+        "* `LieBracketVF(X, Y)`, opaque `Derivation` atom, kept "
         "unexpanded for downstream Cartan rule uniformity.\n"
         "* `OpCommutatorVfDefinition` folds operator commutators into "
         "`L_{[X,Y]_VF}`; `LieVfJacobiDefinition` zeros the cyclic "
@@ -2309,7 +2309,7 @@ TUTORIAL_16: list[tuple[str, str]] = [
         "`HamiltonianCyclicSnFormulaDefinition` close the cyclic "
         "Poisson Jacobi sum to `[·,·]_SN(π, π)` in 7 engine steps.\n"
         "* Form-side (2f-deep) needs additional bookkeeping for "
-        "iterated Lie tails and `d⟨·, ·⟩` residues — a structural "
+        "iterated Lie tails and `d⟨·, ·⟩` residues, a structural "
         "consequence of 1-forms' deeper Cartan layer.",
     ),
 ]
@@ -2319,7 +2319,7 @@ TUTORIAL_17: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 17 — The tilde calculus\n\n"
+        "# 17, The tilde calculus\n\n"
         "Companion notebook to "
         "[17_tilde_calculus.md](17_tilde_calculus.md). The tilde "
         "calculus dualises `ι_X`, `L_X`, `d` on a Poisson manifold "
@@ -2353,9 +2353,9 @@ TUTORIAL_17: list[tuple[str, str]] = [
         "## Defining-identity rewrites\n\n"
         "Three rules in `jacopy.calculus.tilde.axioms` realise the "
         "defining identities:\n\n"
-        "* `TildeIotaSwapDefinition` — `ι̃_ω V → ι_V ω` (notation swap)\n"
-        "* `TildeExteriorDLichnerowiczDefinition(π)` — `d̃ V → [π, V]_SN`\n"
-        "* `TildeLieMagicDefinition(π)` — `L̃_ω V → d̃ ι̃_ω V + ι̃_ω d̃ V`",
+        "* `TildeIotaSwapDefinition`, `ι̃_ω V → ι_V ω` (notation swap)\n"
+        "* `TildeExteriorDLichnerowiczDefinition(π)`, `d̃ V → [π, V]_SN`\n"
+        "* `TildeLieMagicDefinition(π)`, `L̃_ω V → d̃ ι̃_ω V + ι̃_ω d̃ V`",
     ),
     (
         "code",
@@ -2378,7 +2378,7 @@ TUTORIAL_17: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Auxiliary axioms — `Poisson` flag unlocks `d̃² = 0`\n\n"
+        "## Auxiliary axioms, `Poisson` flag unlocks `d̃² = 0`\n\n"
         "Five auxiliary rules in `tilde.aux_axioms` cover the special "
         "cases the three defining rules don't reach:\n\n"
         "| Rule | Folds |\n"
@@ -2406,7 +2406,7 @@ TUTORIAL_17: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `prove_tilde_cartan_relation` — Cartan magic on a 1-vector\n\n"
+        "## `prove_tilde_cartan_relation`, Cartan magic on a 1-vector\n\n"
         "`tilde_intrinsic_engine(pi, koszul, …)` bundles every rule "
         "above plus standard MultiEval / Sharp / Pairing helpers. "
         "Pair it with `prove_tilde_cartan_relation` and the magic "
@@ -2456,12 +2456,12 @@ TUTORIAL_17: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `K̃_η` — the tilde Cartan remainder\n\n"
+        "## `K̃_η`, the tilde Cartan remainder\n\n"
         "`K̃_η := −L̃_η + d̃ ∘ ι̃_η` is the polarity-flipped magic "
         "formula. The atom is inert; "
         "`TildeCartanRemainderDefinition` realises the defining "
         "expansion. Two `K̃` operators on different bivectors stay "
-        "distinct — useful for deformation arguments.",
+        "distinct, useful for deformation arguments.",
     ),
     (
         "code",
@@ -2480,7 +2480,7 @@ TUTORIAL_17: list[tuple[str, str]] = [
     (
         "markdown",
         "## Summary\n\n"
-        "* `tilde_interior(ω)`, `tilde_d(π)`, `tilde_lie(ω, π)` — "
+        "* `tilde_interior(ω)`, `tilde_d(π)`, `tilde_lie(ω, π)`, "
         "opaque `Derivation` atoms acting on multivectors.\n"
         "* Three defining rewrites (`TildeIotaSwap`, "
         "`TildeExteriorDLichnerowicz`, `TildeLieMagic`) plus five "
@@ -2490,7 +2490,7 @@ TUTORIAL_17: list[tuple[str, str]] = [
         "`slot_kind=\"covector\"` keeps the tilde and form-side "
         "engines from aliasing.\n"
         "* The `Poisson` flag unlocks `d̃² V → 0` in 4 engine steps "
-        "— same flag drives the SN-bracket Jacobi chain (tutorial 12).\n"
+        ", same flag drives the SN-bracket Jacobi chain (tutorial 12).\n"
         "* `K̃_η` and `TildeCartanRemainderDefinition` are the "
         "polarity-flipped shortcut for §3.1.4 derived identities; "
         "the atom keys on `(form, bivector)` so multiple `K̃` "
@@ -2503,7 +2503,7 @@ TUTORIAL_18: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 18 — Derivator identities (§3.1.5)\n\n"
+        "# 18, Derivator identities (§3.1.5)\n\n"
         "Companion notebook to "
         "[18_derivator_identities.md](18_derivator_identities.md). The "
         "six §3.1.5 identities equate Cartan / SN derivators to sums "
@@ -2512,11 +2512,11 @@ TUTORIAL_18: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Setup — `KoszulProblem` as the entry point\n\n"
+        "## Setup, `KoszulProblem` as the entry point\n\n"
         "`KoszulProblem` carries the bivector, form / multivector "
         "inventories, and exposes pre-bundled `derivator_form_engine` "
         "/ `derivator_multivector_engine` accessors. "
-        "`assume_poisson()` flags `π` as `Poisson` — that's what "
+        "`assume_poisson()` flags `π` as `Poisson`, that's what "
         "unlocks `d̃² V → 0` and the SN-bracket Jacobi inside the "
         "multivector engine.",
     ),
@@ -2560,7 +2560,7 @@ TUTORIAL_18: list[tuple[str, str]] = [
         "## Form-side identity (1)\n\n"
         "$$D^{T^*M}_{L_U}(\\eta, \\mu) = L_{\\tilde K_\\eta U} \\mu "
         "+ K_{\\tilde K_\\mu U} \\eta$$\n\n"
-        "The cyclic identity — three nested Koszul-bracket expansions "
+        "The cyclic identity, three nested Koszul-bracket expansions "
         "feed into the obstruction. The 109 steps cover Cartan-magic "
         "expansions, operator-commutator folds, and `K̃_η U → "
         "−L̃_η U + d̃ ι̃_η U` polarity flips.",
@@ -2584,7 +2584,7 @@ TUTORIAL_18: list[tuple[str, str]] = [
         "\\tilde L_{K_U \\eta} V + \\tilde K_{K_V \\eta} U$$\n\n"
         "`side=\"multivector\"` routes through "
         "`derivator_multivector_engine` and uses "
-        "`slot_kind=\"covector\"` for the `MultiEval` wrap — same "
+        "`slot_kind=\"covector\"` for the `MultiEval` wrap, same "
         "discipline as `prove_tilde_cartan_relation` (tutorial 17).",
     ),
     (
@@ -2628,7 +2628,7 @@ TUTORIAL_18: list[tuple[str, str]] = [
         "* the bracket isn't Koszul or SN (write your own engine "
         "factory mirroring the `derivator_form_engine` pattern);\n"
         "* you're proving an identity outside §3.1.5's derivator "
-        "shape (Cartan magic, `d² = 0` — those belong to "
+        "shape (Cartan magic, `d² = 0`, those belong to "
         "tutorial 15's `intrinsic_engine`).",
     ),
     (
@@ -2638,11 +2638,11 @@ TUTORIAL_18: list[tuple[str, str]] = [
         "measures `φ`'s failure to be a graded derivation of "
         "`[·, ·]_E`.\n"
         "* Six §3.1.5 identities pin Cartan / SN derivators to sums "
-        "of `K_V` / `K̃_η` corrections — three form-side, three dual.\n"
+        "of `K_V` / `K̃_η` corrections, three form-side, three dual.\n"
         "* `KoszulProblem.prove_derivator(lhs, rhs, *, eval_args, "
         "side)` closes all six in one call: `side=\"form\"` for "
         "(1)/(2)/(3), `side=\"multivector\"` for (1')/(2')/(3').\n"
-        "* Step counts 109/21/30 (form) and 117/25/23 (multivec) — "
+        "* Step counts 109/21/30 (form) and 117/25/23 (multivec), "
         "(1)/(1') are heaviest because three nested bracket "
         "expansions feed the obstruction.\n"
         "* `prove_derivator_identity` is the engine-level entry "
@@ -2655,7 +2655,7 @@ TUTORIAL_19: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 19 — The Courant family: Dorfman, Courant, Dirac\n\n"
+        "# 19, The Courant family: Dorfman, Courant, Dirac\n\n"
         "Companion notebook to "
         "[19_courant_family.md](19_courant_family.md). "
         "`CourantAlgebroid` carries both Courant and Dorfman brackets "
@@ -2688,10 +2688,10 @@ TUTORIAL_19: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## CourantAlgebroid — both brackets, shared operators\n\n"
+        "## CourantAlgebroid, both brackets, shared operators\n\n"
         "Construct with no arguments for untwisted; pass "
         "`background_H=H` to twist by a closed 3-form. Both brackets "
-        "use the **same** Cartan operators — that sharing is what "
+        "use the **same** Cartan operators, that sharing is what "
         "makes the bridge identity exact.",
     ),
     (
@@ -2728,7 +2728,7 @@ TUTORIAL_19: list[tuple[str, str]] = [
         "markdown",
         "## H-twisted Jacobi\n\n"
         "Untwisted: Jacobi holds exactly (obstruction is `0`). "
-        "H-twisted: Jacobi closes iff `dH = 0` — the obstruction "
+        "H-twisted: Jacobi closes iff `dH = 0`, the obstruction "
         "lands on `dH`. Both produce single `axiom`-tagged steps.",
     ),
     (
@@ -2744,10 +2744,10 @@ TUTORIAL_19: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## DiracStructure — isotropy + involutivity\n\n"
+        "## DiracStructure, isotropy + involutivity\n\n"
         "Pairing `⟨a, b⟩ = ½(ι_X β + ι_Y α)`; diagonal "
         "`⟨a, a⟩ = ι_X α` is the isotropy obstruction. Involutivity "
-        "is `[a, b]_C ∈ Γ(L)` — surfaced as a placeholder symbol "
+        "is `[a, b]_C ∈ Γ(L)`, surfaced as a placeholder symbol "
         "since subbundle membership isn't an Expr-level predicate.",
     ),
     (
@@ -2792,9 +2792,9 @@ TUTORIAL_19: list[tuple[str, str]] = [
         "`.vector` / `.form` accessors.\n"
         "* `CourantAlgebroid` exposes `expand` (Courant) and "
         "`expand_dorfman` on shared Cartan operators.\n"
-        "* `prove_courant_dorfman_bridge` — single theorem-step "
+        "* `prove_courant_dorfman_bridge`, single theorem-step "
         "asserting the exact correction `(0, ½ d(ι_X β + ι_Y α))`.\n"
-        "* `prove_jacobi_reduction` — vacuous when untwisted, lands "
+        "* `prove_jacobi_reduction`, vacuous when untwisted, lands "
         "obstruction on `dH` when H-twisted.\n"
         "* `DiracStructure` carries pairing + isotropy + "
         "involutivity, all as axiom-tagged proof steps.\n"
@@ -2808,7 +2808,7 @@ TUTORIAL_20: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 20 — Connection, curvature, and Bianchi identities\n\n"
+        "# 20, Connection, curvature, and Bianchi identities\n\n"
         "Companion notebook to "
         "[20_connection_curvature.md](20_connection_curvature.md). "
         "`AffineConnection` carries `∇_X Y`; `Torsion` / `Curvature` "
@@ -2850,7 +2850,7 @@ TUTORIAL_20: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `BianchiProblem` — the wrapper\n\n"
+        "## `BianchiProblem`, the wrapper\n\n"
         "Bundles every rule needed: four connection axioms, "
         "torsion / curvature definitions, covariant-derivative "
         "definitions, and the LBVF (or `BracketApply`) closure "
@@ -2895,10 +2895,10 @@ TUTORIAL_20: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Koszul connection — same identities on `T*M`\n\n"
+        "## Koszul connection, same identities on `T*M`\n\n"
         "`koszul_connection(name, *, anchor)` produces an algebroid "
         "connection on `T*M` for Poisson problems. Same "
-        "`BianchiProblem` wrapper works — engine swaps in "
+        "`BianchiProblem` wrapper works, engine swaps in "
         "`BracketApply` closure rules and routes function-action "
         "through the anchor.",
     ),
@@ -2922,7 +2922,7 @@ TUTORIAL_20: list[tuple[str, str]] = [
         "* `BianchiProblem` bundles every rule; "
         "`prove_first_bianchi` / `prove_second_bianchi` close in "
         "~60-63 steps.\n"
-        "* `koszul_connection` for the cotangent variant — same "
+        "* `koszul_connection` for the cotangent variant, same "
         "wrapper, `BracketApply` closure family swapped in.",
     ),
 ]
@@ -2932,19 +2932,19 @@ TUTORIAL_21: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 21 — IndexedSum, Wedge, MultiEval\n\n"
+        "# 21, IndexedSum, Wedge, MultiEval\n\n"
         "Companion notebook to "
         "[21_indexed_sum_wedge_multi_eval.md](21_indexed_sum_wedge_multi_eval.md). "
         "Three structural Expr nodes underpin everything from Faz 17 "
-        "onwards. They carry no algebraic content — antisymmetry, "
+        "onwards. They carry no algebraic content, antisymmetry, "
         "distribution, Kronecker contraction, etc. live as engine "
         "Definitions in the companion `*_axioms` modules.",
     ),
     (
         "markdown",
-        "## `MultiEval` — multilinear evaluation\n\n"
+        "## `MultiEval`, multilinear evaluation\n\n"
         "`multi_eval(head, *args, alternating=True, slot_kind=\"vector\")`. "
-        "Slot kind is declarative — `\"vector\"` (form-on-vectors) or "
+        "Slot kind is declarative, `\"vector\"` (form-on-vectors) or "
         "`\"covector\"` (multivector-on-forms). Arity NOT validated at "
         "construction (head's degree may need a registry lookup).",
     ),
@@ -2966,7 +2966,7 @@ TUTORIAL_21: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `Wedge` — graded-antisymmetric product\n\n"
+        "## `Wedge`, graded-antisymmetric product\n\n"
         "Distinct from `Product` (which is non-commutative scalar / "
         "operator product). `Wedge.make` flattens, absorbs `0`, drops "
         "`1`. Degree-aware identities (`α ∧ α = 0`) live in "
@@ -3007,7 +3007,7 @@ TUTORIAL_21: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `IndexedSum` — α-equivalence as `==`\n\n"
+        "## `IndexedSum`, α-equivalence as `==`\n\n"
         "`indexed_sum(dummy, range_, body)`. Equality compares "
         "α-renamed forms via a depth-aware sentinel; nested binders "
         "with overlapping names still distinguish correctly.",
@@ -3053,18 +3053,18 @@ TUTORIAL_21: list[tuple[str, str]] = [
     (
         "markdown",
         "## Summary\n\n"
-        "* `MultiEval(head, *args)` — multilinear evaluation. Slot "
+        "* `MultiEval(head, *args)`, multilinear evaluation. Slot "
         "kind declarative; arity not validated. `swapped(i, j)` "
         "carries the alternating sign.\n"
-        "* `Wedge.make(α, β, …)` — graded-antisymmetric product. "
+        "* `Wedge.make(α, β, …)`, graded-antisymmetric product. "
         "Smart constructor handles 0/1/associativity; degree-aware "
         "`α ∧ α = 0` lives in algorithms layer.\n"
-        "* `IndexedSum(dummy, range_, body)` — bound-index sum with "
+        "* `IndexedSum(dummy, range_, body)`, bound-index sum with "
         "α-equivalence as `==`. `with_dummy(new)` for explicit rename.\n"
         "* Engine rules in `wedge_axioms` / `indexed_sum_axioms` "
         "realise alternating expansion, sum-distribute, scalar-pull, "
         "Kronecker contract, push-in past contraction nodes.\n"
-        "* Direct use rare — debugging Cartan / frame proofs is the "
+        "* Direct use rare, debugging Cartan / frame proofs is the "
         "usual entry point.",
     ),
 ]
@@ -3074,7 +3074,7 @@ TUTORIAL_22: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 22 — Local frames and frame decomposition\n\n"
+        "# 22, Local frames and frame decomposition\n\n"
         "Companion notebook to "
         "[22_frame_decomposition.md](22_frame_decomposition.md). "
         "`LocalFrame` is a library wrapper (not an Expr) bundling a "
@@ -3084,7 +3084,7 @@ TUTORIAL_22: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `LocalFrame` — the wrapper\n\n"
+        "## `LocalFrame`, the wrapper\n\n"
         "Frames with the same `(name, dim, vf_symbol, coframe_symbol)` "
         "compare equal. `dim=None` is the symbolic-dimension mode "
         "Faz 17 proofs use.",
@@ -3102,7 +3102,7 @@ TUTORIAL_22: list[tuple[str, str]] = [
     (
         "markdown",
         "## Indices and basis elements\n\n"
-        "`FrameVectorField` subclasses `Derivation` (degree 0) — "
+        "`FrameVectorField` subclasses `Derivation` (degree 0), "
         "every existing pass picks frame VFs up automatically. "
         "`FrameCovector` is an `Atom` mediated through `Pairing`. "
         "Equality includes the frame name to keep coexisting frames "
@@ -3118,7 +3118,7 @@ TUTORIAL_22: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `KroneckerDelta` — the contraction unit\n\n"
+        "## `KroneckerDelta`, the contraction unit\n\n"
         "`KroneckerDelta(i, j)` collapses to `One` when the indices "
         "are structurally equal; stays opaque otherwise.",
     ),
@@ -3130,7 +3130,7 @@ TUTORIAL_22: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `FramePairingDualityDefinition` — `⟨e^a, X_b⟩ → δ^a_b`\n\n"
+        "## `FramePairingDualityDefinition`, `⟨e^a, X_b⟩ → δ^a_b`\n\n"
         "Frame-scoped: fires only when both halves belong to the "
         "same `LocalFrame`. Build via `F.duality_definition()` to "
         "wire the scoping correctly.",
@@ -3148,7 +3148,7 @@ TUTORIAL_22: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Frame decomposition — opt-in rules\n\n"
+        "## Frame decomposition, opt-in rules\n\n"
         "`FrameDecompositionDefinition(F)` rewrites `W → Σ_a e^a(W) · X_a`. "
         "**Opt-in**: pairing it with duality creates a loop. "
         "`CartanStructureProblem` (tutorial 23) turns it on for a "
@@ -3171,7 +3171,7 @@ TUTORIAL_22: list[tuple[str, str]] = [
         "| `FrameDecompositionDefinition(F)` | `W → Σ_a e^a(W) · X_a` for any non-frame VF |\n"
         "| `ConnectionEvalYFrameDecompositionDefinition(F, ∇)` | `∇_X Y → ∇_X (Σ_a e^a(Y) · X_a)` |\n"
         "| `ConnectionFormDecompositionDefinition(F, ∇, ω)` | `∇_V X_b → Σ_c ω^c_b(V) · X_c` |\n\n"
-        "The third introduces the **connection form** `ω^c_b(∇)` — "
+        "The third introduces the **connection form** `ω^c_b(∇)`, "
         "the keystone of Cartan structure equation proofs. Every "
         "Christoffel-symbol calculation funnels through it.",
     ),
@@ -3184,7 +3184,7 @@ TUTORIAL_22: list[tuple[str, str]] = [
         "* Four Expr shapes: `FrameIndex`, `FrameVectorField` "
         "(Derivation subclass), `FrameCovector` (Atom), "
         "`KroneckerDelta` (collapses on matching indices).\n"
-        "* `FramePairingDualityDefinition` — frame-scoped duality "
+        "* `FramePairingDualityDefinition`, frame-scoped duality "
         "rule. Build via `F.duality_definition()`.\n"
         "* Three opt-in frame-decomposition rules; "
         "`ConnectionFormDecompositionDefinition` introduces "
@@ -3198,7 +3198,7 @@ TUTORIAL_23: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 23 — Cartan structure equations\n\n"
+        "# 23, Cartan structure equations\n\n"
         "Companion notebook to "
         "[23_cartan_structure_equations.md](23_cartan_structure_equations.md). "
         "`CartanStructureProblem(∇, F)` proves both Cartan I and II "
@@ -3212,7 +3212,7 @@ TUTORIAL_23: list[tuple[str, str]] = [
         "markdown",
         "## The three form atoms\n\n"
         "`ConnectionForm` (`ω^a_b`), `TorsionForm` (`T^a`), "
-        "`CurvatureForm` (`R^a_b`) — all inert until their "
+        "`CurvatureForm` (`R^a_b`), all inert until their "
         "definitions fire. All carry degree 1.",
     ),
     (
@@ -3266,7 +3266,7 @@ TUTORIAL_23: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `prove_first_cartan` — Cartan I\n\n"
+        "## `prove_first_cartan`, Cartan I\n\n"
         "~49 steps cover torsion-form opening, frame decomposition "
         "of `U`/`V`, Y-Leibniz on each `∇_U V`, connection-form "
         "decomposition of `∇_V X_b`, intrinsic `d` on `e^a`, wedge "
@@ -3280,8 +3280,8 @@ TUTORIAL_23: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## `prove_second_cartan` — Cartan II\n\n"
-        "~54 steps. Structurally similar to Cartan I — both are "
+        "## `prove_second_cartan`, Cartan II\n\n"
+        "~54 steps. Structurally similar to Cartan I, both are "
         "shadows of the same abstract identity.",
     ),
     (
@@ -3297,22 +3297,22 @@ TUTORIAL_23: list[tuple[str, str]] = [
         "| Index-laden Cartan structure equation | `CartanStructureProblem` |\n"
         "| Coordinate-free Bianchi (no frame) | `BianchiProblem` (tutorial 20) |\n"
         "| Generic operator equality on forms | `prove_intrinsic_equivalence` (tutorial 15) |\n"
-        "| Q9 Koszul mode (custom bracket on `∇`) | Same wrapper — auto-detects via `_intrinsic_d_rule` |",
+        "| Q9 Koszul mode (custom bracket on `∇`) | Same wrapper, auto-detects via `_intrinsic_d_rule` |",
     ),
     (
         "markdown",
         "## Summary\n\n"
-        "* `ConnectionForm`, `TorsionForm`, `CurvatureForm` — three "
+        "* `ConnectionForm`, `TorsionForm`, `CurvatureForm`, three "
         "inert degree-1 form atoms; definitions in `cartan_forms` "
         "engine rules.\n"
-        "* `CartanStructureProblem(∇, F)` — 24-rule engine spanning "
+        "* `CartanStructureProblem(∇, F)`, 24-rule engine spanning "
         "seven phases (torsion/curvature, connection axioms, frame "
         "decomp, indexed-sum, wedge, intrinsic d, duality).\n"
         "* `prove_first_cartan` ~49 steps; `prove_second_cartan` "
         "~54 steps. Both run engine + simplify (with `sort_product`) "
         "to a fix-point.\n"
         "* Auto-detects custom-bracket connections (Q9) and swaps "
-        "in `KoszulExteriorDIntrinsicDefinition` — no caller action "
+        "in `KoszulExteriorDIntrinsicDefinition`, no caller action "
         "needed.\n"
         "* Skip when the problem is coordinate-free (no frame, no "
         "index).",
@@ -3324,12 +3324,12 @@ TUTORIAL_24: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 24 — Writing your own Problem wrapper\n\n"
+        "# 24, Writing your own Problem wrapper\n\n"
         "Companion notebook to "
         "[24_custom_problem_wrapper.md](24_custom_problem_wrapper.md). "
         "Five-step recipe walked end-to-end via a worked "
         "`AlmostSymplecticProblem` (non-degenerate but **not** "
-        "closed `ω`) — illustrates every moving part without "
+        "closed `ω`), illustrates every moving part without "
         "overlapping any existing wrapper.",
     ),
     (
@@ -3337,9 +3337,9 @@ TUTORIAL_24: list[tuple[str, str]] = [
         "## The five steps\n\n"
         "1. Pick the geometric data the wrapper carries.\n"
         "2. Auto-declare structural axioms on the registry "
-        "(check `has(...)` first — pre-declared flags take "
+        "(check `has(...)` first, pre-declared flags take "
         "precedence).\n"
-        "3. Assemble the engine — layer your rules onto "
+        "3. Assemble the engine, layer your rules onto "
         "`default_engine(registry=…)`.\n"
         "4. Write builder + prover methods.\n"
         "5. (optional) Register seeded theorems for one-step "
@@ -3347,7 +3347,7 @@ TUTORIAL_24: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Worked example — `AlmostSymplecticProblem(ω)`\n\n"
+        "## Worked example, `AlmostSymplecticProblem(ω)`\n\n"
         "An almost-symplectic form is non-degenerate but not "
         "necessarily closed. We get the vector-field-equality "
         "rule (`ι_X ω = ι_Y ω ⇒ X = Y`) but *not* the "
@@ -3366,17 +3366,17 @@ TUTORIAL_24: list[tuple[str, str]] = [
         "from jacopy.core.registry import PropertyRegistry\n"
         "from jacopy.proof.expansion import ExpansionEngine, default_engine\n\n"
         "class AlmostSymplecticProblem:\n"
-        "    \"\"\"`(ω, registry)` — non-degenerate (not necessarily closed) 2-form.\"\"\"\n\n"
+        "    \"\"\"`(ω, registry)`, non-degenerate (not necessarily closed) 2-form.\"\"\"\n\n"
         "    __slots__ = (\"_omega\", \"_registry\", \"_engine\", \"_name\")\n\n"
         "    def __init__(self, omega, *, registry=None, name=None):\n"
         "        self._omega    = omega\n"
         "        self._registry = registry or PropertyRegistry()\n"
-        "        # Step 2 — auto-declare; pre-declared flags take precedence.\n"
+        "        # Step 2, auto-declare; pre-declared flags take precedence.\n"
         "        if not self._registry.has(omega, Graded):\n"
         "            self._registry.declare(omega, Graded(degree=2))\n"
         "        if not self._registry.has(omega, NonDegenerate):\n"
         "            self._registry.declare(omega, NonDegenerate())\n"
-        "        # Step 3 — engine assembly.\n"
+        "        # Step 3, engine assembly.\n"
         "        base = default_engine(registry=self._registry)\n"
         "        self._engine = ExpansionEngine(\n"
         "            list(base.definitions) + [\n"
@@ -3394,17 +3394,17 @@ TUTORIAL_24: list[tuple[str, str]] = [
         "    def engine(self): return self._engine\n"
         "    @property\n"
         "    def name(self): return self._name\n\n"
-        "    # Step 4 — builders + provers.\n"
+        "    # Step 4, builders + provers.\n"
         "    def musical_flat(self, X):\n"
         "        \"\"\"`ω^♭(X) = ι_X ω`.\"\"\"\n"
         "        return Act(interior(X), self._omega)\n",
     ),
     (
         "markdown",
-        "## Try it — the rule fires on the difference\n\n"
+        "## Try it, the rule fires on the difference\n\n"
         "On the obstruction `ι_X ω − ι_Y ω`, the engine reduces "
         "to `X − Y` in one step. That **is** the proof "
-        "transcript of `ι_X ω = ι_Y ω ⇒ X = Y` — the residue "
+        "transcript of `ι_X ω = ι_Y ω ⇒ X = Y`, the residue "
         "`X − Y` is the equality the caller discharges.",
     ),
     (
@@ -3426,13 +3426,13 @@ TUTORIAL_24: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Picking your axioms — flags vs Definitions\n\n"
+        "## Picking your axioms, flags vs Definitions\n\n"
         "| Mechanism | Use when | Example |\n"
         "|---|---|---|\n"
         "| Registry flag | Property is a one-bit fact about a single object | `Closed`, `NonDegenerate`, `Poisson` |\n"
         "| Custom `Definition` subclass | Property is a non-trivial rewrite shape | tilde closure axioms |\n"
         "| Seeded `Theorem` | Identity should appear as a single citation step | `poisson_jacobi`, `courant_dorfman_bridge` |\n\n"
-        "Prefer flags when you can — declarative, opt-out via "
+        "Prefer flags when you can, declarative, opt-out via "
         "pre-declaration, single rule fires per object.",
     ),
     (
@@ -3443,7 +3443,7 @@ TUTORIAL_24: list[tuple[str, str]] = [
         "| `library/symplectic.py` | Smallest non-trivial wrapper |\n"
         "| `library/courant_algebroid.py` | Wrapper with seeded theorems + bridge identity |\n"
         "| `library/bianchi_problem.py` | Custom proof loop (`_expand_to_canonical`) |\n"
-        "| `library/koszul_problem.py` | Largest wrapper — multi-engine + canonicalize_indices pre-pass |\n"
+        "| `library/koszul_problem.py` | Largest wrapper, multi-engine + canonicalize_indices pre-pass |\n"
         "| `library/cartan_structure.py` | Index-laden wrapper with per-problem registry |\n\n"
         "Read the wrapper closest to your shape; the pattern repeats.",
     ),
@@ -3470,20 +3470,20 @@ TUTORIAL_25: list[tuple[str, str]] = [
     _BOOTSTRAP,
     (
         "markdown",
-        "# 25 — Frame-component differential geometry (`jacopy.frame_calc`)\n\n"
+        "# 25, Frame-component differential geometry (`jacopy.frame_calc`)\n\n"
         "Companion notebook to "
         "[25_frame_calc.md](25_frame_calc.md). "
         "`jacopy.frame_calc` is jacopy's **component-level submodule** "
         "for concrete metric calculations: given a metric `g` on a "
         "frame, compute Christoffel symbols, Riemann curvature, "
-        "Ricci tensor, scalar curvature, Einstein tensor — with "
+        "Ricci tensor, scalar curvature, Einstein tensor, with "
         "step-by-step derivation transcripts that bridge to "
         "`ProofChain` for paper-grade LaTeX output.\n\n"
         "Requires SymPy: `pip install \"jacopy[components]\"`.",
     ),
     (
         "markdown",
-        "## Quick taste — Schwarzschild vacuum in five lines",
+        "## Quick taste, Schwarzschild vacuum in five lines",
     ),
     (
         "code",
@@ -3495,7 +3495,7 @@ TUTORIAL_25: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Frame setup — `CoordinateFrame`\n\n"
+        "## Frame setup, `CoordinateFrame`\n\n"
         "Most physics literature uses coordinate frames "
         "(`e_a = ∂/∂x^a`). The frame's `derivative(f, a)` is "
         "`∂f/∂x^a`; `gamma(a, b, c) = 0` (coordinate frames are "
@@ -3563,7 +3563,7 @@ TUTORIAL_25: list[tuple[str, str]] = [
     (
         "markdown",
         "## Curvature, Ricci, Einstein\n\n"
-        "Schwarzschild is Ricci-flat — `Ric = 0`, `R = 0`, `G = 0`. "
+        "Schwarzschild is Ricci-flat, `Ric = 0`, `R = 0`, `G = 0`. "
         "This is the vacuum field equation result.",
     ),
     (
@@ -3611,11 +3611,11 @@ TUTORIAL_25: list[tuple[str, str]] = [
     (
         "code",
         "from jacopy.frame_calc.library import minkowski, frw\n\n"
-        "# Minkowski 4D — flat\n"
+        "# Minkowski 4D, flat\n"
         "F_m, g_m = minkowski()\n"
         "G_m = einstein_tensor(levi_civita(g_m), g_m)\n"
         "print(f'Minkowski G.is_vacuum(): {G_m.is_vacuum()}')\n\n"
-        "# FRW (k=0, a(t) symbolic) — non-vacuum cosmology\n"
+        "# FRW (k=0, a(t) symbolic), non-vacuum cosmology\n"
         "F_frw, g_frw = frw()\n"
         "G_frw = einstein_tensor(levi_civita(g_frw), g_frw)\n"
         "print(f'FRW G.is_zero(): {G_frw.is_zero()} (Friedmann eq form)')\n"
@@ -3623,7 +3623,7 @@ TUTORIAL_25: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## ProofChain bridge — paper-grade LaTeX\n\n"
+        "## ProofChain bridge, paper-grade LaTeX\n\n"
         "Each tracked tensor's `derivation_chain(...)` returns a "
         "`ProofChain` compatible with `chain_to_latex_document`. "
         "The `SymPyAtom` wrapper bridges SymPy expressions into "
@@ -3639,11 +3639,11 @@ TUTORIAL_25: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Drop-in template — paste your metric, get everything\n\n"
+        "## Drop-in template, paste your metric, get everything\n\n"
         "Below is the **paper-workflow template**: change *only* the "
         "metric-matrix block; the rest of the pipeline runs as-is on "
         "whatever metric you provided. The default example uses "
-        "Reissner-Nordström (charged Schwarzschild) — not in the "
+        "Reissner-Nordström (charged Schwarzschild), not in the "
         "library, just to show that any metric matrix works.\n\n"
         "**To compute on a different metric**, edit the matrix in "
         "block 2; everything else is unchanged.",
@@ -3656,7 +3656,7 @@ TUTORIAL_25: list[tuple[str, str]] = [
         "    levi_civita, ricci, ricci_scalar, einstein_tensor,\n"
         ")\n\n"
         "# ─────────────────────────────────────────────────────────\n"
-        "# 1. Coordinates — adjust to your metric's chart\n"
+        "# 1. Coordinates, adjust to your metric's chart\n"
         "# ─────────────────────────────────────────────────────────\n"
         "t, r, theta, phi = sp.symbols('t r theta phi')\n"
         "coords = [t, r, theta, phi]\n\n"
@@ -3664,7 +3664,7 @@ TUTORIAL_25: list[tuple[str, str]] = [
         "M = sp.Symbol('M', positive=True)\n"
         "Q = sp.Symbol('Q', positive=True)\n\n"
         "# ─────────────────────────────────────────────────────────\n"
-        "# 2. METRIC MATRIX — REPLACE THIS BLOCK WITH YOUR OWN\n"
+        "# 2. METRIC MATRIX, REPLACE THIS BLOCK WITH YOUR OWN\n"
         "# ─────────────────────────────────────────────────────────\n"
         "# Reissner-Nordström: charged static spherical black hole\n"
         "factor = 1 - 2*M/r + Q**2 / r**2\n"
@@ -3675,7 +3675,7 @@ TUTORIAL_25: list[tuple[str, str]] = [
         "    [0,               0,        0,    r**2 * sp.sin(theta)**2],\n"
         "])\n\n"
         "# ─────────────────────────────────────────────────────────\n"
-        "# 3. Pipeline — runs as-is on whatever metric is above\n"
+        "# 3. Pipeline, runs as-is on whatever metric is above\n"
         "# ─────────────────────────────────────────────────────────\n"
         "F = CoordinateFrame(coords)\n"
         "g = ComponentMetric(F, metric_matrix)\n"
@@ -3684,7 +3684,7 @@ TUTORIAL_25: list[tuple[str, str]] = [
         "R = ricci_scalar(LC, g)\n"
         "G = einstein_tensor(LC, g)\n\n"
         "# ─────────────────────────────────────────────────────────\n"
-        "# 4. Output — summary + all non-zero entries\n"
+        "# 4. Output, summary + all non-zero entries\n"
         "# ─────────────────────────────────────────────────────────\n"
         "names = F.index_names()\n"
         "print(f'# non-zero Christoffel: {len(LC.nonzero_components())}')\n"
@@ -3728,7 +3728,7 @@ TUTORIAL_25: list[tuple[str, str]] = [
         "    [0, 0, 0, r**2 * sp.sin(theta)**2],\n"
         "])\n"
         "```\n\n"
-        "**Kerr-class metrics** (off-diagonal, complex denominators) — "
+        "**Kerr-class metrics** (off-diagonal, complex denominators), "
         "add `optimized=True` to every pipeline call:\n"
         "```python\n"
         "LC = levi_civita(g, optimized=True)\n"
@@ -3743,11 +3743,11 @@ TUTORIAL_25: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "## Custom connection — independent of the metric\n\n"
+        "## Custom connection, independent of the metric\n\n"
         "**Connection and metric are independent geometric objects.** "
         "The Levi-Civita connection is the *unique* connection that's "
         "both torsion-free and metric-compatible for a given metric "
-        "— but it's just one of many possible connections. In "
+        ", but it's just one of many possible connections. In "
         "Einstein-Cartan theory, teleparallel gravity, Palatini "
         "formulations, and other modified gravity frameworks, the "
         "connection is **not** Levi-Civita.\n\n"
@@ -3761,7 +3761,7 @@ TUTORIAL_25: list[tuple[str, str]] = [
         "markdown",
         "### Symbol-domain matching (important pitfall!)\n\n"
         "When you supply Christoffel symbols by hand, **use the "
-        "symbols the frame already carries** — not freshly-created "
+        "symbols the frame already carries**, not freshly-created "
         "ones. Library factories like `schwarzschild()` create "
         "symbols with specific assumptions (`r > 0`, `M > 0`); your "
         "hand-written `sp.symbols('r')` is a *different* symbol "
@@ -3775,7 +3775,7 @@ TUTORIAL_25: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "### Sanity check — manual Schwarzschild matches Levi-Civita\n\n"
+        "### Sanity check, manual Schwarzschild matches Levi-Civita\n\n"
         "Build the textbook Schwarzschild Christoffels by hand, wrap "
         "them in `ComponentConnection`, and verify the result matches "
         "`levi_civita(g)` exactly.",
@@ -3820,7 +3820,7 @@ TUTORIAL_25: list[tuple[str, str]] = [
         "### Non-trivial use: same metric, different connection\n\n"
         "For modified-gravity work, you'd add a torsion correction "
         "or use a fully independent connection. Here's the same "
-        "Schwarzschild metric with a torsion-perturbed connection — "
+        "Schwarzschild metric with a torsion-perturbed connection, "
         "the Einstein tensor is no longer vacuum because the "
         "connection is no longer torsion-free.",
     ),
@@ -3850,7 +3850,7 @@ TUTORIAL_25: list[tuple[str, str]] = [
         "### When you'd actually use this\n\n"
         "| Scenario | Custom connection? |\n"
         "|---|---|\n"
-        "| Standard GR (vacuum, Einstein-Maxwell, Schwarzschild family) | No — `levi_civita(g)` |\n"
+        "| Standard GR (vacuum, Einstein-Maxwell, Schwarzschild family) | No, `levi_civita(g)` |\n"
         "| Einstein-Cartan theory (torsion present) | Yes |\n"
         "| Teleparallel gravity (`R = 0`, torsion only) | Yes |\n"
         "| Palatini formulation (`g`, `Γ` varied independently) | Yes |\n"
@@ -3861,7 +3861,7 @@ TUTORIAL_25: list[tuple[str, str]] = [
     ),
     (
         "markdown",
-        "### API stress test — arbitrary symbols\n\n"
+        "### API stress test, arbitrary symbols\n\n"
         "Before showing physically-motivated patterns, let's check "
         "the API accepts completely arbitrary symbol parameters.\n\n"
         "**Schwarzschild with made-up A, B:** the API runs, but the "
@@ -3892,7 +3892,7 @@ TUTORIAL_25: list[tuple[str, str]] = [
     (
         "markdown",
         "**2D polar with made-up A, B:** the result will reveal that "
-        "B doesn't appear in G — Lovelock 2D theorem in action!",
+        "B doesn't appear in G, Lovelock 2D theorem in action!",
     ),
     (
         "code",
@@ -3962,7 +3962,7 @@ TUTORIAL_25: list[tuple[str, str]] = [
         "#### Pattern 2: Levi-Civita + Weyl non-metricity (2D polar)\n\n"
         "Single scalar `W_x` controls a Weyl-type deformation. "
         "**Surprise**: `G ≡ 0` even with `W_x ≠ 0`, because Weyl "
-        "preserves torsion-freeness — Lovelock 2D still applies. "
+        "preserves torsion-freeness, Lovelock 2D still applies. "
         "Pedagogical lesson: torsion breaks Lovelock; non-metricity "
         "doesn't.",
     ),
@@ -4050,7 +4050,7 @@ TUTORIAL_25: list[tuple[str, str]] = [
     (
         "markdown",
         "#### Pattern 5: FLRW + scalar-gradient projective deformation\n\n"
-        "Connection deformed by a scalar field's gradient — typical "
+        "Connection deformed by a scalar field's gradient, typical "
         "scalar-tensor gravity setup. Coupling form `Γ + δ A_a + δ A_a` "
         "where `A_μ = ∂_μ φ`.",
     ),

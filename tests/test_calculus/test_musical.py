@@ -108,7 +108,7 @@ class TestMusicalCompatibility:
         assert "ω" in compat.name and "π" in compat.name
 
     def test_frozen(self):
-        """Dataclass is frozen — mutating attributes must fail."""
+        """Dataclass is frozen, mutating attributes must fail."""
         compat = MusicalCompatibility.between(Symbol("ω"), Symbol("π"))
         with pytest.raises(Exception):
             compat.omega = Symbol("ω2")  # type: ignore[misc]
@@ -147,7 +147,7 @@ class TestMusicalCompatibilityDefinition:
         assert rule.rewrite(expr) == alpha
 
     def test_reverse_composition_rewrites(self):
-        """``π^♯ ∘ ω^♭ = id`` — the dual direction fires on the same rule."""
+        """``π^♯ ∘ ω^♭ = id``, the dual direction fires on the same rule."""
         omega, pi, X = Symbol("ω"), Symbol("π"), Symbol("X")
         compat = MusicalCompatibility.between(omega, pi)
         rule = compat.as_definition()
@@ -215,7 +215,7 @@ class TestArgNegLinearityDefinition:
         assert not rule.matches(expr)
 
     def test_ignores_non_derivation_op(self):
-        """Safety: rule only fires when op is a Derivation — arbitrary
+        """Safety: rule only fires when op is a Derivation, arbitrary
         Exprs in the op slot aren't guaranteed to be linear."""
         rule = ArgNegLinearityDefinition()
         expr = Act(Symbol("op"), Neg(Symbol("x")))
@@ -223,7 +223,7 @@ class TestArgNegLinearityDefinition:
 
 
 # --------------------------------------------------------------------- #
-# Musical bilinear — ω(π♯α, π♯β) = π(α, β)                                #
+# Musical bilinear, ω(π♯α, π♯β) = π(α, β)                                #
 # --------------------------------------------------------------------- #
 
 
@@ -284,7 +284,7 @@ class TestMusicalCompatibilityBilinear:
         compat = self._compat()
         rule = MusicalCompatibilityBilinearDefinition(compat)
         alpha = Symbol("α")
-        X = Symbol("X")  # bare VF — not Act(sharp, _)
+        X = Symbol("X")  # bare VF, not Act(sharp, _)
         expr = multi_eval(compat.omega, Act(compat.sharp, alpha), X)
         assert not rule.matches(expr)
 

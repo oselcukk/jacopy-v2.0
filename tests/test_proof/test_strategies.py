@@ -55,7 +55,7 @@ class TestCartanTautology:
 
 class TestAlgebraicCancellation:
     def test_trivial_cancellation_closes(self):
-        """Sum(a, b) == Sum(a, b) via trivial expansion — no engine fires."""
+        """Sum(a, b) == Sum(a, b) via trivial expansion, no engine fires."""
         a, b = Symbol("a"), Symbol("b")
         lhs = Sum(a, b)
         rhs = Sum(a, b)
@@ -65,7 +65,7 @@ class TestAlgebraicCancellation:
         assert chain.steps[0].rule == "reflexive"
 
     def test_structurally_distinct_but_algebraically_equal(self):
-        """Sum(a, b) vs Sum(b, a) — cancels under collect_terms."""
+        """Sum(a, b) vs Sum(b, a), cancels under collect_terms."""
         a, b = Symbol("a"), Symbol("b")
         chain = ExpandAndSimplify().prove(Sum(a, b), Sum(b, a))
         assert chain.final == Integer(0)

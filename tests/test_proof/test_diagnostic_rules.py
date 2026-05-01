@@ -46,7 +46,7 @@ class TestStalledDSquared:
         assert not report.by_category("stalled-d-squared")
 
     def test_skips_even_derivation(self, reg):
-        """``L_X`` is degree 0 — two nested L's are not a d² violation."""
+        """``L_X`` is degree 0, two nested L's are not a d² violation."""
         r, f = reg
         L = Derivation("L", degree=0)
         report = diagnose(Act(L, Act(L, f)), registry=r)
@@ -107,7 +107,7 @@ class TestUnreducedIotaOnDf:
         assert report.by_category("unreduced-iota-on-df")
 
     def test_skips_plain_vector_field(self, reg):
-        """``ι_X(df)`` — plain Derivation is handled by the default
+        """``ι_X(df)``, plain Derivation is handled by the default
         definition; diagnostic should stay quiet."""
         r, f = reg
         X = Derivation("X", degree=0)
@@ -123,7 +123,7 @@ class TestUnreducedIotaOnDf:
 
 class TestSymbolVectorField:
     def test_fires_on_iota_of_symbol(self, reg):
-        """``ι_X(df)`` with ``X = Symbol("X")`` — pairing never fires."""
+        """``ι_X(df)`` with ``X = Symbol("X")``, pairing never fires."""
         r, f = reg
         X = Symbol("X")
         residual = Act(interior(X), Act(d, f))
@@ -134,7 +134,7 @@ class TestSymbolVectorField:
         assert any("X" in (h.suggestion or "") for h in hints)
 
     def test_fires_on_lie_derivative_of_symbol(self, reg):
-        """``L_X(f)`` with ``X = Symbol("X")`` — same gate."""
+        """``L_X(f)`` with ``X = Symbol("X")``, same gate."""
         r, f = reg
         X = Symbol("X")
         residual = Act(lie_derivative(X), f)
@@ -142,7 +142,7 @@ class TestSymbolVectorField:
         assert report.by_category("symbol-vector-field")
 
     def test_fires_on_bracket_of_symbols(self, reg):
-        """Bracket ``X*Y − Y*X`` of Symbols — still flags, names deduped."""
+        """Bracket ``X*Y − Y*X`` of Symbols, still flags, names deduped."""
         r, f = reg
         X = Symbol("X")
         Y = Symbol("Y")
@@ -158,7 +158,7 @@ class TestSymbolVectorField:
         assert suggestion.count("Y") == 1
 
     def test_skips_plain_derivation(self, reg):
-        """``ι_X(df)`` with ``X = Derivation(...)`` — pairing fires, no hint."""
+        """``ι_X(df)`` with ``X = Derivation(...)``, pairing fires, no hint."""
         r, f = reg
         X = Derivation("X", degree=0)
         residual = Act(interior(X), Act(d, f))
@@ -176,7 +176,7 @@ class TestSymbolVectorField:
         assert not report.by_category("symbol-vector-field")
 
     def test_skips_operators_without_vector_field(self, reg):
-        """``Act(d, f)`` — outer op has no vector_field slot, no hint."""
+        """``Act(d, f)``, outer op has no vector_field slot, no hint."""
         r, f = reg
         report = diagnose(Act(d, f), registry=r)
         assert not report.by_category("symbol-vector-field")
@@ -232,7 +232,7 @@ class TestIntegration:
 
     def test_multiple_rules_compose(self, reg):
         r, f = reg
-        # Residual contains both a stalled d² and an Act(op, 0) —
+        # Residual contains both a stalled d² and an Act(op, 0),
         # both rules should fire on the same residual.
         residual = Sum(Act(d, Act(d, f)), Act(d, Integer(0)))
         report = diagnose(residual, registry=r)

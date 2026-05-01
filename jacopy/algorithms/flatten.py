@@ -5,8 +5,8 @@ Associativity: flatten nested sums and products.
 constructors (especially by rewrite rules) can carry nested shapes like
 ``Sum(Sum(x, y), z)``. The smart constructors ``Sum.make`` and
 ``Product.make`` already flatten, but rewrite passes that build trees
-positionally — :func:`replace_at`, hand-built patterns, substitutions
-that preserve rhs structure — leave nesting in place. :func:`flatten`
+positionally, :func:`replace_at`, hand-built patterns, substitutions
+that preserve rhs structure, leave nesting in place. :func:`flatten`
 is the explicit pass that normalizes that nesting without touching
 anything else.
 

@@ -1,4 +1,4 @@
-"""Tests for the Bianchi-identity wrapper — Faz 16.D."""
+"""Tests for the Bianchi-identity wrapper, Faz 16.D."""
 
 from __future__ import annotations
 
@@ -263,7 +263,7 @@ def test_proof_result_is_frozen():
 
 
 # --------------------------------------------------------------------- #
-# Q9 Stage 9.C — Koszul-bracket-mode closures                            #
+# Q9 Stage 9.C, Koszul-bracket-mode closures                            #
 # --------------------------------------------------------------------- #
 
 
@@ -332,7 +332,7 @@ class TestKoszulBracketBianchi:
 
     def test_koszul_engine_does_not_carry_lbvf_rules(self):
         # Same content as ``test_engine_picks_bracket_apply_rules`` but
-        # checks every LBVF rule type is absent — guards against
+        # checks every LBVF rule type is absent, guards against
         # accidental double-bundling.
         from jacopy.calculus.bracket_apply_axioms import (
             BracketApplyAntiSymmetryDefinition,

@@ -1,4 +1,4 @@
-"""Tests for MetricTensor + NonMetricityEvalExpr — Faz 17.B."""
+"""Tests for MetricTensor + NonMetricityEvalExpr, Faz 17.B."""
 
 from __future__ import annotations
 
@@ -66,7 +66,7 @@ def test_metric_tensor_is_atom():
 
 
 # --------------------------------------------------------------------- #
-# NonMetricityEvalExpr — construction                                   #
+# NonMetricityEvalExpr, construction                                   #
 # --------------------------------------------------------------------- #
 
 
@@ -935,7 +935,7 @@ def test_compatibility_no_match_when_v_not_derivation():
     X = Derivation("X")
     Y = Derivation("Y")
     rule = NonMetricityCompatibilityDefinition(nabla, g)
-    # Sum-V — not a Derivation, must defer to V-linearity first.
+    # Sum-V, not a Derivation, must defer to V-linearity first.
     assert not rule.matches(
         NonMetricityEvalExpr(nabla, g, Sum.make(A, B), X, Y)
     )
@@ -978,7 +978,7 @@ def test_compatibility_engine_chains_with_v_linearity():
     )
     expr = NonMetricityEvalExpr(nabla, g, Sum.make(A, B), X, Y)
     final, _ = engine.expand(expr)
-    # No NonMetricityEvalExpr should remain — V-linearity splits then
+    # No NonMetricityEvalExpr should remain, V-linearity splits then
     # compatibility opens both.
     def has_nme(e):
         if isinstance(e, NonMetricityEvalExpr):

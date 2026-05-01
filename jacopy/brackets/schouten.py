@@ -25,7 +25,7 @@ This module implements the bracket via its characterizing rules:
      [X ∧ Y, Z]_SN = X ∧ [Y, Z]_SN + (−1)^{|Y||Z|} [X, Z]_SN ∧ Y
      [Z, X ∧ Y]_SN = [Z, X]_SN ∧ Y + (−1)^{|X||Z|} X ∧ [Z, Y]_SN
 
-Wedges reuse :class:`Product` — a dedicated ``Wedge`` Expr type is
+Wedges reuse :class:`Product`, a dedicated ``Wedge`` Expr type is
 deferred polish, not needed here. Degrees of wedge products follow the
 SN convention ``|X ∧ Y| = |X| + |Y| + 1`` (computed by
 :func:`_sn_degree`), so that a wedge of two 1-vectors has SN-degree 1
@@ -34,12 +34,12 @@ SN convention ``|X ∧ Y| = |X| + |Y| + 1`` (computed by
 Atomic higher-order multivectors (e.g. a bare :class:`Symbol` declared
 ``Graded(degree=1)`` standing in for a bivector ``π``) cannot be
 further decomposed. In that case :meth:`expand` returns the inert
-:class:`BracketApply` node unchanged — the obstruction
+:class:`BracketApply` node unchanged, the obstruction
 ``[π, π]_SN`` surfaces as a typed handle that the proof layer and
 derived-bracket machinery consume as the Poisson condition.
 
 **No literal lift onto forms.** ``sn.expand(α, π)`` for a 1-form
-``α`` and a multivector ``π`` is not defined here — SN is the
+``α`` and a multivector ``π`` is not defined here, SN is the
 multivector-only bracket and ``DerivedBracket(sn, π).expand(α, β)``
 without ``acting_on`` deliberately returns the opaque BracketApply.
 Form-level Poisson/Koszul work goes through ``acting_on=ρ`` on the
@@ -73,7 +73,7 @@ def _sn_degree(
     """Return the SN-grading degree of ``expr``.
 
     For a wedge :class:`Product` of ``n`` multivector factors the SN
-    degree is ``sum(|X_i|) + (n − 1)`` — the ``+1`` per extra factor is
+    degree is ``sum(|X_i|) + (n − 1)``, the ``+1`` per extra factor is
     what distinguishes the ``|X| = k − 1`` convention from the plain
     sum-of-degrees that :func:`degree_of` would give.
 
@@ -97,7 +97,7 @@ def _safe_sn_degree(
 
     Used at the top of :meth:`SchoutenBracket.expand`, where the four
     base cases should only fire on operands whose degrees are concrete
-    integers — any unresolved grading silently skips to the wedge /
+    integers, any unresolved grading silently skips to the wedge /
     opaque fallback rather than raising at the user.
     """
     try:
@@ -112,7 +112,7 @@ def _safe_sn_degree(
 
 
 class SchoutenBracket(GradedBracket):
-    """``[·, ·]_SN`` — the Schouten-Nijenhuis bracket.
+    """``[·, ·]_SN``, the Schouten-Nijenhuis bracket.
 
     Degree 0 in the shifted (``|X| = k − 1``) grading, graded
     antisymmetric, graded Leibniz in each slot, graded Jacobi. Expansion
@@ -143,7 +143,7 @@ class SchoutenBracket(GradedBracket):
         deg_a = _safe_sn_degree(a, registry)
         deg_b = _safe_sn_degree(b, registry)
 
-        # Base cases — only fire on atomic operands whose SN degrees are
+        # Base cases, only fire on atomic operands whose SN degrees are
         # concrete integers. Wedge products are handled below; anything
         # with symbolic degree falls through to the opaque return.
         if not isinstance(a, Product) and not isinstance(b, Product):
@@ -165,7 +165,7 @@ class SchoutenBracket(GradedBracket):
             if wedge is not None:
                 return wedge
 
-        # Opaque — atomic higher-order multivector, or sign parity
+        # Opaque, atomic higher-order multivector, or sign parity
         # couldn't be decided. Leave the BracketApply intact so the
         # proof layer can still consume it as a symbolic condition.
         return BracketApply(self, a, b)
@@ -202,7 +202,7 @@ class SchoutenBracket(GradedBracket):
     ) -> Optional[Expr]:
         """``[X ∧ Y, Z]_SN = X ∧ [Y, Z] + (−1)^{|Y||Z|} [X, Z] ∧ Y``.
 
-        Splits ``a`` at its first factor — the tail of length ``n − 1``
+        Splits ``a`` at its first factor, the tail of length ``n − 1``
         becomes ``Y``, so a three-factor wedge ``X1 ∧ X2 ∧ X3`` recurses
         as ``X1 ∧ [X2 ∧ X3, Z]``, peeling one factor per level. Returns
         ``None`` when the sign parity ``|Y||Z|`` is symbolic, letting
@@ -253,14 +253,14 @@ class SchoutenBracket(GradedBracket):
     def self_bracket(
         self, Q: Expr, registry: Optional[PropertyRegistry] = None
     ) -> Expr:
-        """Return ``[Q, Q]_SN`` — the universal obstruction of ``Q``.
+        """Return ``[Q, Q]_SN``, the universal obstruction of ``Q``.
 
         For a Poisson bivector ``π`` this is the 3-vector whose
         vanishing is the Poisson condition. For a Courant generator
         ``Θ`` (once higher algebras land) it plays the same role with
         the Courant compatibility condition. The helper is a thin wrap
         around :meth:`expand` so the caller doesn't have to spell out
-        the self-pairing — and reads cleanly at call sites.
+        the self-pairing, and reads cleanly at call sites.
         """
         return self.expand(Q, Q, registry)
 

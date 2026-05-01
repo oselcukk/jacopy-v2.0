@@ -10,7 +10,7 @@ sequence of unfolds.
 
 The engine is deliberately narrow: it only expands definitions. Koszul
 signs, Leibniz distribution, and collecting like terms are *not* its
-job — those live in :mod:`jacopy.algorithms` and the strategies layer
+job, those live in :mod:`jacopy.algorithms` and the strategies layer
 runs them afterward. Keeping the two concerns separate matches the
 plan's "expand definitions first, then simplify" proof shape, and it
 means a strategy can choose when to interleave or defer each pass.
@@ -55,7 +55,7 @@ class Definition(ABC):
     side?) and :meth:`rewrite` (produce the right-hand side). The
     :attr:`name` is used verbatim in the :class:`ProofStep` rule field.
 
-    A definition is classified as an **axiom** by default — the engine
+    A definition is classified as an **axiom** by default, the engine
     tags its :class:`ProofStep` with ``provenance_tag="axiom"``. A
     subclass that represents a *theorem* overrides
     :meth:`theorem_proof_builder` to return a callable producing the
@@ -105,7 +105,7 @@ def _is_degree_zero(expr: Expr, registry: Optional[PropertyRegistry]) -> bool:
 
 
 class ActOverSumOpDefinition(Definition):
-    """``Act(A + B, x) → Act(A, x) + Act(B, x)`` — linearity in the operator.
+    """``Act(A + B, x) → Act(A, x) + Act(B, x)``, linearity in the operator.
 
     ``product_rule`` distributes an operator across a sum in its
     operand (``D(a+b) → D(a) + D(b)``) but not across a sum in its
@@ -131,7 +131,7 @@ D_SQUARED_CLASSIFICATIONS = ("axiom", "theorem")
 
 
 class DSquaredZeroDefinition(Definition):
-    """``d(d(x)) → 0`` — element-level ``d² = 0``.
+    """``d(d(x)) → 0``, element-level ``d² = 0``.
 
     Fires on nested ``Act(d, Act(d, x))`` shapes. A composed form
     ``Act(d ∘ d, x)`` is reduced by :mod:`product_rule` into the
@@ -139,7 +139,7 @@ class DSquaredZeroDefinition(Definition):
     the strategy runs Leibniz expansion.
 
     ``target`` pins the rewrite to a specific :class:`ExteriorDerivative`
-    instance — useful when a standard ``d`` coexists with a
+    instance, useful when a standard ``d`` coexists with a
     Lie-algebroid ``d_E`` and only one has the ``d² = 0`` axiom
     asserted. ``target=None`` (the default) accepts any
     :class:`ExteriorDerivative`, provided both layers use the *same*
@@ -148,12 +148,12 @@ class DSquaredZeroDefinition(Definition):
     ``classification`` selects how the rule is recorded in a proof
     transcript:
 
-    * ``"axiom"`` (default) — ``d² = 0`` is taken as a primitive axiom
+    * ``"axiom"`` (default), ``d² = 0`` is taken as a primitive axiom
       of the exterior calculus. The :class:`ProofStep` is tagged
       ``provenance_tag="axiom"``; no sub-proof is attached even under
       ``mode="foundational"``. This is the "efficient" presentation the
       plan refers to: fast, no structural justification required.
-    * ``"theorem"`` — ``d² = 0`` is presented as a derived operator
+    * ``"theorem"``, ``d² = 0`` is presented as a derived operator
       identity. Its only primitive input is the generator-level axiom
       ``d(df) = 0`` on 0-forms; everything else extends by agreement on
       the generators of ``Ω*(M)`` and graded Leibniz. In efficient mode
@@ -206,7 +206,7 @@ class DSquaredZeroDefinition(Definition):
             # derived from the generator-level axiom d(df) = 0 via
             # agreement on the generators of Ω*(M). A user who wants the
             # full structural unroll composes AgreementOnGenerators on
-            # an ExteriorAlgebra — this builder cites the generator
+            # an ExteriorAlgebra, this builder cites the generator
             # axiom as the single primitive so the transcript bottoms
             # out at the foundational fact rather than at d² = 0 itself.
             from jacopy.proof.chain import ProofChain
@@ -232,7 +232,7 @@ class DSquaredZeroDefinition(Definition):
 
 
 class IotaSquaredZeroDefinition(Definition):
-    """``ι_X(ι_X(x)) → 0`` — interior product applied twice to the same field."""
+    """``ι_X(ι_X(x)) → 0``, interior product applied twice to the same field."""
 
     name = "ι_X ∘ ι_X = 0"
 
@@ -276,7 +276,7 @@ def _is_derivation_combination(expr: Expr) -> bool:
     whose leaves are all Derivations.
 
     The pairing axiom ``ι_V(df) = V(f)`` is meaningful whenever ``V``
-    represents a vector field built from Derivations — including
+    represents a vector field built from Derivations, including
     composites like the Lie bracket ``X*Y − Y*X`` produced by
     ``vector_bracket.expand(X, Y)``. Restricting to strict
     ``Derivation`` instances would miss those composites and leave
@@ -301,7 +301,7 @@ class IotaOnExactOneFormDefinition(Definition):
     paired against the standard ``d`` doesn't accidentally pair. The
     vector field is accepted as a :class:`Derivation` or any
     ``Sum``/``Product``/``Neg`` composite whose leaves are all
-    Derivations — this covers linear combinations produced by bracket
+    Derivations, this covers linear combinations produced by bracket
     expansion on vector fields. If the field contains a non-Derivation
     leaf the rule stays inert (the user hasn't given that field an
     action on functions yet).
@@ -338,7 +338,7 @@ class IotaOnExactOneFormDefinition(Definition):
 
 
 class LieDerivativeCartanDefinition(Definition):
-    """``L_X(ω) := (d ∘ ι_X + ι_X ∘ d)(ω)`` — Cartan definition of ``L_X``.
+    """``L_X(ω) := (d ∘ ι_X + ι_X ∘ d)(ω)``, Cartan definition of ``L_X``.
 
     Fires only on :class:`LieDerivative` instances whose
     :attr:`definition` is ``"cartan"``; an instance built in ``"flow"``
@@ -346,7 +346,7 @@ class LieDerivativeCartanDefinition(Definition):
     in that mode rather than a tautology.
 
     The rewrite returns the expansion already distributed as a
-    :class:`Sum` of two :class:`Act` nodes — the composed operator form
+    :class:`Sum` of two :class:`Act` nodes, the composed operator form
     ``Act(d ∘ ι_X, ω) + Act(ι_X ∘ d, ω)``. Distributing here rather
     than producing ``Act(Sum(…), ω)`` keeps the result in the shape
     that :mod:`product_rule` and :mod:`simplify` can drive to a normal
@@ -369,7 +369,7 @@ class LieDerivativeCartanDefinition(Definition):
         # ``LieDerivative``: algebroid-constructed ``L_{E,X}`` carries
         # its own ``d_E`` and ``ι_{E,·}`` factory, and without this
         # routing the expansion would reintroduce the TM default ``d``
-        # and ``ι_X`` — leaving the magic-formula residual wedged in
+        # and ``ι_X``, leaving the magic-formula residual wedged in
         # mismatched operator names. Fallback is still the TM default,
         # so existing callers and the ``TM`` Cartan bundle behave as
         # before.
@@ -385,7 +385,7 @@ class LieDerivativeOnZeroFormDefinition(Definition):
     """``L_X(f) → X(f)`` on 0-forms for flow-mode ``L_X``.
 
     Fires only on :class:`LieDerivative` instances whose
-    :attr:`definition` is ``"flow"`` — cartan-mode ``L_X`` unfolds via
+    :attr:`definition` is ``"flow"``, cartan-mode ``L_X`` unfolds via
     :class:`LieDerivativeCartanDefinition` and reaches the same result
     through the magic formula. The vector field must be a Derivation or
     a Sum/Product/Neg composite of Derivations (the pairing gate used
@@ -468,10 +468,10 @@ class ExpansionEngine:
     The engine's :attr:`mode` controls how theorem-classified
     definitions are recorded:
 
-    * ``"efficient"`` — theorems fire like axioms; the resulting step
+    * ``"efficient"``, theorems fire like axioms; the resulting step
       is tagged ``"theorem"`` but carries no sub-proof, matching the
       "property taken as given" mode of the plan.
-    * ``"foundational"`` — theorems fire and their
+    * ``"foundational"``, theorems fire and their
       :meth:`Definition.theorem_proof_builder` is invoked; the
       resulting sub-proof is attached under the step as children,
       exposing the derivation down to axioms.
@@ -564,7 +564,7 @@ class ExpansionEngine:
 
         Returns the fully expanded expression and the list of steps
         taken. Raises :class:`RuntimeError` if the fix-point isn't
-        reached within ``max_steps`` iterations — that would indicate a
+        reached within ``max_steps`` iterations, that would indicate a
         cyclic or divergent rule set.
         """
         steps: List[ProofStep] = []
@@ -595,7 +595,7 @@ def default_engine(
     in its operator, ``d² = 0``, ``ι_X² = 0``, ``ι_X(f) = 0`` on
     0-forms, and the pairing ``ι_X(df) = X(f)``. The registry-aware
     rules stay inert when the relevant grading isn't declared, so
-    passing ``registry=None`` is safe — just less capable.
+    passing ``registry=None`` is safe, just less capable.
 
     Pass a specific :class:`ExteriorDerivative` via ``d`` to pin the
     exact-1-form pairing to a non-default exterior derivative.
@@ -603,7 +603,7 @@ def default_engine(
     :class:`ExpansionEngine`).
 
     ``d_squared_mode`` picks how ``d² = 0`` is classified in the
-    transcript — ``"axiom"`` (default) treats it as primitive;
+    transcript, ``"axiom"`` (default) treats it as primitive;
     ``"theorem"`` presents it as a derived operator identity whose only
     foundational input is the generator-level axiom ``d(df) = 0``. The
     rewrite semantics are identical; only the :class:`ProofStep`

@@ -1,4 +1,4 @@
-"""Tests for jacopy.core.expr — the foundational expression tree."""
+"""Tests for jacopy.core.expr, the foundational expression tree."""
 
 from fractions import Fraction
 
@@ -307,7 +307,7 @@ class TestWalk:
         x, y = Symbol("x"), Symbol("y")
         tree = (x + y) * x
         symbols = list(tree.find(lambda n: isinstance(n, Symbol)))
-        # x appears twice — once in sum, once as top-level factor.
+        # x appears twice, once in sum, once as top-level factor.
         assert symbols.count(x) == 2
         assert y in symbols
 

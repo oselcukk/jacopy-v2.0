@@ -1,5 +1,5 @@
 r"""
-Levi-Civita connection from a metric — Stage D.
+Levi-Civita connection from a metric, Stage D.
 
 The :func:`levi_civita` factory takes a :class:`ComponentMetric` and
 returns a :class:`LeviCivitaConnection` whose components are the
@@ -18,7 +18,7 @@ Christoffel symbols ``Γ^e_{ab}``, computed via the **Koszul formula**:
 
 For a coordinate frame the structure constants ``γ^d_{bc}`` vanish and
 the formula reduces to the textbook three-term form. The
-implementation handles the general case unconditionally — the γ terms
+implementation handles the general case unconditionally, the γ terms
 just evaluate to zero when the frame is holonomic.
 
 Each entry's derivation is recorded as a list of
@@ -102,7 +102,7 @@ class LeviCivitaConnection(ComponentConnection):
     Carries the same component data as a :class:`ComponentConnection`
     plus a per-entry derivation trace accessible via
     :meth:`derivation_steps`. Equality / hashing inherit from the
-    base class — two Levi-Civita connections compare equal iff their
+    base class, two Levi-Civita connections compare equal iff their
     components match (the trace metadata is presentation-only).
 
     The :attr:`optimized` attribute records whether this connection
@@ -136,7 +136,7 @@ class LeviCivitaConnection(ComponentConnection):
         """Return the recorded :class:`KoszulStep`s for ``Γ^e_{ab}``.
 
         For symmetric pairs ``(e, a, b)`` and ``(e, b, a)`` the same
-        underlying derivation is returned — the connection is
+        underlying derivation is returned, the connection is
         torsion-free, so only the canonical ordering ``a ≤ b`` is
         recorded internally.
 
@@ -174,12 +174,12 @@ class LeviCivitaConnection(ComponentConnection):
 
     def derivation_chain(
         self, e: int, a: int, b: int
-    ) -> "ProofChain":  # noqa: F821 — string form to avoid import cycle
+    ) -> "ProofChain":  # noqa: F821, string form to avoid import cycle
         r"""Return a :class:`~jacopy.proof.chain.ProofChain` for ``Γ^e_{ab}``.
 
         The chain wraps the recorded :class:`KoszulStep`s into
         :class:`~jacopy.proof.step.ProofStep`s tagged
-        ``provenance_tag="computation"`` — ready for paper-grade
+        ``provenance_tag="computation"``, ready for paper-grade
         LaTeX output via
         :func:`~jacopy.display.chain_to_latex.chain_to_latex_document`.
 
@@ -247,7 +247,7 @@ def levi_civita(
 
     Returns a :class:`LeviCivitaConnection` whose ``[e, a, b]`` entry
     is ``Γ^e_{ab}`` from the Koszul formula. Symmetry of the
-    connection (torsion-free: ``Γ^e_{ab} = Γ^e_{ba}``) is exploited —
+    connection (torsion-free: ``Γ^e_{ab} = Γ^e_{ba}``) is exploited,
     only the canonical ordering ``a ≤ b`` is computed; the mirror
     is filled in directly.
 
@@ -267,7 +267,7 @@ def levi_civita(
         simplification on complex metrics (e.g. Kerr-class).
         :meth:`LeviCivitaConnection.derivation_steps` will raise
         :class:`RuntimeError` for entries computed in optimized
-        mode. Components remain mathematically correct — they are
+        mode. Components remain mathematically correct, they are
         just stored in raw, unsimplified form. Apply
         :func:`sympy.simplify` (or
         :meth:`ComponentTensor.simplify`) at user-access time when a
@@ -305,7 +305,7 @@ def levi_civita(
             "expressions in a single formula. The opaque "
             "InverseMetricEntryExpr atom for g^{ab} landed in this "
             "stage, but the full pipeline (jacopy Sum / division by "
-            "Rational, mixed-type contraction) is non-trivial — "
+            "Rational, mixed-type contraction) is non-trivial, "
             "deferred to a dedicated abstract-mode pass."
         )
     if not isinstance(frame, (CoordinateFrame, Tetrad)):
@@ -482,7 +482,7 @@ def _koszul_at_optimized(
     """Fast-path Koszul: no per-step trace, no per-entry simplify.
 
     Returns the **raw** Koszul-formula result for ``Γ^e_{ab}``. The
-    expression is mathematically correct but not simplified — call
+    expression is mathematically correct but not simplified, call
     :func:`sympy.simplify` (or :meth:`ComponentTensor.simplify`) at
     the user-access layer when a clean form is desired.
 

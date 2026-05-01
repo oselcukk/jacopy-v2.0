@@ -1,4 +1,4 @@
-"""Tests for Faz 13.D — SnBivectorFormulaDefinition."""
+"""Tests for Faz 13.D, SnBivectorFormulaDefinition."""
 
 import pytest
 
@@ -110,7 +110,7 @@ class TestSnBivectorFormulaMatches:
         a, b, c = Symbol("α"), Symbol("β"), Symbol("γ")
         sh1, sh2 = sharp(pi1), sharp(pi2)
         rule = SnBivectorFormulaDefinition(sh1)
-        # Mixing sharps — the rule is set to π1, so a triple under π2
+        # Mixing sharps, the rule is set to π1, so a triple under π2
         # is not its formula.
         s = Sum(
             _vf_term(sh2, a, b, c),
@@ -120,7 +120,7 @@ class TestSnBivectorFormulaMatches:
         assert not rule.matches(s)
 
     def test_no_match_when_inner_not_sharp_act(self):
-        # LieBracketVF(X, Y) where X is bare Symbol — not Act(Sharp, _).
+        # LieBracketVF(X, Y) where X is bare Symbol, not Act(Sharp, _).
         pi = Symbol("π")
         a, b, c = Symbol("α"), Symbol("β"), Symbol("γ")
         sh = sharp(pi)
@@ -138,7 +138,7 @@ class TestSnBivectorFormulaMatches:
         assert not rule.matches(s)
 
     def test_no_match_on_negated_term(self):
-        # The cyclic SN formula is the *positive* triple — Neg-wrapped
+        # The cyclic SN formula is the *positive* triple, Neg-wrapped
         # terms decline. (Mirrors LieVfJacobiDefinition's policy.)
         pi = Symbol("π")
         a, b, c = Symbol("α"), Symbol("β"), Symbol("γ")

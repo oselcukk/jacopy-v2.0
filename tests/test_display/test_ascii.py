@@ -102,7 +102,7 @@ class TestProductPower:
         assert to_ascii(Product(Symbol("X"), Symbol("Y"))) == "X * Y"
 
     def test_product_wraps_sum_factor(self):
-        # Sum's precedence is below Product's — parens required.
+        # Sum's precedence is below Product's, parens required.
         s = Sum(Symbol("A"), Symbol("B"))
         out = to_ascii(Product(s, Symbol("C")))
         assert out == "(A + B) * C"

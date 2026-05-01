@@ -40,7 +40,7 @@ class TestMinkowskiConstruction:
 
 
 class TestMinkowskiPipeline:
-    """Minkowski has zero everything — Christoffel, curvature, Ricci, G."""
+    """Minkowski has zero everything, Christoffel, curvature, Ricci, G."""
 
     def test_christoffel_zero(self) -> None:
         F, g = minkowski()

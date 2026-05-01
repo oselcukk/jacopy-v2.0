@@ -326,7 +326,7 @@
             \def\PYGZdq{\discretionary{}{\Wrappedafterbreak\char`\"}{\char`\"}}%
             \def\PYGZti{\discretionary{\char`\~}{\Wrappedafterbreak}{\char`\~}}%
         }
-        % Some characters . , ; ? ! / are not pygmentized.
+        % Some characters ., ; ? ! / are not pygmentized.
         % This macro makes them "active" and they will insert potential linebreaks
         \newcommand*\Wrappedbreaksatpunct {%
             \lccode`\~`\.\lowercase{\def~}{\discretionary{\hbox{\char`\.}}{\Wrappedafterbreak}{\hbox{\char`\.}}}%
@@ -369,7 +369,7 @@
 
         % Allow breaks at special characters using \PYG... macros.
         \Wrappedbreaksatspecials
-        % Breaks at punctuation characters . , ; ? ! and / need catcode=\active
+        % Breaks at punctuation characters ., ; ? ! and / need catcode=\active
         \OriginalVerbatim[#1,codes*=\Wrappedbreaksatpunct]%
     }
     \makeatother

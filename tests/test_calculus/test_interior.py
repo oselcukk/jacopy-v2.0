@@ -85,7 +85,7 @@ class TestIotaSquaredZero:
         assert apply_iota_squared_zero(expr, iota_X) == Integer(0)
 
     def test_only_same_field_collapses(self):
-        """ι_X ∘ ι_Y does NOT collapse — they're different operators."""
+        """ι_X ∘ ι_Y does NOT collapse, they're different operators."""
         X, Y = Symbol("X"), Symbol("Y")
         iota_X, iota_Y = interior(X), interior(Y)
         expr = iota_X(iota_Y(Symbol("a")))
@@ -115,7 +115,7 @@ class TestIotaOnFunctions:
         assert apply_iota_axioms(iota_X(f), iota_X, reg) == Integer(0)
 
     def test_does_not_touch_unregistered_operand(self):
-        """Unknown-degree operand stays put — don't silently assume 0-form."""
+        """Unknown-degree operand stays put, don't silently assume 0-form."""
         f = Symbol("f")  # not declared
         X = Symbol("X")
         iota_X = interior(X)
@@ -123,7 +123,7 @@ class TestIotaOnFunctions:
         assert apply_iota_axioms(expr, iota_X) == expr
 
     def test_does_not_touch_one_form(self):
-        """ι_X on a 1-form stays inert — needs further reasoning."""
+        """ι_X on a 1-form stays inert, needs further reasoning."""
         reg = PropertyRegistry()
         alpha = Symbol("alpha")
         reg.declare(alpha, Graded(degree=1))
@@ -147,7 +147,7 @@ class TestIotaOnExactOneForms:
         ) == Act(X_deriv, f)
 
     def test_pairing_requires_explicit_X(self):
-        """Without an X Derivation, ι_X(df) isn't paired — function clause vanishes
+        """Without an X Derivation, ι_X(df) isn't paired, function clause vanishes
         df to X-dependent form only when X is given; absent X, df is degree 1
         so the 0-form vanish clause doesn't fire either, and the expression
         stays inert."""

@@ -1,8 +1,8 @@
 """
-Schouten-Nijenhuis-with-function shortcut — Faz 15.C.
+Schouten-Nijenhuis-with-function shortcut, Faz 15.C.
 
 When the §3.1.5 derivator pre-pass expands ``d̃(f)`` (Lichnerowicz of a
-0-form) it leaves behind ``[π, f]_SN`` — the Schouten-Nijenhuis bracket
+0-form) it leaves behind ``[π, f]_SN``, the Schouten-Nijenhuis bracket
 of the Poisson bivector with a function. This is the same vector field
 as ``π^♯(df) = X_f``, but the engine's existing rules don't bridge the
 two shapes: ``SharpOnExactDefinition`` consolidates ``π^♯(df) → X_f``,
@@ -63,7 +63,7 @@ class SnBracketOfFunctionDefinition(Definition):
         The :class:`~jacopy.calculus.musical.Sharp` atom whose bivector
         ``π`` indexes which SN bracket the rule recognises. Two
         :class:`~jacopy.brackets.schouten.SchoutenBracket` instances
-        share the same name — this rule discriminates on the operands
+        share the same name, this rule discriminates on the operands
         rather than the bracket head, so it fires on any
         ``BracketApply(_, π, f)`` whose first slot equals ``sharp.bivector``.
     d
@@ -118,19 +118,19 @@ class SnBracketOfFunctionDefinition(Definition):
 
 
 class HamiltonianPairingAntisymmetryDefinition(Definition):
-    r"""``⟨X_f, μ⟩ → −π^♯(μ)(f)`` — bivector antisymmetry on exact pairing.
+    r"""``⟨X_f, μ⟩ → −π^♯(μ)(f)``, bivector antisymmetry on exact pairing.
 
     Mathematically: ``⟨π^♯(df), μ⟩ = π(df, μ) = −π(μ, df) = −⟨π^♯(μ), df⟩
     = −π^♯(μ)(f)``. The rule names this collapse so post-Sharp residues
     of the form ``Pairing(X_f, μ)`` reduce to a vector-field-applied-to-
-    function shape — which the closure pipeline (VfActCommutator +
+    function shape, which the closure pipeline (VfActCommutator +
     LieBracketVfAntiSymmetry) can then unify with sibling residues
     inside derivator identities.
 
     Fires in either argument order: ``Pairing(X_f, μ)`` and
     ``Pairing(μ, X_f)``. The :class:`Pairing` constructor stores its
     arguments structurally without enforcing a 1-form-vs-vf convention,
-    so both orientations turn up in practice — the engine lifts the
+    so both orientations turn up in practice, the engine lifts the
     antisymmetry regardless.
 
     Scoped to a specific :class:`~jacopy.calculus.musical.Sharp` (and
@@ -190,7 +190,7 @@ class HamiltonianPairingAntisymmetryDefinition(Definition):
 
 
 class MultiEvalOnHamiltonianDefinition(Definition):
-    r"""``α(X_f) → −π^♯(α)(f)`` — bivector antisymmetry on
+    r"""``α(X_f) → −π^♯(α)(f)``, bivector antisymmetry on
     1-form-evaluated-on-Hamiltonian-vf.
 
     The same algebraic identity as
@@ -252,7 +252,7 @@ class MultiEvalOnHamiltonianDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# Helpers — vf detection for Pairing-Leibniz                             #
+# Helpers, vf detection for Pairing-Leibniz                             #
 # --------------------------------------------------------------------- #
 
 
@@ -309,7 +309,7 @@ def _is_vf_for_pairing_leibniz(D: Expr) -> bool:
     (:class:`LieDerivative`, :class:`InteriorProduct`,
     :class:`ExteriorDerivative` and their tilde counterparts,
     :class:`CartanRemainder`/:class:`TildeCartanRemainder`) and bare
-    :class:`Sharp`/:class:`Flat` heads — those have their own operator
+    :class:`Sharp`/:class:`Flat` heads, those have their own operator
     semantics handled by other rules.
     """
     if isinstance(D, _pairing_leibniz_reserved_ops()):
@@ -324,7 +324,7 @@ def _is_vf_for_pairing_leibniz(D: Expr) -> bool:
 
 
 # --------------------------------------------------------------------- #
-# VfActOnPairingLeibniz — D⟨a, b⟩ → ⟨L_D a, b⟩ + ⟨a, L_D b⟩              #
+# VfActOnPairingLeibniz, D⟨a, b⟩ → ⟨L_D a, b⟩ + ⟨a, L_D b⟩              #
 # --------------------------------------------------------------------- #
 
 
@@ -334,7 +334,7 @@ class VfActOnPairingLeibnizDefinition(Definition):
     The Lie-Leibniz on a scalar pairing for a vector-field-like operator
     ``D``. Distinct from
     :class:`~jacopy.calculus.pairing_axioms.PairingLieLeibnizDefinition`
-    which fires on ``Act(LieDerivative(X), Pairing)`` — this rule fires
+    which fires on ``Act(LieDerivative(X), Pairing)``, this rule fires
     on a *bare* vf-like atom (Symbol, Derivation, ``Act(Sharp, …)``,
     ``LieBracketVF``, ``HamiltonianVectorField``) acting as a degree-0
     derivation on the scalar produced by the pairing.
@@ -373,7 +373,7 @@ class VfActOnPairingLeibnizDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# PoissonCommutatorOnInterior — ι_[π,W]_SN(ω) under Poisson              #
+# PoissonCommutatorOnInterior, ι_[π,W]_SN(ω) under Poisson              #
 # --------------------------------------------------------------------- #
 
 
@@ -395,7 +395,7 @@ class PoissonCommutatorOnInteriorDefinition(Definition):
     ``[π,W]_SN(ω, ·)`` to its interior-product form. Treated here as
     ``[π,W]_SN^♯(ω)``: ``[π,W]_SN`` is a bivector (SN-degree
     ``2 + 1 - 1 = 2``), so ``ι_X`` of it on a 1-form ω returns a vector
-    field — exactly ``[π,W]_SN^♯(ω)`` under the standard
+    field, exactly ``[π,W]_SN^♯(ω)`` under the standard
     bivector-Sharp identification.
 
     Scoped to a specific :class:`Sharp` (and therefore a specific
@@ -465,7 +465,7 @@ class PoissonCommutatorOnInteriorDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# PairingToMultiEval bridge — ⟨α, X⟩ → α(X) for arity-1 vector slot      #
+# PairingToMultiEval bridge, ⟨α, X⟩ → α(X) for arity-1 vector slot      #
 # --------------------------------------------------------------------- #
 
 
@@ -475,7 +475,7 @@ class PairingToMultiEvalBridgeDefinition(Definition):
     The codebase keeps :class:`Pairing` and arity-1 vector-slot
     :class:`MultiEval` as structurally distinct atoms even though they
     encode the same scalar ``⟨α, X⟩``. §3.1.5 derivator residues mix
-    both shapes — one term arrives as ``Pairing(α, X)`` (from
+    both shapes, one term arrives as ``Pairing(α, X)`` (from
     :class:`PairingLieLeibnizDefinition` /
     :class:`VfActOnPairingLeibnizDefinition` outputs) while a sibling
     arrives as ``MultiEval(α, X)`` (from intrinsic-rule expansion of
@@ -483,7 +483,7 @@ class PairingToMultiEvalBridgeDefinition(Definition):
     line up.
 
     The rule canonicalizes towards :class:`MultiEval` (the engine's
-    preferred scalar-pairing shape — Cartan intrinsic axioms produce
+    preferred scalar-pairing shape, Cartan intrinsic axioms produce
     MultiEval, and downstream antisymmetry rules
     (:class:`HamiltonianPairingAntisymmetryDefinition`,
     :class:`MultiEvalOnHamiltonianDefinition`) operate on that shape).
@@ -491,7 +491,7 @@ class PairingToMultiEvalBridgeDefinition(Definition):
     Fires when the second slot is "vector-field-like"
     (per :func:`_is_vf_for_pairing_leibniz`) and the first is
     1-form-like (registry-declared ``Graded(degree=1)`` and not vf-like)
-    — or vice versa, since :class:`Pairing` stores its slots without
+   , or vice versa, since :class:`Pairing` stores its slots without
     enforcing a 1-form-vs-vf order.
     """
 
@@ -536,7 +536,7 @@ class PairingToMultiEvalBridgeDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# BivectorAntisymmetry on MultiEval — α(π^♯β) ↔ −β(π^♯α)                 #
+# BivectorAntisymmetry on MultiEval, α(π^♯β) ↔ −β(π^♯α)                 #
 # --------------------------------------------------------------------- #
 
 
@@ -554,7 +554,7 @@ class MultiEvalBivectorAntisymmetryDefinition(Definition):
     Direction: rewrites only when the right slot's 1-form is
     structurally "smaller" by a deterministic ordering, to avoid an
     infinite swap ``α(π^♯β) ↔ −β(π^♯α) ↔ α(π^♯β)``. The ordering uses
-    Python's tuple ``id``-stable comparison via ``repr`` — sufficient
+    Python's tuple ``id``-stable comparison via ``repr``, sufficient
     for canonicalization since both shapes are reached but only one
     fires per pair.
 
@@ -646,7 +646,7 @@ def _match_act_act_permissive(
 ) -> Optional[Tuple[Expr, Expr, Expr]]:
     """Match ``Act(X, Act(Y, f))`` for permissive vf X, Y; return ``(X, Y, f)``.
 
-    Permissive vf: see :func:`_is_vf_for_pairing_leibniz` — accepts
+    Permissive vf: see :func:`_is_vf_for_pairing_leibniz`, accepts
     Symbol, Derivation, LieBracketVF, HamiltonianVectorField,
     ``Act(Sharp, …)``. Rejects pairs where ``X == Y`` (commutator
     vanishes trivially).
@@ -678,12 +678,12 @@ class PermissiveVfActCommutatorDefinition(Definition):
     :class:`Derivation`, :class:`LieBracketVF`,
     :class:`HamiltonianVectorField`, ``Act(Sharp, …)``). The original
     closure rule restricts to plain ``Derivation`` atoms via
-    ``_is_plain_vf``, which rejects :class:`Symbol` — but §3.1.5
+    ``_is_plain_vf``, which rejects :class:`Symbol`, but §3.1.5
     derivator probes declare vfs as Symbols carrying
     ``Graded(degree=1)``, so the original rule cannot reach them.
 
     This rule is intended for the Faz 15.C ``derivator_form_engine``
-    bundle and should not be added to the generic intrinsic engine —
+    bundle and should not be added to the generic intrinsic engine,
     it would compete with :class:`VfActCommutatorDefinition` on
     Derivation residues that the original was designed to handle.
     """
@@ -760,7 +760,7 @@ class LieBracketVfNegLinearityDefinition(Definition):
     bracket like ``[π^♯μ, Y]_VF`` to ``Neg([Y, π^♯μ]_VF)`` *inside*
     another bracket's argument, the result ``[Neg([Y,π^♯μ]), U]_VF``
     is no longer a recognized "nested bracket" by
-    :func:`_peel_lie_bracket_jacobi` — the Jacobi rule needs the Neg
+    :func:`_peel_lie_bracket_jacobi`, the Jacobi rule needs the Neg
     pushed out to ``Neg([[Y,π^♯μ], U])``.
     """
 
@@ -794,7 +794,7 @@ class LieBracketVfAntisymmetryDefinition(Definition):
 
     Why this matters: §3.1.5 derivator residues mix two paths that
     end up at the same vector-field commutator with opposite arg
-    orders — one path emits ``[U, π^♯η]_VF`` (from the permissive
+    orders, one path emits ``[U, π^♯η]_VF`` (from the permissive
     pair finder), the other ``[π^♯η, U]_VF`` (from a Lichnerowicz
     expansion). Without this rule the two terms remain
     structurally distinct and ``collect_terms`` cannot fold them.
@@ -816,7 +816,7 @@ class LieBracketVfAntisymmetryDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# Faz 15.C — multivector-side dual closures.                             #
+# Faz 15.C, multivector-side dual closures.                             #
 # --------------------------------------------------------------------- #
 
 
@@ -833,7 +833,7 @@ class SnBracketOfOneVectorsToLieBracketVfDefinition(Definition):
 
     Gated on a registry lookup: both arguments must carry
     :class:`Graded` ``degree=1``. Higher-degree multivectors keep their
-    SN bracket — only the 1-vector case is the Lie bracket.
+    SN bracket, only the 1-vector case is the Lie bracket.
     """
 
     def __init__(
@@ -857,7 +857,7 @@ class SnBracketOfOneVectorsToLieBracketVfDefinition(Definition):
         self.name = "[U, V]_SN → [U, V]_VF  [both 1-vectors]"
 
     def _is_one_vector(self, expr: Expr) -> bool:
-        # Structural 1-vector recognizers — opaque atoms whose
+        # Structural 1-vector recognizers, opaque atoms whose
         # construction guarantees SN-degree 1, regardless of registry
         # state. Mirrors
         # :class:`MultiEvalCovectorPairingFlipDefinition._is_one_vector_like`,
@@ -896,7 +896,7 @@ class TildeIotaOnLieBracketVfActAsScalarDefinition(Definition):
     :class:`~jacopy.calculus.tilde.aux_axioms.TildeIotaActAsScalarDefinition`
     for :class:`~jacopy.algebra.lie_bracket_vf.LieBracketVF` operands.
     LieBracketVF instances are 1-vectors by construction, but the
-    registry has no Graded entry on the synthetic atom — the original
+    registry has no Graded entry on the synthetic atom, the original
     rule's ``Graded(1)`` guard skips them. This sibling fires
     unconditionally when the inner contraction is over a LieBracketVF,
     matching the same bridge shape and emitting the same
@@ -936,7 +936,7 @@ class VfActOnExteriorDOfScalarDefinition(Definition):
     r"""``Act(D, Act(d, f)) → Act(D, f)`` for vf-like ``D`` and 0-form ``f``.
 
     Direct evaluation of ``D(df)`` as the directional derivative
-    ``D(f)`` — in this engine's semantics, ``Act(D, X)`` for vf ``D``
+    ``D(f)``, in this engine's semantics, ``Act(D, X)`` for vf ``D``
     only makes sense when ``X`` is a 0-form scalar; the contraction
     ``ι_D(df) = D(f)`` is the only meaningful reading. Mirrors the
     arity-1 branch of
@@ -1032,7 +1032,7 @@ class PermissiveIotaActAsScalarDefinition(Definition):
     The §3.1.5 multivector-side derivator residues end up with
     ``Act(Sharp(π)(ξ), Act(U, Act(ι_V, η)))`` shapes where the inner
     operator ``U`` is a registry-declared :class:`Symbol` (the
-    convention W/U/V stay as Symbol — converting them to
+    convention W/U/V stay as Symbol, converting them to
     :class:`Derivation` triggers misclassification by
     ``degree_of`` and breaks
     :class:`~jacopy.calculus.sn_function_axiom.SnBracketOfFunctionDefinition`).
@@ -1092,12 +1092,12 @@ class MultiEvalCovectorPairingFlipDefinition(Definition):
 
     Restrictions:
 
-    * arity exactly 1 (single slot — the symmetry is only valid for
+    * arity exactly 1 (single slot, the symmetry is only valid for
       pairings, not for genuine multivector evaluations on multiple
       forms);
     * ``slot_kind="covector"`` (the only side where a flip changes the
       semantics);
-    * head ``X`` is 1-vector-like — :class:`Symbol` registered
+    * head ``X`` is 1-vector-like, :class:`Symbol` registered
       :class:`Graded` ``degree=1``, :class:`LieBracketVF`,
       ``Act(Sharp, _)`` (anchor image), :class:`HamiltonianVectorField`;
     * arg ``ω`` resolves under
@@ -1163,7 +1163,7 @@ class SnBracketNegLinearityDefinition(Definition):
     :class:`SnBracketOfOneVectorsToLieBracketVfDefinition`. Without
     this rule the §3.1.5 (2') residue ends up with
     ``BracketApply(sn, Neg(X_f), V)`` (after the
-    ``Act(d̃_π, f) → −X_f`` bridge) and stalls — neither the
+    ``Act(d̃_π, f) → −X_f`` bridge) and stalls, neither the
     SN→LBVF rule (which gates on structural 1-vector shapes, not
     Neg-wrapped ones) nor the antisymmetry pair-finder can crack it.
     """
@@ -1206,10 +1206,10 @@ class TildeDOnScalarToHamiltonianVfDefinition(Definition):
     Bridges the structural shape ``Act(TildeExteriorDerivative(π), f)``
     (which is ``π♯(d f)`` semantically) to the canonical Hamiltonian
     vector field, picking up a sign for the geometer's convention
-    ``X_f = −π♯(d f)`` (sign ``'-'`` — the
+    ``X_f = −π♯(d f)`` (sign ``'-'``, the
     :class:`HamiltonianVectorField` default). Without this bridge the
     §3.1.5 (2') residue ends with parallel terms ``ξ([V, X_f]_VF)`` and
-    ``ξ([V, d̃_π(f)]_VF)`` — both naming the same Lie bracket but in
+    ``ξ([V, d̃_π(f)]_VF)``, both naming the same Lie bracket but in
     incompatible spellings, leaving the engine unable to spot the
     cancellation.
 
@@ -1251,7 +1251,7 @@ class HamiltonianVfInnerIotaToMultiEvalDefinition(Definition):
     ``Act(ι_X, ω)`` carried as the function of an HVF is invisible to
     them. Without this normalisation the (2') residue ends up with
     ``X_{Act(ι_U, η)}`` from one side and ``X_{MultiEval(η, U)}`` from
-    the other — algebraically equal but structurally distinct.
+    the other, algebraically equal but structurally distinct.
 
     Preserves the bivector / symplectic_form / sign attributes of the
     incoming HVF so the rewrite is sign-stable.
@@ -1287,7 +1287,7 @@ class MultiEvalCovectorDArityOneDefinition(Definition):
 
     Covector-slot dual of the arity-1 branch of
     :class:`~jacopy.calculus.intrinsic_axioms.ExteriorDIntrinsicDefinition`
-    — the form-side rule only fires on vector-slot evaluations, but the
+   , the form-side rule only fires on vector-slot evaluations, but the
     §3.1.5 multivector-side residues produce
     ``MultiEval(V, Act(d, scalar), slot_kind="covector")`` shapes after
     L̃ / d̃ intrinsic emission. Routes the same identity ``(d f)(D) =
@@ -1304,7 +1304,7 @@ class MultiEvalCovectorDArityOneDefinition(Definition):
     Act(d, _)`` + ``slot_kind="covector"`` + ``arity=1`` forces the
     well-typed reading: the arg must be a 1-form, hence the inner ``f``
     must be a 0-form, hence ``Act(D, f)`` is the directional derivative
-    on a scalar — well-defined regardless of how :func:`degree_of`
+    on a scalar, well-defined regardless of how :func:`degree_of`
     classifies the syntactic shape.
     """
 
@@ -1450,7 +1450,7 @@ class SnBracketSumLinearityDefinition(Definition):
     Distributes a ``Sum`` operand through either slot of the
     Schouten-Nijenhuis bracket. The :class:`SchoutenBracket` ``expand``
     method handles wedge products and the four base cases but leaves a
-    ``Sum`` operand opaque — the §3.1.5 (1') closure path emits a
+    ``Sum`` operand opaque, the §3.1.5 (1') closure path emits a
     three-term Sum into one slot (from the tilde-Lie Lichnerowicz
     expansion on a 1-vector), so the bracket needs an explicit
     distributor before the SN→LBVF coercion can fire on each piece.

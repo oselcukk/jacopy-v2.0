@@ -1,32 +1,32 @@
 r"""
-Metric tensor and its evaluation node — Faz 17.B.
+Metric tensor and its evaluation node, Faz 17.B.
 
 A *metric tensor* on a smooth manifold is a smooth, symmetric,
 non-degenerate ``(0, 2)``-tensor field ``g``. Faz 17 needs three
 distinct surfaces:
 
-* an *identifier* — :class:`MetricTensor`, an opaque named atom that
+* an *identifier*, :class:`MetricTensor`, an opaque named atom that
   carries "this is the metric ``g``" through proofs as a parametric
   slot of the non-metricity tensor and (later) of compatibility-style
   expansions;
-* an *evaluation node* — :class:`MetricEvalExpr`, the rank-2
+* an *evaluation node*, :class:`MetricEvalExpr`, the rank-2
   evaluation ``g(X, Y)`` whose children are ``(X, Y)`` so the engine
   walks freely;
-* a *symmetry axiom* — :class:`MetricEvalSymmetryDefinition`, which
+* a *symmetry axiom*, :class:`MetricEvalSymmetryDefinition`, which
   canonicalises ``g(X, Y) → g(Y, X)`` whenever the args are out of
   ``repr``-order, mirroring
   :class:`~jacopy.calculus.antisym_axioms.RegistryAntiSymCanonicalDefinition`'s
   canonicalise-only-out-of-order strategy.
-* a *bilinearity axiom* — :class:`MetricEvalLinearityDefinition`,
+* a *bilinearity axiom*, :class:`MetricEvalLinearityDefinition`,
   distributing :class:`Sum` and :class:`Neg` in either slot.
-* a *scalar-pull axiom* — :class:`MetricEvalScalarPullDefinition`,
+* a *scalar-pull axiom*, :class:`MetricEvalScalarPullDefinition`,
   pulling a scalar factor out of either slot. Same shape as
   :class:`~jacopy.calculus.pairing_linearity_axioms.PairingScalarPullDefinition`.
 
-The Cartan-form mechanisations don't exercise ``g`` directly — the
+The Cartan-form mechanisations don't exercise ``g`` directly, the
 non-metricity 1-form proofs route through ``Q``'s primitive
 ``V``-linearity and the Cartan structure equations carry no ``g``
-— but the C∞-bilinearity machinery lands now so ``MetricEvalExpr``
+, but the C∞-bilinearity machinery lands now so ``MetricEvalExpr``
 is fully calculational the moment a future proof (``∇``
 compatibility, Levi-Civita, …) reaches for it.
 """
@@ -44,7 +44,7 @@ class MetricTensor(Atom):
 
     Carries just a display name. Equality is structural over the name
     so any two constructions with the same name agree. The atom does
-    not appear inside :class:`~jacopy.algebra.derivation.Act` nodes —
+    not appear inside :class:`~jacopy.algebra.derivation.Act` nodes,
     its mathematical evaluation ``g(X, Y)`` lives in
     :class:`MetricEvalExpr` so the engine can rewrite the eval shape
     without disturbing identity comparisons that route through the
@@ -82,7 +82,7 @@ def metric(name: str = "g") -> MetricTensor:
 
 
 class MetricEvalExpr(Expr):
-    r"""``g(X, Y)`` — metric evaluated on two vector fields.
+    r"""``g(X, Y)``, metric evaluated on two vector fields.
 
     Children are ``(X, Y)``; the metric sits in a parametric slot so
     engine rules can dispatch on a specific metric (e.g. "this rule
@@ -145,13 +145,13 @@ class MetricEvalExpr(Expr):
 
 
 class MetricEvalSymmetryDefinition(Definition):
-    r"""``g(X, Y) → g(Y, X)`` — canonical-order swap on a symmetric metric.
+    r"""``g(X, Y) → g(Y, X)``, canonical-order swap on a symmetric metric.
 
     Fires on a :class:`MetricEvalExpr` whose args are out of
     ``repr``-order. After the rewrite the args are sorted, so the
     rule applies at most once per node. Mirrors
     :class:`~jacopy.calculus.antisym_axioms.RegistryAntiSymCanonicalDefinition`
-    in shape but without the :class:`Neg` wrapper — ``g`` is symmetric,
+    in shape but without the :class:`Neg` wrapper, ``g`` is symmetric,
     not antisymmetric.
 
     Scoped to a specific :class:`MetricTensor` so two distinct metrics

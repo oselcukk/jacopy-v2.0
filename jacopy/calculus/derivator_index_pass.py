@@ -6,18 +6,18 @@ Operator atoms in this codebase (``LieDerivative``, ``InteriorProduct``,
 private slot rather than as a child. The :class:`ExpansionEngine`'s
 walk descends only into ``children`` so any rewrite shape buried inside
 an index slot is unreachable. Section 3.1.5's identities reach for
-heads like ``L_{K̃_η U}``, ``K_{K̃_μ U}``, etc. — heads whose index
-*is* a rewrite target — and bottom out without progress unless we open
+heads like ``L_{K̃_η U}``, ``K_{K̃_μ U}``, etc., heads whose index
+*is* a rewrite target, and bottom out without progress unless we open
 the index up first.
 
 This module ships two passes that, together, fully canonicalize index
 slots before the :func:`prove_derivator_identity` driver wraps the LHS
 / RHS in a ``MultiEval``:
 
-* :func:`expand_operator_indices` — walks ``expr`` post-order; for each
+* :func:`expand_operator_indices`, walks ``expr`` post-order; for each
   recognised operator atom, runs the engine on its index slot, rebuilds
   the atom with the canonicalized index, and recurses to a fixed point.
-* :func:`distribute_act_over_index_sums` — for each ``Act(Op, arg)``
+* :func:`distribute_act_over_index_sums`, for each ``Act(Op, arg)``
   whose ``Op`` has a ``Sum`` (or ``Neg``) index, distributes outward to
   ``Sum(Act(Op_with_summand, arg), …)``. Indices are R-linear for every
   operator handled here, so distribution is a no-op semantically.
@@ -65,7 +65,7 @@ def _rebuild_op_with_index(op: Expr, new_index: Expr) -> Expr:
     """Return a fresh op atom of the same type with index replaced.
 
     Returns ``op`` unchanged if the operator class is not on the
-    recognised list — callers should treat that as "no recursion needed
+    recognised list, callers should treat that as "no recursion needed
     here". Tilde ops keep their bivector slot; only the form slot is
     treated as the rewriteable index (the bivector is a fixed ``π``).
     """
@@ -95,7 +95,7 @@ def _rebuild_op_with_index(op: Expr, new_index: Expr) -> Expr:
             symplectic_form=op.symplectic_form,
             sign=op.sign,
         )
-    # TildeExteriorDerivative: index is bivector (π) — not rewritten in
+    # TildeExteriorDerivative: index is bivector (π), not rewritten in
     # the §3.1.5 setting, so don't touch it. Same for any unknown op.
     return op
 
@@ -127,7 +127,7 @@ def _rebuild_bracket_atom(op: Expr, new_X: Expr, new_Y: Expr) -> Expr:
 
 
 # --------------------------------------------------------------------- #
-# Pass 1 — recursive index expansion                                     #
+# Pass 1, recursive index expansion                                     #
 # --------------------------------------------------------------------- #
 
 
@@ -145,7 +145,7 @@ def expand_operator_indices(
     ``op._key()`` is structural over the index so equality tracks the
     rewrite.
 
-    Idempotent at the fixed point — re-applying it after distribution
+    Idempotent at the fixed point, re-applying it after distribution
     catches indices that newly surface as atoms.
     """
     if not isinstance(expr, Expr):
@@ -186,7 +186,7 @@ def expand_operator_indices(
 
 
 # --------------------------------------------------------------------- #
-# Pass 2 — distribute Act over Sum/Neg index                             #
+# Pass 2, distribute Act over Sum/Neg index                             #
 # --------------------------------------------------------------------- #
 
 
@@ -220,7 +220,7 @@ def distribute_act_over_index_sums(expr: Expr) -> Expr:
 
     For every recognised ``Act(Op, arg)`` whose Op's index is a Sum or
     Neg, splits into ``Sum(Act(Op_{i}, arg))`` (resp. ``Neg(...)``).
-    Repeats until a fixed point — distribution surfaces fresh Acts that
+    Repeats until a fixed point, distribution surfaces fresh Acts that
     may themselves carry index Sums (e.g. a triple-nested chain).
     """
     if not isinstance(expr, Expr):
@@ -238,7 +238,7 @@ def distribute_act_over_index_sums(expr: Expr) -> Expr:
         distributed = _distribute_one(expr.op, expr.arg)
         if distributed is not None:
             # The distributed shape may itself contain undistributed
-            # Acts (e.g. when the original index was nested) — recurse.
+            # Acts (e.g. when the original index was nested), recurse.
             return distribute_act_over_index_sums(distributed)
 
     return expr
@@ -250,7 +250,7 @@ def distribute_act_over_index_sums(expr: Expr) -> Expr:
 
 
 # --------------------------------------------------------------------- #
-# Engine-time lift — open atom slots from inside the proof loop          #
+# Engine-time lift, open atom slots from inside the proof loop          #
 # --------------------------------------------------------------------- #
 
 
@@ -270,14 +270,14 @@ class AtomSlotLiftDefinition(Definition):
     ``op`` is a recognised atom and whose slots are *not yet*
     fixed-points of ``inner_engine``. The rewrite re-runs the inner
     engine on each slot and rebuilds the atom with the canonicalized
-    pieces — leaving the surrounding ``Act`` shape intact, so the main
+    pieces, leaving the surrounding ``Act`` shape intact, so the main
     engine's bottom-up walk picks up where it left off.
 
     The ``inner_engine`` typically carries
     :class:`~jacopy.calculus.sharp_axioms.SharpOnExactDefinition`,
     :class:`~jacopy.calculus.sn_function_axiom.SnBracketOfFunctionDefinition`,
     and any K̃ / K-remainder rules whose presence is needed inside
-    atom slots — but emphatically *not* itself, to avoid an infinite
+    atom slots, but emphatically *not* itself, to avoid an infinite
     loop. A separate engine instance keeps the lift idempotent: once
     the inner engine reports no change, the lift's :meth:`matches`
     returns ``False`` and the surrounding loop terminates.
@@ -341,7 +341,7 @@ class BareAtomSlotLiftDefinition(Definition):
     opaque atom (currently :class:`LieBracketVF`,
     :class:`HamiltonianVectorField`, or any operator atom carrying a
     rewriteable index) appears as a child of an outer node *other* than
-    an :class:`Act` head — typically as an arg of a
+    an :class:`Act` head, typically as an arg of a
     :class:`~jacopy.core.multi_eval.MultiEval`, or as a child of a
     :class:`Sum` / :class:`Neg` etc.
 
@@ -349,7 +349,7 @@ class BareAtomSlotLiftDefinition(Definition):
     ``Act(op, arg)``: when the atom *is* the operator, its slots are
     opened and the surrounding ``Act`` shape is preserved. But §3.1.5
     (1') residues produce ``MultiEval(ξ, LBVF(U, π^♯(K_V η)), …)`` where
-    the LBVF is the arg, not the op — so the K_V η inside the LBVF.Y
+    the LBVF is the arg, not the op, so the K_V η inside the LBVF.Y
     slot is unreachable to the standard engine walk *and* to the Act-
     shaped lift.
 
@@ -368,7 +368,7 @@ class BareAtomSlotLiftDefinition(Definition):
         self.name = "bare-atom-slot lift"
 
     def _slots(self, expr: Expr):
-        # LBVF — both X and Y slots.
+        # LBVF, both X and Y slots.
         if isinstance(expr, LieBracketVF):
             yield ("X", expr.X)
             yield ("Y", expr.Y)
@@ -421,8 +421,8 @@ def canonicalize_indices(
     :func:`distribute_act_over_index_sums` in alternation until the
     expression stabilises (or ``max_passes`` rounds elapse).
 
-    The default cap is generous for §3.1.5 — the deepest identity
-    bottoms out in two rounds — but not unbounded so a pathological
+    The default cap is generous for §3.1.5, the deepest identity
+    bottoms out in two rounds, but not unbounded so a pathological
     input cannot loop forever.
     """
     prev = None

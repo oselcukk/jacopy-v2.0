@@ -1,9 +1,9 @@
-# 08 — The unified picture
+# 08, The unified picture
 
 The pedagogical claim of this package: Poisson geometry + Lie
 algebroid + Cartan calculus + Courant geometry are all faces of a
 single mathematical mechanism. At the centre stands the *Derived
-Bracket Theorem* — a bracket's two structural axioms (antisymmetry
+Bracket Theorem*, a bracket's two structural axioms (antisymmetry
 + graded Jacobi) reduce to a single equation, `[Q, Q]_base = 0`.
 This tutorial shows how the same hypothesis closes both the
 function-side and form-side Jacobi identities, how `theorem_book`
@@ -11,8 +11,8 @@ serves the hierarchy through a single citation chain, and why
 "one assumption, many consequences" falls out naturally from the
 architecture.
 
-[07 — Derived bracket](07_derived_bracket.md) introduced the
-mechanism; [05 — Cartan calculus](05_cartan_calculus.md) opened
+[07, Derived bracket](07_derived_bracket.md) introduced the
+mechanism; [05, Cartan calculus](05_cartan_calculus.md) opened
 operator-level proofs. Here we tie those pieces together.
 
 ## A single hypothesis: `[π, π]_SN = 0`
@@ -35,7 +35,7 @@ poisson.jacobi_condition(reg).obstruction     # [·,·]_SN(π, π)
 poisson.koszul_jacobi_condition(reg).obstruction  # the same
 ```
 
-The two conditions point to the *same* `Expr` — only the display
+The two conditions point to the *same* `Expr`, only the display
 name differs. Not a coincidence: the derived bracket's
 obstruction depends only on `(base, Q)`; layering
 `acting_on=π^♯` on top doesn't change the Jacobi obstruction.
@@ -57,7 +57,7 @@ func_chain.steps[0].after   # [·,·]_SN(π, π)
 **Form level.** The same mechanism gives the Koszul Jacobi
 identity on 1-forms. `prove_koszul_jacobi_reduction` produces
 the same theorem citation and lands on the *same*
-`[π, π]_SN` obstruction — the `π^♯` anchor is in play only for
+`[π, π]_SN` obstruction, the `π^♯` anchor is in play only for
 operand lifting:
 
 ```python
@@ -73,7 +73,7 @@ func_chain.steps[0].after == form_chain.steps[0].after   # True
 ```
 
 The mathematical content: "classical Poisson Jacobi" and
-"classical Koszul Jacobi" are *not* two separate theorems —
+"classical Koszul Jacobi" are *not* two separate theorems,
 both are the Derived Bracket Theorem reducing to the same
 universal obstruction.
 
@@ -86,7 +86,7 @@ Koszul bracket = SN-derived bracket (with `π^♯`)".
 ```python
 chain = poisson.prove_koszul_equivalence(alpha, beta, registry=reg)
 len(chain)                # 1
-chain.steps[0].rule       # 'reflexive' — both sides land on the same canonical form
+chain.steps[0].rule       # 'reflexive', both sides land on the same canonical form
 ```
 
 The meaning of the `reflexive` step: the package's expand rules
@@ -97,7 +97,7 @@ Jacobi reduces to the same obstruction as function Jacobi.
 ## Citation chain via seeded theorems
 
 Three seeded theorems wait inside `theorem_book`. Each declares
-its dependence on atomic axioms via `from_axioms` — the
+its dependence on atomic axioms via `from_axioms`, the
 theorem-level counterpart of the package's *property provenance*
 philosophy:
 
@@ -116,7 +116,7 @@ theorem_book.get("poisson_koszul_jacobi").from_axioms
 #  '[π, π]_SN = 0 (Poisson hypothesis)')
 ```
 
-Each citation has a `ProofChain` behind it — the theorem's
+Each citation has a `ProofChain` behind it, the theorem's
 canonical proof. Downstream code can take that chain via
 `theorem_book.get(...)` and embed it directly into a larger proof:
 
@@ -129,7 +129,7 @@ thm.proof.steps[0].rule   # 'DerivedBracketTheorem'
 The same pattern shows up for the Lie algebroid
 (`lie_algebroid_anchor_compat`) and Courant geometry
 (`courant_jacobi_twist`, `courant_dorfman_bridge`,
-`dirac_isotropy`, `dirac_involutivity`) — the package currently
+`dirac_isotropy`, `dirac_involutivity`), the package currently
 carries 8 seeded theorems.
 
 ## A parallel example: `dH = 0`
@@ -157,7 +157,7 @@ theorem_book.get("courant_jacobi_twist").from_axioms
 ```
 
 The structural analogy: a single equation `[π, π]_SN = 0` on the
-Poisson side, a single equation `dH = 0` on the Courant side —
+Poisson side, a single equation `dH = 0` on the Courant side,
 both reduce a bracket's two structural axioms (antisymmetry +
 Jacobi) to one condition, and the theorem book serves the
 reduction as a single citation.
@@ -172,21 +172,21 @@ Observable consequences of the package design:
    instantiations.
 2. **Shared obstruction.** Two distinct proof paths (function
    vs form) that land on the same `Expr` are backed by the same
-   theorem. The package catches this mechanically — even when
+   theorem. The package catches this mechanically, even when
    display names differ.
 3. **Traceable citation chain.**
    `theorem_book.get(name).from_axioms` exposes which atomic
    axioms a theorem rests on; one can trace a paper's proof
    flow alongside the corresponding `from_axioms` lists.
 4. **New bracket, old theorem.** A user defining a fresh
-   derived bracket doesn't redo the Jacobi proof from scratch —
+   derived bracket doesn't redo the Jacobi proof from scratch,
    `prove_jacobi` auto-dispatches to `DerivedBracketStrategy`
    and reuses the same theorem citation.
 
 ## Next step
 
 This tutorial answered "which theorem connects to where?". The
-final tutorial — [09 — Foundations](09_foundations.md) — drops
+final tutorial, [09, Foundations](09_foundations.md), drops
 to "where does an axiom come from?". Why is `d² = 0` an axiom;
 what sub-proof generates it from the generator level in
 foundational mode; how the proof layer reconfigures itself when

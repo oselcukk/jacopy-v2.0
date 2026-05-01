@@ -1,5 +1,5 @@
 """
-Proof transcript — an ordered sequence of :class:`ProofStep`.
+Proof transcript, an ordered sequence of :class:`ProofStep`.
 
 A :class:`ProofChain` is a flat list; nesting lives inside each step's
 ``children``. That split keeps the chain a simple linear narrative at
@@ -8,7 +8,7 @@ work hierarchically. Strategies append steps as they run; the caller
 inspects ``initial``/``final`` to see the starting and ending
 expressions.
 
-Verbosity choices for :meth:`format` are intentionally coarse —
+Verbosity choices for :meth:`format` are intentionally coarse,
 ``"compact"`` prints one line per top-level step and hides children,
 ``"full"`` renders every step with its children tree. Richer display
 modes (LaTeX, coloured terminal) belong in the Faz 8 display layer and
@@ -72,8 +72,8 @@ class ProofChain:
     def format(self, verbosity: str = "full") -> str:
         """Render the chain as text.
 
-        * ``"compact"`` — one line per top-level step, children hidden.
-        * ``"full"`` — every step with its full children tree.
+        * ``"compact"``, one line per top-level step, children hidden.
+        * ``"full"``, every step with its full children tree.
         """
         if verbosity == "compact":
             return "\n".join(

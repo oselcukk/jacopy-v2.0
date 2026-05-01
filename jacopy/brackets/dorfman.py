@@ -7,14 +7,14 @@ bracket. On section pairs ``(X, α), (Y, β)`` it is
     [(X, α), (Y, β)]_D = ( [X, Y],  L_X β − ι_Y dα ).
 
 Unlike its Courant counterpart, the Dorfman bracket satisfies the
-Leibniz (Jacobi-for-Loday) identity exactly — at the cost of graded
+Leibniz (Jacobi-for-Loday) identity exactly, at the cost of graded
 antisymmetry, which only holds up to an exact term. That asymmetry is
 encoded here by declaring ``is_graded_antisymmetric=False`` and
 ``satisfies_graded_jacobi=True``: Dorfman is a Leibniz algebra, which
 is the structure the downstream derived-bracket machinery actually
 relies on.
 
-Operands live as :class:`SectionPair` nodes — a small :class:`Expr`
+Operands live as :class:`SectionPair` nodes, a small :class:`Expr`
 wrapper carrying a vector-field half and a form half. The bracket's
 :meth:`~DorfmanBracket.expand` unpacks both sides, runs the vector
 Lie bracket on the ``X, Y`` components, and assembles the form
@@ -124,7 +124,7 @@ class DorfmanBracket(GradedBracket):
         lie_derivative: Optional[LieDerivativeFactory] = None,
         interior: Optional[InteriorFactory] = None,
     ) -> None:
-        # Leibniz (Loday) holds exactly; graded antisymmetry does not —
+        # Leibniz (Loday) holds exactly; graded antisymmetry does not,
         # it's broken by an exact correction ``d⟨X, β⟩ + d⟨Y, α⟩`` so the
         # Dorfman pair is the asymmetric-but-Jacobi twin of Courant.
         super().__init__(
@@ -154,7 +154,7 @@ class DorfmanBracket(GradedBracket):
         """``[(X, α), (Y, β)]_D = ( [X, Y],  L_X β − ι_Y dα )``.
 
         Raises :class:`TypeError` if either operand is not a
-        :class:`SectionPair` — the Dorfman bracket is defined on the
+        :class:`SectionPair`, the Dorfman bracket is defined on the
         product bundle and has no meaningful action on raw vectors or
         raw forms alone.
         """
@@ -186,7 +186,7 @@ class DorfmanBracket(GradedBracket):
     def _identity_key(self) -> Any:
         # Two DorfmanBrackets are equal iff they share their axiom
         # profile AND the underlying vector bracket / Cartan operators.
-        # The factories compare by identity — two calls to
+        # The factories compare by identity, two calls to
         # ``lie_derivative`` producing distinct Derivation instances are
         # OK as long as the factories themselves are the same callable.
         return super()._identity_key() + (

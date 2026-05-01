@@ -1,5 +1,5 @@
 """
-Vector-field Lie bracket as a :class:`Derivation` atom — Faz 13.C.
+Vector-field Lie bracket as a :class:`Derivation` atom, Faz 13.C.
 
 Two vector fields' Lie bracket ``[X, Y]_VF`` is itself a vector field
 (degree-0 derivation on functions). This module provides
@@ -14,7 +14,7 @@ Why a dedicated atom (instead of expanding to ``X*Y − Y*X``)
 The 2f-deep / 2g-deep proof chain folds an *operator-commutator*
 shape ``L_X ∘ L_Y − L_Y ∘ L_X`` into a single ``L_{[X,Y]_VF}`` step
 (Faz 13.C axiom 5). After that fold the resulting Lie derivative
-must be applicable to a form just like any ordinary ``L_W`` — in
+must be applicable to a form just like any ordinary ``L_W``, in
 particular, downstream Cartan-style rewrites need to see a single
 :class:`~jacopy.algebra.derivation.Derivation` operand, not a
 2-term commutator expansion. Keeping ``[X, Y]_VF`` opaque is what
@@ -33,7 +33,7 @@ from jacopy.core.expr import Expr
 
 
 class LieBracketVF(Derivation):
-    """``[X, Y]_VF`` — vector-field Lie bracket as a Derivation atom.
+    """``[X, Y]_VF``, vector-field Lie bracket as a Derivation atom.
 
     A degree-0 named derivation parametric in the two vector fields.
     Equality / hash are structural over ``(name, degree, X, Y)`` so

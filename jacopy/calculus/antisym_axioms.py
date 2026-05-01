@@ -1,5 +1,5 @@
 r"""
-Registry-driven antisymmetry — Faz 12.B #11.
+Registry-driven antisymmetry, Faz 12.B #11.
 
 Engine rewrite that consumes the
 :class:`~jacopy.core.properties.Antisymmetric` registry property.
@@ -43,7 +43,7 @@ class RegistryAntiSymCanonicalDefinition(Definition):
     Fires on ``MultiEval(head, α, β)`` (arity 2) when:
 
     * the registry has :class:`Antisymmetric` declared on ``head``, and
-    * ``repr(α) > repr(β)`` — i.e. the args are out of canonical order.
+    * ``repr(α) > repr(β)``, i.e. the args are out of canonical order.
 
     Rewrites to ``Neg(MultiEval(head, β, α, …))`` preserving the
     ``alternating`` and ``slot_kind`` flags. Termination: each fire
@@ -60,7 +60,7 @@ class RegistryAntiSymCanonicalDefinition(Definition):
         ])
 
     With ``registry=None`` (the default), :meth:`matches` always
-    returns ``False`` — dormant.
+    returns ``False``, dormant.
     """
 
     name = "Antisymmetric (registry): π(α, β) = -π(β, α)"

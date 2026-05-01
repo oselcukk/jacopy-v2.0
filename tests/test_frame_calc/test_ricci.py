@@ -98,7 +98,7 @@ class TestRicciTypeChecks:
 
 
 # --------------------------------------------------------------------- #
-# Schwarzschild — Ric = 0                                               #
+# Schwarzschild, Ric = 0                                               #
 # --------------------------------------------------------------------- #
 
 
@@ -125,7 +125,7 @@ class TestSchwarzschildRicci:
 
 
 # --------------------------------------------------------------------- #
-# Minkowski curvilinear — Ric = 0                                       #
+# Minkowski curvilinear, Ric = 0                                       #
 # --------------------------------------------------------------------- #
 
 
@@ -146,7 +146,7 @@ class TestMinkowskiRicci:
 
 
 # --------------------------------------------------------------------- #
-# 2-sphere — Ricci proportional to metric (Einstein space)              #
+# 2-sphere, Ricci proportional to metric (Einstein space)              #
 # --------------------------------------------------------------------- #
 
 
@@ -170,7 +170,7 @@ class TestTwoSphere:
         Ric = ricci(levi_civita(g))
         # Ric_θθ = -1
         assert sp.simplify(Ric[0, 0] - (-1)) == 0
-        # Ric_φφ = -sin²θ — needs trigsimp to recognise the form
+        # Ric_φφ = -sin²θ, needs trigsimp to recognise the form
         assert sp.simplify(
             sp.trigsimp(Ric[1, 1]) - (-sp.sin(theta) ** 2)
         ) == 0
@@ -178,7 +178,7 @@ class TestTwoSphere:
         assert sp.simplify(Ric[0, 1]) == 0
 
     def test_einstein_space_relation(self, two_sphere) -> None:
-        """Ric = −(1/R₀²) g — Einstein-space condition (with sign)."""
+        """Ric = −(1/R₀²) g, Einstein-space condition (with sign)."""
         F, g = two_sphere
         R0 = sp.Symbol("R0", positive=True)
         Ric = ricci(levi_civita(g))

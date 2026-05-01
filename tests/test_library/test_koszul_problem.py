@@ -240,7 +240,7 @@ class TestEndToEnd:
 
 
 # --------------------------------------------------------------------- #
-# Faz 14.C — multivectors auto-declare                                  #
+# Faz 14.C, multivectors auto-declare                                  #
 # --------------------------------------------------------------------- #
 
 
@@ -298,7 +298,7 @@ class TestMultivectorsParam:
 
 
 # --------------------------------------------------------------------- #
-# Faz 14.C — tilde axiom registration                                   #
+# Faz 14.C, tilde axiom registration                                   #
 # --------------------------------------------------------------------- #
 
 
@@ -328,7 +328,7 @@ class TestTildeAxiomRegistration:
 
 
 # --------------------------------------------------------------------- #
-# Faz 14.C — tilde factory methods                                      #
+# Faz 14.C, tilde factory methods                                      #
 # --------------------------------------------------------------------- #
 
 
@@ -367,7 +367,7 @@ class TestTildeFactories:
 
 
 # --------------------------------------------------------------------- #
-# Faz 14.C — assume_poisson                                             #
+# Faz 14.C, assume_poisson                                             #
 # --------------------------------------------------------------------- #
 
 
@@ -394,7 +394,7 @@ class TestAssumePoisson:
 
 
 # --------------------------------------------------------------------- #
-# Faz 14.C — engine fires tilde rules end-to-end                        #
+# Faz 14.C, engine fires tilde rules end-to-end                        #
 # --------------------------------------------------------------------- #
 
 
@@ -456,7 +456,7 @@ class TestTildeEndToEnd:
 
 
 # --------------------------------------------------------------------- #
-# Faz 14.D — KoszulProblem auto-registers all 5 auxiliary axioms        #
+# Faz 14.D, KoszulProblem auto-registers all 5 auxiliary axioms        #
 # --------------------------------------------------------------------- #
 
 
@@ -520,7 +520,7 @@ class TestTildeAuxRegistration:
 
 
 # --------------------------------------------------------------------- #
-# Faz 14.D — engine fires the right shortcut on the right shape          #
+# Faz 14.D, engine fires the right shortcut on the right shape          #
 # --------------------------------------------------------------------- #
 
 
@@ -578,7 +578,7 @@ class TestTildeAuxEndToEnd:
         ``Act(d̃, [π,V]_SN)`` and Aux-5's pattern is gone. Stage E will
         either invoke Aux-5 directly or extend the engine; for now the
         engine pipeline normalises to ``[π, [π, V]_SN]_SN`` regardless
-        of the Poisson flag — this test pins the current behaviour.
+        of the Poisson flag, this test pins the current behaviour.
         """
         V = Symbol("V")
         kp = KoszulProblem(

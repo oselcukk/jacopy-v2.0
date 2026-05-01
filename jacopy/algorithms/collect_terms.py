@@ -4,7 +4,7 @@ Sum-level like-term collection.
 Merges structurally-equal summands into a single term with the
 combined coefficient: ``x + x → 2*x``, ``2*x + 3*x → 5*x``,
 ``x - x → 0``. This is the narrowest slice of what
-:func:`jacopy.algorithms.canonicalize.canonicalize` does — the rest
+:func:`jacopy.algorithms.canonicalize.canonicalize` does, the rest
 (numeric folding in Products, Power rules, sorting) lives elsewhere.
 
 The shared helpers ``_coeff_and_core`` and ``_combine_coeff`` are

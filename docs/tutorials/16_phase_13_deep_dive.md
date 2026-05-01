@@ -1,7 +1,7 @@
-# 16 — Phase 13 deep dive: the `[π, π]_SN` obstruction
+# 16, Phase 13 deep dive: the `[π, π]_SN` obstruction
 
 Tutorial 12 introduced the Schouten–Nijenhuis bracket and noted that
-``[·,·]_SN(π, π)`` is the universal Poisson obstruction — the inert
+``[·,·]_SN(π, π)`` is the universal Poisson obstruction, the inert
 `BracketApply` handle whose vanishing *is* the Jacobi identity for
 ``{·,·}_π``. That tutorial closed the function-side Jacobi sum in
 **one** step via `prove_jacobi_reduction`, citing the seeded
@@ -9,8 +9,8 @@ Tutorial 12 introduced the Schouten–Nijenhuis bracket and noted that
 
 Phase 13 took the harder road: close the same identity *without
 citing any seeded theorem*, using only engine-level rewrite axioms.
-This tutorial walks the resulting machinery — the eight axioms and
-the `LieBracketVF` atom that make it possible — and the asymmetry
+This tutorial walks the resulting machinery, the eight axioms and
+the `LieBracketVF` atom that make it possible, and the asymmetry
 between the form-side (2f-deep) and function-side (2g-deep) chains.
 
 The deeper view matters when you want to:
@@ -23,7 +23,7 @@ The deeper view matters when you want to:
 * understand *why* the function-side chain is short and the
   form-side chain needs bookkeeping.
 
-## `LieBracketVF` — Lie bracket of vector fields as an atom
+## `LieBracketVF`, Lie bracket of vector fields as an atom
 
 The first design decision: `[X, Y]_VF` is *not* expanded to
 ``X*Y − Y*X`` inside the engine. It's an opaque
@@ -46,7 +46,7 @@ print(f"same atom : {bracket == lie_bracket_vf(X, Y)}")
 
 Why opaque: after the operator-commutator fold collapses
 ``L_X ∘ L_Y − L_Y ∘ L_X`` to ``L_{[X,Y]_VF}``, the resulting Lie
-derivative must be applicable to a form like any ordinary `L_W` —
+derivative must be applicable to a form like any ordinary `L_W`,
 downstream Cartan rewrites need a single derivation, not a
 two-term commutator. Keeping `[X, Y]_VF` opaque preserves that
 uniformity. The literal expansion is still available through
@@ -57,7 +57,7 @@ uniformity. The literal expansion is still available through
 `OpCommutatorVfDefinition` folds the operator commutator into a
 `LieBracketVF`-flavoured Lie derivative; `LieVfJacobiDefinition`
 discharges the cyclic three-bracket triple. Both fire on a `Sum`
-and scan its children for the matching pattern — order-permissive,
+and scan its children for the matching pattern, order-permissive,
 so the upstream pipeline doesn't have to canonicalise first.
 
 ```python
@@ -84,7 +84,7 @@ print(f"rule   : {steps[0].rule}")
 ```
 
 The rule fired exactly once, replacing the two-term commutator
-with a single `Act(L_{[X,Y]_VF}, ω)`. The match is structural —
+with a single `Act(L_{[X,Y]_VF}, ω)`. The match is structural,
 the rule looks for a positive `Act(L_X, Act(L_Y, ω))` paired with
 its sign-flipped twin `Neg(Act(L_Y, Act(L_X, ω)))` and rejects
 anything else.
@@ -96,12 +96,12 @@ and rewrites the cyclic sum to `Integer(0)`.
 
 ## Function-side closure (2g-deep, end-to-end)
 
-Two more axioms — both in `jacopy.calculus.poisson_axioms` — close
+Two more axioms, both in `jacopy.calculus.poisson_axioms`, close
 the cyclic Poisson Jacobi sum to ``[·,·]_SN(π, π)``:
 
 * `PoissonAsHamiltonianDefinition` rewrites ``{f, g}_π → X_f(g)``
   for a *pinned* `DerivedBracket` instance (object identity, not
-  name match — keeps unrelated brackets out of the rewrite scope).
+  name match, keeps unrelated brackets out of the rewrite scope).
 * `HamiltonianCyclicSnFormulaDefinition` collapses the cyclic
   ``Σ_cyc Act(X_a, Act(X_b, c))`` triple to a single
   `BracketApply([·,·]_SN, π, π)` node.
@@ -141,21 +141,21 @@ print(f"final : {result}")
 ```
 
 Seven steps: six `PoissonAsHamiltonian` rewrites (inner-then-outer
-on each cyclic term — `{f, {g, h}}` becomes `X_f(X_g(h))`) plus
+on each cyclic term, `{f, {g, h}}` becomes `X_f(X_g(h))`) plus
 one `HamiltonianCyclicSn` collapse to ``−[·,·]_SN(π, π)``. The
 final `Neg` is the sign carried in from the
 `graded_jacobi_obstruction` shape, not a sign-error.
 
 ## Form-side asymmetry (2f-deep)
 
-The form-side chain — the cyclic Koszul Jacobi sum on three 1-forms
-— closes through an analogous `SnBivectorFormulaDefinition` (Faz
+The form-side chain, the cyclic Koszul Jacobi sum on three 1-forms
+, closes through an analogous `SnBivectorFormulaDefinition` (Faz
 13.D), but it doesn't reach a clean ``[·,·]_SN(π, π)`` residue
 without extra bookkeeping. The reason is structural: the form-side
 sum, after expanding ``{α, β}_K = L_{π^♯α}β − L_{π^♯β}α − d⟨π^♯α, β⟩``
 and folding operator commutators, leaves three pieces:
 
-1. The named-bracket cyclic ``Σ_cyc L_{[π^♯·, π^♯·]_VF}(·)`` —
+1. The named-bracket cyclic ``Σ_cyc L_{[π^♯·, π^♯·]_VF}(·)``,
    what `SnBivectorFormulaDefinition` rewrites to
    ``[·,·]_SN(π, π)``.
 2. Iterated Lie-derivative tails ``L_{π^♯·}(L_{π^♯·}(·))`` that
@@ -168,7 +168,7 @@ algebraically but require either user-driven simplification or
 additional rules to reach a literal-zero residue. The function-side
 chain doesn't have that burden because the `Act(X_f, X_g(h))` shape
 absorbs all the relevant content into a single iterated derivation
-— there's nothing left over to cancel separately.
+, there's nothing left over to cancel separately.
 
 This asymmetry isn't a bug. It's the natural consequence of
 1-forms carrying more structure than functions: the Cartan-layer
@@ -184,7 +184,7 @@ hamiltonian-action expansion of the Poisson bracket.
 | The same chain on a custom derived bracket without a seeded theorem | Pin a `DerivedBracket`, layer `PoissonAsHamiltonian` + `HamiltonianCyclicSn` |
 | Form-side cancellation showing the 3-form ``a ∧ b ∧ c`` pairing | Faz 13.D `SnBivectorFormulaDefinition` + manual residue work |
 
-The default workflow stays at the seeded-theorem level —
+The default workflow stays at the seeded-theorem level,
 `prove_jacobi_reduction` is shorter and the transcript reads as
 "by the Derived Bracket Theorem". This deeper machinery is what
 sits *underneath* that one-line theorem citation, ready when the
@@ -192,7 +192,7 @@ seed isn't applicable.
 
 ## Summary
 
-* `LieBracketVF(X, Y)` is an opaque `Derivation` atom — kept
+* `LieBracketVF(X, Y)` is an opaque `Derivation` atom, kept
   unexpanded so the operator-commutator fold yields a single
   derivation that downstream Cartan rules can consume.
 * `OpCommutatorVfDefinition` folds ``L_X(L_Y(ω)) − L_Y(L_X(ω))``
@@ -208,5 +208,5 @@ seed isn't applicable.
   cancellation work.
 * The seeded `poisson_jacobi` theorem (cited via
   `prove_jacobi_reduction`) is the one-step shortcut for this
-  whole chain — use it as the default workflow; reach for this
+  whole chain, use it as the default workflow; reach for this
   machinery when the seed doesn't apply.

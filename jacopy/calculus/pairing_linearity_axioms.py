@@ -1,5 +1,5 @@
 r"""
-Pairing C∞-linearity axiom — Faz 12.B #12.
+Pairing C∞-linearity axiom, Faz 12.B #12.
 
 Engine rewrite that pulls a scalar factor out of either slot of a
 :class:`~jacopy.calculus.pairing.Pairing`:
@@ -15,7 +15,7 @@ vector fields; both sides of the pairing are C∞(M)-modules), so the
 rule fires whenever either slot is a :class:`~jacopy.core.expr.Product`
 of two or more factors. By convention the **last** factor in the slot
 product is the underlying covector / vector and the leading factors
-are scalars — matching the same split used by
+are scalars, matching the same split used by
 :class:`~jacopy.calculus.lie_rescaling_axioms.LieRescalingDefinition`.
 
 Both slots are unconditional: callers building tutorials over a
@@ -53,7 +53,7 @@ class PairingScalarPullDefinition(Definition):
 
     def rewrite(self, expr: Expr) -> Expr:
         slot = self._slot_to_pull(expr)
-        # _slot_to_pull is consulted from matches() — this branch is
+        # _slot_to_pull is consulted from matches(), this branch is
         # unreachable if the engine respects the matches contract, but
         # keep the helper honest for direct callers.
         assert slot is not None

@@ -1,5 +1,5 @@
 r"""
-Einstein tensor — Stage F.
+Einstein tensor, Stage F.
 
 The Einstein tensor of a connection ``∇`` and a metric ``g`` is the
 ``(0, 2)`` tensor
@@ -13,7 +13,7 @@ The Einstein tensor of a connection ``∇`` and a metric ``g`` is the
 The Einstein field equations of general relativity (in geometric
 units) read ``G = T``, where ``T`` is the stress-energy-momentum
 tensor. A vacuum solution is one where ``G_{ab} ≡ 0`` for every
-``(a, b)`` — Schwarzschild is the canonical example, and the
+``(a, b)``, Schwarzschild is the canonical example, and the
 :func:`einstein_tensor`-built tensor on Schwarzschild satisfies
 :meth:`~jacopy.frame_calc.component_tensor.ComponentTensor.is_zero`
 identically (after :func:`sympy.simplify` / :func:`sympy.trigsimp`).

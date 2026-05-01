@@ -1,23 +1,23 @@
-# 25 — Frame-component differential geometry (`jacopy.frame_calc`)
+# 25, Frame-component differential geometry (`jacopy.frame_calc`)
 
 `jacopy.frame_calc` is jacopy's component-level submodule for
 **concrete metric calculations**: given a metric ``g`` on a frame,
 compute Christoffel symbols, Riemann curvature, Ricci tensor,
-scalar curvature, Einstein tensor — with optional step-by-step
+scalar curvature, Einstein tensor, with optional step-by-step
 derivation transcripts that bridge to `ProofChain` for paper-grade
 LaTeX output.
 
 This tutorial covers:
 
-1. The `jacopy.frame_calc` submodule layout — what it adds on top
+1. The `jacopy.frame_calc` submodule layout, what it adds on top
    of jacopy's symbolic / proof layer.
 2. Frame setup: `CoordinateFrame` (most common) and `Tetrad`
    (orthonormal bases via vielbein).
 3. `ComponentMetric` and its `.inverse()`.
-4. `levi_civita(g)` — Christoffel via Koszul formula.
+4. `levi_civita(g)`, Christoffel via Koszul formula.
 5. `curvature`, `ricci`, `ricci_scalar`, `einstein_tensor`.
 6. Optimised mode for Kerr-class metrics.
-7. Library fixtures — `minkowski`, `schwarzschild`, `frw`, `kerr`.
+7. Library fixtures, `minkowski`, `schwarzschild`, `frw`, `kerr`.
 8. ProofChain bridge: rendering derivations to paper-grade LaTeX.
 
 `frame_calc` requires **SymPy as an optional dependency** under
@@ -27,7 +27,7 @@ the `[components]` extras. Install via:
 pip install "jacopy[components]"
 ```
 
-## A quick taste — Schwarzschild vacuum in five lines
+## A quick taste, Schwarzschild vacuum in five lines
 
 ```python
 from jacopy.frame_calc import einstein_tensor, levi_civita
@@ -38,14 +38,14 @@ G = einstein_tensor(levi_civita(g), g)
 assert G.is_vacuum()
 ```
 
-That's it — `jacopy` symbolically computes that Schwarzschild's
+That's it, `jacopy` symbolically computes that Schwarzschild's
 Einstein tensor vanishes identically, the defining property of a
 vacuum solution to Einstein's field equations.
 
 ## 1. Submodule layout
 
 `jacopy.frame_calc` is **separate from jacopy's symbolic / proof
-layer** — it does component-level numerical-symbolic computation,
+layer**, it does component-level numerical-symbolic computation,
 where the rest of jacopy does abstract operator algebra on
 brackets / Cartan calculus / etc. The two layers complement each
 other through the `proof_bridge` module (Stage G).
@@ -55,7 +55,7 @@ Pieces you'll encounter:
 | Type | What it is |
 |---|---|
 | `Frame` (protocol) | The interface every frame implementation satisfies |
-| `CoordinateFrame` | `e_a = ∂/∂x^a` — most common |
+| `CoordinateFrame` | `e_a = ∂/∂x^a`, most common |
 | `Tetrad` | `e_a = e_a^μ ∂/∂x^μ` defined by a vielbein |
 | `AbstractFrame` | Symbolic frame with opaque structure constants |
 | `ComponentMetric` | A `(0, 2)` symmetric tensor, the metric `g_{ab}` |
@@ -68,7 +68,7 @@ Pieces you'll encounter:
 
 ## 2. Frame setup
 
-### `CoordinateFrame` — the natural starting point
+### `CoordinateFrame`, the natural starting point
 
 ```python
 from jacopy.frame_calc import CoordinateFrame
@@ -84,7 +84,7 @@ print(F.derivative(r**2, 1))      # 2*r  (frame derivative on coord index 1)
 print(F.gamma(0, 1, 0))           # 0    (coordinate frames are holonomic)
 ```
 
-### `Tetrad` — orthonormal frames via vielbein
+### `Tetrad`, orthonormal frames via vielbein
 
 A tetrad sits on top of a coordinate frame; the vielbein matrix
 prescribes how each tetrad vector decomposes into coord vectors.
@@ -93,7 +93,7 @@ prescribes how each tetrad vector decomposes into coord vectors.
 from jacopy.frame_calc import Tetrad
 
 # A Schwarzschild orthonormal tetrad: each row is e_a^μ
-# (this is just illustrative — you'd normally build it from the metric)
+# (this is just illustrative, you'd normally build it from the metric)
 M, r = sp.symbols("M r", positive=True)
 factor = 1 - 2*M/r
 vielbein = sp.diag(
@@ -105,12 +105,12 @@ vielbein = sp.diag(
 
 coord_frame = CoordinateFrame(list(sp.symbols("t r theta phi")))
 T = Tetrad(coord_frame, vielbein)
-print(T.gamma(0, 1, 0))           # non-zero — γ from the vielbein
+print(T.gamma(0, 1, 0))           # non-zero, γ from the vielbein
 ```
 
 Most of the rest of this tutorial uses `CoordinateFrame` because
 it's the more common case in physics literature. Everything below
-also works on `Tetrad` — the `Frame` protocol is uniform.
+also works on `Tetrad`, the `Frame` protocol is uniform.
 
 ## 3. `ComponentMetric` and `inverse()`
 
@@ -131,7 +131,7 @@ g = ComponentMetric(F, sp.Matrix([
 print(g[0, 0])                  # -(1 - 2*M/r)
 print(g.det())                  # determinant
 g_inv = g.inverse()
-print(g_inv[0, 0])              # r/(2M - r)  — inverse metric component
+print(g_inv[0, 0])              # r/(2M - r) , inverse metric component
 
 # Verify g^{ac} g_{cb} = δ^a_b on a few entries
 print(sum(g_inv[0, c] * g[c, 0] for c in range(4)))   # → 1
@@ -140,7 +140,7 @@ print(sum(g_inv[0, c] * g[c, 0] for c in range(4)))   # → 1
 `ComponentMetric` checks symmetry at construction (`g_{ab} = g_{ba}`)
 and rejects non-symmetric input.
 
-## 4. `levi_civita(g)` — Christoffel symbols via Koszul
+## 4. `levi_civita(g)`, Christoffel symbols via Koszul
 
 Stage D's deliverable: the unique torsion-free metric-compatible
 connection.
@@ -153,14 +153,14 @@ print(LC[0, 0, 1])              # Γ^t_{tr} = M / (r²(1-2M/r))
 print(LC.nonzero_components())  # full table of non-zero Γ
 ```
 
-For Schwarzschild, 13 non-zero Christoffel components — all
+For Schwarzschild, 13 non-zero Christoffel components, all
 matching textbook values (`Γ^θ_{rθ} = 1/r`, `Γ^φ_{θφ} = cot θ`,
 etc.).
 
 ### Step-by-step derivation transcript
 
 Each Christoffel computation records its derivation as a list of
-`KoszulStep`s — accessible via `derivation_steps` or the
+`KoszulStep`s, accessible via `derivation_steps` or the
 human-readable `format_derivation`:
 
 ```python
@@ -195,7 +195,7 @@ print(chain_to_latex_document(chain))
 #   - \end{document}
 ```
 
-The output is publication-ready — the same display pipeline used
+The output is publication-ready, the same display pipeline used
 by jacopy's other proof transcripts (Cartan magic, Bianchi, etc.).
 A paper that mixes abstract operator-level proofs with
 component-level Christoffel computations renders both in a
@@ -229,7 +229,7 @@ traces in default mode.
 The Ricci tensor follows the convention from the operator
 definition `R(U, V) W := ∇_U∇_V W − ∇_V∇_U W − ∇_{[U,V]} W`, with
 contraction `Ric_{ab} := R^c_{acb}`. This gives Ricci with the
-**opposite** sign of the Wald / Carroll physics convention — on a
+**opposite** sign of the Wald / Carroll physics convention, on a
 2-sphere of radius `R₀`,
 
 ```python
@@ -242,7 +242,7 @@ convention-independent; both terms in `G = Ric − ½ R g` flip sign
 together. Schwarzschild's vacuum verification works in either
 convention.
 
-## 6. Optimised mode — Kerr-class metrics
+## 6. Optimised mode, Kerr-class metrics
 
 For complex metrics like Kerr (off-diagonal `dt dφ` cross-term
 plus `Σ = r² + a²cos²θ` denominators), per-entry `sympy.simplify`
@@ -251,7 +251,7 @@ exponentially. **Default mode times out on full Kerr Ricci**.
 
 The fix: `optimized=True` skips per-entry simplify, keeping
 expressions in raw form. Components remain mathematically correct
-— `sympy.simplify` on access produces the clean form when needed.
+, `sympy.simplify` on access produces the clean form when needed.
 
 ```python
 from jacopy.frame_calc.library import kerr
@@ -262,12 +262,12 @@ G = einstein_tensor(LC, g, optimized=True)
 
 # ~13 seconds for the full pipeline (vs 180s+ default mode)
 assert G.is_vacuum()
-# Surprise: G entries are *literal zero* in raw form —
+# Surprise: G entries are *literal zero* in raw form,
 # no simplify needed for the vacuum check.
 assert G.is_zero(simplify=False)
 ```
 
-The trade-off — optimised mode skips recording derivation traces.
+The trade-off, optimised mode skips recording derivation traces.
 `derivation_chain()` raises `RuntimeError` in optimised mode:
 
 ```python
@@ -289,25 +289,25 @@ from jacopy.frame_calc.library import (
     minkowski, schwarzschild, frw, kerr,
 )
 
-# Minkowski 4D — flat
+# Minkowski 4D, flat
 F, g = minkowski()                  # signature='-+++' default
 
-# Schwarzschild — static spherical vacuum
+# Schwarzschild, static spherical vacuum
 F, g = schwarzschild()              # M is a positive Symbol
 
-# FRW — homogeneous isotropic cosmology
+# FRW, homogeneous isotropic cosmology
 F, g = frw()                        # k=0 (flat) default; a(t) is sp.Function
 F, g = frw(k=1)                     # closed universe
 F, g = frw(a_func=t**sp.Rational(2, 3))   # matter-dominated explicit
 
-# Kerr — rotating vacuum (Boyer-Lindquist)
+# Kerr, rotating vacuum (Boyer-Lindquist)
 F, g = kerr()                       # M, a both positive Symbols
 ```
 
 Each factory accepts optional `Symbol` / `Function` overrides so
 the metric composes with user-supplied parameters.
 
-## 8. ProofChain bridge — paper-grade rendering
+## 8. ProofChain bridge, paper-grade rendering
 
 The `proof_bridge` module wraps frame-calc derivation traces into
 the same `ProofChain` data type the rest of jacopy uses, with
@@ -324,13 +324,13 @@ chain = LC.derivation_chain(0, 0, 1)
 print(chain_to_latex_document(chain))
 ```
 
-The `SymPyAtom` opaque atom is the type bridge — it wraps SymPy
+The `SymPyAtom` opaque atom is the type bridge, it wraps SymPy
 expressions inside jacopy `Expr` so they can sit in
 `ProofStep.before / after` slots. The display layer registers a
 LaTeX dispatcher for `SymPyAtom` that delegates to `sympy.latex()`
 for clean rendering.
 
-## Drop-in template — paste your metric, get everything
+## Drop-in template, paste your metric, get everything
 
 For paper work, the most common need is: "I have a metric on
 some chart, give me Christoffels / Ricci / Einstein". Copy the
@@ -338,7 +338,7 @@ template below, **replace only the metric-matrix block**, and the
 rest of the pipeline runs as-is on whatever metric you provided.
 
 The example uses the **Reissner-Nordström** (charged Schwarzschild)
-metric — not in the library because it's a different *family*
+metric, not in the library because it's a different *family*
 (non-vacuum, electromagnetic source). The point is to show that
 you don't need a library factory: any metric matrix works.
 
@@ -350,7 +350,7 @@ from jacopy.frame_calc import (
 )
 
 # ─────────────────────────────────────────────────────────────
-# 1. Coordinates — adjust to your metric's chart
+# 1. Coordinates, adjust to your metric's chart
 # ─────────────────────────────────────────────────────────────
 t, r, theta, phi = sp.symbols("t r theta phi")
 coords = [t, r, theta, phi]
@@ -360,7 +360,7 @@ M = sp.Symbol("M", positive=True)
 Q = sp.Symbol("Q", positive=True)
 
 # ─────────────────────────────────────────────────────────────
-# 2. METRIC MATRIX — REPLACE THIS BLOCK WITH YOUR OWN
+# 2. METRIC MATRIX, REPLACE THIS BLOCK WITH YOUR OWN
 # ─────────────────────────────────────────────────────────────
 # Reissner-Nordström: charged static spherical black hole
 factor = 1 - 2*M/r + Q**2 / r**2
@@ -372,7 +372,7 @@ metric_matrix = sp.Matrix([
 ])
 
 # ─────────────────────────────────────────────────────────────
-# 3. Pipeline — runs as-is on whatever metric is above
+# 3. Pipeline, runs as-is on whatever metric is above
 # ─────────────────────────────────────────────────────────────
 F = CoordinateFrame(coords)
 g = ComponentMetric(F, metric_matrix)
@@ -382,7 +382,7 @@ R = ricci_scalar(LC, g)
 G = einstein_tensor(LC, g)
 
 # ─────────────────────────────────────────────────────────────
-# 4. Output — summary + all non-zero entries
+# 4. Output, summary + all non-zero entries
 # ─────────────────────────────────────────────────────────────
 names = F.index_names()
 print(f"# non-zero Christoffel: {len(LC.nonzero_components())}")
@@ -454,18 +454,18 @@ correct; ``G.is_vacuum()`` and other zero-checks still work via
 SymPy's basic arithmetic. Use ``sp.simplify(LC[a, b, c])`` on the
 specific entries you want to inspect.
 
-## Custom connection — independent of the metric
+## Custom connection, independent of the metric
 
 A **connection** and a **metric** are two independent geometric
 objects. The Levi-Civita connection is the *unique* connection
 that's both **torsion-free** and **metric-compatible** for a
-given metric — but it's just one of many possible connections on
+given metric, but it's just one of many possible connections on
 the same manifold. In Einstein-Cartan theory, teleparallel
 gravity, Palatini formulations, and other modified gravity
 frameworks, the connection is **not** Levi-Civita.
 
 `einstein_tensor(connection, g)` accepts **any**
-`ComponentConnection` — not just `LeviCivitaConnection`. So you
+`ComponentConnection`, not just `LeviCivitaConnection`. So you
 can:
 
 - Build a connection with **arbitrary Christoffel symbols** via
@@ -477,7 +477,7 @@ can:
 ### Symbol-domain matching (important pitfall)
 
 When you supply Christoffel symbols by hand, **use the symbols
-the frame already carries** — not freshly-created ones. Library
+the frame already carries**, not freshly-created ones. Library
 factories like `schwarzschild()` create symbols with specific
 assumptions (`r > 0`, `M > 0`); your hand-written `sp.symbols('r')`
 is a *different* symbol object even though it shares the name.
@@ -491,7 +491,7 @@ M = sp.Symbol("M", positive=True)    # ← assumption must match factory's
 If you skip this, your Christoffel formulas will reference
 "phantom" symbols and `einstein_tensor` will produce nonsense.
 
-### Sanity check — manual Schwarzschild matches Levi-Civita
+### Sanity check, manual Schwarzschild matches Levi-Civita
 
 Build the textbook Schwarzschild Christoffels by hand, wrap them
 in `ComponentConnection`, and verify the result matches
@@ -511,7 +511,7 @@ M = sp.Symbol("M", positive=True)
 # Pre-allocated zero array for the (1, 2)-tensor
 manual = sp.MutableDenseNDimArray.zeros(F.dim, F.dim, F.dim)
 
-# Set the 13 non-zero entries — textbook Schwarzschild
+# Set the 13 non-zero entries, textbook Schwarzschild
 factor = 1 - 2*M/r
 val = M / (r**2 * factor)
 manual[0, 0, 1] = val          # Γ^t_tr
@@ -543,14 +543,14 @@ assert einstein_tensor(LC, g).is_vacuum()
 assert einstein_tensor(manual_conn, g).is_vacuum()
 ```
 
-This is the smoke test — your hand-written Christoffels match
+This is the smoke test, your hand-written Christoffels match
 the package's Levi-Civita output, so the API is consistent.
 
 ### Non-trivial use: same metric, different connection
 
 For modified-gravity work, you'd add a torsion correction or use
 a fully independent connection. Here's a connection that's the
-Schwarzschild Levi-Civita **plus a torsion term** — the same
+Schwarzschild Levi-Civita **plus a torsion term**, the same
 metric, but the Einstein tensor is no longer vacuum because the
 connection is no longer torsion-free:
 
@@ -574,11 +574,11 @@ G_with_torsion = einstein_tensor(torsion_conn, g)
 
 print("Levi-Civita G.is_vacuum():     ", einstein_tensor(LC, g).is_vacuum())
 print("Custom-torsion G.is_vacuum():  ", G_with_torsion.is_vacuum())
-# → True / False — adding torsion breaks vacuum
+# → True / False, adding torsion breaks vacuum
 ```
 
 The `einstein_tensor(connection, g)` call doesn't care where the
-Christoffel symbols came from — it just computes
+Christoffel symbols came from, it just computes
 `G_{ab} = Ric_{ab} - ½ R g_{ab}` from whatever connection you
 supply.
 
@@ -586,8 +586,8 @@ supply.
 
 | Scenario | Why custom connection |
 |---|---|
-| Standard GR (vacuum, Einstein-Maxwell, Schwarzschild family) | Use Levi-Civita — `levi_civita(g)` |
-| Einstein-Cartan theory | Connection has torsion — supply Christoffels with `T ≠ 0` |
+| Standard GR (vacuum, Einstein-Maxwell, Schwarzschild family) | Use Levi-Civita, `levi_civita(g)` |
+| Einstein-Cartan theory | Connection has torsion, supply Christoffels with `T ≠ 0` |
 | Teleparallel gravity | Connection is flat (`R = 0`) but has torsion |
 | Palatini formulation | Vary `g` and `Γ` independently |
 | Affine theory (no metric) | Connection alone determines the geometry |
@@ -596,7 +596,7 @@ For the standard-GR cases the metric → Levi-Civita → tensors
 chain is all you need. The custom-connection path opens up when
 the physics requires it.
 
-### API stress test — arbitrary symbols
+### API stress test, arbitrary symbols
 
 Before showing physically-motivated patterns, here is what
 happens with **completely arbitrary** symbol parameters. Useful
@@ -624,7 +624,7 @@ G_manual = einstein_tensor(manual_conn, g_sw)
 
 The result is `G_{tt}, G_{rr}, G_{θθ}, G_{φφ}` non-zero with
 arbitrary A,B-dependence. Plug `A`, `B` into actual Levi-Civita
-values to recover vacuum — but **only the angular block is
+values to recover vacuum, but **only the angular block is
 already filled** (1/r); the diagonal Schwarzschild Christoffels
 that A, B replace need *full* Levi-Civita formulas, otherwise
 the result stays non-vacuum.
@@ -774,7 +774,7 @@ vacuum.
 
 #### Pattern 5: FLRW + scalar-gradient projective deformation
 
-Connection deformed by a scalar field's gradient — a typical
+Connection deformed by a scalar field's gradient, a typical
 scalar-tensor gravity setup. Coupling form `Γ + δ A_a + δ A_a`:
 
 ```python
@@ -836,7 +836,7 @@ Two concrete takeaways:
 |---|---|
 | Concrete metric → Christoffel / Ricci / Einstein components | `jacopy.frame_calc` |
 | Abstract operator algebra (Cartan magic, Bianchi, derived bracket theorems) | the rest of `jacopy` |
-| Both, in the same proof transcript | both — `proof_bridge` unifies them |
+| Both, in the same proof transcript | both, `proof_bridge` unifies them |
 
 `frame_calc` is the answer to "I have a metric for my paper, give
 me the tensors". The rest of jacopy is the answer to "I have an

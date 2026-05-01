@@ -2,21 +2,21 @@
 Equality utilities.
 
 The default ``a == b`` on expressions is *structural*: same type,
-same children in the same order. That's the right default — it makes
+same children in the same order. That's the right default, it makes
 hashing well-defined and keeps the core layer free of semantic
 assumptions. But proofs need a few other notions of sameness, and
 this module collects the ones that are not deep enough to warrant
 the canonicalization machinery of Faz 2.
 
-* :func:`structural_equal` — a named alias for ``==``, for readable
+* :func:`structural_equal`, a named alias for ``==``, for readable
   proof transcripts.
 
-* :func:`alpha_equal` — two *patterns* are alpha-equivalent if they
+* :func:`alpha_equal`, two *patterns* are alpha-equivalent if they
   agree modulo a consistent renaming of wildcard names. Used to
   deduplicate rewrite rules that differ only in how they name their
   holes.
 
-* :func:`sum_bag_equal` — top-level :class:`Sum` children compared
+* :func:`sum_bag_equal`, top-level :class:`Sum` children compared
   as a multiset. Useful for sanity-checking an intermediate step
   without committing to a canonical term order; deeper commutative
   equality is the job of :mod:`jacopy.algorithms.canonicalize`.
@@ -37,7 +37,7 @@ from jacopy.core.wildcards import SeqWildcard, Wildcard
 
 
 def structural_equal(a: Expr, b: Expr) -> bool:
-    """Return ``a == b`` — structural, position-sensitive equality."""
+    """Return ``a == b``, structural, position-sensitive equality."""
     return a == b
 
 
@@ -51,13 +51,13 @@ def alpha_equal(p: Expr, q: Expr) -> bool:
 
     Two patterns like ``?A + x`` and ``?B + x`` are alpha-equivalent:
     both describe "a sum of something with x". The renaming must be
-    a *bijection* — two distinct wildcards in ``p`` cannot collapse
+    a *bijection*, two distinct wildcards in ``p`` cannot collapse
     into one in ``q``, and vice versa. Type filters must match
     exactly: a ``?A:Scalar`` is not alpha-equivalent to a plain
     ``?A`` or a ``?A:Graded``.
 
     Wildcards on one side with non-wildcards on the other are never
-    alpha-equal, even if the non-wildcard "fits" — alpha is about
+    alpha-equal, even if the non-wildcard "fits", alpha is about
     shape, not inhabitation.
     """
     return _alpha(p, q, {}, {})
@@ -75,7 +75,7 @@ def _alpha(
         return _bind_name(p.name, q.name, fwd, bwd)
     if isinstance(p, SeqWildcard) and isinstance(q, SeqWildcard):
         return _bind_name(p.name, q.name, fwd, bwd)
-    # Mixed kinds — wildcard on one side only.
+    # Mixed kinds, wildcard on one side only.
     if isinstance(p, (Wildcard, SeqWildcard)) or isinstance(
         q, (Wildcard, SeqWildcard)
     ):
@@ -97,7 +97,7 @@ def _bind_name(a: str, b: str, fwd: Dict[str, str], bwd: Dict[str, str]) -> bool
     if a in fwd:
         return fwd[a] == b
     if b in bwd:
-        # ``b`` is already claimed by some other name — not a bijection.
+        # ``b`` is already claimed by some other name, not a bijection.
         return False
     fwd[a] = b
     bwd[b] = a
@@ -114,7 +114,7 @@ def sum_bag_equal(a: Expr, b: Expr) -> bool:
 
     Compares only the top level. Inner Sums are still compared
     structurally, so ``Sum(x+y, z)`` and ``Sum(y+x, z)`` are *not*
-    bag-equal by this function — reach for
+    bag-equal by this function, reach for
     :mod:`jacopy.algorithms.canonicalize` if you want the deep
     version. For non-Sum inputs, degenerates to ``==``.
     """

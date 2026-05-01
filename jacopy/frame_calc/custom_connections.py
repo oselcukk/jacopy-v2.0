@@ -1,5 +1,5 @@
 r"""
-Custom-connection helpers — Faz 19 Chunk D.
+Custom-connection helpers, Faz 19 Chunk D.
 
 Tutorial 25 demonstrates these patterns by hand; this module collapses
 them into one-line factories. Each takes a metric ``g`` and a deformation
@@ -10,11 +10,11 @@ to feed into :func:`~jacopy.frame_calc.curvature.curvature` /
 
 Functions
 ---------
-* :func:`connection_with_torsion` — Levi-Civita + contorsion(T)
+* :func:`connection_with_torsion`, Levi-Civita + contorsion(T)
   (Einstein-Cartan)
-* :func:`weyl_connection` — Levi-Civita + Weyl non-metricity from a
+* :func:`weyl_connection`, Levi-Civita + Weyl non-metricity from a
   1-form ``W``
-* :func:`projective_connection` — Levi-Civita + projective deformation
+* :func:`projective_connection`, Levi-Civita + projective deformation
   from a 1-form ``X`` (geodesic-preserving)
 
 All three return a :class:`ComponentConnection` with the same shape as
@@ -77,7 +77,7 @@ def connection_with_torsion(
         Metric.
     T
         Torsion ``(1, 2)`` tensor; antisymmetry in ``(b, c)`` is *not*
-        verified here — pass a tensor that already satisfies it.
+        verified here, pass a tensor that already satisfies it.
     optimized
         Forwarded to the Levi-Civita base.
 

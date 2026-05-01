@@ -10,11 +10,11 @@ calls them directly when the object is the last expression in a cell.
 
 Three helpers cover the common cases:
 
-* :func:`display_expr` — a single :class:`~jacopy.core.expr.Expr`,
+* :func:`display_expr`, a single :class:`~jacopy.core.expr.Expr`,
   wrapped as inline math (``$…$``) so it flows inside a prose cell.
-* :func:`display_step` — a single :class:`~jacopy.proof.step.ProofStep`,
+* :func:`display_step`, a single :class:`~jacopy.proof.step.ProofStep`,
   wrapped in an ``align*`` body so arrows and annotations align.
-* :func:`display_chain` (aliased :func:`display_proof`) — an entire
+* :func:`display_chain` (aliased :func:`display_proof`), an entire
   :class:`~jacopy.proof.chain.ProofChain` rendered as one ``align*``
   block, ready to paste into a paper draft.
 
@@ -91,7 +91,7 @@ class LatexDisplay:
     def _repr_mimebundle_(
         self, include=None, exclude=None
     ) -> dict:
-        """Combined bundle — Jupyter prefers this when available."""
+        """Combined bundle, Jupyter prefers this when available."""
         bundle = {
             "text/latex": self._repr_latex_(),
             "text/html": self._repr_html_(),
@@ -236,7 +236,7 @@ def _step_summary_html(step: ProofStep, verbosity: str) -> str:
         pieces.append(f'<span class="jacopy-math">\\({before} \\to {after}\\)</span>')
         if verbosity == "full" and step.justification:
             just = _html.escape(step.justification)
-            pieces.append(f'<span class="jacopy-just">— {just}</span>')
+            pieces.append(f'<span class="jacopy-just">, {just}</span>')
     return " ".join(pieces)
 
 
@@ -246,7 +246,7 @@ def _step_to_html(step: ProofStep, verbosity: str, max_depth: int) -> str:
     Leaf steps (or compact-mode / depth-capped steps) become a plain
     ``<div>``; steps with visible children become ``<details open>`` so
     the reader sees the nesting expanded by default but can fold it
-    away. ``max_depth`` mirrors the terminal renderer's semantics —
+    away. ``max_depth`` mirrors the terminal renderer's semantics,
     ``0`` suppresses descent.
     """
     summary = _step_summary_html(step, verbosity)
@@ -274,7 +274,7 @@ def display_step_collapsible(
 ) -> HtmlProofDisplay:
     """Wrap a :class:`ProofStep` as a collapsible HTML tree for Jupyter.
 
-    ``verbosity`` is one of :data:`VERBOSITY_MODES` — see
+    ``verbosity`` is one of :data:`VERBOSITY_MODES`, see
     :mod:`jacopy.display.ascii` for the mode semantics.
     """
     if not isinstance(step, ProofStep):

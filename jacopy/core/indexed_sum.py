@@ -1,8 +1,8 @@
 r"""
-Indexed sum :math:`\Sigma_d \, \mathrm{body}` — Faz 17.E.
+Indexed sum :math:`\Sigma_d \, \mathrm{body}`, Faz 17.E.
 
 A :class:`IndexedSum` is a bound-index summation over a discrete range
-— the structural shape behind every "sum over frame indices" appearing
+, the structural shape behind every "sum over frame indices" appearing
 in Faz 17 (and beyond). The dummy is an :class:`Atom` (typically a
 :class:`~jacopy.calculus.local_frame.FrameIndex` with kind ``"bound"``);
 the range is an opaque domain object (typically a
@@ -76,7 +76,7 @@ class IndexedSum(Expr):
     @property
     def children(self) -> Tuple[Expr, ...]:
         # Body is the only Expr child. The dummy is structural metadata
-        # — exposing it as a child would leak the binder into every
+        #, exposing it as a child would leak the binder into every
         # generic walk and break shadowing semantics.
         return (self._body,)
 
@@ -129,7 +129,7 @@ class IndexedSum(Expr):
     def substitute_dummy_with(self, target: Expr) -> Expr:
         """Return ``body[dummy ↦ target]``.
 
-        Used by the Kronecker-contraction rewrite — once the engine
+        Used by the Kronecker-contraction rewrite, once the engine
         decides ``Σ_b δ(a, b) · f(b) → f(a)``, it asks for the body
         with the dummy replaced by the contracting free index.
         """
@@ -178,7 +178,7 @@ def _range_key(range_: Any) -> Any:
     name = getattr(range_, "name", None)
     if name is not None:
         return ("named", type(range_).__name__, name)
-    # Fall back to repr — keeps the key hashable for anything Python
+    # Fall back to repr, keeps the key hashable for anything Python
     # callers throw at us, at the cost of distinguishing two equal
     # ranges only by their repr() text.
     return ("opaque", type(range_).__name__, repr(range_))

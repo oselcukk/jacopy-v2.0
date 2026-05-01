@@ -61,7 +61,7 @@ class TestIsGeneratedBy:
     def test_missing_one_form_fails(self):
         f = Symbol("f")
         omega = ExteriorAlgebra([f])
-        # Only the function, not its differential — insufficient.
+        # Only the function, not its differential, insufficient.
         assert not omega.is_generated_by([f])
 
     def test_empty_trivially_covered(self):

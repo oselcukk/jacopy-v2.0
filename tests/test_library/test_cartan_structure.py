@@ -1,4 +1,4 @@
-"""Tests for the Cartan-structure equation wrapper — Faz 17.F.2."""
+"""Tests for the Cartan-structure equation wrapper, Faz 17.F.2."""
 
 from __future__ import annotations
 
@@ -177,7 +177,7 @@ def test_first_cartan_rhs_is_sum_of_d_term_and_wedge_term():
     U, V = Derivation("U", 0), Derivation("V", 0)
     rhs = P.first_cartan_rhs(U, V, "a")
     assert isinstance(rhs, Sum)
-    # First child: (de^a)(U,V) — MultiEval over Act(d, e^a).
+    # First child: (de^a)(U,V), MultiEval over Act(d, e^a).
     d_term, wedge_term = rhs.children
     assert isinstance(d_term, MultiEval)
     assert isinstance(d_term.head, Act)
@@ -240,7 +240,7 @@ def test_prove_first_cartan_closes_for_alternative_index_name():
 
 
 def test_prove_first_cartan_closes_for_alternative_frame_dim():
-    """Frame dim is symbolic / informational — proof closes regardless."""
+    """Frame dim is symbolic / informational, proof closes regardless."""
     nabla = connection("∇")
     F = local_frame("F", dim=5)
     P = CartanStructureProblem(nabla, F)
@@ -374,7 +374,7 @@ def test_prove_second_cartan_closes_for_alternative_indices():
 
 
 def test_prove_second_cartan_closes_for_alternative_frame_dim():
-    """Frame dim is symbolic / informational — proof closes regardless."""
+    """Frame dim is symbolic / informational, proof closes regardless."""
     nabla = connection("∇")
     F = local_frame("F", dim=5)
     P = CartanStructureProblem(nabla, F)
@@ -384,13 +384,13 @@ def test_prove_second_cartan_closes_for_alternative_frame_dim():
 
 
 # --------------------------------------------------------------------- #
-# Q9 Stage 9.E — Koszul-connection mode                                  #
+# Q9 Stage 9.E, Koszul-connection mode                                  #
 # --------------------------------------------------------------------- #
 
 
 class TestKoszulConnectionCartanStructure:
     """Cartan I/II closes for an affine connection equipped with a
-    Koszul bracket and an anchor-pulled function action — the Q9 setting
+    Koszul bracket and an anchor-pulled function action, the Q9 setting
     of a Poisson-induced ``∇̃`` on T*M.
 
     :class:`CartanStructureProblem` swaps in

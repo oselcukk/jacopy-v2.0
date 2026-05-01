@@ -1,5 +1,5 @@
 r"""
-Non-metricity tensor ``Q(∇, g)`` — Faz 17.B.
+Non-metricity tensor ``Q(∇, g)``, Faz 17.B.
 
 For an affine connection ``∇`` and a metric ``g`` the non-metricity
 tensor is the ``(0, 3)``-tensor
@@ -10,39 +10,39 @@ tensor is the ``(0, 3)``-tensor
 
 For the local-component / form-property reading the only fact
 needed downstream is that ``Q(∇, g)(V, X, Y)`` is
-:math:`C^\infty`-linear in ``V`` — the
+:math:`C^\infty`-linear in ``V``, the
 ``V``-slot is exactly what becomes the local 1-form ``Q_{ab}(∇, g)``
 when ``X = X_a`` and ``Y = X_b``. The compatibility-style expansion
 ``Q = ∂g - g(∇·, ·) - g(·, ∇·)`` is also mechanised here as an
 **opt-in** rule: include
 :class:`NonMetricityCompatibilityDefinition` in the engine bundle
 to open every ``Q``, leave it out to keep ``Q`` opaque. The two
-modes don't interfere — the closure axioms (V-linearity, X↔Y
+modes don't interfere, the closure axioms (V-linearity, X↔Y
 symmetry) and the opener live in the same registry, but the engine
 only fires what's been registered.
 
 This module ships:
 
-* :class:`NonMetricityEvalExpr` — the ``Q(∇, g)(V, X, Y)``
+* :class:`NonMetricityEvalExpr`, the ``Q(∇, g)(V, X, Y)``
   evaluation node. Children are ``(V, X, Y)`` so the engine walks
   freely; the connection and metric sit in parametric slots, exactly
   as :class:`~jacopy.calculus.torsion_curvature.Torsion` does for
   ``∇``.
-* :class:`NonMetricityVLinearityDefinition` — distributes
+* :class:`NonMetricityVLinearityDefinition`, distributes
   :class:`Sum` and :class:`Neg` in the ``V``-slot. Same shape as
   :class:`~jacopy.calculus.connection.ConnectionXLinearityDefinition`.
-* :class:`NonMetricityVScalarPullDefinition` —
+* :class:`NonMetricityVScalarPullDefinition`,
   ``Q(f · V, X, Y) → f · Q(V, X, Y)`` with ``f`` a scalar prefactor.
   Models the C∞-linearity of the V-slot at the engine level so the
   local-component identity ``Q_{ab}(fV) = f · Q_{ab}(V)`` reduces in
   two rewrites (Sum → distribute → ScalarPull on a singleton Sum).
-* :class:`NonMetricityXYSymmetryDefinition` — canonicalises
+* :class:`NonMetricityXYSymmetryDefinition`, canonicalises
   ``Q(V, X, Y) → Q(V, Y, X)`` whenever the last two slots are out of
   ``repr``-order. Q inherits ``X ↔ Y`` symmetry from ``g``'s symmetry;
   taken primitive here so a ``Q_{ab} = Q_{ba}`` rewrite never has to
   open the compatibility expansion. Same shape as
   :class:`~jacopy.calculus.metric.MetricEvalSymmetryDefinition`.
-* :class:`NonMetricityCompatibilityDefinition` — opt-in opener
+* :class:`NonMetricityCompatibilityDefinition`, opt-in opener
   ``Q(∇, g)(V, X, Y) → V(g(X, Y)) − g(∇_V X, Y) − g(X, ∇_V Y)``.
   The first term ``V(g(X, Y))`` is encoded as
   :class:`~jacopy.algebra.derivation.Act` of ``V`` on
@@ -69,7 +69,7 @@ from jacopy.proof.expansion import Definition
 
 
 class NonMetricityEvalExpr(Expr):
-    r"""``Q(∇, g)(V, X, Y)`` — non-metricity evaluation node.
+    r"""``Q(∇, g)(V, X, Y)``, non-metricity evaluation node.
 
     Children are ``(V, X, Y)``; the connection ``∇`` and metric ``g``
     sit in parametric slots so engine rules can dispatch on a specific
@@ -233,7 +233,7 @@ class NonMetricityVLinearityDefinition(Definition):
 
 
 class NonMetricityVScalarPullDefinition(Definition):
-    r"""``Q(f · V, X, Y) → f · Q(V, X, Y)`` — :math:`C^\infty`-linearity in V.
+    r"""``Q(f · V, X, Y) → f · Q(V, X, Y)``, :math:`C^\infty`-linearity in V.
 
     Fires when the V-slot is a :class:`Product` of two or more factors.
     The leading factors are folded into the scalar prefactor ``f`` and
@@ -285,11 +285,11 @@ class NonMetricityVScalarPullDefinition(Definition):
 
 
 class NonMetricityXYSymmetryDefinition(Definition):
-    r"""``Q(V, X, Y) → Q(V, Y, X)`` — canonical-order swap on the symmetric pair.
+    r"""``Q(V, X, Y) → Q(V, Y, X)``, canonical-order swap on the symmetric pair.
 
     Fires on a :class:`NonMetricityEvalExpr` whose ``(X, Y)`` are out
     of ``repr``-order. After the rewrite the pair is sorted so the
-    rule applies at most once per node — same termination story as
+    rule applies at most once per node, same termination story as
     :class:`~jacopy.calculus.metric.MetricEvalSymmetryDefinition`.
 
     Mathematically the symmetry is a consequence of ``g``'s symmetry
@@ -342,7 +342,7 @@ class NonMetricityCompatibilityDefinition(Definition):
     tensor: ``Q = (∇_V g)(X, Y)`` expanded by the Leibniz rule for
     ``∇`` on the ``(0, 2)``-tensor ``g``. The first term
     ``V(g(X, Y))`` is the derivation ``V`` acting on the scalar
-    ``g(X, Y)`` — represented as :class:`Act` of ``V`` (which must be a
+    ``g(X, Y)``, represented as :class:`Act` of ``V`` (which must be a
     :class:`Derivation`) on
     :class:`~jacopy.calculus.metric.MetricEvalExpr`. The other two
     terms compose ``∇`` with the metric eval through

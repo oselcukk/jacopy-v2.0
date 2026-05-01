@@ -24,7 +24,7 @@ class TestConstruction:
             KoszulBracket("ρ")  # type: ignore[arg-type]
 
     def test_accepts_sharp_as_anchor(self):
-        """Any :class:`Derivation` is a valid anchor — the relaxed check
+        """Any :class:`Derivation` is a valid anchor, the relaxed check
         lets the musical map ``π^♯`` stand in as the anchor on a
         Poisson manifold, which is what
         :class:`jacopy.library.poisson.PoissonBracket` relies on."""
@@ -108,7 +108,7 @@ class TestExpand:
         assert out.children[2] == expected_third
 
     def test_pairing_slot_order_is_rho_alpha_then_beta(self):
-        """The convention ⟨ρα, β⟩ — 1-form slot first, vector slot second."""
+        """The convention ⟨ρα, β⟩, 1-form slot first, vector slot second."""
         rho = Anchor("ρ")
         K = KoszulBracket(rho)
         alpha, beta = Symbol("α"), Symbol("β")
@@ -183,7 +183,7 @@ class TestAxiomObstructionApi:
 class TestKoszulDerivedEquivalence:
     def test_equivalence_chain_closes(self):
         """`KoszulBracket(ρ)` and `DerivedBracket(sn, π, acting_on=ρ)`
-        produce identical Exprs on the same operands — the
+        produce identical Exprs on the same operands, the
         classical-vs-derived theorem reduces to reflexive closure."""
         rho = Anchor("ρ")
         pi = Symbol("π")
@@ -192,7 +192,7 @@ class TestKoszulDerivedEquivalence:
         D = DerivedBracket(sn, pi, degree_Q=1, acting_on=rho)
         chain = prove_equivalence(K, D, alpha, beta)
         assert len(chain) == 1
-        # Reflexive step — justification wording is engine-provided.
+        # Reflexive step, justification wording is engine-provided.
         assert chain.steps[0].rule == "reflexive"
 
     def test_reversed_direction_also_closes(self):
@@ -214,7 +214,7 @@ class TestKoszulDerivedEquivalence:
         alpha, beta = Symbol("α"), Symbol("β")
         K = KoszulBracket(rho1)
         D = DerivedBracket(sn, pi, degree_Q=1, acting_on=rho2)
-        # The two expansions differ structurally — no common rewrite
+        # The two expansions differ structurally, no common rewrite
         # rule bridges them, so ExpandAndSimplify leaves a residual.
         with pytest.raises(ProofFailure):
             prove_equivalence(K, D, alpha, beta)
@@ -256,7 +256,7 @@ class TestJacobiCondition:
 
     def test_is_anchor_agnostic(self):
         """Two Koszul brackets with different anchors return the same
-        condition on the same generator — the condition lives on π,
+        condition on the same generator, the condition lives on π,
         not ρ."""
         pi = Symbol("π")
         c1 = KoszulBracket(Anchor("ρ1")).jacobi_condition(pi)
@@ -294,7 +294,7 @@ class TestProveJacobiReduction:
         assert first.provenance_tag == "theorem"
 
     def test_terminal_obstruction_is_sn_self_bracket(self):
-        """Final expression in the chain is ``[π, π]_SN`` — the same
+        """Final expression in the chain is ``[π, π]_SN``, the same
         universal obstruction the typed condition wraps."""
         K, pi, a, b, g, reg = self._setup()
         chain = K.prove_jacobi_reduction(a, b, g, bivector=pi, registry=reg)
@@ -304,7 +304,7 @@ class TestProveJacobiReduction:
     def test_matches_poisson_bracket_view(self):
         """KoszulBracket.prove_jacobi_reduction with anchor=Sharp(π)
         produces the same terminal obstruction as PoissonBracket's
-        Koszul-view reduction — one Poisson hypothesis closes both."""
+        Koszul-view reduction, one Poisson hypothesis closes both."""
         from jacopy.library.poisson import PoissonBracket
         K, pi, a, b, g, reg = self._setup()
         chain_K = K.prove_jacobi_reduction(a, b, g, bivector=pi, registry=reg)

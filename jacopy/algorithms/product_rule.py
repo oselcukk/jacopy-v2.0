@@ -10,7 +10,7 @@ through sums (R-linearity) and products (graded Leibniz):
                + (−1)^{|D|(|a|+|b|)} a*b*D(c)``
 
 For the Leibniz expansion the degrees of the factors must be
-determinable — either because the factor is a :class:`Derivation`
+determinable, either because the factor is a :class:`Derivation`
 (self-describing), a numeric literal (degree 0), or registered as
 :class:`Scalar`/:class:`Graded` in the supplied registry. An
 undetermined factor raises :class:`ValueError`: the modelling gap is
@@ -70,15 +70,15 @@ def _expand_act(
 ) -> Expr:
     """Apply linearity + graded Leibniz to a single ``Act`` node.
 
-    When ``op`` is itself a :class:`Product` of operators — i.e. an
-    explicit composition ``D1 ∘ D2 ∘ … ∘ Dn`` — the application is
+    When ``op`` is itself a :class:`Product` of operators, i.e. an
+    explicit composition ``D1 ∘ D2 ∘ … ∘ Dn``, the application is
     unfolded right-to-left into nested ``Act`` nodes and each layer is
     expanded in turn. That is the only place in the algorithm where
     derivation composition actually acts on an operand; at
     :class:`Act` construction it stays inert.
 
-    Scalar-level linearity on the operator side — ``Neg(op)`` and the
-    zero operator ``Integer(0)`` — is peeled here too. Commutator
+    Scalar-level linearity on the operator side, ``Neg(op)`` and the
+    zero operator ``Integer(0)``, is peeled here too. Commutator
     expansion routinely generates ``Act(Neg(compose(D1, D2)), x)``
     shapes; pulling the sign out and recursing lets the composition
     unfold through the negation instead of stalling.
@@ -118,14 +118,14 @@ def _expand_leibniz(
     """``D(a1*...*an) → Σ_i sign_i * a1*...*D(a_i)*...*an``.
 
     ``sign_i = (−1)^{|D| * (|a1|+...+|a_{i−1}|)}``. Undecidable sign
-    parity raises — the caller needs to narrow down the degrees. Scalar
+    parity raises, the caller needs to narrow down the degrees. Scalar
     factors (degree 0) contribute nothing to the running sign, so
     symbolic-degree factors only cause trouble when they actually
     precede a splitting point.
     """
     factors: Tuple[Expr, ...] = prod.children
     if not factors:
-        # Empty product — D(1) = 0. Shouldn't normally arise but
+        # Empty product, D(1) = 0. Shouldn't normally arise but
         # handle defensively; Sum.make([]) returns Zero.
         return Integer(0)
 

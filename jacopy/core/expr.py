@@ -1,5 +1,5 @@
 """
-Expression tree — the foundation of jacopy.
+Expression tree, the foundation of jacopy.
 
 Every symbolic object in the package lives in this tree. Nodes are
 immutable; operators (`+`, `-`, `*`, `**`) build new trees.
@@ -7,7 +7,7 @@ immutable; operators (`+`, `-`, `*`, `**`) build new trees.
 This module deliberately stays minimal: structural representation,
 equality, hashing, traversal, and a few trivial normalisations (drop
 zeros in sums, drop ones in products, collapse zero-factor products).
-Non-trivial rewriting — Koszul signs, Leibniz rule, bracket expansion —
+Non-trivial rewriting, Koszul signs, Leibniz rule, bracket expansion,
 lives in `jacopy.algorithms` and later layers.
 """
 
@@ -92,7 +92,7 @@ class Expr(ABC):
     def replace_at(self, path: Tuple[int, ...], new: "Expr") -> "Expr":
         """Return a new tree with ``new`` spliced at ``path``.
 
-        ``path`` is a tuple of child indices — ``(1, 0)`` means "the
+        ``path`` is a tuple of child indices, ``(1, 0)`` means "the
         first child of the second child". An empty path replaces the
         root. Rebuilding uses the raw constructor (no smart-ctor
         flattening), so the surrounding shape is preserved exactly.
@@ -193,7 +193,7 @@ class Expr(ABC):
 def _wrap(value: object) -> "Expr":
     """Coerce a Python number into an :class:`Expr`.
 
-    ``bool`` is rejected deliberately — ``True + Symbol("x")`` almost
+    ``bool`` is rejected deliberately, ``True + Symbol("x")`` almost
     always reflects a bug, not a genuine arithmetic operation.
     """
     if isinstance(value, Expr):
@@ -342,7 +342,7 @@ class Neg(Expr):
     """Unary negation ``-x``.
 
     Kept as a first-class node rather than ``-1 * x`` so that the sign
-    is easy to pattern-match against later — many rewrite rules and
+    is easy to pattern-match against later, many rewrite rules and
     proof-display routines care about whether a term is negated.
     """
 
@@ -392,7 +392,7 @@ class Sum(Expr):
 
         Flattens nested sums (associativity), drops integer zeros, and
         collapses trivial cases (no terms -> ``0``; one term -> that
-        term). No commutative reordering or like-term collection — that
+        term). No commutative reordering or like-term collection, that
         belongs to the algorithms layer.
         """
         flat: list[Expr] = []

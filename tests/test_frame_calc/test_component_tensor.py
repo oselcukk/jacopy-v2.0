@@ -29,7 +29,7 @@ def polar() -> tuple[CoordinateFrame, sp.Matrix]:
 
 @pytest.fixture
 def schwarzschild_2d() -> tuple[CoordinateFrame, sp.Matrix]:
-    """A 2D slice of Schwarzschild — for non-trivial inversion tests."""
+    """A 2D slice of Schwarzschild, for non-trivial inversion tests."""
     t, r = sp.symbols("t r", positive=True)
     M = sp.Symbol("M", positive=True)
     F = CoordinateFrame([t, r])
@@ -215,7 +215,7 @@ class TestComponentMetric:
 
     def test_abstract_frame_inverse_returns_opaque(self) -> None:
         """AbstractFrame inverse returns a ComponentMetricInverse with
-        opaque InverseMetricEntryExpr atoms — the symbolic g^{ab}.
+        opaque InverseMetricEntryExpr atoms, the symbolic g^{ab}.
         """
         from jacopy.frame_calc.symbolic_atoms import InverseMetricEntryExpr
 
@@ -231,7 +231,7 @@ class TestComponentMetric:
         assert m_inv[0, 0] != m2.inverse()[0, 0]
 
     def test_abstract_frame_det_raises(self) -> None:
-        """det on AbstractFrame remains deferred — would need its own
+        """det on AbstractFrame remains deferred, would need its own
         opaque-atom design (no polymorphic determinant on jacopy Expr)."""
         F = AbstractFrame(dim=2)
         m = ComponentMetric(F, sp.eye(2))
@@ -356,7 +356,7 @@ class TestContraction:
     """Stage-C addition: ComponentTensor.contract(upper, lower)."""
 
     def test_trace_of_2d_identity_returns_dim(self) -> None:
-        """δ^a_a = dim — trace of identity (1,1) tensor."""
+        """δ^a_a = dim, trace of identity (1,1) tensor."""
         t, r = sp.symbols("t r")
         F = CoordinateFrame([t, r])
         delta = sp.MutableDenseNDimArray.zeros(2, 2)

@@ -277,7 +277,7 @@ class TestRebuildHook:
     def test_prove_jacobi_sn_derived_surfaces_diagnostic(self, reg):
         """Regression: ``prove_jacobi`` on ``DerivedBracket(sn, π, …)``
         used to crash inside flatten. It now surfaces the honest
-        mathematical diagnostic — the obstruction needs the Poisson
+        mathematical diagnostic, the obstruction needs the Poisson
         hypothesis ``[π, π]_SN = 0`` which the generic dispatcher cannot
         assume."""
         from jacopy.brackets.derived import DerivedBracket

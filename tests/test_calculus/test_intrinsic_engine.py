@@ -148,14 +148,14 @@ class TestRecognizerNonMatch:
 
     def test_act_with_non_intrinsic_op_returns_none(self):
         # Act(SomeDerivation, ω) with a plain Derivation op (not ι/L/d)
-        # — the recognizer should walk away cleanly.
+        #, the recognizer should walk away cleanly.
         omega = Symbol("ω")
         X = Derivation("X", 0)
         rec = IntrinsicFormulaRecognizer()
         assert rec.recognize(multi_eval(Act(X, omega), X)) is None
 
     def test_nested_intrinsic_only_matches_outer(self):
-        # MultiEval(Act(L_X, Act(ι_Y, ω)), Z) — outer head is L_X.
+        # MultiEval(Act(L_X, Act(ι_Y, ω)), Z), outer head is L_X.
         # The recognizer reports L_X with omega = Act(ι_Y, ω); it does
         # NOT unwrap further. Re-recognition on the inner is the
         # caller's job.
@@ -286,7 +286,7 @@ class TestProveEquivalenceCartanRelations:
 
 class TestProveEquivalenceFailure:
     def test_open_d_squared_raises(self):
-        # d² = 0 on a 1-form, evaluated on (X, Y, Z) — does NOT close
+        # d² = 0 on a 1-form, evaluated on (X, Y, Z), does NOT close
         # without 12.A.6 axioms; prove_intrinsic_equivalence should
         # raise ProofFailure with the residue in the message.
         omega = Symbol("ω")
@@ -312,7 +312,7 @@ class TestProveEquivalenceFailure:
 class TestProveEquivalenceCustomEngine:
     def test_passing_engine_overrides_default(self):
         # If a caller passes a stripped-down engine (only the iota rule),
-        # Cartan magic won't close — confirms the engine kwarg is honoured.
+        # Cartan magic won't close, confirms the engine kwarg is honoured.
         from jacopy.calculus.intrinsic_axioms import (
             InteriorProductIntrinsicDefinition,
         )

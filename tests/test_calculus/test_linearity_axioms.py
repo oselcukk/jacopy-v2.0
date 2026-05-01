@@ -37,7 +37,7 @@ class TestLieDerivativeArgLinearity:
     def test_no_match_non_lie(self):
         a, b = Symbol("a"), Symbol("b")
         rule = LieDerivativeArgLinearityDefinition()
-        # Act with non-LieDerivative operator — shouldn't fire.
+        # Act with non-LieDerivative operator, shouldn't fire.
         assert not rule.matches(Act(default_d, Sum(a, b)))
 
     def test_distributes_over_sum(self):
@@ -89,7 +89,7 @@ class TestExteriorDerivativeLinearity:
         X = Symbol("X")
         a, b = Symbol("a"), Symbol("b")
         rule = ExteriorDerivativeLinearityDefinition()
-        # Lie derivative of a Sum — different operator, shouldn't fire.
+        # Lie derivative of a Sum, different operator, shouldn't fire.
         assert not rule.matches(Act(lie_derivative(X), Sum(a, b)))
 
     def test_distributes_over_sum(self):
@@ -133,7 +133,7 @@ class TestLinearityAxiomsEngine:
         )
 
     def test_engine_combined_distributes_through_compound(self):
-        # d(L_X(a + b)) — d's arg is a Lie act, but the inner Sum is
+        # d(L_X(a + b)), d's arg is a Lie act, but the inner Sum is
         # what triggers distribution. After the Lie-arg rule fires, d
         # ends up over a Sum and its own rule fires.
         X = Symbol("X")

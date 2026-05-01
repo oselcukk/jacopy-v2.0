@@ -1,16 +1,16 @@
 r"""
 Engine rules for :class:`~jacopy.core.multi_eval.MultiEval`.
 
-Three structural rewrite rules — together they make a ``MultiEval``
+Three structural rewrite rules, together they make a ``MultiEval``
 node behave the way a textbook ``ω(Y_1, …, Y_p)`` does:
 
-* :class:`MultiEvalRepeatArgZeroDefinition` — alternating evaluation
+* :class:`MultiEvalRepeatArgZeroDefinition`, alternating evaluation
   with two equal arguments collapses to ``0``.
-* :class:`MultiEvalArgLinearityDefinition` — distributes
+* :class:`MultiEvalArgLinearityDefinition`, distributes
   :class:`~jacopy.core.expr.Sum` and
   :class:`~jacopy.core.expr.Neg` in any argument slot, producing the
   expected "expand-the-second-arg" rewrite step.
-* :class:`MultiEvalHeadLinearityDefinition` — distributes the same
+* :class:`MultiEvalHeadLinearityDefinition`, distributes the same
   Sum / Neg pattern in the *head* slot, so
   ``MultiEval(α + β, X)`` opens to ``MultiEval(α, X) + MultiEval(β, X)``.
 
@@ -45,7 +45,7 @@ def _distribute_in_slot(
     """Distribute a ``Sum``/``Neg`` sitting at ``slot_index``.
 
     ``target`` selects whether the slot is the head (index ``-1``
-    semantically — but represented by ``"head"``) or one of the args
+    semantically, but represented by ``"head"``) or one of the args
     (``"arg"``). The two cases are structurally identical apart from
     which child gets the distributing children copied over.
     """
@@ -115,7 +115,7 @@ class MultiEvalRepeatArgZeroDefinition(Definition):
 
 
 class MultiEvalZeroHeadDefinition(Definition):
-    """``0(X_1, …, X_p) → 0`` — multilinear evaluation of the zero head.
+    """``0(X_1, …, X_p) → 0``, multilinear evaluation of the zero head.
 
     Universal multilinearity collapses ``MultiEval(Integer(0), …)`` to
     ``Integer(0)`` regardless of ``alternating`` flag or slot kind. Lets
@@ -194,15 +194,15 @@ class MultiEvalAlternatingNormalDefinition(Definition):
     ``repr``-order, performs a *single* adjacent transposition on the
     leftmost out-of-order pair and wraps the result in a
     :class:`~jacopy.core.expr.Neg` so the antisymmetry sign is tracked
-    explicitly. Engine iteration drives this to fix-point — bubble sort
-    in disguise — at which point the arg tuple is sorted and the
+    explicitly. Engine iteration drives this to fix-point, bubble sort
+    in disguise, at which point the arg tuple is sorted and the
     cumulative sign sits as a stack of nested ``Neg`` wrappers. A
     subsequent :func:`~jacopy.algorithms.simplify.simplify` pass
     collapses the ``Neg`` cascade into a single global ``±``.
 
     Why this matters: Cartan identities like
     ``(ι_X d + d ι_X)(ω) = L_X(ω)`` only close *modulo alternation* on
-    a ``p ≥ 2`` form — the intrinsic Koszul / Cartan rewrites produce
+    a ``p ≥ 2`` form, the intrinsic Koszul / Cartan rewrites produce
     residuals like ``ω([X, Z]_VF, Y) + ω(Y, [X, Z]_VF)`` that vanish
     only after recognizing the swap-symmetry. This rule supplies that
     recognition as a sequence of one-swap engine steps, keeping the

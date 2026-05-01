@@ -32,7 +32,7 @@ class TestCommutatorRecognizer:
 
     def test_rejects_sum_of_commutators(self):
         # A Sum containing a Commutator still isn't a Commutator at the
-        # top level — the recognizer only inspects the root node.
+        # top level, the recognizer only inspects the root node.
         A, B = Symbol("A"), Symbol("B")
         expr = Sum(Commutator(A, B), Commutator(B, A))
         assert CommutatorRecognizer().recognize(expr) is None

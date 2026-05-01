@@ -17,7 +17,7 @@ Compared to :class:`~jacopy.brackets.dorfman.DorfmanBracket`:
   them assemble the correction by hand.
 
 Courant's graded Jacobi is *conditional*. In the plain case it holds
-exactly — the "Courant algebroid Jacobi" is the identity on
+exactly, the "Courant algebroid Jacobi" is the identity on
 ``(TM ⊕ T*M, [·,·]_C)``. In the H-twisted variant (pass
 ``background_H=H`` to the constructor) the form part gains a
 contraction correction ``ι_Y ι_X H``, and Jacobi now holds iff ``H``
@@ -29,7 +29,7 @@ Implementation mirrors :class:`DorfmanBracket`: operands are
 half is routed through a caller-supplied vector bracket (default Lie),
 and the form half is assembled from the standard Cartan operators
 (``d``, ``L``, ``ι``). The ``background_H`` kwarg is optional and
-defaults to ``None`` — when absent, the bracket is the plain Courant
+defaults to ``None``, when absent, the bracket is the plain Courant
 bracket with unconditional (exact) Jacobi behaviour in the sense of a
 Courant algebroid.
 """
@@ -77,7 +77,7 @@ class CourantBracket(GradedBracket):
     -----
     * Degree 0; graded-antisymmetric; Leibniz fails (the Courant
       side of the Dorfman/Courant dichotomy). Jacobi is reported as
-      ``None`` — "conditional" — because the H-twisted case needs
+      ``None``, "conditional", because the H-twisted case needs
       ``dH = 0`` and even the untwisted case is more cleanly
       expressed as "Courant algebroid Jacobi holds" at the proof
       layer rather than as an unconditional flag.
@@ -98,9 +98,9 @@ class CourantBracket(GradedBracket):
                 f"CourantBracket background_H must be an Expr, "
                 f"got {type(background_H).__name__}"
             )
-        # Courant is the skew twin of Dorfman — antisymmetric holds,
+        # Courant is the skew twin of Dorfman, antisymmetric holds,
         # Leibniz fails. Jacobi is tracked as conditional (None) so the
-        # proof layer is the one that discharges it — exactly against
+        # proof layer is the one that discharges it, exactly against
         # dH = 0 in the H-twisted case.
         super().__init__(
             name,
@@ -139,7 +139,7 @@ class CourantBracket(GradedBracket):
         b: Expr,
         registry: Optional[PropertyRegistry] = None,
     ) -> Expr:
-        """``[(X, α), (Y, β)]_C`` — classical (and H-twisted) Courant.
+        """``[(X, α), (Y, β)]_C``, classical (and H-twisted) Courant.
 
         Form part assembled as ``L_X β − L_Y α − ½ d(ι_X β − ι_Y α)``,
         plus ``ι_Y ι_X H`` when ``background_H`` is set. Raises
@@ -179,7 +179,7 @@ class CourantBracket(GradedBracket):
         ]
 
         if self._background_H is not None:
-            # H-twist: ``+ ι_Y ι_X H``. No sign on this term — the
+            # H-twist: ``+ ι_Y ι_X H``. No sign on this term, the
             # classical convention is that the twist is additive.
             form_terms.append(Act(iota_Y, Act(iota_X, self._background_H)))
 
@@ -195,7 +195,7 @@ class CourantBracket(GradedBracket):
         """Return the :class:`VanishingCondition` for Courant Jacobi.
 
         * **Untwisted** (``background_H is None``): the obstruction is
-          :class:`Zero`-valued — Courant algebroid Jacobi holds
+          :class:`Zero`-valued, Courant algebroid Jacobi holds
           unconditionally, and the condition is reported as vacuous.
         * **H-twisted**: the obstruction is ``dH``. Classical result:
           the H-twisted Courant bracket satisfies graded Jacobi iff

@@ -3,17 +3,17 @@
 This guide is mathematician-flavoured: how do you **seed a new
 Theorem**, **define a new bracket**, **add a new identity rule**,
 or **write a Problem wrapper**? The package's surface is a
-collection of those four things — every contribution lands in one
+collection of those four things, every contribution lands in one
 of them.
 
 Before writing, glance at:
 
 - The architectural design doc: [`plan.md`](plan.md) (long;
   intended for package authors, not users).
-- The most relevant tutorial — `library/symplectic.py` (smallest
+- The most relevant tutorial, `library/symplectic.py` (smallest
   wrapper) and `library/koszul_problem.py` (largest) are the
   reference templates for non-trivial library modules.
-- The existing pattern for whatever you're adding — look at how
+- The existing pattern for whatever you're adding, look at how
   `poisson_jacobi` is seeded if you're adding a Theorem,
   `KoszulBracket` if you're adding a bracket subclass, etc.
 
@@ -39,7 +39,7 @@ def _build_my_theorem() -> Theorem:
     """Construct the canonical `my_theorem` record."""
     # 1. Build the operands you'll prove the identity on.
     #    Use generic Symbols + Graded(degree=...) on a fresh
-    #    PropertyRegistry — the operands are display witnesses.
+    #    PropertyRegistry, the operands are display witnesses.
     reg = PropertyRegistry()
     pi = Symbol("π"); reg.declare(pi, Graded(degree=1))
     # ... your operands ...
@@ -62,7 +62,7 @@ def _build_my_theorem() -> Theorem:
     )
 
 
-# Module-level seeding — runs at import time.
+# Module-level seeding, runs at import time.
 THEOREM_MY_THEOREM = _build_my_theorem()
 if "my_theorem" not in theorem_book:
     theorem_book.add(THEOREM_MY_THEOREM)
@@ -72,10 +72,10 @@ if "my_theorem" not in theorem_book:
 
 - **`from_axioms` is the contract.** It declares the atomic
   hypotheses your proof depends on. The package does not
-  cross-validate this against the chain — accuracy is on you. Be
+  cross-validate this against the chain, accuracy is on you. Be
   honest: a downstream paper citation will quote what you wrote.
 - **The chain is generic.** Build it on fixed symbolic witnesses
-  (`f, g, h` for functions, `α, β` for forms, etc.) — downstream
+  (`f, g, h` for functions, `α, β` for forms, etc.), downstream
   callers produce their own chain on their concrete operands by
   calling the same `prove_*` method that produced your seed.
 - **Idempotent registration.** Wrap the `theorem_book.add` call
@@ -86,7 +86,7 @@ The eight currently seeded theorems
 (`poisson_jacobi`, `poisson_koszul_equivalence`,
 `poisson_koszul_jacobi`, `lie_algebroid_anchor_compat`,
 `courant_jacobi_twist`, `courant_dorfman_bridge`,
-`dirac_isotropy`, `dirac_involutivity`) are the references —
+`dirac_isotropy`, `dirac_involutivity`) are the references,
 each follows this template.
 
 ---
@@ -95,7 +95,7 @@ each follows this template.
 
 There are two paths, depending on how much structure you need.
 
-### Quick path — `CustomBracket`
+### Quick path, `CustomBracket`
 
 For a one-off rule (test, exploration, paper draft), wrap an
 expand callable directly. Tutorial 06 covers this end-to-end.
@@ -117,7 +117,7 @@ B = CustomBracket(
 )
 ```
 
-### Subclass path — `GradedBracket`
+### Subclass path, `GradedBracket`
 
 For a bracket with structural identity (a shared anchor, a
 seeded theorem, custom obstruction hooks, registry-aware
@@ -128,11 +128,11 @@ from jacopy.brackets.base import GradedBracket
 from jacopy.core.expr import Expr
 
 class MyBracket(GradedBracket):
-    """`[·,·]_M` — your bracket's display name + structural identity."""
+    """`[·,·]_M`, your bracket's display name + structural identity."""
 
     is_graded_antisymmetric = True
     satisfies_leibniz       = True
-    satisfies_graded_jacobi = None      # conditional — picks DerivedBracketStrategy
+    satisfies_graded_jacobi = None      # conditional, picks DerivedBracketStrategy
 
     def __init__(self, anchor: Expr, *, name: str = "[·,·]_M"):
         super().__init__(name=name, degree=0)
@@ -149,7 +149,7 @@ class MyBracket(GradedBracket):
 ```
 
 The `KoszulBracket`, `CourantBracket`, `SchoutenBracket`, and
-`DerivedBracket` classes are the reference subclasses — read
+`DerivedBracket` classes are the reference subclasses, read
 `brackets/koszul.py` for the smallest non-trivial example.
 
 **When to graduate from `CustomBracket` to a subclass:**
@@ -171,14 +171,14 @@ declares a `matches(expr)` predicate and a `rewrite(expr)` rule;
 optionally a `theorem_proof_builder()` for foundational mode.
 Tutorial 09 walks the axiom-vs-theorem split end-to-end.
 
-### Axiom-class rule — single rewrite, no sub-proof
+### Axiom-class rule, single rewrite, no sub-proof
 
 ```python
 from jacopy.proof.expansion import Definition
 from jacopy.core.expr import Expr, Integer
 
 class MyAxiomDefinition(Definition):
-    """`some_pattern → 0` — the rewrite this axiom enacts."""
+    """`some_pattern → 0`, the rewrite this axiom enacts."""
 
     name = "my axiom: some_pattern → 0"
 
@@ -189,7 +189,7 @@ class MyAxiomDefinition(Definition):
         return Integer(0)                         # canonical replacement
 ```
 
-### Registry-aware rule — fires only when a flag is declared
+### Registry-aware rule, fires only when a flag is declared
 
 ```python
 from jacopy.core.properties import Closed
@@ -207,16 +207,16 @@ class MyClosedRule(Definition):
         if not isinstance(expr, ...):
             return False
         if self._registry is None:
-            return False        # safety hatch — no-op without a registry
+            return False        # safety hatch, no-op without a registry
         return self._registry.has(expr.target_form, Closed)
 ```
 
-`registry=None` as a no-op is the package convention — see
+`registry=None` as a no-op is the package convention, see
 `ClosedFormDefinition`, `NonDegenerateInteriorEqualityDefinition`,
 `RegistryAntiSymCanonicalDefinition` in `calculus/*_axioms.py`
 for the reference.
 
-### Theorem-class rule — attaches a sub-proof in foundational mode
+### Theorem-class rule, attaches a sub-proof in foundational mode
 
 ```python
 from jacopy.proof.chain import ProofChain
@@ -254,7 +254,7 @@ template.
 - **Library-specific** (only fires inside a particular Problem
   wrapper): keep it next to the wrapper in `jacopy/library/`.
 
-The line is fuzzy — when in doubt, follow the closest existing
+The line is fuzzy, when in doubt, follow the closest existing
 rule. `calculus/closed_axioms.py` is the smallest reference for
 a registry-aware rule; `library/cartan_structure.py` is the
 reference for "this rule only makes sense inside this wrapper".
@@ -264,13 +264,13 @@ reference for "this rule only makes sense inside this wrapper".
 ## 4. Write a Problem wrapper
 
 The five-step recipe is in **[Tutorial 24](docs/tutorials/24_custom_problem_wrapper.md)**
-— it walks an `AlmostSymplecticProblem` example end-to-end. The
+, it walks an `AlmostSymplecticProblem` example end-to-end. The
 short version:
 
 1. Pick the geometric data the wrapper carries.
-2. Auto-declare structural axioms on the registry — guarded with
+2. Auto-declare structural axioms on the registry, guarded with
    `registry.has(...)` to honour pre-declared flags.
-3. Assemble the engine — layer your rules onto
+3. Assemble the engine, layer your rules onto
    `default_engine(registry=reg)`.
 4. Write builder + prover methods that match the textbook idiom.
 5. (Optional) Register seeded `Theorem`s for one-step citations.
@@ -278,7 +278,7 @@ short version:
 The reference templates by size:
 `library/symplectic.py` (~200 lines, smallest non-trivial),
 `library/courant_algebroid.py` (mid-size, with seeded theorems),
-`library/koszul_problem.py` (~1100 lines, the largest — has
+`library/koszul_problem.py` (~1100 lines, the largest, has
 multi-engine, `canonicalize_indices` pre-pass, three derivator
 modes).
 
@@ -288,9 +288,9 @@ modes).
 
 The package uses pytest. Two suites you'll touch:
 
-- `tests/` — ~2700 unit tests. Add tests for any new
+- `tests/`, ~2700 unit tests. Add tests for any new
   bracket / Definition / wrapper.
-- `tests/test_docs/test_notebooks.py` — 24 notebook smoke tests.
+- `tests/test_docs/test_notebooks.py`, 24 notebook smoke tests.
   If you add a tutorial, register its `TUTORIAL_NN` cell list in
   `docs/tutorials/_build_notebooks.py` and the test will pick it
   up automatically on the next regeneration.
@@ -328,7 +328,7 @@ pytest tests/test_docs/test_notebooks.py -q   # 24/24 in ~18s
 
 - New tutorial: paired `.md` + `TUTORIAL_NN` cell list in
   `_build_notebooks.py` + `build_all` registration. Keep both
-  in sync — mismatched markdown vs notebook cells is the most
+  in sync, mismatched markdown vs notebook cells is the most
   common drift.
 - New library module: a paragraph in `docs/tutorials/README.md`
   if it warrants its own tutorial; otherwise fold mention into
@@ -339,7 +339,7 @@ pytest tests/test_docs/test_notebooks.py -q   # 24/24 in ~18s
 ## Memory & repo state
 
 - Avoid committing `.aux`, `.log`, `.pdf` artefacts in
-  `examples/Question N/` directories — those are
+  `examples/Question N/` directories, those are
   build-by-product. The corresponding `.tex` is the source of
   truth.
 - Memory files in `~/.claude/projects/...` belong to the
@@ -351,6 +351,6 @@ pytest tests/test_docs/test_notebooks.py -q   # 24/24 in ~18s
 
 This is a research-grade package; there's no community channel
 yet. Open an issue with a minimal reproducer and the relevant
-`ProofFailure` text — most "the engine left a residue I can't
+`ProofFailure` text, most "the engine left a residue I can't
 explain" reports are diagnosable from the message text alone
 (see Tutorial 10).

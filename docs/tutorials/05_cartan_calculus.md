@@ -1,10 +1,10 @@
-# 05 — Cartan calculus
+# 05, Cartan calculus
 
 The arithmetic core of differential geometry reduces to five
 relations:
 
-1. `d² = 0` — the exterior derivative squares to zero
-2. `[d, ι_X] = L_X` — Cartan's magic formula
+1. `d² = 0`, the exterior derivative squares to zero
+2. `[d, ι_X] = L_X`, Cartan's magic formula
 3. `[d, L_X] = 0`
 4. `[L_X, L_Y] = L_{[X, Y]}`
 5. `[L_X, ι_Y] = ι_{[X, Y]}`
@@ -17,7 +17,7 @@ shows (a) how to read each relation as an *operator equation*,
 (efficient vs foundational), and (c) the `invariant-d` formula as
 a derived theorem.
 
-[04 — Lie algebroid](04_lie_algebroid.md) runs the same API with
+[04, Lie algebroid](04_lie_algebroid.md) runs the same API with
 bundle-tagged operators; the live verifications here are on
 ``TM``.
 
@@ -49,7 +49,7 @@ RELATIONS
 
 `cart.relation(name, X=..., Y=..., algebra=...)` returns the
 operator-level equation for each relation. Which arguments are
-required depends on the relation — `d²` needs none,
+required depends on the relation, `d²` needs none,
 `magic` / `d_lie` need a single `X`, `lie_lie` / `lie_iota` need
 both:
 
@@ -71,10 +71,10 @@ cart.relation("lie_lie", X=X, Y=Y, algebra=algebra)
 # ((L_X * L_Y) + (-(L_Y * L_X))) = L_([X, Y])
 ```
 
-## `d² = 0` — axiom mode vs theorem mode
+## `d² = 0`, axiom mode vs theorem mode
 
 The `d²` default-engine rewrite carries two classifications:
-`axiom` (default — emits the axiom directly) and `theorem`
+`axiom` (default, emits the axiom directly) and `theorem`
 (opens a generator-level sub-proof in foundational mode). Pick
 between them via `default_engine(..., d_squared_mode=...)`:
 
@@ -85,7 +85,7 @@ from jacopy.proof.expansion import default_engine
 x = Symbol("x")
 reg.declare(x, Graded(degree=0))
 
-# Plain axiom rewrite — calculation helper
+# Plain axiom rewrite, calculation helper
 apply_d_squared_zero(d(d(x)))       # 0
 
 # Theorem-mode expansion (foundational)
@@ -96,11 +96,11 @@ steps                               # [ProofStep(rule='d² = 0', d(d(x)) → 0)]
 ```
 
 In the `theorem` classification the sub-proof derives `d(df) = 0`
-on 0-form generators from generator-level facts — the standard
+on 0-form generators from generator-level facts, the standard
 `AgreementOnGenerators` strategy that lifts an operator identity
 ``d ∘ d = 0`` from agreement on generators.
 
-## All five relations — live proof via `verify`
+## All five relations, live proof via `verify`
 
 On the default `CartanCalculus` together with an `ExteriorAlgebra`
 on a single function generator, all five relations close under
@@ -118,7 +118,7 @@ chain_f = cart.verify(
     registry=reg,
     mode="foundational",
 )
-len(chain_f)              # 1 — UnrollToFoundations wraps it
+len(chain_f)              # 1, UnrollToFoundations wraps it
 
 # Three need X,Y; d_squared_zero is purely operator-level:
 cart.verify("d_squared_zero", algebra=algebra, registry=reg)
@@ -140,10 +140,10 @@ generator-level via `AgreementOnGenerators` + `ExpandAndSimplify`:
 the Lie bracket `[X, Y] = X*Y − Y*X` opens up, graded Leibniz
 distributes, and `d²=0` plus the definition `ι_V(df) = V(f)`
 collapse the residue. For the algebroid variant see
-[04_lie_algebroid.md](04_lie_algebroid.md) — over there `verify`'s
+[04_lie_algebroid.md](04_lie_algebroid.md), over there `verify`'s
 inability to fire on bundle-tagged operators is a known deferral.
 
-## `invariant_d` — magic + lie_iota → the `d` formula
+## `invariant_d`, magic + lie_iota → the `d` formula
 
 The classical Koszul-Cartan "invariant d" formula
 `dω(X, Y) = X(ω(Y)) − Y(ω(X)) − ω([X, Y])` is a *theorem*
@@ -163,22 +163,22 @@ invariant_d_one_form(omega, X, Y, bracket=lie)
 # (X(ι_Y(ω)) + (-Y(ι_X(ω))) + (-ι_((X * Y) + (-(Y * X)))(ω)))
 ```
 
-The formula is also exposed as a `Definition` —
-`InvariantDOneFormDefinition` — with default classification
+The formula is also exposed as a `Definition`,
+`InvariantDOneFormDefinition`, with default classification
 `"theorem"` (sub-proof citing magic + lie_iota). Note the
 exception: the default classification is `"axiom"` for `d²=0` but
 `"theorem"` here, because the formula naturally falls out of
 those two relations rather than serving as an axiomatic entry
 point.
 
-## Twisted Cartan bundle — `d_H = d + H∧`
+## Twisted Cartan bundle, `d_H = d + H∧`
 
 For a closed 3-form ``H`` the H-twisted exterior derivative
 ``d_H`` carries the Cartan calculus through the same five
 relations. `jacopy` exposes this as a `TwistedCartanBundle(H)`
 wrapper: the bundle builds ``d_H`` as a fresh
 `ExteriorDerivative` and rewires the Lie-derivative factory so
-that ``d_H`` slots into the bundle — a one-to-one twisted
+that ``d_H`` slots into the bundle, a one-to-one twisted
 counterpart to the algebroid bundle.
 
 ```python
@@ -187,7 +187,7 @@ from jacopy.library import TwistedCartanBundle
 H = Symbol("H")
 reg.declare(H, Graded(degree=3))
 bundle = TwistedCartanBundle(H)
-bundle.d             # d_H — fresh degree-+1 ExteriorDerivative
+bundle.d             # d_H, fresh degree-+1 ExteriorDerivative
 bundle.cartan        # CartanCalculus(d=d_H, L_{H,·}, ι_·, [·,·])
 
 algebra_H = ExteriorAlgebra((f,), d=bundle.d)
@@ -196,7 +196,7 @@ bundle.cartan.verify_all(algebra=algebra_H, X=X, Y=Y, registry=reg)
 #  'd_lie': ProofChain, 'lie_lie': ProofChain, 'lie_iota': ProofChain}
 ```
 
-The package treats ``d_H`` as a formal degree-+1 derivative — the
+The package treats ``d_H`` as a formal degree-+1 derivative, the
 ``d + H∧`` decomposition is not unfolded inside the engine.
 Constructing a `TwistedCartanBundle` is making the assumption
 ``dH = 0``: closure of ``d_H² = 0`` rests on it. For the twisted
@@ -205,7 +205,7 @@ Courant bracket (the `background_H` kwarg) see
 
 ## Next step
 
-Writing your own bracket and running the Jacobi test on it —
+Writing your own bracket and running the Jacobi test on it,
 `CustomBracket`, the flags, and the interaction with
 `prove_jacobi`: [06_custom_bracket.md](06_custom_bracket.md)
 (Stage C).

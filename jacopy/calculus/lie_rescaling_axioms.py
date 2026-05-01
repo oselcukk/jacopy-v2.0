@@ -1,5 +1,5 @@
 r"""
-Lie-derivative rescaling axiom — Faz 12.B #10.
+Lie-derivative rescaling axiom, Faz 12.B #10.
 
 Engine rewrite that turns the action of a Lie derivative whose vector
 field is itself a scaled product into the canonical Cartan-style
@@ -23,7 +23,7 @@ The rewrite carries the original Lie derivative's bundle hooks
 (:attr:`LieDerivative.d`, :attr:`LieDerivative.iota_factory`,
 :attr:`LieDerivative.definition`) into both the rebuilt ``L_X`` and
 the freshly-built ``ι_X`` and ``d``, so an algebroid ``L_{E,fX}``
-expands to ``f·L_{E,X}(ω) + d_E(f)∧ι_{E,X}(ω)`` — the bundle never
+expands to ``f·L_{E,X}(ω) + d_E(f)∧ι_{E,X}(ω)``, the bundle never
 leaks back to the ambient ``TM``.
 """
 
@@ -38,7 +38,7 @@ from jacopy.proof.expansion import Definition
 
 
 class LieRescalingDefinition(Definition):
-    r"""``L_{f·X}(ω) → f·L_X(ω) + df∧ι_X(ω)`` — Lie-derivative rescaling.
+    r"""``L_{f·X}(ω) → f·L_X(ω) + df∧ι_X(ω)``, Lie-derivative rescaling.
 
     Fires on ``Act(LieDerivative, ω)`` when the underlying vector
     field is a :class:`Product` of two or more factors. The leading
@@ -47,7 +47,7 @@ class LieRescalingDefinition(Definition):
     expansion. Bundle hooks (``d`` override and ``iota_factory``) ride
     along so an algebroid Lie derivative stays inside its bundle.
 
-    For arity 1 the rule does nothing — that case is just plain
+    For arity 1 the rule does nothing, that case is just plain
     ``L_X(ω)`` and the existing intrinsic / Cartan-magic rules cover
     it.
     """

@@ -11,7 +11,7 @@ At the symbolic level ``ρ`` is just a named linear operator that
 applies to an operand via :class:`Act` and carries no graded-Leibniz
 rule: its degree is ``0`` so the Koszul signs in :mod:`product_rule`
 vanish anyway, but more importantly it is not a derivation on its
-own algebra — it is a *morphism* between two different algebras.
+own algebra, it is a *morphism* between two different algebras.
 That is why it lives here rather than as a subclass of a bracket
 operator.
 
@@ -37,7 +37,7 @@ from jacopy.core.registry import PropertyRegistry
 
 
 class Anchor(Derivation):
-    """Anchor morphism ``ρ: E → TM`` — a named degree-0 linear operator.
+    """Anchor morphism ``ρ: E → TM``, a named degree-0 linear operator.
 
     Structurally a :class:`Derivation` of degree 0, which buys us the
     existing ``Act`` application machinery and degree-aware Leibniz
@@ -49,7 +49,7 @@ class Anchor(Derivation):
 
     The constructor accepts an optional ``name`` (defaults to
     ``"ρ"``) and does not require any declaration of the source /
-    target algebras at this layer — those live in higher-level
+    target algebras at this layer, those live in higher-level
     algebroid objects and only matter when compatibility is being
     proved.
     """
@@ -67,7 +67,7 @@ class AnchoredVectorField(Derivation):
         ρ(σ)(f)  ∈  C∞(M).
 
     Wrapping ``(ρ, σ)`` as a single degree-0 derivation lets it sit
-    naturally in the operator slot of :class:`Act` — i.e. ``Act(ρ(σ), f)``
+    naturally in the operator slot of :class:`Act`, i.e. ``Act(ρ(σ), f)``
     represents the directional derivative of ``f`` along ``ρ(σ)``. The
     section ``σ`` is held in a private slot rather than as a child so
     that the engine's bottom-up walk does not accidentally peer inside

@@ -3,7 +3,7 @@ Shared algorithm interface.
 
 An *algorithm* in jacopy is a single rewriting step: a flatten pass, a
 distribute pass, a sort-product pass, a collect-terms pass. Each lives
-in its own module and exposes a free function — the free function is
+in its own module and exposes a free function, the free function is
 what callers actually use. This module gives those algorithms a
 shared :class:`Algorithm` facade and a :class:`StepResult` value type
 so proof-level machinery (Faz 7+) can record what each pass did.
@@ -28,7 +28,7 @@ class StepResult:
 
     ``changed`` is computed against structural equality. A pass that
     rebuilds the tree but lands on an equal expression reports
-    ``changed=False`` — the fix-point driver uses this to know when to
+    ``changed=False``, the fix-point driver uses this to know when to
     stop.
     """
 

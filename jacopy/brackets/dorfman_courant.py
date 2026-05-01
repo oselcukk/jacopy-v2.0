@@ -1,5 +1,5 @@
 """
-Dorfman-Courant bridge — pedagogical helper.
+Dorfman-Courant bridge, pedagogical helper.
 
 The Dorfman bracket :math:`[\\cdot,\\cdot]_D` and the (untwisted) Courant
 bracket :math:`[\\cdot,\\cdot]_C` agree on the vector half and differ on
@@ -7,7 +7,7 @@ the form half by an exact, *symmetric* correction:
 
     [(X, α), (Y, β)]_D − [(X, α), (Y, β)]_C  =  ( 0,  ½ d(ι_X β + ι_Y α) ).
 
-Equivalently — and this is the form most useful for the proof layer —
+Equivalently, and this is the form most useful for the proof layer,
 the Dorfman form part ``L_X β − ι_Y dα`` minus the Courant form part
 ``L_X β − L_Y α − ½ d(ι_X β − ι_Y α)`` collapses to ``½ d(ι_X β + ι_Y α)``
 once Cartan's magic formula ``L_Y α = ι_Y dα + d(ι_Y α)`` is applied.
@@ -21,10 +21,10 @@ discussing the relationship between the two brackets.
 Public surface
 --------------
 
-* :func:`dorfman_courant_correction` — build the canonical correction
+* :func:`dorfman_courant_correction`, build the canonical correction
   :class:`SectionPair` ``(0, ½ d(ι_X β + ι_Y α))`` for a given pair of
   operands.
-* :func:`prove_dorfman_courant_bridge` — prove
+* :func:`prove_dorfman_courant_bridge`, prove
   ``D.expand(a, b) − C.expand(a, b) == correction`` componentwise and
   return a single concatenated :class:`ProofChain`.
 
@@ -62,7 +62,7 @@ def dorfman_courant_correction(
     component is :data:`Zero` (both brackets agree on the vector half);
     form component is the symmetric exact term ``½ d(ι_X β + ι_Y α)``.
 
-    ``d`` and ``interior`` default to the smooth-manifold singletons —
+    ``d`` and ``interior`` default to the smooth-manifold singletons,
     pass overrides when working in a Lie-algebroid bundle whose Cartan
     operators differ from the default.
     """
@@ -124,7 +124,7 @@ def prove_dorfman_courant_bridge(
     if C.is_twisted:
         raise TypeError(
             "prove_dorfman_courant_bridge requires an untwisted CourantBracket "
-            "— the H-twisted variant carries a ι_Y ι_X H term that the "
+            ", the H-twisted variant carries a ι_Y ι_X H term that the "
             "canonical correction does not absorb"
         )
     if not isinstance(a, SectionPair):

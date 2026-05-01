@@ -19,7 +19,7 @@ class TestSubs:
         LC = levi_civita(g)
         M = sp.Symbol("M", positive=True)
         LC_at_M1 = LC.subs(M, 1)
-        # Γ^t_{tr} = M / (r²(1-2M/r)) — at M=1: 1/(r²(1-2/r)) = 1/(r²-2r)
+        # Γ^t_{tr} = M / (r²(1-2M/r)), at M=1: 1/(r²(1-2/r)) = 1/(r²-2r)
         r = sp.Symbol("r", positive=True)
         expected = 1 / (r ** 2 - 2 * r)
         assert sp.simplify(LC_at_M1[0, 0, 1] - expected) == 0

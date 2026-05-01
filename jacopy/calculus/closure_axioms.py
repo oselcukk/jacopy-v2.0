@@ -1,11 +1,11 @@
 r"""
-Closure axioms — Faz 12.A.6.
+Closure axioms, Faz 12.A.6.
 
 Two engine-level rewrite rules that close the three Cartan relations
 that 12.A.4's intrinsic + canonicalize pipeline left open on a 1- or
 2-form (``[d, L_X] = 0``, ``d² = 0``, ``[L_X, L_Y] = L_{[X,Y]_VF}``):
 
-* :class:`VfActCommutatorDefinition` — the *generic* version of
+* :class:`VfActCommutatorDefinition`, the *generic* version of
   Faz 13.C's :class:`~jacopy.calculus.vf_axioms.OpCommutatorVfDefinition`.
   Whereas the latter fires only on
   ``Act(L_X, Act(L_Y, ω)) − Act(L_Y, Act(L_X, ω))``, this rule fires
@@ -17,7 +17,7 @@ that 12.A.4's intrinsic + canonicalize pipeline left open on a 1- or
   Lie-derivative-on-form level. The L-specific rule no longer
   matches; this generic rule does.
 
-* :class:`LieBracketVfJacobiDefinition` — Sum-level cyclic-triple
+* :class:`LieBracketVfJacobiDefinition`, Sum-level cyclic-triple
   finder for the unwrapped Lie-bracket Jacobi identity, recognising
   any of the algebraically-equivalent forms (cyclic
   ``[X,[Y,Z]] + [Y,[Z,X]] + [Z,[X,Y]] = 0``, the Leibniz form
@@ -27,7 +27,7 @@ that 12.A.4's intrinsic + canonicalize pipeline left open on a 1- or
   permutations of ``(X, Y, Z)`` are recognised regardless of which
   algebraic form they happen to occupy in the Sum.
 
-Both rules need ``product_rule`` to have run first — the residual
+Both rules need ``product_rule`` to have run first, the residual
 commutator pairs only surface as bare ``Act(X, Act(Y, f))`` once Act
 has been distributed through Sum / Neg layers.
 :func:`jacopy.calculus.intrinsic_engine.intrinsic_engine_with_closure`
@@ -107,8 +107,8 @@ def _is_plain_vf(op: Expr) -> bool:
     The three Cartan operators (``L_X``, ``ι_X``, ``d``) have their
     own intrinsic axioms; the closure pass deliberately doesn't try
     to combine them via VF-commutator. Anything else with degree-0
-    :class:`Derivation` typing — a plain vector field or a
-    :class:`LieBracketVF` atom — is a valid commutator participant.
+    :class:`Derivation` typing, a plain vector field or a
+    :class:`LieBracketVF` atom, is a valid commutator participant.
 
     Anchor-image extension: ``Act(Sharp(π), α)`` is also accepted as
     a plain VF. A ``Sharp(π)`` is a degree-``+1`` derivation that
@@ -118,7 +118,7 @@ def _is_plain_vf(op: Expr) -> bool:
     Recognising it here lets
     :class:`VfActCommutatorDefinition` fold residues like
     ``π^♯(α)(π^♯(η)(f)) − π^♯(η)(π^♯(α)(f))`` into
-    ``[π^♯(α), π^♯(η)]_VF(f)`` — the bridge that
+    ``[π^♯(α), π^♯(η)]_VF(f)``, the bridge that
     :class:`~jacopy.calculus.tilde.closure_axioms.AnchorLieHomomorphismDefinition`
     then converts to ``π^♯([α, η]_K)(f)``.
     """
@@ -224,7 +224,7 @@ class VfActCommutatorDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# Bare ι_X(ω) used as a scalar — bridge to MultiEval                     #
+# Bare ι_X(ω) used as a scalar, bridge to MultiEval                     #
 # --------------------------------------------------------------------- #
 
 
@@ -235,7 +235,7 @@ class IotaActAsScalarDefinition(Definition):
     (a :class:`Derivation` that is not one of the three Cartan
     operators). The outer ``Act(D, _)`` syntactically asserts that its
     argument is a 0-form scalar, which means ``ι_X(ω)`` must be a
-    0-form, which in turn forces ``ω`` to be a 1-form — so the
+    0-form, which in turn forces ``ω`` to be a 1-form, so the
     rewrite
 
     .. math::
@@ -249,15 +249,15 @@ class IotaActAsScalarDefinition(Definition):
     :class:`MultiEval`. The arity-1 branch of
     :class:`ExteriorDIntrinsicDefinition` (``(d f)(Y) = Y(f)``)
     produces residues like ``Act(Y, Act(ι_X, ω))`` where the inner
-    ``Act(ι_X, ω)`` is bare — no enclosing MultiEval — so the iota
+    ``Act(ι_X, ω)`` is bare, no enclosing MultiEval, so the iota
     rule can't reach it. Without this bridge the 1-form Cartan magic
     relation ``(d ι_X + ι_X d) ω = L_X ω``, evaluated at a single
     vector field ``Y``, leaves the residue ``Y(ι_X ω) − Y(ω(X))``.
 
     The guard ``_is_plain_vf(D)`` is essential: it excludes the cases
     ``Act(d, Act(ι_X, ω))``, ``Act(L_Y, Act(ι_X, ω))``,
-    ``Act(ι_Y, Act(ι_X, ω))`` — none of which treat their argument as
-    a scalar — so the rule never converts an honest operator
+    ``Act(ι_Y, Act(ι_X, ω))``, none of which treat their argument as
+    a scalar, so the rule never converts an honest operator
     composition into a malformed MultiEval. ``LieBracketVF`` is
     accepted (it acts as a vector field on scalars).
     """
@@ -299,7 +299,7 @@ class IotaActAsScalarDefinition(Definition):
 class LieBracketVfAntiSymmetryDefinition(Definition):
     r"""Sum-level cancellation: ``[X,Y]_VF(…) + [Y,X]_VF(…) → 0``.
 
-    :class:`LieBracketVF` is opaque — ``LieBracketVF(X, Y)`` and
+    :class:`LieBracketVF` is opaque, ``LieBracketVF(X, Y)`` and
     ``LieBracketVF(Y, X)`` are distinct atoms with no built-in
     anti-symmetry. After the closure pipeline distributes operators
     through the Cartan obstructions of ``d² = 0`` and ``[d, L_X] = 0``
@@ -313,7 +313,7 @@ class LieBracketVfAntiSymmetryDefinition(Definition):
     :func:`_extract_bracket_with_wrapper`) coincides and whose
     bracket payloads are ``LieBracketVF(X, Y)`` versus
     ``LieBracketVF(Y, X)`` with opposite outer Sum signs (one positive,
-    one negated, OR one positive in either order — anti-symmetry alone
+    one negated, OR one positive in either order, anti-symmetry alone
     means they always cancel regardless of how the outer signs sit).
     Both children are removed.
     """
@@ -338,7 +338,7 @@ class LieBracketVfAntiSymmetryDefinition(Definition):
         """Find two children whose bracket payloads are ``[X,Y]`` and ``[Y,X]``.
 
         Wrapper structures must match (so ``ω(X, [Y,Z]) + ω(W, [Z,Y])``
-        won't trigger — different positions). Outer signs must have
+        won't trigger, different positions). Outer signs must have
         opposite parity so the pair sums to zero rather than ``2[X,Y]``.
         """
         children = sum_expr.children
@@ -391,7 +391,7 @@ def _peel_lie_bracket_jacobi(
 
     P, Q = bracket.X, bracket.Y
 
-    # Form 1: bracket reads [P, [Q.X, Q.Y]] — already in [A, [B, C]] shape.
+    # Form 1: bracket reads [P, [Q.X, Q.Y]], already in [A, [B, C]] shape.
     inner_right_variants: list[Tuple[int, Expr, Expr, Expr]] = []
     if isinstance(Q, LieBracketVF):
         A, B, C = P, Q.X, Q.Y
@@ -412,15 +412,15 @@ class LieBracketVfJacobiDefinition(Definition):
     r"""``[X,[Y,Z]_VF]_VF + [Y,[Z,X]_VF]_VF + [Z,[X,Y]_VF]_VF = 0`` (cyclic).
 
     Sum-level cyclic-triple finder. Looks for three children whose
-    underlying nested-bracket payload — possibly inside an arbitrary
-    structurally-shared single-arg wrapper — forms the Jacobi cyclic
+    underlying nested-bracket payload, possibly inside an arbitrary
+    structurally-shared single-arg wrapper, forms the Jacobi cyclic
     triple in any of its algebraically-equivalent sign-permuted guises.
     The three matched children are removed and the wrapped triple is
     replaced with ``0``.
 
     Why "any algebraically-equivalent guise": the three open Cartan
     relations produce Jacobi residues with quite different sign
-    structures —
+    structures,
 
     * ``[d, L_X] = 0`` :    ``+ω([X,[Y,Z]]) − ω([Y,[X,Z]]) − ω([[X,Y],Z])``
                             (Leibniz form)
@@ -445,7 +445,7 @@ class LieBracketVfJacobiDefinition(Definition):
     the three. A bare ``LieBracketVF`` (no wrapper) qualifies; so does
     ``MultiEval(ω, …)`` with a single bracket arg, or
     ``Act(L_op, ω)`` shapes. The "structurally identical" check is
-    Expr equality on the wrapper after redacting the bracket payload —
+    Expr equality on the wrapper after redacting the bracket payload,
     so different ω's or different surrounding scalars block the match
     by design.
     """
@@ -578,11 +578,11 @@ def _extract_bracket_with_wrapper(
     from jacopy.core.multi_eval import MultiEval
 
     # Single bracket-bearing arg slot in an arbitrary-arity MultiEval.
-    # ``ω(W, [[X,Y],Z])`` — bracket in slot 1, W in slot 0; the wrapper
+    # ``ω(W, [[X,Y],Z])``, bracket in slot 1, W in slot 0; the wrapper
     # key carries (head, W, placeholder) so siblings with the same head
     # and the same fixed slot match. A residue with brackets in
     # *different* slots (``ω([X,Y], Z)`` vs ``ω(W, [X,Y])``) is rejected
-    # by the wrapper-equality check downstream — same-slot is what
+    # by the wrapper-equality check downstream, same-slot is what
     # matters for cyclic-triple recognition.
     if isinstance(expr, MultiEval):
         bracket_slots = [
@@ -608,14 +608,14 @@ def _extract_bracket_with_wrapper(
         )
         return inner_bracket, _compose_wrapper(wrapper, inner_key)
 
-    # Affine connection evaluation ``∇_X(Y)`` — two-arg wrapper. The
+    # Affine connection evaluation ``∇_X(Y)``, two-arg wrapper. The
     # bracket can sit in either slot; require exactly one to qualify so
     # cross-child wrapper-equality stays unambiguous (a residue with
     # brackets in different slots across siblings gets rejected here).
     # Imported locally to avoid a top-of-module dependency cycle:
     # connection.py imports nothing from closure_axioms, but this module
     # is imported by intrinsic_engine.py which connection.py does not
-    # see, so a top-level import would still be safe — keeping it local
+    # see, so a top-level import would still be safe, keeping it local
     # mirrors the MultiEval branch above and avoids hoisting calculus
     # imports earlier than they're needed.
     from jacopy.calculus.connection import ConnectionEvalExpr
@@ -659,7 +659,7 @@ def _compose_wrapper(outer: Expr, inner_key: Optional[Expr]) -> Expr:
 # --------------------------------------------------------------------- #
 #
 # ``_BRACKET_PLACEHOLDER`` is a unique :class:`Symbol` used to occupy the
-# bracket's position when building a wrapper key — two wrappers compare
+# bracket's position when building a wrapper key, two wrappers compare
 # equal iff their operator / multi-eval structure (excluding the bracket
 # payload) coincides. ``_BARE_BRACKET_KEY`` is the sentinel used when no
 # wrapper is present at all.

@@ -1,5 +1,5 @@
 r"""
-Frame-decomposition axioms — Faz 17.E.7 + Faz 17.F.2.
+Frame-decomposition axioms, Faz 17.E.7 + Faz 17.F.2.
 
 Three **one-directional** rewrites that introduce an :class:`IndexedSum`
 shape on the right-hand side. They are *opt-in*: not registered in any
@@ -8,15 +8,15 @@ rules (Pairing duality, ``ConnectionFormDefinition``) creates a loop.
 The Cartan structure proofs (:class:`~jacopy.library.cartan_structure.CartanStructureProblem`)
 turn them on for the specific reduction sub-pass that needs them.
 
-* :class:`FrameDecompositionDefinition` — ``W → Σ_a e^a(W)·X_a`` for
+* :class:`FrameDecompositionDefinition`, ``W → Σ_a e^a(W)·X_a`` for
   any vector field ``W`` over a fixed local frame. Fires on every
   :class:`~jacopy.algebra.derivation.Derivation` instance whose frame
-  identity is *not* the wrapper's own frame — i.e. it expands an
+  identity is *not* the wrapper's own frame, i.e. it expands an
   outside-frame vector field into the basis of *this* frame. The dummy
   index is alpha-fresh on every match, so the engine's cache stays
   sane.
 
-* :class:`ConnectionEvalYFrameDecompositionDefinition` (Faz 17.F.2) —
+* :class:`ConnectionEvalYFrameDecompositionDefinition` (Faz 17.F.2),
   the *positional* counterpart of the previous rule. Decomposes only
   the ``Y`` slot of a :class:`~jacopy.calculus.connection.ConnectionEvalExpr`,
   rewriting
@@ -29,10 +29,10 @@ turn them on for the specific reduction sub-pass that needs them.
   Avoids the global-position loop concerns of
   :class:`FrameDecompositionDefinition` (which fires on every
   Derivation, including ``X`` of the same connection-eval, ``U`` of
-  ``Act(U, …)``, etc.) — needed by Cartan I/II reductions where
+  ``Act(U, …)``, etc.), needed by Cartan I/II reductions where
   :class:`FramePairingDualityDefinition` is also in the bundle.
 
-* :class:`ConnectionFormDecompositionDefinition` — the special-case
+* :class:`ConnectionFormDecompositionDefinition`, the special-case
   rewrite the Cartan-structure proof actually needs:
 
   .. math::
@@ -44,7 +44,7 @@ turn them on for the specific reduction sub-pass that needs them.
   belonging to *this* rule's frame, with a *free* index ``b``. The
   body uses :class:`~jacopy.calculus.cartan_forms.ConnectionForm`
   paired with ``V`` so the residue is no longer a
-  :class:`ConnectionEvalExpr` — adding
+  :class:`ConnectionEvalExpr`, adding
   :class:`ConnectionFormDefinition` to the same bundle would loop.
 
 The three rules cover the three distinct shapes Cartan I/II reductions
@@ -95,7 +95,7 @@ def _collect_index_names(expr: Expr, acc: Set[str]) -> None:
         _collect_index_names(expr.body, acc)
         return
     if expr.is_atom:
-        # Frame-aware atoms hide a FrameIndex in private slots — pick
+        # Frame-aware atoms hide a FrameIndex in private slots, pick
         # them up via the canonical accessors when available.
         for slot in ("idx", "upper", "lower", "lower_a", "lower_b"):
             v = getattr(expr, slot, None)
@@ -120,7 +120,7 @@ def _fresh_bound_index(prefix: str, expr: Expr) -> FrameIndex:
 
 
 # --------------------------------------------------------------------- #
-# 17.E.7 — FrameDecomposition                                           #
+# 17.E.7, FrameDecomposition                                           #
 # --------------------------------------------------------------------- #
 
 
@@ -134,14 +134,14 @@ class FrameDecompositionDefinition(Definition):
     The sum is over basis indices of the wrapper's :class:`LocalFrame`.
     The dummy ``a`` is alpha-fresh on every match.
 
-    **Direction & loop avoidance.** This rule is one-directional — the
+    **Direction & loop avoidance.** This rule is one-directional, the
     inverse step ``Σ_a e^a(W)·X_a → W`` is not an engine rule.
     Pairing :class:`FramePairingDualityDefinition`
     (``e^a(X_b) → δ^a_b``) would unfold the residue back into a sum of
     Kronecker deltas, but it never reproduces the original ``W`` shape
     (which is an arbitrary outside-frame VF). So the loop concern only
     arises if a caller registers the rule on a VF that is *itself* a
-    :class:`FrameVectorField` of this frame — the matcher excludes
+    :class:`FrameVectorField` of this frame, the matcher excludes
     that case to keep the rule monotone.
 
     **Scope.** Match shape is "any :class:`Derivation` instance whose
@@ -182,7 +182,7 @@ class FrameDecompositionDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# 17.F.2 — ConnectionEvalYFrameDecomposition (positional)                #
+# 17.F.2, ConnectionEvalYFrameDecomposition (positional)                #
 # --------------------------------------------------------------------- #
 
 
@@ -203,7 +203,7 @@ class ConnectionEvalYFrameDecompositionDefinition(Definition):
     residue forward.
 
     **Why a separate positional rule?** :class:`FrameDecompositionDefinition`
-    fires on *every* :class:`Derivation` in the expression — including
+    fires on *every* :class:`Derivation` in the expression, including
     ``X`` of the same :class:`ConnectionEvalExpr`, the bare ``U`` in
     ``Act(U, …)`` shapes, and so on. Bundling it with
     :class:`~jacopy.calculus.local_frame.FramePairingDualityDefinition`
@@ -279,7 +279,7 @@ class ConnectionEvalYFrameDecompositionDefinition(Definition):
 
 
 # --------------------------------------------------------------------- #
-# 17.E.7 — ConnectionFormDecomposition                                  #
+# 17.E.7, ConnectionFormDecomposition                                  #
 # --------------------------------------------------------------------- #
 
 
@@ -292,17 +292,17 @@ class ConnectionFormDecompositionDefinition(Definition):
 
     Fires on a :class:`ConnectionEvalExpr` whose ``Y`` slot is a
     :class:`FrameVectorField` of this rule's :class:`LocalFrame`. The
-    dummy ``c`` is alpha-fresh on every match — relative to the entire
-    expression — so it never collides with an outer-bound ``b``
+    dummy ``c`` is alpha-fresh on every match, relative to the entire
+    expression, so it never collides with an outer-bound ``b``
     introduced by an enclosing :class:`IndexedSum`.
 
     **Direction & loop avoidance.** The body uses
     :class:`ConnectionForm` paired with ``V`` (i.e. ``ω^c_b(∇)(V)``),
     not :class:`ConnectionEvalExpr`. So the residue contains no
-    matching shape for this rule — no loop. It does, however, contain
+    matching shape for this rule, no loop. It does, however, contain
     an ``ω`` that could be unfolded by
     :class:`~jacopy.calculus.cartan_forms.ConnectionFormDefinition`
-    back into ``Pairing(e^c, ∇_V X_b)`` — and **that would loop**. A
+    back into ``Pairing(e^c, ∇_V X_b)``, and **that would loop**. A
     bundle that registers this rule must therefore *not* register
     ``ConnectionFormDefinition`` on the same connection/frame, or vice
     versa. The Cartan-structure problem wrappers in 17.F/G keep this
@@ -313,7 +313,7 @@ class ConnectionFormDecompositionDefinition(Definition):
     the inner ``∇_V X_c`` shape that arises *inside* a frame-
     decomposition IS body (where ``c`` is bound by the enclosing
     binder). The fresh-``d`` minting collects every index name in the
-    target expression so it never collides with the outer ``c`` —
+    target expression so it never collides with the outer ``c``,
     nested IndexedSums correctly nest under standard alpha-shadowing
     rules.
     """

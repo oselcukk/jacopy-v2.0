@@ -2,7 +2,7 @@
 Cartan–Koszul invariant formula for ``d``.
 
 Evaluated against vector fields, the exterior derivative ``d`` has a
-closed-form, coordinate-free expansion — the *Cartan–Koszul invariant
+closed-form, coordinate-free expansion, the *Cartan–Koszul invariant
 formula*. In full generality, for a ``k``-form ``ω`` and vector fields
 ``X_0, …, X_k``:
 
@@ -10,7 +10,7 @@ formula*. In full generality, for a ``k``-form ``ω`` and vector fields
         = Σ_i (−1)^i  X_i(ω(X_0, …, X̂_i, …, X_k))
         + Σ_{i<j} (−1)^{i+j}  ω([X_i, X_j], X_0, …, X̂_i, …, X̂_j, …, X_k).
 
-This module ships the simplest interesting case — the **one-form
+This module ships the simplest interesting case, the **one-form
 formula** (``k = 1``, two vector fields):
 
     (dω)(X, Y) = X(ω(Y)) − Y(ω(X)) − ω([X, Y]).
@@ -35,20 +35,20 @@ relations gives
         = X(ω(Y)) − Y(ω(X)) − ω([X, Y]).
 
 The module offers two entry points. :func:`invariant_d_one_form`
-builds the right-hand-side :class:`Expr` directly — use it when you
+builds the right-hand-side :class:`Expr` directly, use it when you
 want the formula as a ready-made expression to compare against or
 substitute into a larger calculation.
 :class:`InvariantDOneFormDefinition` wraps the same rewrite as a
 :class:`~jacopy.proof.expansion.Definition` so it can be registered
 with an :class:`~jacopy.proof.expansion.ExpansionEngine` and fire
 bottom-up on ``Act(ι_Y, Act(ι_X, Act(d, ω)))`` subterms, with
-``provenance_tag`` selectable between ``"axiom"`` and ``"theorem"`` —
+``provenance_tag`` selectable between ``"axiom"`` and ``"theorem"``,
 the same "choice of presentation" knob the plan asked for alongside
 the :class:`~jacopy.proof.expansion.DSquaredZeroDefinition`.
 
-Higher-degree analogues (``k ≥ 2``) follow the same pattern — stack
+Higher-degree analogues (``k ≥ 2``) follow the same pattern, stack
 more interior products on the outside and pick up additional bracket
-corrections — but are not implemented here; the ``k = 1`` case is the
+corrections, but are not implemented here; the ``k = 1`` case is the
 non-trivial anchor, and the machinery for arbitrary ``k`` needs
 hat-and-sign bookkeeping that is pedagogical rather than load-bearing.
 """
@@ -90,11 +90,11 @@ def invariant_d_one_form(
 
     The three :class:`Act` shapes encode, in order:
 
-    * ``Act(X, Act(ι_Y, ω))`` — the directional derivative of the
+    * ``Act(X, Act(ι_Y, ω))``, the directional derivative of the
       scalar ``ω(Y)`` along ``X``,
-    * ``Act(Y, Act(ι_X, ω))`` — the symmetric partner with the sign
+    * ``Act(Y, Act(ι_X, ω))``, the symmetric partner with the sign
       absorbed in an outer :class:`Neg`,
-    * ``Act(ι_{[X, Y]}, ω)`` — the pairing of ``ω`` with the bracket,
+    * ``Act(ι_{[X, Y]}, ω)``, the pairing of ``ω`` with the bracket,
       wrapped in a :class:`Neg`.
 
     ``bracket`` supplies the vector-field commutator; typically the
@@ -147,10 +147,10 @@ class InvariantDOneFormDefinition(Definition):
     ``classification`` selects the provenance recorded in the fired
     :class:`~jacopy.proof.step.ProofStep`:
 
-    * ``"axiom"`` — the formula is taken as a primitive characterisation
+    * ``"axiom"``, the formula is taken as a primitive characterisation
       of ``d`` on 1-forms; the step is tagged ``"axiom"`` with no
       sub-proof attached.
-    * ``"theorem"`` (default) — the formula is a theorem derivable
+    * ``"theorem"`` (default), the formula is a theorem derivable
       from the Cartan magic formula and the ``[L_X, ι_Y] = ι_{[X, Y]}``
       commutator; the step is tagged ``"theorem"`` and, in
       ``mode="foundational"``, carries a one-step sub-proof citing
@@ -247,7 +247,7 @@ class InvariantDOneFormDefinition(Definition):
             # formula and the [L_X, ι_Y] = ι_{[X, Y]} commutator. A
             # user who wants the full multi-step derivation composes
             # CartanCalculus.verify('cartan_magic') and verify('lie_iota')
-            # and stitches them — see this module's header for the
+            # and stitches them, see this module's header for the
             # derivation. The sub-proof here cites those two relations
             # as the theorem's foundations.
             from jacopy.proof.chain import ProofChain

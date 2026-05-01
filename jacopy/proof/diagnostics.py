@@ -7,12 +7,12 @@ surviving *residual* carries structural information about *why* the
 pipeline stalled: a definition never fired, a factor's grading was
 missing, an engine pass wasn't interleaved properly. Historically the
 user (and the agent driving the proof) had to eyeball that residual and
-trace the missing rewrite by hand — a five-fix hunt to close the Cartan
+trace the missing rewrite by hand, a five-fix hunt to close the Cartan
 ``verify()`` suite lived through exactly this loop.
 
 This module mechanises the first pass of that analysis. :func:`diagnose`
 walks the residual and emits :class:`DiagnosticHint` records for each
-*stalled shape* it recognises — an ``Act(d_like, Act(d_like, x))`` that
+*stalled shape* it recognises, an ``Act(d_like, Act(d_like, x))`` that
 would have cancelled under ``d² = 0``, an ``ι_V(df)`` where ``V`` is a
 bracket-like sum the current :class:`IotaOnExactOneFormDefinition`
 wouldn't match, an unclassified factor reaching the Koszul sort layer,
@@ -49,7 +49,7 @@ class DiagnosticHint:
     ``category`` is a short machine key (``"stalled-d-squared"``,
     ``"unreduced-iota"``, ``"unclassified-factor"``, …) so programmatic
     callers can filter without parsing free text. ``location`` is the
-    offending sub-expression — rendered with ``_repr_inner()`` in
+    offending sub-expression, rendered with ``_repr_inner()`` in
     :meth:`DiagnosticReport.format` but kept as an :class:`Expr` here
     so callers can re-inspect it. ``message`` is the prose
     description; ``suggestion`` is a hint at the fix (optional, not
@@ -148,7 +148,7 @@ def diagnose(
     Rules run in registration order; duplicate hints (same category +
     location) are de-duplicated so callers aren't spammed when two
     rules overlap on the same stalled shape. ``registry`` and
-    ``engine`` are passed through — rules that need grading or
+    ``engine`` are passed through, rules that need grading or
     definition-coverage context read them, the rest ignore them.
     """
     report = DiagnosticReport(residual=residual)

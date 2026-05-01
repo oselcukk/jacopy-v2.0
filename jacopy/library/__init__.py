@@ -18,7 +18,7 @@ from jacopy.library.declarations import (
     VectorFields,
 )
 
-# Stage B — seeding happens on import of these modules.
+# Stage B, seeding happens on import of these modules.
 from jacopy.library.symplectic import SymplecticManifold
 from jacopy.library.symplectic_problem import SymplecticProblem
 from jacopy.library.poisson import (
@@ -33,7 +33,7 @@ from jacopy.library.koszul_problem import (
     KoszulProblem,
 )
 
-# Stage C — Lie algebroid + algebroid Cartan; seeds
+# Stage C, Lie algebroid + algebroid Cartan; seeds
 # ``lie_algebroid_anchor_compat`` on import.
 from jacopy.library.lie_algebroid import (
     THEOREM_LIE_ALGEBROID_ANCHOR_COMPAT,
@@ -41,7 +41,7 @@ from jacopy.library.lie_algebroid import (
     lie_algebroid,
 )
 
-# Stage D — Courant algebroid + Dirac structures; seeds
+# Stage D, Courant algebroid + Dirac structures; seeds
 # ``courant_jacobi_twist``, ``courant_dorfman_bridge``,
 # ``dirac_isotropy``, ``dirac_involutivity`` on import.
 from jacopy.library.courant_algebroid import (
@@ -58,7 +58,7 @@ from jacopy.library.dirac import (
     presymplectic_dirac,
 )
 
-# Twisted Cartan bundle — d_H = d + H∧ variant (Faz 10 tutorial gap closure).
+# Twisted Cartan bundle, d_H = d + H∧ variant (Faz 10 tutorial gap closure).
 from jacopy.library.twisted_cartan import (
     TwistedCartanBundle,
     twisted_cartan_bundle,
@@ -84,7 +84,7 @@ from jacopy.library.cartan_structure import (
     CartanStructureProofResult,
 )
 
-# Q9 Stage 9.F — Koszul-connection capstone wrapper bundling
+# Q9 Stage 9.F, Koszul-connection capstone wrapper bundling
 # Bianchi + form-property + Cartan-structure facets for ∇̃ on T*M.
 from jacopy.library.koszul_connection_problem import KoszulConnectionProblem
 

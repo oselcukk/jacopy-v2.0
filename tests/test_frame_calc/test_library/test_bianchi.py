@@ -68,7 +68,7 @@ class TestBianchiIX:
         assert F.index_names() == ("t", "psi", "theta", "phi")
 
     def test_christoffel_computes_optimised(self) -> None:
-        """Just verify the pipeline doesn't blow up — Mixmaster is famously
+        """Just verify the pipeline doesn't blow up, Mixmaster is famously
         complex, so we use optimized=True."""
         F, g = bianchi_IX()
         LC = levi_civita(g, optimized=True)

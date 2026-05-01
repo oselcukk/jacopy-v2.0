@@ -1,16 +1,16 @@
 r"""
-Opaque ``Expr`` atoms for the abstract-frame mode — Stage A.2.
+Opaque ``Expr`` atoms for the abstract-frame mode, Stage A.2.
 
 When a frame is :class:`~jacopy.frame_calc.frame.AbstractFrame`, the
 frame derivative ``e_a(f)`` and the Lie bracket structure constant
 ``γ^a_{bc}`` cannot be evaluated to concrete SymPy expressions. They
-remain symbolic — and this module supplies the two opaque
+remain symbolic, and this module supplies the two opaque
 :class:`~jacopy.core.expr.Expr` atoms that carry that symbolism
 through downstream formulas:
 
-* :class:`FrameDerivativeExpr` — ``e_a(body)`` with ``body`` a
+* :class:`FrameDerivativeExpr`, ``e_a(body)`` with ``body`` a
   arbitrary :class:`Expr`.
-* :class:`GammaExpr` — ``γ^a_{bc}`` indexed atom, used when
+* :class:`GammaExpr`, ``γ^a_{bc}`` indexed atom, used when
   :class:`AbstractFrame`'s user-supplied ``gamma_table`` doesn't
   cover ``(a, b, c)``.
 
@@ -27,7 +27,7 @@ from jacopy.core.expr import Atom, Expr
 
 
 # --------------------------------------------------------------------- #
-# FrameDerivativeExpr — ``e_a(body)``                                   #
+# FrameDerivativeExpr, ``e_a(body)``                                   #
 # --------------------------------------------------------------------- #
 
 
@@ -90,7 +90,7 @@ class FrameDerivativeExpr(Expr):
         return FrameDerivativeExpr(self._frame, self._index, new_children[0])
 
     def _key(self) -> Any:
-        # Frame is keyed by its id — structural equality across
+        # Frame is keyed by its id, structural equality across
         # AbstractFrame instances is intentional only when the same
         # object is used. Two distinct abstract frames stay distinct.
         return ("FrameDerivativeExpr", id(self._frame), self._index, self._body)
@@ -102,14 +102,14 @@ class FrameDerivativeExpr(Expr):
 
 
 # --------------------------------------------------------------------- #
-# GammaExpr — ``γ^a_{bc}``                                              #
+# GammaExpr, ``γ^a_{bc}``                                              #
 # --------------------------------------------------------------------- #
 
 
 class GammaExpr(Atom):
     r"""Opaque structure constant ``γ^a_{bc}`` for an abstract frame.
 
-    A pure :class:`Atom` — no children, no rebuild. Two
+    A pure :class:`Atom`, no children, no rebuild. Two
     :class:`GammaExpr` instances compare equal iff their frames and
     all three indices match.
     """
@@ -155,7 +155,7 @@ class GammaExpr(Atom):
 
 
 # --------------------------------------------------------------------- #
-# SymPyAtom — jacopy `Expr` wrapping a SymPy expression                 #
+# SymPyAtom, jacopy `Expr` wrapping a SymPy expression                 #
 # --------------------------------------------------------------------- #
 
 
@@ -169,7 +169,7 @@ class InverseMetricEntryExpr(Atom):
     refer to ``g^{ab}`` symbolically, so we expose each inverse
     entry as a fresh :class:`Atom` keyed on ``(metric_id, a, b)``.
 
-    The atom carries no algebraic relation to the metric — its
+    The atom carries no algebraic relation to the metric, its
     only contract is structural identity. Higher-level proofs that
     need the relation ``g^{ac} g_{cb} = δ^a_b`` would need explicit
     rewrite rules (out of scope for Stage A.2 / Stage D follow-up).
@@ -234,7 +234,7 @@ class SymPyAtom(Atom):
     :func:`~jacopy.display.chain_to_latex_document` output renders
     SymPy entries correctly.
 
-    The wrapping is **opaque from jacopy's algebra perspective** —
+    The wrapping is **opaque from jacopy's algebra perspective**,
     no jacopy engine rule fires on it, no substitution descends
     into it. That's intentional: SymPy and jacopy operate on
     different algebras, and the bridge only mediates *display*,

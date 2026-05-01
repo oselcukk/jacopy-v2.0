@@ -175,7 +175,7 @@ class TestJacobi:
 
     def test_twisted_condition_obstruction_involves_H(self, twisted):
         cond = twisted.jacobi_condition()
-        # The obstruction is Act(d, H) — assert H appears in it.
+        # The obstruction is Act(d, H), assert H appears in it.
         assert "H" in repr(cond.obstruction)
 
     def test_prove_jacobi_reduction_untwisted(self, algebroid):
@@ -216,7 +216,7 @@ class TestCourantDorfmanBridge:
         assert corr.vector == Integer(0)
 
     def test_correction_form_involves_d(self, algebroid, ab):
-        """The form half is ``½ d(ι_X β + ι_Y α)`` — ``d`` and both
+        """The form half is ``½ d(ι_X β + ι_Y α)``, ``d`` and both
         interior products must show up."""
         a, b = ab
         corr = algebroid.bridge_correction(a, b)

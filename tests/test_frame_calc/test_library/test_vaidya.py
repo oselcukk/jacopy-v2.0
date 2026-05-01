@@ -38,7 +38,7 @@ class TestVaidyaConstruction:
 
 class TestVaidyaPhysics:
     def test_constant_M_is_vacuum(self) -> None:
-        """When M(v) = const, Vaidya reduces to (ingoing-EF) Schwarzschild —
+        """When M(v) = const, Vaidya reduces to (ingoing-EF) Schwarzschild,
         which is vacuum."""
         v = sp.Symbol("v", real=True)
         M_const = sp.Symbol("M", positive=True)

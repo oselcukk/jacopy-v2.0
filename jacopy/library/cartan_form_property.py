@@ -4,10 +4,10 @@ Cartan form-property problem wrapper.
 Given an affine connection ``∇`` (and optionally a metric ``g``) on a
 local frame ``F``, the four local-component objects
 
-* ``ω^a{}_b(∇)`` — connection 1-form,
-* ``Q_{ab}(∇, g)`` — non-metricity 1-form (needs ``g``),
-* ``T^a(∇)`` — torsion 2-form,
-* ``R^a{}_b(∇)`` — curvature 2-form,
+* ``ω^a{}_b(∇)``, connection 1-form,
+* ``Q_{ab}(∇, g)``, non-metricity 1-form (needs ``g``),
+* ``T^a(∇)``, torsion 2-form,
+* ``R^a{}_b(∇)``, curvature 2-form,
 
 obey textbook *form-degree* properties: ``ω`` and ``Q`` are
 ``C^∞``-linear in ``V``, while ``T`` and ``R`` are ``C^∞``-bilinear
@@ -53,7 +53,7 @@ Termination notes. The form definitions only fire on closed-shape
 ``Pairing(form, V)`` / ``MultiEval(form, U, V)`` patterns; their
 right-hand sides contain no form atom, so a single open-and-canonicalise
 pass per term suffices. Antisymmetry rules are repr-canonicalize so
-they apply at most once per node — same termination story as
+they apply at most once per node, same termination story as
 :class:`~jacopy.calculus.metric.MetricEvalSymmetryDefinition`.
 """
 
@@ -143,7 +143,7 @@ class CartanFormPropertyProofResult:
 
 
 class CartanFormPropertyProblem:
-    """``(∇, F, g?)`` — Cartan form-property problem bundle.
+    """``(∇, F, g?)``, Cartan form-property problem bundle.
 
     Parameters
     ----------
@@ -203,7 +203,7 @@ class CartanFormPropertyProblem:
             ConnectionFormDefinition(self._conn, self._frame),
             TorsionFormDefinition(self._conn, self._frame),
             CurvatureFormDefinition(self._conn, self._frame),
-            # Connection X-slot linearity / scalar pull — carries
+            # Connection X-slot linearity / scalar pull, carries
             # ∇_{fV} X_b → f·∇_V X_b for the ω 1-form proof, and the
             # Sum / Neg additivity for ω(V₁ + V₂).
             ConnectionXLinearityDefinition(self._conn),
@@ -282,11 +282,11 @@ class CartanFormPropertyProblem:
         r"""``Q_{ab}(∇, g)`` bound to this problem's connection / metric / frame.
 
         Raises a :class:`ValueError` when no metric was supplied at
-        construction time — the non-metricity form needs one.
+        construction time, the non-metricity form needs one.
         """
         if self._metric is None:
             raise ValueError(
-                "CartanFormPropertyProblem.Q requires a metric — "
+                "CartanFormPropertyProblem.Q requires a metric, "
                 "construct the problem with metric=..."
             )
         return NonMetricityForm(
@@ -349,7 +349,7 @@ class CartanFormPropertyProblem:
     def omega_eval(
         self, upper: FrameIndex | str, lower: FrameIndex | str, V: Expr
     ) -> Pairing:
-        r"""``⟨ω^upper{}_lower, V⟩`` — the engine entry point."""
+        r"""``⟨ω^upper{}_lower, V⟩``, the engine entry point."""
         return Pairing(self.omega(upper, lower), V)
 
     def prove_omega_scalar_linear_in_V(
@@ -391,7 +391,7 @@ class CartanFormPropertyProblem:
         lower_b: FrameIndex | str,
         V: Expr,
     ) -> Pairing:
-        r"""``⟨Q_{ab}, V⟩`` — the engine entry point."""
+        r"""``⟨Q_{ab}, V⟩``, the engine entry point."""
         return Pairing(self.Q(lower_a, lower_b), V)
 
     def prove_Q_scalar_linear_in_V(
@@ -430,7 +430,7 @@ class CartanFormPropertyProblem:
     def T_eval(
         self, upper: FrameIndex | str, U: Expr, V: Expr
     ) -> MultiEval:
-        r"""``T^a(U, V)`` — the engine entry point."""
+        r"""``T^a(U, V)``, the engine entry point."""
         return MultiEval(self.T(upper), U, V)
 
     def prove_T_scalar_linear_in_first(
@@ -520,7 +520,7 @@ class CartanFormPropertyProblem:
         U: Expr,
         V: Expr,
     ) -> MultiEval:
-        r"""``R^a_b(U, V)`` — the engine entry point."""
+        r"""``R^a_b(U, V)``, the engine entry point."""
         return MultiEval(self.R(upper, lower), U, V)
 
     def prove_R_scalar_linear_in_first(

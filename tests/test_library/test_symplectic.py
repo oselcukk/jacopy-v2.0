@@ -61,7 +61,7 @@ class TestConstruction:
 
     def test_compatibility_reuses_manifold_flat_sharp(self, omega, pi):
         """The compatibility axiom must carry the *same* Flat/Sharp
-        instances the manifold exposes, not freshly built ones — else
+        instances the manifold exposes, not freshly built ones, else
         downstream proof engines see two `Flat(ω)` operators that compare
         structurally equal but fail identity checks callers rely on."""
         M = SymplecticManifold(omega, bivector=pi)
@@ -129,7 +129,7 @@ class TestProveEquivalence:
 
     def test_closes_to_proof_chain(self, omega, pi, registry):
         """The manifold's compatibility axiom discharges the symplectic
-        obstruction to zero — the same close used in
+        obstruction to zero, the same close used in
         :meth:`HamiltonianVectorField.prove_equivalence` directly, just
         driven off the manifold's canonical compatibility object."""
         M = SymplecticManifold(omega, bivector=pi)
@@ -142,7 +142,7 @@ class TestProveEquivalence:
 
 
 # --------------------------------------------------------------------- #
-# Bivector bridge — ω(π♯df, π♯dg) = π(df, dg)                            #
+# Bivector bridge, ω(π♯df, π♯dg) = π(df, dg)                            #
 # --------------------------------------------------------------------- #
 
 

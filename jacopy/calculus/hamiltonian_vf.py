@@ -3,9 +3,9 @@ Hamiltonian vector field ``X_f``.
 
 Two standard definitions:
 
-* **Symplectic** — ``X_f`` is the unique vector field with
+* **Symplectic**, ``X_f`` is the unique vector field with
   ``ι_{X_f} ω = −df`` for a non-degenerate closed 2-form ``ω``.
-* **Derived** — ``X_f := −[f, π]_SN`` for a Poisson bivector ``π``.
+* **Derived**, ``X_f := −[f, π]_SN`` for a Poisson bivector ``π``.
 
 The two agree whenever ``ω`` and ``π`` are *compatible* (musical
 inverses): non-degeneracy of ``ω`` gives a bundle isomorphism
@@ -13,12 +13,12 @@ inverses): non-degeneracy of ``ω`` gives a bundle isomorphism
 does not yet carry an Expr-level encoding of that musical isomorphism,
 so the equivalence of the two definitions surfaces here as a
 :class:`VanishingCondition`: the obstruction to compatibility is
-``ι_{X_f} ω + df`` — zero iff the symplectic definition matches the
+``ι_{X_f} ω + df``, zero iff the symplectic definition matches the
 derived one on this ``f``.
 
 :class:`HamiltonianVectorField` is a :class:`Derivation` of degree 0.
 It can be created from a bivector, from a symplectic form, or from
-both — the extra field only adds access to the relevant methods
+both, the extra field only adds access to the relevant methods
 (:meth:`~HamiltonianVectorField.derived_expansion` needs ``π``;
 :meth:`~HamiltonianVectorField.symplectic_obstruction` needs ``ω``).
 Downstream code treats the operator like any other
@@ -53,14 +53,14 @@ _VALID_SIGNS = ("+", "-")
 
 
 class HamiltonianVectorField(Derivation):
-    """``X_f`` — the Hamiltonian vector field of a function ``f``.
+    """``X_f``, the Hamiltonian vector field of a function ``f``.
 
     A degree-0 :class:`Derivation` named ``X_{f}`` by default. Carries
     the defining function and, optionally, either (or both) of:
 
-    * ``bivector`` — a Poisson bivector ``π`` used by the derived
+    * ``bivector``, a Poisson bivector ``π`` used by the derived
       definition ``X_f = −[f, π]_SN``.
-    * ``symplectic_form`` — a symplectic 2-form ``ω`` used by the
+    * ``symplectic_form``, a symplectic 2-form ``ω`` used by the
       symplectic definition ``ι_{X_f} ω = −df``.
 
     At least one of the two must be supplied; without it a
@@ -117,7 +117,7 @@ class HamiltonianVectorField(Derivation):
 
     @property
     def sign(self) -> str:
-        """Sign convention for ``ι_{X_f} ω = sign·df`` — ``'+'`` or ``'-'``.
+        """Sign convention for ``ι_{X_f} ω = sign·df``, ``'+'`` or ``'-'``.
 
         Defaults to ``'-'`` (geometer's convention ``ι_{X_f} ω = -df``).
         Notebook problems following the textbook ``ι_{X_f} ω = +df``
@@ -135,7 +135,7 @@ class HamiltonianVectorField(Derivation):
         Dispatches to the :mod:`schouten` SN singleton's expansion.
         For atomic ``π`` (a bare :class:`Symbol` declared
         ``Graded(degree=1)``) the inner bracket stays opaque, which is
-        the right shape for the derived-bracket machinery — the
+        the right shape for the derived-bracket machinery, the
         caller's proof layer consumes the outer ``Neg`` directly.
 
         Raises :class:`ValueError` when no bivector is attached.
@@ -159,7 +159,7 @@ class HamiltonianVectorField(Derivation):
 
         Zero iff the symplectic definition ``ι_{X_f} ω = sign·df`` holds
         on this ``X_f`` (sign ``'-'`` ⇒ ``ι_{X_f} ω + df``; sign ``'+'``
-        ⇒ ``ι_{X_f} ω − df``). The helper is registry-free — the shape
+        ⇒ ``ι_{X_f} ω − df``). The helper is registry-free, the shape
         itself doesn't depend on grading, and downstream simplification
         is where the grading gets consulted.
 
@@ -224,7 +224,7 @@ class HamiltonianVectorField(Derivation):
           (:class:`HamiltonianVfDerivedDefinition`, scoped to this
           ``X_f`` instance);
         * the musical triplet returned by
-          :meth:`MusicalCompatibility.musical_definitions` —
+          :meth:`MusicalCompatibility.musical_definitions`,
           :class:`~jacopy.calculus.musical.IotaFlatDefinition`,
           :class:`~jacopy.calculus.musical.ArgNegLinearityDefinition`,
           and :class:`~jacopy.calculus.musical.MusicalCompatibilityDefinition`.
@@ -236,7 +236,7 @@ class HamiltonianVectorField(Derivation):
 
         Raises :class:`ValueError` when this Hamiltonian is missing
         ``bivector`` or ``symplectic_form``, or when the attached
-        values don't match the compatibility's declared pair —
+        values don't match the compatibility's declared pair,
         proceeding with a mismatched axiom would produce a
         superficially closed proof that doesn't actually control the
         stated obstruction.
@@ -293,7 +293,7 @@ def hamiltonian_vf(
     """Build the Hamiltonian vector field ``X_f``.
 
     Mirror of the :class:`HamiltonianVectorField` constructor with a
-    functional name — preferred at call sites for readability.
+    functional name, preferred at call sites for readability.
     """
     return HamiltonianVectorField(
         f,
@@ -321,14 +321,14 @@ def equivalence_condition(
 
     Builds ``X_f`` with both data attached and returns its symplectic
     obstruction wrapped as a named condition. Vanishing here means
-    ``ω`` and ``π`` are musically inverse on ``df`` — the exact
+    ``ω`` and ``π`` are musically inverse on ``df``, the exact
     condition the two Hamiltonian definitions need to coincide. The
     caller discharges this against whatever compatibility axiom their
     setup declares (typically ``ω ∘ π♯ = id`` or its 1-form image
     ``ω(π(df), ·) = df``).
 
     The helper deliberately stays at :class:`VanishingCondition` level
-    rather than issuing a :class:`ProofChain` — closing the condition
+    rather than issuing a :class:`ProofChain`, closing the condition
     requires a musical-isomorphism axiom the Expr layer does not yet
     encode. Feed the returned condition to
     :func:`~jacopy.proof.verifier.prove_equivalence` once the caller
@@ -344,7 +344,7 @@ def equivalence_condition(
 
 
 # --------------------------------------------------------------------- #
-# Proof-engine rule — X_f as −π♯(df) under a declared compatibility     #
+# Proof-engine rule, X_f as −π♯(df) under a declared compatibility     #
 # --------------------------------------------------------------------- #
 
 
@@ -359,7 +359,7 @@ class HamiltonianVfDerivedDefinition(Definition):
     :class:`~jacopy.calculus.musical.MusicalCompatibilityDefinition`
     to collapse the symplectic obstruction.
 
-    The sign lives in the rewrite's output ``Neg`` — with
+    The sign lives in the rewrite's output ``Neg``, with
     :class:`~jacopy.calculus.musical.ArgNegLinearityDefinition` in
     the engine, it pulls through the outer ``ω^♭`` so the
     compatibility can match the clean ``ω^♭(π^♯(df))`` shape

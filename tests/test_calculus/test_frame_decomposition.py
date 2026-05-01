@@ -177,7 +177,7 @@ def test_conn_decomp_rewrite_shape():
     assert out.dummy.is_bound
     body = out.body
     assert isinstance(body, Product)
-    # Locate the Pairing factor — should wrap a ConnectionForm.
+    # Locate the Pairing factor, should wrap a ConnectionForm.
     pairing_factor = next(c for c in body.children if isinstance(c, Pairing))
     assert isinstance(pairing_factor.alpha, ConnectionForm)
     assert pairing_factor.alpha.connection == nabla
@@ -218,7 +218,7 @@ def test_eval_y_frame_decomp_matches_outside_derivation_y():
 
 
 def test_eval_y_frame_decomp_does_not_match_frame_vf_y():
-    """Y is X_b of THIS frame — handled by ConnectionFormDecomposition instead."""
+    """Y is X_b of THIS frame, handled by ConnectionFormDecomposition instead."""
     nabla = connection("∇")
     F = LocalFrame("F")
     U = Derivation("U", 0)
@@ -229,7 +229,7 @@ def test_eval_y_frame_decomp_does_not_match_frame_vf_y():
 
 
 def test_eval_y_frame_decomp_matches_other_frame_vf_y():
-    """Y is X_b of a DIFFERENT frame — decompose into THIS frame."""
+    """Y is X_b of a DIFFERENT frame, decompose into THIS frame."""
     nabla = connection("∇")
     F = LocalFrame("F")
     G = LocalFrame("G")
@@ -262,7 +262,7 @@ def test_eval_y_frame_decomp_does_not_match_non_derivation_y():
 
 
 def test_eval_y_frame_decomp_does_not_match_non_connection_eval():
-    """Bare Derivation, no ConnectionEval wrapper — rule skips."""
+    """Bare Derivation, no ConnectionEval wrapper, rule skips."""
     nabla = connection("∇")
     F = LocalFrame("F")
     V = Derivation("V", 0)
@@ -360,7 +360,7 @@ def test_pipeline_conn_decomp_does_not_loop_with_form_definition_absent():
     engine = ExpansionEngine()
     engine.register(ConnectionFormDecompositionDefinition(nabla, F))
     result, _ = engine.expand(expr, max_steps=32)
-    # Single decomposition — produces an IS containing ω·X_c, then no
+    # Single decomposition, produces an IS containing ω·X_c, then no
     # rule applies.
     assert isinstance(result, IndexedSum)
 

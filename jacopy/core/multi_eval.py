@@ -1,9 +1,9 @@
 r"""
 Multilinear evaluation node ``MultiEval(head, *args)``.
 
-Represents the textbook expression ``ω(Y_1, …, Y_p)`` — a ``p``-form
-``ω`` evaluated against ``p`` vector fields — and its dual
-``π(α, β)`` — a bivector evaluated against two covectors. Both share
+Represents the textbook expression ``ω(Y_1, …, Y_p)``, a ``p``-form
+``ω`` evaluated against ``p`` vector fields, and its dual
+``π(α, β)``, a bivector evaluated against two covectors. Both share
 the same algebraic shape: a graded multilinear contract that swallows
 ``len(args)`` slots and produces a scalar (degree ``0``).
 
@@ -16,13 +16,13 @@ linearity, and intrinsic-formula rewrites live in
 Slot semantics
 --------------
 
-* ``slot_kind="vector"`` — args are vector fields; ``head`` is a form.
+* ``slot_kind="vector"``, args are vector fields; ``head`` is a form.
   Plain "form-on-vectors" evaluation, the rank-``p`` generalisation of
   :class:`Pairing`.
-* ``slot_kind="covector"`` — args are 1-forms; ``head`` is a
+* ``slot_kind="covector"``, args are 1-forms; ``head`` is a
   bivector / multivector. Same antisymmetry, dual contract.
 
-The slot kind is purely declarative — it documents the user's intent
+The slot kind is purely declarative, it documents the user's intent
 and lets renderers decide on bracket conventions, but the structural
 algebra (antisymmetry, linearity) is identical in both cases.
 
@@ -33,7 +33,7 @@ When ``alternating=True`` (the default) the node is graded-antisymmetric
 in its argument slots: swapping two args picks up a sign of ``-1``;
 two identical args force the whole expression to ``0``. When
 ``alternating=False`` the slots are treated as plain multilinear with
-no symmetry — useful for pedagogical demonstrations or for evaluation
+no symmetry, useful for pedagogical demonstrations or for evaluation
 contracts that aren't antisymmetric (rare; included for completeness).
 
 Arity
@@ -67,7 +67,7 @@ class MultiEval(Expr):
         The form or multivector being evaluated.
     *args:
         Vector fields (for ``slot_kind="vector"``) or 1-forms (for
-        ``slot_kind="covector"``). At least one arg is required —
+        ``slot_kind="covector"``). At least one arg is required,
         a zero-arg "evaluation" is just ``head`` itself; constructing
         a :class:`MultiEval` with no args is a category error.
     alternating:
@@ -77,7 +77,7 @@ class MultiEval(Expr):
         zeroing fires.
     slot_kind:
         ``"vector"`` (default) when args are vector fields, or
-        ``"covector"`` when args are 1-forms. Documentation only —
+        ``"covector"`` when args are 1-forms. Documentation only,
         does not affect structural algebra.
     """
 
@@ -206,7 +206,7 @@ def multi_eval(
 ) -> MultiEval:
     """Functional constructor for :class:`MultiEval`.
 
-    Mirrors :func:`jacopy.calculus.pairing.pairing` — call sites read
+    Mirrors :func:`jacopy.calculus.pairing.pairing`, call sites read
     ``multi_eval(omega, X, Y)`` rather than the capitalised class name.
     """
     return MultiEval(
@@ -245,7 +245,7 @@ def validate_arity(
     ``registry`` (or in registry-free dispatch). Raises
     :class:`ValueError` when the head's degree is determinate and does
     not equal ``arity``. Returns ``None`` when the head's degree cannot
-    be determined — callers in symbolic-degree contexts may then
+    be determined, callers in symbolic-degree contexts may then
     proceed without arity enforcement.
     """
     # Late import: ``degree_of`` lives in :mod:`jacopy.algebra.derivation`,

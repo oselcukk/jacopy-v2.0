@@ -1,4 +1,4 @@
-"""Tests for Faz 13.A — Sharp R-linearity and Sharp-on-exact rewrites."""
+"""Tests for Faz 13.A, Sharp R-linearity and Sharp-on-exact rewrites."""
 
 import pytest
 
@@ -173,8 +173,8 @@ class TestSharpOnExactRewrite:
         assert any("X_f" in s.rule for s in steps)
 
     def test_combined_with_linearity(self):
-        # Sharp(π)(d(f) + d(g)) — linearity first, then SharpOnExact
-        # twice — gives X_f + X_g.
+        # Sharp(π)(d(f) + d(g)), linearity first, then SharpOnExact
+        # twice, gives X_f + X_g.
         pi = Symbol("π")
         sh = sharp(pi)
         f, reg = _registry_with_function("f")

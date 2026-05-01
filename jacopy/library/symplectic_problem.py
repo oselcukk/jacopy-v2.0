@@ -23,7 +23,7 @@ interest in a problem statement) and a pre-configured
 
 The wrapper is the problem-book counterpart to
 :class:`SymplecticManifold`: where the manifold names the geometric
-data, ``SymplecticProblem`` names the *proof setup* — the engine is
+data, ``SymplecticProblem`` names the *proof setup*, the engine is
 ready to discharge ``L_{X_f} ω = 0``, ``ω(X_f, X_g) = π(df, dg)``, or
 the symplectic↔derived equivalence in one call.
 
@@ -31,7 +31,7 @@ Auto-declarations are deliberate but minimal: ``ω`` gets the
 :class:`Closed` flag if absent, and ``π`` gets :class:`Antisymmetric`
 if absent. Grading declarations (``Graded(degree=2)`` for ``ω``,
 ``Graded(degree=1)`` for ``π``, ``Graded(degree=0)`` for the
-functions) stay the caller's responsibility — they affect
+functions) stay the caller's responsibility, they affect
 :mod:`sort_product` and other grading-driven layers and a wrapper
 should not silently change them.
 """
@@ -155,7 +155,7 @@ class SymplecticProblem:
         # Antisymmetric are part of the *problem statement* (a
         # symplectic form is closed and non-degenerate by definition; a
         # Poisson bivector is antisymmetric by definition), so the
-        # wrapper records them as axioms — but only if absent; we
+        # wrapper records them as axioms, but only if absent; we
         # never overwrite a caller's prior declaration.
         if not registry.has(omega, Closed):
             registry.declare(omega, Closed())
@@ -270,7 +270,7 @@ class SymplecticProblem:
         """Return the registered ``X_f`` for a designated function ``f``.
 
         Raises :class:`KeyError` when ``f`` was not part of the
-        ``functions`` tuple at construction time — the engine has no
+        ``functions`` tuple at construction time, the engine has no
         defining relation for it, so silently building a fresh
         ``X_f`` would produce a Hamiltonian the proof layer can't
         actually reduce.
@@ -311,7 +311,7 @@ class SymplecticProblem:
 
         Builds the obstruction ``ι_Y ω − ι_Z ω`` and lets the engine's
         :class:`NonDegenerateInteriorEqualityDefinition` peel off the
-        ``ι_(·) ω`` shell — under non-degeneracy this is exactly the
+        ``ι_(·) ω`` shell, under non-degeneracy this is exactly the
         injectivity statement ``ι_Y ω = ι_Z ω ⇒ Y = Z``, encoded as a
         term-rewriting step. The remaining ``Y − Z`` then reduces to
         ``0`` whenever the engine has enough machinery to bring ``Y``
@@ -319,16 +319,16 @@ class SymplecticProblem:
 
         Typical use:
 
-        * Trivial — passing the same vector field twice gives a
+        * Trivial, passing the same vector field twice gives a
           one-step proof (``ι_Y ω − ι_Y ω → Y − Y → 0``).
-        * Engine-derived — when ``Y`` and ``Z`` are different
+        * Engine-derived, when ``Y`` and ``Z`` are different
           syntactic shapes that simplify identically (e.g. via
           algebroid Cartan magic, Lie-bracket axioms, sharp
           axioms), the chain closes through the standard
           :class:`ExpandAndSimplify` pipeline.
 
         Raises :class:`ValueError` when ``ω`` is not declared
-        :class:`NonDegenerate` on the registry — the rule then
+        :class:`NonDegenerate` on the registry, the rule then
         produces no rewrite and the chain cannot close. The
         :class:`SymplecticProblem` constructor auto-declares the flag,
         so the typical caller never sees this error.
@@ -350,7 +350,7 @@ class SymplecticProblem:
             raise ValueError(
                 "prove_vector_field_equality requires NonDegenerate(ω) "
                 "on the registry; SymplecticProblem normally auto-declares "
-                "this — only triggered when the caller deliberately "
+                "this, only triggered when the caller deliberately "
                 "removed the flag"
             )
         obstruction = Sum(
@@ -377,7 +377,7 @@ class SymplecticProblem:
 
         The chain still proceeds by citing the
         :class:`HamiltonianDefiningRelationDefinition` for the
-        ``(Y, h, ω)`` triple as a one-off axiom — that captures the
+        ``(Y, h, ω)`` triple as a one-off axiom, that captures the
         caller's hypothesis that ``Y`` does in fact satisfy the
         defining relation. Non-degeneracy then licenses the *implicit*
         upgrade from ``ι_Y ω = sign·dh`` to ``Y = X_h`` (the rule
@@ -385,14 +385,14 @@ class SymplecticProblem:
         their goal as a vector-field equality directly).
 
         Typical use: closing
-        ``[X_f, X_g] = X_{\{f,g\}}`` in problem 2c — the caller passes
+        ``[X_f, X_g] = X_{\{f,g\}}`` in problem 2c, the caller passes
         ``Y = lie_bracket(X_f, X_g)`` and ``h = {f, g}``.
 
         Parameters
         ----------
         Y
             The vector field side of the equality. Any :class:`Expr`
-            representing a vector field — typically a
+            representing a vector field, typically a
             :class:`Derivation`, a Lie bracket, or a designated
             :class:`HamiltonianVectorField`.
         h
@@ -407,7 +407,7 @@ class SymplecticProblem:
         Notes
         -----
         The temporary defining relation does *not* persist on
-        :attr:`engine` — successive calls with different ``(Y, h)``
+        :attr:`engine`, successive calls with different ``(Y, h)``
         pairs do not pollute one another's engines.
         """
         from jacopy.algebra.derivation import Act
@@ -454,7 +454,7 @@ class SymplecticProblem:
         """Close ``ι_{X_f} ω + df = 0`` (or its sign-flipped sibling).
 
         Delegates to :meth:`SymplecticManifold.prove_hamiltonian_equivalence`
-        so the manifold's compatibility object drives the bridge —
+        so the manifold's compatibility object drives the bridge,
         identical to constructing the manifold directly and calling
         the method, just guaranteed to use the same registry/sign as
         the rest of the problem.

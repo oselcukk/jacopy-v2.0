@@ -1,4 +1,4 @@
-"""Tests for Faz 13.C — LieBracketVF + Op commutator + Lie-Jacobi VF."""
+"""Tests for Faz 13.C, LieBracketVF + Op commutator + Lie-Jacobi VF."""
 
 import pytest
 
@@ -46,7 +46,7 @@ class TestLieBracketVF:
     def test_distinct_arguments_give_distinct_atoms(self):
         X, Y, Z = Symbol("X"), Symbol("Y"), Symbol("Z")
         assert lie_bracket_vf(X, Y) != lie_bracket_vf(X, Z)
-        # Order matters at the atomic level — antisymmetry is an
+        # Order matters at the atomic level, antisymmetry is an
         # axiom that lives at the rewrite layer, not in identity.
         assert lie_bracket_vf(X, Y) != lie_bracket_vf(Y, X)
 
@@ -77,7 +77,7 @@ class TestOpCommutatorMatches:
         X, Y, w = Symbol("X"), Symbol("Y"), Symbol("ω")
         L_X, L_Y = lie_derivative(X), lie_derivative(Y)
         rule = OpCommutatorVfDefinition()
-        # Negative term first, positive term second — both should match.
+        # Negative term first, positive term second, both should match.
         s = Sum(
             Neg(Act(L_Y, Act(L_X, w))),
             Act(L_X, Act(L_Y, w)),
@@ -192,7 +192,7 @@ class TestLieVfJacobiMatches:
 
     def test_no_match_when_inner_not_lie_bracket_vf(self):
         A, w = Symbol("A"), Symbol("ω")
-        # Outer is a LieBracketVF, but inner is a bare Symbol — not the
+        # Outer is a LieBracketVF, but inner is a bare Symbol, not the
         # nested pattern this axiom captures.
         rule = LieVfJacobiDefinition()
         t = Act(lie_derivative(LieBracketVF(A, Symbol("B"))), w)

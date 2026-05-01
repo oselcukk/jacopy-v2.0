@@ -1,18 +1,18 @@
-# 10 — Diagnostics & proof debugging
+# 10, Diagnostics & proof debugging
 
 This tutorial covers what to do when a `prove_equivalence` call **fails**.
 By the end you'll know how to read a `ProofFailure`, attach a
 `DiagnosticReport` to surviving residuals, and extend the diagnostic
 catalogue with your own rules.
 
-The diagnostic layer was added in Phase 11.A — before it, a stalled
+The diagnostic layer was added in Phase 11.A, before it, a stalled
 proof gave you a bare residual `Expr` and an exception message; you
 were on your own to spot which rewrite never fired. The layer
 mechanises the first pass of that detective work: `diagnose(residual)`
 walks the surviving expression, recognises *stalled shapes* (a
 `d(d(ω))` that never collapsed under d² = 0, an `Act(op, 0)` that
 never got annihilated, an unclassified factor with no grading
-evidence), and emits a hint per shape — a hypothesis list, not a
+evidence), and emits a hint per shape, a hypothesis list, not a
 proof, that points you at the specific rewrite to check.
 
 ## A failing proof
@@ -73,16 +73,16 @@ couldn't reduce the residual further.
 `ProofFailure.report` is a `DiagnosticReport` (or `None` if the
 strategy didn't attach one). It carries:
 
-* `report.residual` — the surviving `Expr`, exactly the term that
+* `report.residual`, the surviving `Expr`, exactly the term that
   `simplify` couldn't drive to `0`.
-* `report.hints` — a list of `DiagnosticHint`, one per recognised
+* `report.hints`, a list of `DiagnosticHint`, one per recognised
   stalled shape.
 
 Each hint exposes four fields:
 
 | Field | Type | What it says |
 |---|---|---|
-| `category` | `str` | Machine key (`stalled-d-squared`, `unclassified-factor`, …) — filter on this in code. |
+| `category` | `str` | Machine key (`stalled-d-squared`, `unclassified-factor`, …), filter on this in code. |
 | `message` | `str` | Human-readable description of the stall. |
 | `location` | `Optional[Expr]` | The offending sub-expression. |
 | `suggestion` | `Optional[str]` | Concrete fix (often "enable mode X" or "register definition Y"). |
@@ -147,7 +147,7 @@ when you only care about one class of hint.
 A diagnostic rule is just a function
 `(expr, registry, engine) → Iterable[DiagnosticHint]`. Register it
 with the `register_rule` decorator and it joins the catalogue
-immediately — no engine wiring required, because diagnostics are
+immediately, no engine wiring required, because diagnostics are
 read-only on the residual tree.
 
 ```python
@@ -179,11 +179,11 @@ catch the same stall.
 
 ## When the report is empty
 
-`bool(report)` is `False` when no rule fired — the residual is in a
+`bool(report)` is `False` when no rule fired, the residual is in a
 shape the catalogue doesn't recognise. That's a signal to either (a)
 inspect the term by hand to find a missing rewrite the existing rules
 should know about, then add a rule, or (b) accept that the stall is
-genuine — the equality you tried to prove may simply not hold.
+genuine, the equality you tried to prove may simply not hold.
 
 ## Summary
 
@@ -192,8 +192,8 @@ genuine — the equality you tried to prove may simply not hold.
 * The report bundles `residual` + a list of `DiagnosticHint`s, each
   with `category` / `message` / `location` / `suggestion`.
 * `diagnose(expr, registry=…)` runs the same pipeline against any
-  expression — handy for inspecting intermediate terms.
+  expression, handy for inspecting intermediate terms.
 * The built-in catalogue covers d²/ι² stalls, `Act` linearity gaps,
   unreduced iota-on-df, and unclassified `Product` factors.
-* Add a rule with `@register_rule` — it's a one-file change with no
+* Add a rule with `@register_rule`, it's a one-file change with no
   engine plumbing.

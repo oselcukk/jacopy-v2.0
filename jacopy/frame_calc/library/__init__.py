@@ -1,5 +1,5 @@
 r"""
-Concrete metric fixtures — Stage H + Faz 19 expansion.
+Concrete metric fixtures, Stage H + Faz 19 expansion.
 
 Ready-made ``(frame, metric)`` factories for standard metrics. Each
 returns ``tuple[CoordinateFrame, ComponentMetric]`` ready for the

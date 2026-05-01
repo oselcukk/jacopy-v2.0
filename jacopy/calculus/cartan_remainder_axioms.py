@@ -6,14 +6,14 @@ Cartan-remainder atoms introduced in
 :mod:`jacopy.calculus.cartan_remainder` (standard) and
 :mod:`jacopy.calculus.tilde.cartan_remainder` (tilde):
 
-* :class:`CartanRemainderDefinition` —
+* :class:`CartanRemainderDefinition`,
   ``K_V → −L_V + d ∘ ι_V``. Acts on ``Act(K_V, ω)`` and emits the inert
   Sum ``Sum(Neg(Act(L_V, ω)), Act(d, Act(ι_V, ω)))``. Configurable
   ``d`` / ``lie_derivative`` / ``interior`` factories let Lie-algebroid
   callers swap the standard Cartan operators for their algebroid
   counterparts.
 
-* :class:`TildeCartanRemainderDefinition` —
+* :class:`TildeCartanRemainderDefinition`,
   ``K̃_η → −L̃_η + d̃ ∘ ι̃_η``. Reads the indexing form ``η`` and Poisson
   bivector ``π`` off the matched
   :class:`~jacopy.calculus.tilde.cartan_remainder.TildeCartanRemainder`
@@ -73,7 +73,7 @@ class CartanRemainderDefinition(Definition):
     Optional ``d`` / ``lie_derivative`` / ``interior`` overrides let
     Lie-algebroid callers substitute their Cartan operators (different
     exterior derivative ``d_E``, algebroid Lie derivative
-    ``L_X^E``, algebroid interior product) — the rule itself is shape-
+    ``L_X^E``, algebroid interior product), the rule itself is shape-
     agnostic, only requiring the three pieces to compose into a
     degree-0 form-side operator.
     """
@@ -123,7 +123,7 @@ class TildeCartanRemainderDefinition(Definition):
     Matches on the outer head being a
     :class:`~jacopy.calculus.tilde.cartan_remainder.TildeCartanRemainder`
     atom. The form ``η`` and bivector ``π`` are read off the matched
-    atom — no constructor parameter needed because each ``K̃_η`` carries
+    atom, no constructor parameter needed because each ``K̃_η`` carries
     its own ``π``. The rewrite constructs fresh ``L̃_η``, ``ι̃_η``, and
     ``d̃`` heads on that ``π``.
 

@@ -62,7 +62,7 @@ class TestLeibnizViaProductRule:
         assert expanded == expected
 
     def test_d_of_function_stays_inert(self):
-        """d on a degree-0 operand is kept inert — it's the atomic 1-form df."""
+        """d on a degree-0 operand is kept inert, it's the atomic 1-form df."""
         reg = PropertyRegistry()
         f = Symbol("f")
         reg.declare(f, Graded(degree=0))
@@ -92,7 +92,7 @@ class TestDSquaredZero:
         assert apply_d_squared_zero(expr) == Integer(0)
 
     def test_composition_with_trailing_operators_collapses(self):
-        """(d ∘ d ∘ E)(x) → 0 — leading d² vanishes the whole stack."""
+        """(d ∘ d ∘ E)(x) → 0, leading d² vanishes the whole stack."""
         x = Symbol("x")
         E = Derivation("E", degree=1)
         expr = Act(compose(d, d, E), x)
@@ -122,7 +122,7 @@ class TestDSquaredZero:
         expr = d(d_E(x))
         assert apply_d_squared_zero(expr) == expr  # unchanged
         # But applying the pass targeted at d_E leaves the same
-        # expression alone too — the leftmost d is not d_E.
+        # expression alone too, the leftmost d is not d_E.
         assert apply_d_squared_zero(expr, target=d_E) == expr
 
     def test_operator_degree_is_plus_one(self):

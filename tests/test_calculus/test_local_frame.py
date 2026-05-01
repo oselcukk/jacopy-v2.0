@@ -1,4 +1,4 @@
-"""Tests for LocalFrame + KroneckerDelta + duality — Faz 17.A."""
+"""Tests for LocalFrame + KroneckerDelta + duality, Faz 17.A."""
 
 from __future__ import annotations
 
@@ -296,7 +296,7 @@ def test_frame_covector_rejects_bad_args():
 
 
 # --------------------------------------------------------------------- #
-# Duality axiom — matches                                               #
+# Duality axiom, matches                                               #
 # --------------------------------------------------------------------- #
 
 
@@ -318,7 +318,7 @@ def test_duality_rejects_swapped_slot_order():
     F = LocalFrame("F")
     rule = F.duality_definition()
     # Pairing with VF in alpha-slot is structurally legal but not the
-    # duality shape — rule should not fire.
+    # duality shape, rule should not fire.
     bad = Pairing(F.X("a"), F.coframe("b"))
     assert not rule.matches(bad)
 
@@ -332,7 +332,7 @@ def test_duality_rejects_cross_frame_pairing():
 
 
 # --------------------------------------------------------------------- #
-# Duality axiom — rewrite                                               #
+# Duality axiom, rewrite                                               #
 # --------------------------------------------------------------------- #
 
 

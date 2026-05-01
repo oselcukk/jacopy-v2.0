@@ -27,12 +27,12 @@ carrying every axiom needed to mechanise the Cartan I structure
 equation:
 
 * :class:`~jacopy.calculus.cartan_forms.TorsionFormDefinition` /
-  :class:`~jacopy.calculus.cartan_forms.CurvatureFormDefinition` —
+  :class:`~jacopy.calculus.cartan_forms.CurvatureFormDefinition`,
   open ``T^a(U, V) → ⟨e^a, T(∇)(U, V)⟩`` and
   ``R^a_b(U, V) → ⟨e^a, R(∇)(U, V) X_b⟩`` respectively;
 * :class:`~jacopy.calculus.torsion_curvature.TorsionDefinitionDefinition`
   / :class:`~jacopy.calculus.torsion_curvature.CurvatureDefinitionDefinition`
-  — open the structural definitions
+ , open the structural definitions
   ``T(∇)(U, V) → ∇_U V − ∇_V U − [U, V]_VF`` and
   ``R(∇)(U, V) Z → ∇_U ∇_V Z − ∇_V ∇_U Z − ∇_{[U,V]_VF} Z``;
 * the four connection X-/Y-slot rules (linearity, scalar pull,
@@ -50,7 +50,7 @@ equation:
 * :class:`~jacopy.calculus.pairing.Pairing` C∞-linearity (scalar pull
   + Sum/Neg distribution) so ``⟨e^a, f·V⟩``-shapes split correctly;
 * the Wedge alternating expansion + arity-1
-  :class:`MultiEval` → :class:`Pairing` bridge (Faz 17.F.1.5/.6) — these
+  :class:`MultiEval` → :class:`Pairing` bridge (Faz 17.F.1.5/.6), these
   fire on the RHS ``(ω^a_b ∧ e^b)(U, V)`` once the
   :class:`IndexedSum` is pushed out of the
   :class:`MultiEval` head;
@@ -62,7 +62,7 @@ equation:
 The bundle deliberately *omits*
 :class:`~jacopy.calculus.cartan_forms.ConnectionFormDefinition`: that
 rule would unfold ``ω^a_b(V) → ⟨e^a, ∇_V X_b⟩``, which the
-:class:`ConnectionFormDecompositionDefinition` immediately re-folds —
+:class:`ConnectionFormDecompositionDefinition` immediately re-folds,
 a loop. The Cartan-structure proof keeps ``ω^a_b`` packaged on the
 RHS and lets the LHS unfold all the way to ``∇_V X_b`` shapes that
 the decomposition rule then re-expresses in terms of ``ω``.
@@ -71,7 +71,7 @@ The wrapper exposes a per-problem
 :class:`~jacopy.core.registry.PropertyRegistry` that declares
 :class:`~jacopy.calculus.local_frame.FrameCovector` and
 :class:`~jacopy.calculus.cartan_forms.ConnectionForm` as degree-1 forms
-— the wedge alternating expansion and the
+, the wedge alternating expansion and the
 :class:`MultiEvalOneFormPairingBridgeDefinition` consult that registry
 to confirm the factors are one-forms before firing.
 
@@ -88,7 +88,7 @@ collect_terms`` pair :class:`~jacopy.library.bianchi_problem.BianchiProblem`
 uses: the Cartan I residue exposes :class:`~jacopy.core.expr.Product`'s
 in different factor orders (e.g. ``P(e,V)·P(ω,U)`` and
 ``P(ω,U)·P(e,V)``) that only :func:`sort_product` puts into a common
-canonical order — without which collect_terms cannot cancel the pair.
+canonical order, without which collect_terms cannot cancel the pair.
 """
 
 from __future__ import annotations
@@ -195,7 +195,7 @@ class CartanStructureProofResult:
 
 
 class CartanStructureProblem:
-    """``(∇, F)`` — Cartan structure equation problem bundle.
+    """``(∇, F)``, Cartan structure equation problem bundle.
 
     Parameters
     ----------
@@ -246,7 +246,7 @@ class CartanStructureProblem:
         :class:`FrameCovector` and :class:`ConnectionForm` carry degree
         ``1``. The wedge alternating expansion and the arity-1
         :class:`MultiEval` → :class:`Pairing` bridge consult this
-        registry before firing — without these declarations both rules
+        registry before firing, without these declarations both rules
         decline to rewrite, and the RHS never reduces.
         """
         reg = PropertyRegistry()
@@ -302,7 +302,7 @@ class CartanStructureProblem:
             MultiEvalIndexedSumPushInDefinition(),
             # 17.A: ``⟨e^a, X_b⟩ → δ^a_b`` for this frame.
             self._frame.duality_definition(),
-            # 12.B: scalar pull-out of either Pairing slot — required
+            # 12.B: scalar pull-out of either Pairing slot, required
             # once the Y-decomposition surfaces ``⟨e^a, P(e^c, V)·X_c⟩``.
             PairingScalarPullDefinition(),
             # 13.B: Sum / Neg distribution through either Pairing slot.
@@ -378,7 +378,7 @@ class CartanStructureProblem:
     def first_cartan_lhs(
         self, U: Expr, V: Expr, upper_a: FrameIndex | str
     ) -> Expr:
-        r"""``T^a(U, V)`` — Cartan I LHS as a :class:`MultiEval`."""
+        r"""``T^a(U, V)``, Cartan I LHS as a :class:`MultiEval`."""
         return MultiEval(
             self.torsion_form(upper_a), U, V, alternating=True
         )
@@ -386,10 +386,10 @@ class CartanStructureProblem:
     def first_cartan_rhs(
         self, U: Expr, V: Expr, upper_a: FrameIndex | str
     ) -> Expr:
-        r"""``(de^a)(U, V) + Σ_b (ω^a_b ∧ e^b)(U, V)`` — Cartan I RHS.
+        r"""``(de^a)(U, V) + Σ_b (ω^a_b ∧ e^b)(U, V)``, Cartan I RHS.
 
         The bound dummy ``b`` is freshly minted on each call as a
-        bound :class:`FrameIndex` — caller-supplied ``upper_a`` is the
+        bound :class:`FrameIndex`, caller-supplied ``upper_a`` is the
         only free index in the result.
         """
         e_a = self.coframe(upper_a)
@@ -413,7 +413,7 @@ class CartanStructureProblem:
         upper_a: FrameIndex | str,
         lower_b: FrameIndex | str,
     ) -> Expr:
-        r"""``R^a_b(U, V)`` — Cartan II LHS as a :class:`MultiEval`."""
+        r"""``R^a_b(U, V)``, Cartan II LHS as a :class:`MultiEval`."""
         return MultiEval(
             self.curvature_form(upper_a, lower_b),
             U,
@@ -428,7 +428,7 @@ class CartanStructureProblem:
         upper_a: FrameIndex | str,
         lower_b: FrameIndex | str,
     ) -> Expr:
-        r"""``(dω^a_b)(U, V) + Σ_c (ω^a_c ∧ ω^c_b)(U, V)`` — Cartan II RHS.
+        r"""``(dω^a_b)(U, V) + Σ_c (ω^a_c ∧ ω^c_b)(U, V)``, Cartan II RHS.
 
         The bound dummy ``c`` is freshly minted on each call as a bound
         :class:`FrameIndex`. The caller-supplied ``upper_a`` /

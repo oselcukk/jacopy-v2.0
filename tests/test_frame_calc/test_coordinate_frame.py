@@ -17,7 +17,7 @@ from jacopy.frame_calc import (
 
 
 class TestFrameProtocol:
-    """The base ``Frame`` is an abstract protocol — direct instantiation is
+    """The base ``Frame`` is an abstract protocol, direct instantiation is
     rejected; subclasses inherit the ``index_names`` default and the index
     bounds-check helper."""
 
@@ -218,7 +218,7 @@ class TestCoordinateFrameEquality:
 
 
 class TestAbstractFrameConstruction:
-    """Stage A.2 — `AbstractFrame` is fully populated."""
+    """Stage A.2, `AbstractFrame` is fully populated."""
 
     def test_construction_with_dim(self) -> None:
         F = AbstractFrame(dim=4)

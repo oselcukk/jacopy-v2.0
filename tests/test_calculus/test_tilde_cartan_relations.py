@@ -9,7 +9,7 @@ of generic 1-forms ``(η_1, …, η_q)`` and closed via
 
 The textbook poses the question for a *vector field* (1-VF). Where the
 engine closes on a higher-degree ``V`` without extra cost, the test
-evaluates on the degree the relation naturally fits — e.g. ``V`` a
+evaluates on the degree the relation naturally fits, e.g. ``V`` a
 2-vector for ι̃ ι̃ + ι̃ ι̃ = 0, since both sides drop two degrees and the
 shortest non-trivial evaluation needs the result to still have at least
 one slot.
@@ -21,9 +21,9 @@ Relations:
 5. ``[L̃_α, ι̃_β] = ι̃_{[α,β]_K}``           (commutator with ι̃)
 6. ``[L̃_α, d̃] = 0``                        (Lie commutes with d̃)
 4. ``[L̃_α, L̃_β] = L̃_{[α,β]_K}``           (Lie commutator)
-2. ``d̃² = 0``                              (Poisson — needs ``[π,π]_SN = 0``)
+2. ``d̃² = 0``                              (Poisson, needs ``[π,π]_SN = 0``)
 
-Relations 2 and 4 are the hardest — they require Jacobi-style identities
+Relations 2 and 4 are the hardest, they require Jacobi-style identities
 of the Koszul bracket / Poisson bivector to close. Tests for them are
 included so that any future closure axiom landing on the engine
 immediately turns those into green lights without code changes.
@@ -56,7 +56,7 @@ def _build_problem(form_names=("ω", "η"), V_degree=1):
     The generic multivector ``V`` is declared :class:`Graded` with the
     requested SN degree; the form symbols are declared 1-forms. The
     problem registers all tilde aux + defining axioms; ``assume_poisson``
-    is *not* called automatically — tests that need it invoke explicitly.
+    is *not* called automatically, tests that need it invoke explicitly.
     """
     reg = PropertyRegistry()
     pi = Symbol("π")
@@ -75,7 +75,7 @@ def _build_problem(form_names=("ω", "η"), V_degree=1):
 
 
 # --------------------------------------------------------------------- #
-# Relation 1 — ι̃_ω ι̃_η + ι̃_η ι̃_ω = 0                                  #
+# Relation 1, ι̃_ω ι̃_η + ι̃_η ι̃_ω = 0                                  #
 # --------------------------------------------------------------------- #
 
 
@@ -105,7 +105,7 @@ class TestTildeIotaAntiCommute:
 
 
 # --------------------------------------------------------------------- #
-# Relation 3 — L̃_ω = d̃ ι̃_ω + ι̃_ω d̃    (Cartan magic, defining)         #
+# Relation 3, L̃_ω = d̃ ι̃_ω + ι̃_ω d̃    (Cartan magic, defining)         #
 # --------------------------------------------------------------------- #
 
 
@@ -139,7 +139,7 @@ class TestTildeCartanMagic:
 
 
 # --------------------------------------------------------------------- #
-# Relation 4 — [L̃_α, L̃_β] = L̃_{[α,β]_K}                                  #
+# Relation 4, [L̃_α, L̃_β] = L̃_{[α,β]_K}                                  #
 # --------------------------------------------------------------------- #
 
 
@@ -148,7 +148,7 @@ class TestTildeLieLieCommutator:
 
     Both sides preserve the SN degree of ``V``: with ``V`` deg-1, both
     sides are 1-vectors, and a single 1-form ``η`` evaluation yields
-    a function. Closure runs through the Faz 14.G closure pipeline —
+    a function. Closure runs through the Faz 14.G closure pipeline,
     after the slot-Lie commutator, anchor Lie homomorphism, pairing
     Leibniz, etc. lower the residue, the
     :class:`WrappedPairingAnchorAntisymmetryDefinition` cancels its 2
@@ -184,7 +184,7 @@ class TestTildeLieLieCommutator:
 
 
 # --------------------------------------------------------------------- #
-# Relation 2 — d̃² V = 0   (π Poisson)                                    #
+# Relation 2, d̃² V = 0   (π Poisson)                                    #
 # --------------------------------------------------------------------- #
 
 
@@ -196,7 +196,7 @@ class TestTildeDSquared:
     :class:`~jacopy.core.properties.Poisson` flag set by
     :meth:`~jacopy.library.koszul_problem.KoszulProblem.assume_poisson`.
     Without ``assume_poisson()`` the rule is a strict no-op and the
-    proof fails — exactly the behaviour that lets a script *check*
+    proof fails, exactly the behaviour that lets a script *check*
     whether a candidate ``π`` is Poisson.
     """
 
@@ -208,7 +208,7 @@ class TestTildeDSquared:
 
         # d̃² V evaluated on (η, ξ): d̃V is a 2-vector, d̃²V a 3-vector,
         # so two slots leave a 1-vector residue. We need at least the
-        # full arity to fully collapse — but the Aux-5 axiom matches
+        # full arity to fully collapse, but the Aux-5 axiom matches
         # at the operator level (``Act(d̃, Act(d̃, V))``) before any
         # MultiEval expansion, so any non-empty etas tuple works.
         lhs = Act(
@@ -220,12 +220,12 @@ class TestTildeDSquared:
 
 
 # --------------------------------------------------------------------- #
-# Relation 6 — [L̃_α, d̃] = 0      (Lie commutes with d̃)                  #
+# Relation 6, [L̃_α, d̃] = 0      (Lie commutes with d̃)                  #
 # --------------------------------------------------------------------- #
 
 
 class TestTildeLieCommutesWithD:
-    r"""``[L̃_α, d̃]V = 0`` — Lie commutes with d̃ on a generic 1-vector.
+    r"""``[L̃_α, d̃]V = 0``, Lie commutes with d̃ on a generic 1-vector.
 
     Closure runs through the Faz 14.G closure pipeline (same as rel-4):
     after the slot-Lie commutator, anchor Lie homomorphism, pairing
@@ -262,7 +262,7 @@ class TestTildeLieCommutesWithD:
 
 
 # --------------------------------------------------------------------- #
-# Relation 5 — [L̃_α, ι̃_β] = ι̃_{[α,β]_K}                                  #
+# Relation 5, [L̃_α, ι̃_β] = ι̃_{[α,β]_K}                                  #
 # --------------------------------------------------------------------- #
 
 
@@ -299,7 +299,7 @@ class TestTildeLieIotaCommutator:
                 )
             ),
         )
-        # RHS: ι̃_{[α,β]_K} V — the bracket-expansion rule unfolds
+        # RHS: ι̃_{[α,β]_K} V, the bracket-expansion rule unfolds
         # ``[α,β]_K`` into the Cartan form L_{ρα}β − L_{ρβ}α − d⟨ρα,β⟩
         # and ι̃-linearity then splits the contraction term-by-term.
         bracket_form = prob.bracket(alpha, beta)

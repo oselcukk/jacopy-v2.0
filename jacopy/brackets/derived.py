@@ -1,5 +1,5 @@
 """
-Derived bracket construction — the mathematical heart of the package.
+Derived bracket construction, the mathematical heart of the package.
 
 Given a graded bracket ``[·, ·]`` on a graded module and a generator
 ``Q`` of odd (or appropriate) degree, the *derived bracket* is
@@ -14,7 +14,7 @@ compatibility condition
     [Q, Q] = 0
 
 holds in the base bracket. This conditionality is the whole point of
-the construction — structures like Poisson, Courant, and Koszul
+the construction, structures like Poisson, Courant, and Koszul
 brackets arise as derived brackets of a Schouten-type base bracket,
 and each of their Jacobi identities reduces to a single equation on
 the generator ``Q``.
@@ -24,12 +24,12 @@ algorithmic level:
 
 * :meth:`expand` produces ``[[a, Q], b]`` using the base bracket's own
   :meth:`~jacopy.brackets.base.GradedBracket.expand` on each layer.
-* :meth:`jacobi_obstruction` returns ``[Q, Q]_base`` — the Expr whose
+* :meth:`jacobi_obstruction` returns ``[Q, Q]_base``, the Expr whose
   vanishing is equivalent to the derived bracket satisfying Jacobi.
 * :func:`derived_bracket` is a light factory helper.
 
-The *Derived Bracket Theorem* itself — that Jacobi holds ⟺ the
-obstruction vanishes — is registered as a package-level theorem in
+The *Derived Bracket Theorem* itself, that Jacobi holds ⟺ the
+obstruction vanishes, is registered as a package-level theorem in
 Faz 9 and consulted from the proof layer. This module only provides
 the object; the theorem lives elsewhere so that each new
 ``DerivedBracket`` instance automatically inherits the result rather
@@ -64,7 +64,7 @@ class VanishingCondition:
     condition around is the same as passing around the theorem's
     hypothesis.
 
-    The class is intentionally minimal — it is data, not a proof
+    The class is intentionally minimal, it is data, not a proof
     tactic. :meth:`holds` runs :func:`simplify` against the
     ``obstruction`` and reports whether the canonical form is the
     literal :class:`Integer` ``0``. Symbolic residues that the
@@ -94,7 +94,7 @@ class DerivedBracket(GradedBracket):
     base
         The underlying graded bracket.
     Q
-        The generator — an :class:`Expr` of degree ``degree_Q``.
+        The generator, an :class:`Expr` of degree ``degree_Q``.
     degree_Q
         Explicit generator degree. Defaults to ``0`` when unspecified.
         The derived bracket's own degree is ``degree_Q − 2`` per the
@@ -113,7 +113,7 @@ class DerivedBracket(GradedBracket):
         ``L_{ρa} b − L_{ρb} a − d⟨ρa, b⟩`` rather than the literal
         ``[[a, Q]_base, b]_base``. The literal form is unreachable
         when operands are 1-forms and the base bracket (SN) takes
-        multivectors — the anchor bridges the two bundles.
+        multivectors, the anchor bridges the two bundles.
     d, lie_derivative
         Cartan operators used *only* when ``acting_on`` is set. Default
         to the smooth-manifold singletons.
@@ -143,7 +143,7 @@ class DerivedBracket(GradedBracket):
         self._Q = Q
         self._degree_Q = as_degree(degree_Q)
         self._acting_on = acting_on
-        # Cartan ops resolved lazily to avoid import-time cycles — only
+        # Cartan ops resolved lazily to avoid import-time cycles, only
         # used when acting_on is set.
         self._d_override = d
         self._lie_derivative_override = lie_derivative
@@ -151,7 +151,7 @@ class DerivedBracket(GradedBracket):
         # Derived-bracket degree formula: |{·,·}_Q| = |Q| - 2. Graded
         # Leibniz always holds; antisymmetry and Jacobi are conditional
         # on [Q, Q]_base = 0. We surface that by reporting Jacobi as
-        # None ("conditional") rather than True or False — the proof
+        # None ("conditional") rather than True or False, the proof
         # layer is the one that discharges it against the obstruction.
         super().__init__(
             display,
@@ -190,7 +190,7 @@ class DerivedBracket(GradedBracket):
 
         With ``acting_on=ρ``:
         ``{a, b}_{Q, ρ} = L_{ρa} b − L_{ρb} a − d⟨ρa, b⟩``,
-        matching :class:`~jacopy.brackets.koszul.KoszulBracket(ρ)` —
+        matching :class:`~jacopy.brackets.koszul.KoszulBracket(ρ)`,
         the structural equality is the content of the
         classical/derived equivalence theorem on Poisson manifolds.
         """
@@ -254,7 +254,7 @@ class DerivedBracket(GradedBracket):
     def jacobi_obstruction(
         self, registry: Optional[PropertyRegistry] = None
     ) -> Expr:
-        """Return ``[Q, Q]_base`` — the expression whose vanishing is
+        """Return ``[Q, Q]_base``, the expression whose vanishing is
         equivalent to the derived bracket satisfying graded Jacobi.
 
         This is the *universal* obstruction: the Derived Bracket Theorem
@@ -265,7 +265,7 @@ class DerivedBracket(GradedBracket):
 
     def jacobi_obstruction_raw(self) -> BracketApply:
         """Return the unexpanded ``[Q, Q]_base`` :class:`BracketApply`
-        node — leaving the base-bracket shape intact for display or
+        node, leaving the base-bracket shape intact for display or
         further pattern matching."""
         return BracketApply(self._base, self._Q, self._Q)
 
@@ -293,7 +293,7 @@ class DerivedBracket(GradedBracket):
         # Extend the base key with the base-bracket reference, the
         # generator, and the generator's degree so that two derived
         # brackets with identical parameters compare equal and hash
-        # alike. ``acting_on`` + Cartan overrides also participate —
+        # alike. ``acting_on`` + Cartan overrides also participate,
         # two derived brackets with different anchors are distinct.
         return super()._identity_key() + (
             self._base,
@@ -317,6 +317,6 @@ def derived_bracket(
     degree_Q: DegreeLike = 0,
     name: Optional[str] = None,
 ) -> DerivedBracket:
-    """Construct a :class:`DerivedBracket` — mirror of the class
+    """Construct a :class:`DerivedBracket`, mirror of the class
     constructor with a friendlier functional name."""
     return DerivedBracket(base, Q, degree_Q=degree_Q, name=name)
