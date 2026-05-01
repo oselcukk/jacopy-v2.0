@@ -1,7 +1,7 @@
 # jacopy
 
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![License: Proprietary](https://img.shields.io/badge/license-proprietary-red)](LICENSE)
 [![Status: Pre-Alpha](https://img.shields.io/badge/status-pre--alpha-orange)](https://pypi.org/classifiers/)
 [![Tests: 3108](https://img.shields.io/badge/tests-3108%20passing-brightgreen)](#testing)
 
@@ -219,7 +219,19 @@ If you use `jacopy` in academic work, please cite:
 
 ## 📄 License
 
-[MIT](LICENSE).
+**Proprietary — Source-Available, Personal Use Only.**
+
+Copyright (c) 2026 Oğuzhan Selçuk. All rights reserved.
+
+This source code is publicly visible for transparency, academic
+review, and personal experimentation. You **may** clone the repo,
+read the code, and run it locally for personal/educational/research
+use, and cite the software in academic work. You **may not** modify,
+redistribute, or use this code in any commercial product or service
+without prior written permission.
+
+For commercial licensing or extended-rights inquiries, contact
+**stabledifgc@gmail.com**. Full terms in [`LICENSE`](LICENSE).
 
 ---
 

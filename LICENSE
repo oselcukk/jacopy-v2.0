@@ -1,21 +1,70 @@
-MIT License
+jacopy — Proprietary Source-Available License
 
-Copyright (c) 2026 Oğuzhan Selçuk
+Copyright (c) 2026 Oğuzhan Selçuk. All rights reserved.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+This source code is made publicly visible for transparency, academic
+review, and personal experimentation. It is **not** open-source software
+in the OSI sense; the rights granted below are deliberately limited.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+================================================================================
+You MAY, without prior permission:
+================================================================================
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+  1. Clone, view, read, and study this repository for personal,
+     educational, or research purposes.
+  2. Run the code on your own machine for personal experimentation
+     and learning.
+  3. Cite this software in academic work, with attribution to the
+     copyright holder and a reference to the public repository URL.
+
+================================================================================
+You MAY NOT, without prior written permission from the copyright holder:
+================================================================================
+
+  1. Modify this software, in whole or in part, for any purpose other
+     than ephemeral local experimentation. Modifications must not be
+     distributed, published, or otherwise made available to others.
+  2. Redistribute this software, modified or unmodified, by any means
+     (including but not limited to: package repositories, mirrors,
+     forks intended as primary distribution channels, embedded copies
+     inside other projects).
+  3. Use this software, or any derivative thereof, in any commercial
+     product, service, or revenue-generating activity.
+  4. Sublicense, sell, or grant rights in this software to any third
+     party.
+  5. Remove or obscure copyright notices, this license, or attribution
+     statements present in the source.
+
+================================================================================
+Pull requests and contributions
+================================================================================
+
+This repository does not solicit external contributions. Pull requests
+may be received but will not be merged unless explicitly invited. By
+submitting a pull request you irrevocably grant the copyright holder a
+perpetual, worldwide, royalty-free license to use, modify, and
+incorporate the contribution at the copyright holder's sole discretion,
+under the terms of this license or any future license the copyright
+holder may adopt.
+
+================================================================================
+Disclaimer of warranty
+================================================================================
+
+THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
+NON-INFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR
+ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+================================================================================
+Licensing inquiries
+================================================================================
+
+For commercial use, redistribution rights, or any usage beyond the
+permissions granted above, contact the copyright holder:
+
+  Oğuzhan Selçuk
+  stabledifgc@gmail.com
