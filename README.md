@@ -69,13 +69,24 @@ Install directly from GitHub.
 pip install git+https://github.com/oselcukk/jacopy-v2.0.git
 ```
 
+If you want the component-level differential geometry submodule
+(`jacopy.frame_calc` — Christoffel / Ricci / Einstein / Kretschmann
+on concrete metrics), install with the `components` extra:
+
+```bash
+pip install "jacopy[components] @ git+https://github.com/oselcukk/jacopy-v2.0.git"
+```
+
 ### For development
 
 ```bash
 git clone https://github.com/oselcukk/jacopy-v2.0.git
 cd jacopy-v2.0
-pip install -e ".[dev]"        # editable + dev tools (pytest, rich, nbformat, ...)
+pip install -e ".[dev]"        # editable + dev tools (pytest, rich, nbformat, sympy, ...)
 ```
+
+> **zsh note:** the brackets in `".[dev]"` need quoting; copy-paste
+> the line as-is.
 
 ### Optional dependency groups
 
@@ -84,11 +95,13 @@ pip install -e ".[dev]"        # editable + dev tools (pytest, rich, nbformat, .
 | `[rich]` | `rich` — coloured terminal tree rendering |
 | `[test]` | `pytest` |
 | `[docs]` | `nbformat`, `nbclient`, `ipykernel` — needed for tutorial notebooks |
+| `[components]` | `sympy` — required for `jacopy.frame_calc` (component-level differential geometry) |
 | `[dev]` | All of the above (single one-liner for contributors) |
 
-**Requirements:** Python ≥ 3.10. **Zero required runtime dependencies** —
-the package works out of the box with the standard library alone;
-extras only enhance display, testing, and notebook execution.
+**Requirements:** Python ≥ 3.10. **Zero required runtime dependencies**
+for the proof / bracket / Cartan core — works with the standard
+library alone. The `frame_calc` submodule is the only part that
+needs SymPy (via the `[components]` extra).
 
 ## 📚 Library landmarks
 
