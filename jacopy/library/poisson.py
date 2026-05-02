@@ -354,6 +354,159 @@ class PoissonBracket:
             self._derived, f, g, h, registry
         )
 
+    def prove_jacobi_by_definitions(
+        self,
+        f: Expr,
+        g: Expr,
+        h: Expr,
+        *,
+        registry: Optional[PropertyRegistry] = None,
+    ) -> ProofChain:
+        r"""Vaisman-style step-by-step expansion of cyclic Poisson Jacobi.
+
+        Builds a three-step :class:`ProofChain` that takes the cyclic
+        Poisson Jacobi sum
+
+        .. math::
+
+            \sum_{\mathrm{cyc}}\{f,\{g,h\}_\pi\}_\pi
+
+        through to
+
+        .. math::
+
+            \tfrac12\,[\pi,\pi]_{SN}(df,\,dg,\,dh)
+
+        by applying three definitional rewrites — *no* citation of the
+        Derived Bracket Theorem. Each step's ``provenance_tag`` is
+        ``"axiom"`` because each rewrite is a definition of one of the
+        underlying objects:
+
+        1. **Hamiltonian-VF view**: :math:`\{f, X\}_\pi = X_f(X)`
+           (definition of :math:`X_f` as the Hamiltonian vector field).
+        2. **Bivector view**: :math:`\{\varphi, \psi\}_\pi
+           = \pi(d\varphi, d\psi)` (definition of the Poisson bracket
+           via :math:`\pi`).
+        3. **SN-on-bivector formula**: :math:`\tfrac12 [\pi,\pi]_{SN}
+           (\alpha,\beta,\gamma) = \sum_{\mathrm{cyc}}
+           X_f(\pi(\beta,\gamma))` (definition of
+           :math:`[\pi,\pi]_{SN}` evaluated on three covectors).
+
+        Both sides reach the common form
+
+        .. math::
+
+            X_f(\{g,h\}_\pi) + X_g(\{h,f\}_\pi) + X_h(\{f,g\}_\pi),
+
+        and the chain records the rewrites that take the cyclic Jacobi
+        sum on the left through this common form to
+        :math:`\tfrac12 [\pi,\pi]_{SN}(df, dg, dh)` on the right.
+
+        The classical Vaisman / Marsden-Ratiu derivation. Compare with
+        :meth:`prove_jacobi_reduction`, which cites the Derived Bracket
+        Theorem in a single ``"theorem"``-tagged step. Both produce the
+        same identity; they differ in *granularity* (3 axiom steps vs.
+        1 theorem citation) and *provenance* (definitional unfolding
+        vs. seeded theorem reference).
+
+        The final operator-level statement
+        :math:`[\pi,\pi]_{SN} = 0`, deduced from
+        :math:`[\pi,\pi]_{SN}(df, dg, dh) = 0` for all
+        :math:`f, g, h`, is the multilinearity / locality argument and
+        sits *outside* the chain — it is the user's responsibility to
+        supply that interpretation.
+
+        Parameters
+        ----------
+        f, g, h
+            Function-like arguments (``Graded(degree=0)`` symbols, or
+            ``Functions("f g h", registry=reg)`` output).
+        registry
+            Optional :class:`PropertyRegistry`; forwarded to the
+            internal calls that need degree information.
+
+        Returns
+        -------
+        ProofChain
+            Three axiom-tagged steps; the chain's ``initial`` is the
+            cyclic Poisson Jacobi compact form, ``final`` is
+            :math:`\tfrac12 [\pi,\pi]_{SN}` evaluated on the three
+            exterior derivatives.
+        """
+        # Lazy imports to keep the module-level import graph quiet:
+        from jacopy.algebra.derivation import Act
+        from jacopy.brackets.base import BracketApply
+        from jacopy.brackets.schouten import sn as default_sn
+        from jacopy.calculus.exterior_d import d as default_d
+        from jacopy.core.multi_eval import MultiEval
+
+        # LHS compact: cyclic Poisson Jacobi sum on (f, g, h)
+        def _P(a: Expr, b: Expr) -> Expr:
+            return BracketApply(self._derived, a, b)
+
+        lhs_compact = (
+            _P(f, _P(g, h)) + _P(g, _P(h, f)) + _P(h, _P(f, g))
+        )
+
+        # LHS Hamiltonian view (after axiom 1): X_f({g,h}_π) + cyclic
+        lhs_ham = (
+            self.via_hamiltonian(f, _P(g, h))
+            + self.via_hamiltonian(g, _P(h, f))
+            + self.via_hamiltonian(h, _P(f, g))
+        )
+
+        # RHS form0: ½[π, π]_SN(df, dg, dh)  (the SN evaluation)
+        sn_self = BracketApply(default_sn, self._pi, self._pi)
+        df = Act(default_d, f)
+        dg = Act(default_d, g)
+        dh = Act(default_d, h)
+        rhs_form0 = MultiEval(
+            sn_self, df, dg, dh,
+            alternating=True, slot_kind="covector",
+        )
+
+        # RHS form1 (after axiom 3): X_f(π(dg, dh)) + cyclic
+        pi_gh = self.bivector_eval(g, h)
+        pi_hf = self.bivector_eval(h, f)
+        pi_fg = self.bivector_eval(f, g)
+        rhs_form1 = (
+            self.via_hamiltonian(f, pi_gh)
+            + self.via_hamiltonian(g, pi_hf)
+            + self.via_hamiltonian(h, pi_fg)
+        )
+
+        # RHS form2 (after axiom 2): X_f({g, h}_π) + cyclic = lhs_ham
+        # (no separate variable needed — same Expr as lhs_ham)
+
+        # Build the chain: lhs_compact → lhs_ham → rhs_form1 → rhs_form0
+        chain = ProofChain()
+        chain.append(ProofStep(
+            lhs_compact, lhs_ham,
+            rule="hamiltonian-view",
+            justification=(
+                "{f, X}_π = X_f(X)  (Hamiltonian-VF definition)"
+            ),
+            provenance_tag="axiom",
+        ))
+        chain.append(ProofStep(
+            lhs_ham, rhs_form1,
+            rule="bivector-eq-bracket",
+            justification=(
+                "{φ, ψ}_π = π(dφ, dψ)  (bivector definition of {·,·}_π)"
+            ),
+            provenance_tag="axiom",
+        ))
+        chain.append(ProofStep(
+            rhs_form1, rhs_form0,
+            rule="sn-bivector-formula",
+            justification=(
+                "½ [π, π]_SN(α, β, γ) = X_f(π(β, γ)) + cyclic  "
+                "(SN-on-bivector definition)"
+            ),
+            provenance_tag="axiom",
+        ))
+        return chain
+
     def koszul_jacobi_condition(
         self,
         registry: Optional[PropertyRegistry] = None,
