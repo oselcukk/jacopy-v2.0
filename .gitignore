@@ -21,3 +21,6 @@ env/
 *.swp
 .DS_Store
 .claude/
+
+# Local-only presentation materials (Pazartesi ders sunumu)
+presentation/
