@@ -50,6 +50,10 @@ from jacopy.library.courant_algebroid import (
     CourantAlgebroid,
     courant_algebroid,
 )
+from jacopy.library.triangular_lie_bialgebroid import (
+    TriangularLieBialgebroid,
+    triangular_lie_bialgebroid,
+)
 from jacopy.library.dirac import (
     THEOREM_DIRAC_INVOLUTIVITY,
     THEOREM_DIRAC_ISOTROPY,
@@ -106,6 +110,8 @@ __all__ = [
     "lie_algebroid",
     "CourantAlgebroid",
     "courant_algebroid",
+    "TriangularLieBialgebroid",
+    "triangular_lie_bialgebroid",
     "DiracStructure",
     "poisson_dirac",
     "presymplectic_dirac",
