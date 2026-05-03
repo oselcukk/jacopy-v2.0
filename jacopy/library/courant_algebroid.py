@@ -35,11 +35,22 @@ from __future__ import annotations
 from typing import Any, Callable, Optional
 
 from jacopy.algebra.derivation import Act, Derivation
-from jacopy.brackets.base import GradedBracket
+from jacopy.brackets.base import BracketApply, GradedBracket
 from jacopy.brackets.courant import CourantBracket
+from jacopy.brackets.courant_anchor_d import (
+    CourantAnchor,
+    CourantAnchorDefinition,
+    DOperator,
+    DOperatorDefinition,
+)
+from jacopy.brackets.courant_inner_product import (
+    CourantInnerProduct,
+    CourantInnerProductDefinition,
+)
 from jacopy.brackets.derived import VanishingCondition
 from jacopy.brackets.dorfman import DorfmanBracket, SectionPair
 from jacopy.brackets.lie import LieBracket
+from jacopy.calculus.pairing import Pairing
 from jacopy.calculus.exterior_d import d as default_d
 from jacopy.calculus.interior import interior as default_interior
 from jacopy.calculus.lie_derivative import (
@@ -218,6 +229,624 @@ class CourantAlgebroid:
     ) -> SectionPair:
         """``[a, b]_D``, the Dorfman twin, same Cartan operators."""
         return self._dorfman.expand(a, b, registry)
+
+    # ---- structural operators (Stage E) ---------------------------- #
+
+    def inner_product(
+        self,
+        a: SectionPair,
+        b: SectionPair,
+    ) -> CourantInnerProduct:
+        """Build the symmetric inner product ``⟨a, b⟩`` on this algebroid.
+
+        Wraps a literal :class:`CourantInnerProduct` Expr node; the
+        unfold is handled by
+        :class:`~jacopy.brackets.courant_inner_product.CourantInnerProductDefinition`
+        when the prove suite invokes the engine on the resulting node.
+        """
+        if not isinstance(a, SectionPair) or not isinstance(b, SectionPair):
+            raise TypeError(
+                "inner_product requires SectionPair operands"
+            )
+        return CourantInnerProduct(a, b)
+
+    def D(self, f: Expr) -> DOperator:
+        """Build the section ``D f = (0, d f)`` for ``f ∈ C∞(M)``.
+
+        Routes the algebroid's own :attr:`d` operator into the
+        :class:`DOperator` instance so non-default Cartan families
+        propagate faithfully when this :class:`CourantAlgebroid` was
+        constructed with a custom ``d``.
+        """
+        if not isinstance(f, Expr):
+            raise TypeError("D() argument must be an Expr")
+        return DOperator(f, d=self._d)
+
+    def anchor_of(self, section: Expr) -> CourantAnchor:
+        """Build the anchor projection ``anchor(section)``.
+
+        The image is a :class:`CourantAnchor` shape; the unfold to the
+        vector half of a :class:`SectionPair` is handled by
+        :class:`~jacopy.brackets.courant_anchor_d.CourantAnchorDefinition`.
+
+        The method is named ``anchor_of`` rather than ``anchor`` to
+        avoid shadowing the canonical anchor-construction helper
+        :func:`jacopy.brackets.courant_anchor_d.anchor` if both are
+        imported into the same scope.
+        """
+        if not isinstance(section, Expr):
+            raise TypeError("anchor_of argument must be an Expr")
+        return CourantAnchor(section)
+
+    # ---- Stage E: D-compatibility prove method --------------------- #
+
+    def prove_D_compat(
+        self,
+        f: Expr,
+    ) -> ProofChain:
+        """Definitional proof of ``anchor(D f) = 0``.
+
+        Two-step axiom-tagged unfold:
+
+        1. ``anchor(D f) → anchor((0, d f))`` via the D-operator
+           direct definition ``D f := (0, d f)``;
+        2. ``anchor((0, d f)) → 0`` via the anchor projection
+           ``anchor((X, α)) := X``.
+
+        Both steps tag with ``provenance_tag="axiom"``: each is a
+        single primitive rewrite from a Definition class, not a
+        seeded theorem citation. The chain therefore exhibits the
+        full definitional path from ``anchor(D f)`` to ``0`` rather
+        than collapsing the derivation into a single step.
+        """
+        if not isinstance(f, Expr):
+            raise TypeError("prove_D_compat argument must be an Expr")
+        Df = self.D(f)
+        anchor_Df = self.anchor_of(Df)
+
+        d_unfold = DOperatorDefinition().rewrite(Df)
+        after_step1 = CourantAnchor(d_unfold)
+        after_step2 = CourantAnchorDefinition().rewrite(after_step1)
+
+        chain = ProofChain()
+        chain.append(
+            ProofStep(
+                anchor_Df,
+                after_step1,
+                rule="DOperatorDefinition",
+                justification=(
+                    "D f := (0, d f); the D operator on (TM ⊕ T*M) "
+                    "places the function's exterior derivative on the "
+                    "form half and zero on the vector half."
+                ),
+                provenance_tag="axiom",
+            )
+        )
+        chain.append(
+            ProofStep(
+                after_step1,
+                after_step2,
+                rule="CourantAnchorDefinition",
+                justification=(
+                    "anchor((X, α)) := X; the canonical projection "
+                    "π_TM picks out the vector-field component of a "
+                    "section pair."
+                ),
+                provenance_tag="axiom",
+            )
+        )
+        return chain
+
+    # ---- Stage E: anchor compatibility ----------------------------- #
+
+    def prove_anchor_compat(
+        self,
+        e1: SectionPair,
+        e2: SectionPair,
+        *,
+        registry: Optional[PropertyRegistry] = None,
+    ) -> ProofChain:
+        """Definitional proof of ``anchor([e1, e2]_C) = [anchor(e1), anchor(e2)]_VF``.
+
+        On concrete operands ``e1 = (X, α)``, ``e2 = (Y, β)`` the chain
+        unfolds the Courant bracket and projects out the vector half:
+
+        1. ``anchor([(X,α),(Y,β)]_C) → anchor(([X,Y]_VF, form_part))``
+           via the Courant bracket definition. The vector-bracket
+           apply on the right is kept *inert* (a literal
+           :class:`BracketApply` on :attr:`vector_bracket`) so the
+           chain's final form reads as the textbook RHS rather than
+           the underlying ``X·Y − Y·X`` derivation product.
+        2. ``anchor((·, ·)) → vector_part`` via the anchor projection
+           ``anchor((X, α)) := X``.
+
+        Both steps are atomic axiom rewrites; no seeded theorem
+        citation is used. The form half is built verbatim from the
+        algebroid's own Cartan operators (``L``, ``ι``, ``d``, plus
+        the H-twist contraction ``ι_Y ι_X H`` when twisted), so the
+        proof is faithful to the H-twisted as well as untwisted
+        Courant bracket.
+        """
+        if not isinstance(e1, SectionPair) or not isinstance(e2, SectionPair):
+            raise TypeError(
+                "prove_anchor_compat requires SectionPair operands"
+            )
+        bracket_apply = BracketApply(self._courant, e1, e2)
+        lhs = self.anchor_of(bracket_apply)
+
+        # Build the unfolded SectionPair, but replace its vector half
+        # with the inert ``BracketApply(vector_bracket, X, Y)`` so the
+        # chain end mirrors ``[anchor(e1), anchor(e2)]_VF`` literally.
+        full_unfold = self._courant.expand(e1, e2, registry)
+        inert_vector = BracketApply(self._vector_bracket, e1.vector, e2.vector)
+        section_with_inert_vec = SectionPair(inert_vector, full_unfold.form)
+        after_step1 = self.anchor_of(section_with_inert_vec)
+        after_step2 = inert_vector
+
+        chain = ProofChain()
+        chain.append(
+            ProofStep(
+                lhs,
+                after_step1,
+                rule="CourantBracketDefinition",
+                justification=(
+                    "[(X,α), (Y,β)]_C := ([X,Y]_VF, "
+                    "L_X β − L_Y α − ½ d(ι_X β − ι_Y α)"
+                    + (" + ι_Y ι_X H" if self.is_twisted else "")
+                    + "); the vector half is the underlying "
+                    "vector-bracket on X and Y."
+                ),
+                provenance_tag="axiom",
+            )
+        )
+        chain.append(
+            ProofStep(
+                after_step1,
+                after_step2,
+                rule="CourantAnchorDefinition",
+                justification=(
+                    "anchor((X, α)) := X; on the unfolded Courant "
+                    "bracket the vector half is exactly [X, Y]_VF, "
+                    "which equals [anchor(e1), anchor(e2)]_VF since "
+                    "anchor((X,α)) = X and anchor((Y,β)) = Y."
+                ),
+                provenance_tag="axiom",
+            )
+        )
+        return chain
+
+    # ---- Stage E: Vaisman Leibniz ---------------------------------- #
+
+    def prove_leibniz(
+        self,
+        e1: SectionPair,
+        e2: SectionPair,
+        f: Expr,
+        *,
+        registry: Optional[PropertyRegistry] = None,
+    ) -> ProofChain:
+        """Definitional proof of the Vaisman Leibniz axiom
+
+        ``[e1, f·e2]_C = f [e1, e2]_C + (anchor(e1)·f) e2 − ⟨e1, e2⟩ D f``.
+
+        Concrete operands ``e1 = (X, α)``, ``e2 = (Y, β)``, scalar
+        ``f ∈ C∞(M)``. The chain emits **eight** axiom-tagged steps,
+        each a single named atomic axiom (no seeded-theorem citation,
+        no bundled Cartan-Leibniz macro):
+
+        1. **CourantBracketDefinition** unfolds
+           ``[(X,α), (fY, fβ)]_C`` to its component-form
+           ``([X, fY]_VF, L_X(fβ) − L_{fY}α − ½ d(ι_X(fβ) − ι_{fY}α))``
+           (plus ``ι_{fY} ι_X H`` when twisted).
+        2. **LieBracketLeibnizSecondSlot**: ``[X, fY] = f [X, Y] + X(f) Y``.
+           Rewrites the vector half.
+        3. **LieDerivativeProductRule**: ``L_X(f β) = f L_X β + X(f) β``.
+           Rewrites the first form-half summand.
+        4. **LieRescaling**: ``L_{fY} α = f L_Y α + α(Y) d f``. Rewrites
+           ``L_{fY} α`` (operator-side rescaling).
+        5. **InteriorScalarLinearity**: ``ι_{f·V}(ω) = f ι_V(ω)`` and
+           ``ι_V(f·ω) = f ι_V(ω)``. Applied to ``ι_X(fβ) → f ι_X β``,
+           ``ι_{fY}α → f ι_Y α``, plus the twist contribution
+           ``ι_{fY} ι_X H → f ι_Y ι_X H`` when twisted.
+        6. **InteriorPairing**: ``ι_V(ω) = ω(V) = ⟨ω, V⟩`` for a 1-form
+           ``ω`` and vector ``V``. Applied to ``ι_X β → β(X)`` and
+           ``ι_Y α → α(Y)``.
+        7. **ExteriorDProductRule**: ``d(f g) = df · g + f · d g`` for a
+           scalar ``f`` and 0-form ``g``. Applied to
+           ``d(f β(X) − f α(Y))`` (also using d-additivity, treated as
+           part of the same product-rule axiom).
+        8. **VaismanLeibnizRegroup**: collect terms by scalar
+           coefficient. The ``f``-subset reassembles ``f [e1, e2]_C``,
+           the ``X(f)``-subset is ``X(f) e2``, the ``df``-subset
+           collapses to ``− ⟨e1, e2⟩ df = − ⟨e1, e2⟩ (form half of D f)``.
+
+        All eight steps are tagged ``provenance_tag="axiom"``. Each step
+        names *exactly one* atomic axiom (some applied to several
+        subexpressions of the same kind, e.g. step 5 applies interior
+        C∞-linearity to two distinct ``ι`` expressions, but they are
+        all instances of one axiom). On the H-twisted algebroid the
+        chain shape is unchanged; the twist term ``ι_{fY} ι_X H`` is
+        threaded through and absorbed by the same C∞-linearity in
+        step 5.
+
+        Parameters
+        ----------
+        e1, e2
+            The unscaled section pairs ``(X, α)`` and ``(Y, β)``.
+        f
+            The scalar function applied to ``e2``.
+        registry
+            Optional property registry; consulted by
+            :meth:`CourantBracket.expand` for degree information when
+            building intermediate Exprs.
+
+        Returns
+        -------
+        :class:`ProofChain`
+            An 8-step chain whose initial Expr is
+            ``BracketApply([·,·]_C, e1, f·e2)`` and whose final Expr
+            is the RHS :class:`SectionPair`.
+
+        Raises
+        ------
+        TypeError
+            If ``e1`` or ``e2`` is not a :class:`SectionPair`, or
+            ``f`` is not an :class:`Expr`.
+        """
+        if not isinstance(e1, SectionPair) or not isinstance(e2, SectionPair):
+            raise TypeError(
+                "prove_leibniz requires SectionPair operands"
+            )
+        if not isinstance(f, Expr):
+            raise TypeError("prove_leibniz f argument must be an Expr")
+
+        X, alpha = e1.vector, e1.form
+        Y, beta = e2.vector, e2.form
+        fY = Product(f, Y)
+        fbeta = Product(f, beta)
+        sc_e2 = SectionPair(fY, fbeta)
+
+        lhs = BracketApply(self._courant, e1, sc_e2)
+
+        L_X = self._lie_derivative(X)
+        L_Y = self._lie_derivative(Y)
+        L_fY = self._lie_derivative(fY)
+        iota_X = self._interior(X)
+        iota_Y = self._interior(Y)
+        iota_fY = self._interior(fY)
+        half = Rational(1, 2)
+        d_op = self._d
+        H = self._background_H
+        df = Act(d_op, f)
+        Xf = Act(L_X, f)
+        beta_X = Pairing(beta, X)
+        alpha_Y = Pairing(alpha, Y)
+        L_X_beta = Act(L_X, beta)
+        L_Y_alpha = Act(L_Y, alpha)
+
+        # ------- Build the eight intermediate states ------- #
+
+        # vec_inert: vector half before Lie-bracket Leibniz (step 1 form).
+        vec_inert = BracketApply(self._vector_bracket, X, fY)
+        # vec_leibniz: vector half after Lie-bracket Leibniz (step 2 form).
+        vec_leibniz = Sum(
+            Product(f, BracketApply(self._vector_bracket, X, Y)),
+            Product(Xf, Y),
+        )
+
+        def _form_half(
+            *,
+            L_X_fbeta_term: Expr,   # represents L_X(fβ) or its rewrite
+            L_fY_alpha_term: Expr,  # represents L_{fY}α or its rewrite
+            iota_X_fbeta: Expr,     # ι_X(fβ) or its rewrite
+            iota_fY_alpha: Expr,    # ι_{fY}α or its rewrite
+            d_inner: Optional[Expr] = None,
+            twist_term: Optional[Expr] = None,
+        ) -> Expr:
+            """Assemble the form half from its five Vaisman pieces.
+
+            ``d_inner`` overrides the half-d term when given (used by
+            step 7 after d-product rule fires); otherwise the half-d
+            term is built as ``− ½ d(iota_X_fbeta − iota_fY_alpha)``.
+            ``twist_term`` is the (optional) ``ι_{fY} ι_X H`` (or its
+            rewrite); only included when self.is_twisted.
+            """
+            if d_inner is None:
+                d_inner_expr = Sum(iota_X_fbeta, Neg(iota_fY_alpha))
+                half_d = Neg(Product(half, Act(d_op, d_inner_expr)))
+            else:
+                half_d = Neg(Product(half, d_inner))
+            terms = [L_X_fbeta_term, Neg(L_fY_alpha_term), half_d]
+            # The "Cartan Leibniz on form" expansion of L_X(fβ) emits
+            # ``f L_X β + X(f) β``, two summands that we keep at the
+            # top level for clean regrouping in step 8. We push them
+            # in only when the caller pre-expanded; otherwise they
+            # arrive as a single ``Act(L_X, fβ)`` term.
+            if self.is_twisted:
+                if twist_term is None:
+                    twist_term = Act(iota_fY, Act(iota_X, H))
+                terms.append(twist_term)
+            return Sum(*terms)
+
+        # State after step 1 (Courant bracket def).
+        F1 = _form_half(
+            L_X_fbeta_term=Act(L_X, fbeta),
+            L_fY_alpha_term=Act(L_fY, alpha),
+            iota_X_fbeta=Act(iota_X, fbeta),
+            iota_fY_alpha=Act(iota_fY, alpha),
+        )
+        after_step1 = SectionPair(vec_inert, F1)
+
+        # State after step 2 (Lie-bracket Leibniz on vector half only).
+        after_step2 = SectionPair(vec_leibniz, F1)
+
+        # State after step 3 (L_X(fβ) → f L_X β + X(f) β).
+        # Replace the L_X(fβ) summand with two separate summands
+        # ``f L_X β`` and ``X(f) β``.
+        F3_terms = [
+            Product(f, L_X_beta),
+            Product(Xf, beta),
+            Neg(Act(L_fY, alpha)),
+            Neg(
+                Product(
+                    half,
+                    Act(
+                        d_op,
+                        Sum(Act(iota_X, fbeta), Neg(Act(iota_fY, alpha))),
+                    ),
+                )
+            ),
+        ]
+        if self.is_twisted:
+            F3_terms.append(Act(iota_fY, Act(iota_X, H)))
+        F3 = Sum(*F3_terms)
+        after_step3 = SectionPair(vec_leibniz, F3)
+
+        # State after step 4 (L_{fY}α → f L_Y α + α(Y) df).
+        # Replace ``− Act(L_fY, α)`` with ``−(f L_Y α + α(Y) df)``,
+        # i.e. ``− f L_Y α − α(Y) df``.
+        F4_terms = [
+            Product(f, L_X_beta),
+            Product(Xf, beta),
+            Neg(Product(f, L_Y_alpha)),
+            Neg(Product(alpha_Y, df)),
+            Neg(
+                Product(
+                    half,
+                    Act(
+                        d_op,
+                        Sum(Act(iota_X, fbeta), Neg(Act(iota_fY, alpha))),
+                    ),
+                )
+            ),
+        ]
+        if self.is_twisted:
+            F4_terms.append(Act(iota_fY, Act(iota_X, H)))
+        F4 = Sum(*F4_terms)
+        after_step4 = SectionPair(vec_leibniz, F4)
+
+        # State after step 5 (interior C∞-linearity, ×2 + twist).
+        # ι_X(fβ) → f ι_X β; ι_{fY}α → f ι_Y α; (twist) ι_{fY} ι_X H
+        # → f ι_Y ι_X H.
+        F5_terms = [
+            Product(f, L_X_beta),
+            Product(Xf, beta),
+            Neg(Product(f, L_Y_alpha)),
+            Neg(Product(alpha_Y, df)),
+            Neg(
+                Product(
+                    half,
+                    Act(
+                        d_op,
+                        Sum(
+                            Product(f, Act(iota_X, beta)),
+                            Neg(Product(f, Act(iota_Y, alpha))),
+                        ),
+                    ),
+                )
+            ),
+        ]
+        if self.is_twisted:
+            F5_terms.append(
+                Product(f, Act(iota_Y, Act(iota_X, H)))
+            )
+        F5 = Sum(*F5_terms)
+        after_step5 = SectionPair(vec_leibniz, F5)
+
+        # State after step 6 (ι on 1-form → Pairing, ×2).
+        # ι_X β → β(X); ι_Y α → α(Y).
+        F6_terms = [
+            Product(f, L_X_beta),
+            Product(Xf, beta),
+            Neg(Product(f, L_Y_alpha)),
+            Neg(Product(alpha_Y, df)),
+            Neg(
+                Product(
+                    half,
+                    Act(
+                        d_op,
+                        Sum(Product(f, beta_X), Neg(Product(f, alpha_Y))),
+                    ),
+                )
+            ),
+        ]
+        if self.is_twisted:
+            F6_terms.append(
+                Product(f, Act(iota_Y, Act(iota_X, H)))
+            )
+        F6 = Sum(*F6_terms)
+        after_step6 = SectionPair(vec_leibniz, F6)
+
+        # State after step 7 (d product rule on the half-d term).
+        # d(f β(X) − f α(Y)) → df (β(X) − α(Y)) + f d(β(X) − α(Y))
+        # by d additivity + Leibniz on each Product.
+        # We assemble the post-Leibniz pre-collection form: keep the
+        # ``½`` distributed over the two summands so step 8 can regroup
+        # cleanly.
+        diff_pairings = Sum(beta_X, Neg(alpha_Y))
+        d_diff = Act(d_op, diff_pairings)
+        F7_terms = [
+            Product(f, L_X_beta),
+            Product(Xf, beta),
+            Neg(Product(f, L_Y_alpha)),
+            Neg(Product(alpha_Y, df)),
+            Neg(Product(half, Product(df, diff_pairings))),
+            Neg(Product(half, Product(f, d_diff))),
+        ]
+        if self.is_twisted:
+            F7_terms.append(
+                Product(f, Act(iota_Y, Act(iota_X, H)))
+            )
+        F7 = Sum(*F7_terms)
+        after_step7 = SectionPair(vec_leibniz, F7)
+
+        # State after step 8 (RHS regrouping).
+        # f-coefficient subset → form half of f [e1, e2]_C
+        # X(f)-coefficient subset → form half of X(f) e2 (= X(f) β)
+        # df-coefficient subset → -⟨e1, e2⟩ df (form half of -⟨e1,e2⟩ Df)
+        f_courant_form_terms = [
+            Product(f, L_X_beta),
+            Neg(Product(f, L_Y_alpha)),
+            Neg(Product(half, Product(f, d_diff))),
+        ]
+        if self.is_twisted:
+            f_courant_form_terms.append(
+                Product(f, Act(iota_Y, Act(iota_X, H)))
+            )
+        f_courant_form = Sum(*f_courant_form_terms)
+        f_courant_vec = Product(f, BracketApply(self._vector_bracket, X, Y))
+        Xf_e2_vec = Product(Xf, Y)
+        Xf_e2_form = Product(Xf, beta)
+        inner = CourantInnerProduct(e1, e2)
+        neg_inner_Df_form = Neg(Product(inner, df))
+        rhs_vec = Sum(f_courant_vec, Xf_e2_vec)
+        rhs_form = Sum(f_courant_form, Xf_e2_form, neg_inner_Df_form)
+        after_step8 = SectionPair(rhs_vec, rhs_form)
+
+        # ------- Assemble the chain ------- #
+        chain = ProofChain()
+        chain.append(
+            ProofStep(
+                lhs,
+                after_step1,
+                rule="CourantBracketDefinition",
+                justification=(
+                    "Unfold [(X,α), (fY, fβ)]_C into ([X, fY]_VF, "
+                    "L_X(fβ) − L_{fY}α − ½ d(ι_X(fβ) − ι_{fY}α)"
+                    + (" + ι_{fY} ι_X H" if self.is_twisted else "")
+                    + "). The vector half is kept inert as "
+                    "BracketApply on the underlying vector bracket."
+                ),
+                provenance_tag="axiom",
+            )
+        )
+        chain.append(
+            ProofStep(
+                after_step1,
+                after_step2,
+                rule="LieBracketLeibnizSecondSlot",
+                justification=(
+                    "[X, fY] = f [X, Y] + X(f) Y; Lie-bracket Leibniz "
+                    "on the second slot. Rewrites the vector half "
+                    "from BracketApply(VB, X, fY) to its expansion."
+                ),
+                provenance_tag="axiom",
+            )
+        )
+        chain.append(
+            ProofStep(
+                after_step2,
+                after_step3,
+                rule="LieDerivativeProductRule",
+                justification=(
+                    "L_X(f β) = f L_X β + X(f) β; Lie-derivative "
+                    "Leibniz on the product of a scalar and a 1-form."
+                ),
+                provenance_tag="axiom",
+            )
+        )
+        chain.append(
+            ProofStep(
+                after_step3,
+                after_step4,
+                rule="LieRescaling",
+                justification=(
+                    "L_{f Y} α = f L_Y α + (df) ι_Y α = f L_Y α + α(Y) df; "
+                    "Lie-derivative rescaling under a scaled vector "
+                    "field, with the iota-on-1-form contraction "
+                    "yielding the pairing α(Y)."
+                ),
+                provenance_tag="axiom",
+            )
+        )
+        chain.append(
+            ProofStep(
+                after_step4,
+                after_step5,
+                rule="InteriorScalarLinearity",
+                justification=(
+                    "ι_{f V}(ω) = f ι_V(ω) and ι_V(f ω) = f ι_V(ω); "
+                    "interior product C∞-linearity in either slot. "
+                    "Applied to ι_X(f β) → f ι_X β, ι_{f Y} α → f ι_Y α"
+                    + (
+                        ", and ι_{f Y} ι_X H → f ι_Y ι_X H "
+                        "for the twist term"
+                        if self.is_twisted
+                        else ""
+                    )
+                    + "."
+                ),
+                provenance_tag="axiom",
+            )
+        )
+        chain.append(
+            ProofStep(
+                after_step5,
+                after_step6,
+                rule="InteriorPairing",
+                justification=(
+                    "ι_V(ω) = ω(V) = ⟨ω, V⟩ for a 1-form ω and vector "
+                    "V; interior product on a 1-form is the canonical "
+                    "pairing. Applied to ι_X β → β(X) = ⟨β, X⟩ and "
+                    "ι_Y α → α(Y) = ⟨α, Y⟩."
+                ),
+                provenance_tag="axiom",
+            )
+        )
+        chain.append(
+            ProofStep(
+                after_step6,
+                after_step7,
+                rule="ExteriorDProductRule",
+                justification=(
+                    "d(f g) = df · g + f · dg for a scalar f and "
+                    "0-form g (extended to the difference β(X) − α(Y) "
+                    "by d-additivity). Applied to "
+                    "d(f β(X) − f α(Y)) → df (β(X) − α(Y)) "
+                    "+ f d(β(X) − α(Y)), yielding the two summands "
+                    "scaled by − ½."
+                ),
+                provenance_tag="axiom",
+            )
+        )
+        chain.append(
+            ProofStep(
+                after_step7,
+                after_step8,
+                rule="VaismanLeibnizRegroup",
+                justification=(
+                    "Collect terms by scalar coefficient: "
+                    "f-coefficient subset → form half of f [e1, e2]_C; "
+                    "X(f)-coefficient subset → form half of X(f) e2; "
+                    "df-coefficient subset (− α(Y) df − ½ β(X) df + ½ "
+                    "α(Y) df = − ½(α(Y) + β(X)) df = − ⟨e1, e2⟩ df) → "
+                    "form half of − ⟨e1, e2⟩ D f. Final: "
+                    "f [e1, e2]_C + X(f) e2 − ⟨e1, e2⟩ D f."
+                ),
+                provenance_tag="axiom",
+            )
+        )
+        return chain
 
     # ---- Jacobi ---------------------------------------------------- #
 

@@ -12,6 +12,19 @@ from jacopy.brackets.derived import (
     derived_bracket,
 )
 from jacopy.brackets.courant import CourantBracket
+from jacopy.brackets.courant_anchor_d import (
+    CourantAnchor,
+    CourantAnchorDefinition,
+    DOperator,
+    DOperatorDefinition,
+    anchor,
+    d_operator,
+)
+from jacopy.brackets.courant_inner_product import (
+    CourantInnerProduct,
+    CourantInnerProductDefinition,
+    courant_inner_product,
+)
 from jacopy.brackets.dorfman import DorfmanBracket, SectionPair
 from jacopy.brackets.dorfman_courant import (
     dorfman_courant_correction,
@@ -32,6 +45,15 @@ __all__ = [
     "derived_bracket",
     "CustomBracket",
     "CourantBracket",
+    "CourantAnchor",
+    "CourantAnchorDefinition",
+    "CourantInnerProduct",
+    "CourantInnerProductDefinition",
+    "DOperator",
+    "DOperatorDefinition",
+    "anchor",
+    "courant_inner_product",
+    "d_operator",
     "DorfmanBracket",
     "SectionPair",
     "dorfman_courant_correction",

@@ -4,11 +4,15 @@ from __future__ import annotations
 
 import pytest
 
+from jacopy.algebra.derivation import Act
 from jacopy.brackets.base import GradedBracket
 from jacopy.brackets.courant import CourantBracket
+from jacopy.brackets.courant_anchor_d import CourantAnchor, DOperator
+from jacopy.brackets.courant_inner_product import CourantInnerProduct
 from jacopy.brackets.derived import VanishingCondition
 from jacopy.brackets.dorfman import DorfmanBracket, SectionPair
 from jacopy.brackets.lie import LieBracket
+from jacopy.calculus.exterior_d import d as default_d
 from jacopy.core.expr import Expr, Integer, Symbol
 from jacopy.core.properties import Graded
 from jacopy.core.registry import PropertyRegistry
@@ -310,3 +314,377 @@ class TestSeededTheorems:
         thm = THEOREM_COURANT_DORFMAN_BRIDGE
         assert "½" in thm.statement
         assert "d(" in thm.statement
+
+
+# --------------------------------------------------------------------- #
+# Stage E.0 wiring: inner_product / D / anchor_of                        #
+# --------------------------------------------------------------------- #
+
+
+class TestStageEStructuralOperators:
+    """``inner_product``, ``D``, ``anchor_of`` helpers on ``CourantAlgebroid``."""
+
+    def test_inner_product_returns_cip(self):
+        C = CourantAlgebroid()
+        X, alpha = Symbol("X"), Symbol("α")
+        Y, beta = Symbol("Y"), Symbol("β")
+        ip = C.inner_product(SectionPair(X, alpha), SectionPair(Y, beta))
+        assert isinstance(ip, CourantInnerProduct)
+        assert ip.left == SectionPair(X, alpha)
+        assert ip.right == SectionPair(Y, beta)
+
+    def test_inner_product_rejects_non_section_pair(self):
+        C = CourantAlgebroid()
+        with pytest.raises(TypeError):
+            C.inner_product(Symbol("a"), Symbol("b"))
+
+    def test_D_returns_d_operator_with_algebroid_d(self):
+        C = CourantAlgebroid()
+        f = Symbol("f")
+        Df = C.D(f)
+        assert isinstance(Df, DOperator)
+        assert Df.f is f
+        assert Df.d_op is C.d
+
+    def test_D_rejects_non_expr(self):
+        C = CourantAlgebroid()
+        with pytest.raises(TypeError):
+            C.D("not_expr")
+
+    def test_anchor_of_returns_courant_anchor(self):
+        C = CourantAlgebroid()
+        X, alpha = Symbol("X"), Symbol("α")
+        a = C.anchor_of(SectionPair(X, alpha))
+        assert isinstance(a, CourantAnchor)
+        assert a.section == SectionPair(X, alpha)
+
+    def test_anchor_of_accepts_opaque_section(self):
+        C = CourantAlgebroid()
+        e = Symbol("e")
+        a = C.anchor_of(e)
+        assert isinstance(a, CourantAnchor)
+        assert a.section is e
+
+
+# --------------------------------------------------------------------- #
+# Stage E.1: prove_D_compat                                              #
+# --------------------------------------------------------------------- #
+
+
+class TestStageEProveDCompat:
+    """Definitional proof of ``anchor(D f) = 0``."""
+
+    def test_returns_proof_chain(self):
+        C = CourantAlgebroid()
+        chain = C.prove_D_compat(Symbol("f"))
+        assert isinstance(chain, ProofChain)
+
+    def test_two_definitional_steps(self):
+        """Chain has *exactly* two atomic axiom steps (no theorem citation)."""
+        C = CourantAlgebroid()
+        chain = C.prove_D_compat(Symbol("f"))
+        assert len(chain) == 2
+
+    def test_both_steps_axiom_tagged(self):
+        """Neither step is a ``theorem`` citation — full definitional unfold."""
+        C = CourantAlgebroid()
+        chain = C.prove_D_compat(Symbol("f"))
+        for step in chain.steps:
+            assert step.provenance_tag == "axiom"
+
+    def test_step_zero_unfolds_D(self):
+        C = CourantAlgebroid()
+        chain = C.prove_D_compat(Symbol("f"))
+        step = chain.steps[0]
+        assert step.rule == "DOperatorDefinition"
+        assert isinstance(step.before, CourantAnchor)
+        assert isinstance(step.before.section, DOperator)
+        assert isinstance(step.after, CourantAnchor)
+        assert isinstance(step.after.section, SectionPair)
+
+    def test_step_one_extracts_vector(self):
+        C = CourantAlgebroid()
+        f = Symbol("f")
+        chain = C.prove_D_compat(f)
+        step = chain.steps[1]
+        assert step.rule == "CourantAnchorDefinition"
+        assert step.after == Integer(0)
+
+    def test_initial_is_anchor_of_D(self):
+        C = CourantAlgebroid()
+        f = Symbol("f")
+        chain = C.prove_D_compat(f)
+        initial = chain.initial
+        assert isinstance(initial, CourantAnchor)
+        assert isinstance(initial.section, DOperator)
+        assert initial.section.f is f
+
+    def test_final_is_zero(self):
+        C = CourantAlgebroid()
+        chain = C.prove_D_compat(Symbol("f"))
+        assert chain.final == Integer(0)
+
+    def test_d_operator_propagates_algebroid_d(self):
+        """If the algebroid carries a custom ``d``, ``D f`` uses *that* d."""
+        C = CourantAlgebroid()
+        f = Symbol("f")
+        chain = C.prove_D_compat(f)
+        step = chain.steps[0]
+        section_after = step.after.section
+        assert isinstance(section_after, SectionPair)
+        assert section_after.form == Act(C.d, f)
+
+    def test_rejects_non_expr_argument(self):
+        C = CourantAlgebroid()
+        with pytest.raises(TypeError):
+            C.prove_D_compat("not_an_expr")
+
+    def test_chain_consistent(self):
+        """Step 1's ``before`` matches step 0's ``after``."""
+        C = CourantAlgebroid()
+        chain = C.prove_D_compat(Symbol("f"))
+        assert chain.steps[1].before == chain.steps[0].after
+
+
+# --------------------------------------------------------------------- #
+# Stage E.2: prove_anchor_compat                                         #
+# --------------------------------------------------------------------- #
+
+
+class TestStageEProveAnchorCompat:
+    """Definitional proof of ``anchor([e1, e2]_C) = [X, Y]_VF``."""
+
+    def test_returns_proof_chain(self, algebroid, ab, registry):
+        a, b = ab
+        chain = algebroid.prove_anchor_compat(a, b, registry=registry)
+        assert isinstance(chain, ProofChain)
+
+    def test_two_definitional_steps(self, algebroid, ab, registry):
+        a, b = ab
+        chain = algebroid.prove_anchor_compat(a, b, registry=registry)
+        assert len(chain) == 2
+
+    def test_both_steps_axiom_tagged(self, algebroid, ab, registry):
+        a, b = ab
+        chain = algebroid.prove_anchor_compat(a, b, registry=registry)
+        for step in chain.steps:
+            assert step.provenance_tag == "axiom"
+
+    def test_step_zero_courant_definition(self, algebroid, ab, registry):
+        a, b = ab
+        chain = algebroid.prove_anchor_compat(a, b, registry=registry)
+        step = chain.steps[0]
+        assert step.rule == "CourantBracketDefinition"
+        assert isinstance(step.before, CourantAnchor)
+        assert isinstance(step.after, CourantAnchor)
+        assert isinstance(step.after.section, SectionPair)
+
+    def test_step_one_anchor_projection(self, algebroid, ab, registry):
+        a, b = ab
+        chain = algebroid.prove_anchor_compat(a, b, registry=registry)
+        step = chain.steps[1]
+        assert step.rule == "CourantAnchorDefinition"
+
+    def test_initial_is_anchor_of_courant_apply(self, algebroid, ab, registry):
+        a, b = ab
+        chain = algebroid.prove_anchor_compat(a, b, registry=registry)
+        initial = chain.initial
+        assert isinstance(initial, CourantAnchor)
+
+    def test_final_is_inert_vector_bracket(self, algebroid, ab, registry):
+        """Final form is ``BracketApply(vector_bracket, X, Y)``."""
+        from jacopy.brackets.base import BracketApply
+        a, b = ab
+        chain = algebroid.prove_anchor_compat(a, b, registry=registry)
+        final = chain.final
+        assert isinstance(final, BracketApply)
+        assert final.bracket is algebroid.vector_bracket
+        assert final.a == a.vector
+        assert final.b == b.vector
+
+    def test_chain_consistent(self, algebroid, ab, registry):
+        a, b = ab
+        chain = algebroid.prove_anchor_compat(a, b, registry=registry)
+        assert chain.steps[1].before == chain.steps[0].after
+
+    def test_section_after_step_zero_carries_inert_vector(
+        self, algebroid, ab, registry
+    ):
+        """Step 0 produces a SectionPair whose vector half is inert."""
+        from jacopy.brackets.base import BracketApply
+        a, b = ab
+        chain = algebroid.prove_anchor_compat(a, b, registry=registry)
+        section = chain.steps[0].after.section
+        assert isinstance(section, SectionPair)
+        assert isinstance(section.vector, BracketApply)
+
+    def test_form_half_includes_lie_terms(self, algebroid, ab, registry):
+        """Form half of the unfold contains L_X β / L_Y α / d(ι terms."""
+        a, b = ab
+        chain = algebroid.prove_anchor_compat(a, b, registry=registry)
+        section = chain.steps[0].after.section
+        assert "L_X" in repr(section.form) or "L_" in repr(section.form)
+
+    def test_twisted_justification_mentions_iY_iX_H(self, twisted, ab, registry):
+        a, b = ab
+        chain = twisted.prove_anchor_compat(a, b, registry=registry)
+        # Justification on step 0 includes the twist contribution
+        assert "ι_Y ι_X H" in chain.steps[0].justification
+
+    def test_twisted_final_still_inert_vector_bracket(self, twisted, ab, registry):
+        """H-twist only affects the form half; vector projection unchanged."""
+        from jacopy.brackets.base import BracketApply
+        a, b = ab
+        chain = twisted.prove_anchor_compat(a, b, registry=registry)
+        assert isinstance(chain.final, BracketApply)
+        assert chain.final.bracket is twisted.vector_bracket
+
+    def test_rejects_non_section_pair_left(self, algebroid, registry):
+        with pytest.raises(TypeError):
+            algebroid.prove_anchor_compat(
+                Symbol("e1"),
+                SectionPair(Symbol("Y"), Symbol("β")),
+                registry=registry,
+            )
+
+    def test_rejects_non_section_pair_right(self, algebroid, registry):
+        with pytest.raises(TypeError):
+            algebroid.prove_anchor_compat(
+                SectionPair(Symbol("X"), Symbol("α")),
+                Symbol("e2"),
+                registry=registry,
+            )
+
+
+# --------------------------------------------------------------------- #
+# Stage E.3: prove_leibniz                                               #
+# --------------------------------------------------------------------- #
+
+
+class TestStageEProveLeibniz:
+    """Definitional proof of Vaisman Leibniz on Courant bracket."""
+
+    @pytest.fixture
+    def f_sym(self):
+        return Symbol("f")
+
+    def test_returns_proof_chain(self, algebroid, ab, f_sym, registry):
+        a, b = ab
+        chain = algebroid.prove_leibniz(a, b, f_sym, registry=registry)
+        assert isinstance(chain, ProofChain)
+
+    def test_eight_axiom_steps(self, algebroid, ab, f_sym, registry):
+        """Granular 8-step chain (Vaisman atomic axioms)."""
+        a, b = ab
+        chain = algebroid.prove_leibniz(a, b, f_sym, registry=registry)
+        assert len(chain) == 8
+
+    def test_all_steps_axiom_tagged(self, algebroid, ab, f_sym, registry):
+        """No theorem-citation shortcut; all eight steps are axioms."""
+        a, b = ab
+        chain = algebroid.prove_leibniz(a, b, f_sym, registry=registry)
+        for step in chain.steps:
+            assert step.provenance_tag == "axiom"
+
+    def test_step_rules_in_expected_order(self, algebroid, ab, f_sym, registry):
+        a, b = ab
+        chain = algebroid.prove_leibniz(a, b, f_sym, registry=registry)
+        rules = [s.rule for s in chain.steps]
+        assert rules == [
+            "CourantBracketDefinition",
+            "LieBracketLeibnizSecondSlot",
+            "LieDerivativeProductRule",
+            "LieRescaling",
+            "InteriorScalarLinearity",
+            "InteriorPairing",
+            "ExteriorDProductRule",
+            "VaismanLeibnizRegroup",
+        ]
+
+    def test_initial_is_bracket_apply(self, algebroid, ab, f_sym, registry):
+        from jacopy.brackets.base import BracketApply
+        a, b = ab
+        chain = algebroid.prove_leibniz(a, b, f_sym, registry=registry)
+        assert isinstance(chain.initial, BracketApply)
+        assert chain.initial.bracket is algebroid.courant
+
+    def test_final_is_section_pair(self, algebroid, ab, f_sym, registry):
+        a, b = ab
+        chain = algebroid.prove_leibniz(a, b, f_sym, registry=registry)
+        assert isinstance(chain.final, SectionPair)
+
+    def test_chain_consistency(self, algebroid, ab, f_sym, registry):
+        """Each step's before equals the previous step's after."""
+        a, b = ab
+        chain = algebroid.prove_leibniz(a, b, f_sym, registry=registry)
+        for i in range(1, len(chain)):
+            assert chain.steps[i].before == chain.steps[i - 1].after
+
+    def test_step_zero_unfolds_to_section_pair(
+        self, algebroid, ab, f_sym, registry
+    ):
+        """After Courant def, current state is a SectionPair."""
+        a, b = ab
+        chain = algebroid.prove_leibniz(a, b, f_sym, registry=registry)
+        assert isinstance(chain.steps[0].after, SectionPair)
+
+    def test_twisted_chain_has_same_length(self, twisted, ab, f_sym, registry):
+        a, b = ab
+        chain = twisted.prove_leibniz(a, b, f_sym, registry=registry)
+        assert len(chain) == 8
+
+    def test_twisted_step_zero_mentions_iY_iX_H(
+        self, twisted, ab, f_sym, registry
+    ):
+        a, b = ab
+        chain = twisted.prove_leibniz(a, b, f_sym, registry=registry)
+        # The Courant def justification mentions the H twist contraction
+        # (in the f-scaled form: ι_{fY} ι_X H).
+        assert "ι_{fY}" in chain.steps[0].justification
+
+    def test_twisted_step_four_factors_h_via_iota_linearity(
+        self, twisted, ab, f_sym, registry
+    ):
+        """Step 4 (InteriorScalarLinearity) factors f out of ι_{fY} ι_X H."""
+        a, b = ab
+        chain = twisted.prove_leibniz(a, b, f_sym, registry=registry)
+        assert "f ι_Y ι_X H" in chain.steps[4].justification
+
+    def test_final_form_carries_inner_product_node(
+        self, algebroid, ab, f_sym, registry
+    ):
+        """The − ⟨e1, e2⟩ Df term appears via a CourantInnerProduct node."""
+        a, b = ab
+        chain = algebroid.prove_leibniz(a, b, f_sym, registry=registry)
+        final_repr = repr(chain.final)
+        assert "⟨" in final_repr or "CourantInnerProduct" in final_repr
+
+    def test_final_form_carries_d_of_f(self, algebroid, ab, f_sym, registry):
+        """The Df term shows up in the form half via d(f)."""
+        a, b = ab
+        chain = algebroid.prove_leibniz(a, b, f_sym, registry=registry)
+        # df should appear in the form half.
+        assert "d" in repr(chain.final.form)
+
+    def test_rejects_non_section_pair_e1(self, algebroid, f_sym, registry):
+        with pytest.raises(TypeError):
+            algebroid.prove_leibniz(
+                Symbol("e1"),
+                SectionPair(Symbol("Y"), Symbol("β")),
+                f_sym,
+                registry=registry,
+            )
+
+    def test_rejects_non_section_pair_e2(self, algebroid, f_sym, registry):
+        with pytest.raises(TypeError):
+            algebroid.prove_leibniz(
+                SectionPair(Symbol("X"), Symbol("α")),
+                Symbol("e2"),
+                f_sym,
+                registry=registry,
+            )
+
+    def test_rejects_non_expr_f(self, algebroid, ab, registry):
+        a, b = ab
+        with pytest.raises(TypeError):
+            algebroid.prove_leibniz(a, b, "not_an_expr", registry=registry)
