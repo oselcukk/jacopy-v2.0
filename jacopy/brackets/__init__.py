@@ -12,6 +12,7 @@ from jacopy.brackets.derived import (
     derived_bracket,
 )
 from jacopy.brackets.courant import CourantBracket
+from jacopy.brackets.courant_lwx import LWXCourantBracket
 from jacopy.brackets.courant_anchor_d import (
     CourantAnchor,
     CourantAnchorDefinition,
@@ -45,6 +46,7 @@ __all__ = [
     "derived_bracket",
     "CustomBracket",
     "CourantBracket",
+    "LWXCourantBracket",
     "CourantAnchor",
     "CourantAnchorDefinition",
     "CourantInnerProduct",

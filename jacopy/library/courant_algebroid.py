@@ -37,6 +37,7 @@ from typing import Any, Callable, Optional
 from jacopy.algebra.derivation import Act, Derivation
 from jacopy.brackets.base import BracketApply, GradedBracket
 from jacopy.brackets.courant import CourantBracket
+from jacopy.brackets.courant_lwx import LWXCourantBracket
 from jacopy.brackets.courant_anchor_d import (
     CourantAnchor,
     CourantAnchorDefinition,
@@ -116,12 +117,14 @@ class CourantAlgebroid:
         "_lie_derivative",
         "_interior",
         "_background_H",
+        "_bialgebroid",
         "_name",
     )
 
     def __init__(
         self,
         *,
+        bialgebroid: Optional[Any] = None,
         vector_bracket: Optional[GradedBracket] = None,
         d: Optional[Derivation] = None,
         lie_derivative: Optional[LieDerivativeFactory] = None,
@@ -133,38 +136,87 @@ class CourantAlgebroid:
             raise TypeError(
                 "CourantAlgebroid background_H must be an Expr when provided"
             )
-        self._vector_bracket = (
-            vector_bracket if vector_bracket is not None else LieBracket()
-        )
-        self._d = d if d is not None else default_d
-        self._lie_derivative = (
-            lie_derivative
-            if lie_derivative is not None
-            else default_lie_derivative
-        )
-        self._interior = (
-            interior if interior is not None else default_interior
-        )
+        if bialgebroid is not None and any(
+            arg is not None
+            for arg in (vector_bracket, d, lie_derivative, interior)
+        ):
+            raise ValueError(
+                "CourantAlgebroid: when 'bialgebroid' is supplied the "
+                "Cartan operators (vector_bracket / d / lie_derivative / "
+                "interior) must be omitted; the bialgebroid carries them."
+            )
+        self._bialgebroid = bialgebroid
+        if bialgebroid is not None:
+            # LWX mode: pull TM-side operators from the bialgebroid.
+            for attr in (
+                "tm_bracket", "tm_d", "tm_lie_derivative", "tm_interior",
+                "koszul", "tilde_d", "tilde_lie_derivative",
+                "tilde_interior", "sharp", "pi",
+            ):
+                if not hasattr(bialgebroid, attr):
+                    raise TypeError(
+                        f"CourantAlgebroid: bialgebroid is missing "
+                        f"attribute '{attr}'; expected a "
+                        f"TriangularLieBialgebroid"
+                    )
+            self._vector_bracket = bialgebroid.tm_bracket
+            self._d = bialgebroid.tm_d
+            self._lie_derivative = bialgebroid.tm_lie_derivative
+            self._interior = bialgebroid.tm_interior
+        else:
+            self._vector_bracket = (
+                vector_bracket if vector_bracket is not None else LieBracket()
+            )
+            self._d = d if d is not None else default_d
+            self._lie_derivative = (
+                lie_derivative
+                if lie_derivative is not None
+                else default_lie_derivative
+            )
+            self._interior = (
+                interior if interior is not None else default_interior
+            )
         self._background_H = background_H
-        self._courant = CourantBracket(
-            vector_bracket=self._vector_bracket,
-            d=self._d,
-            lie_derivative=self._lie_derivative,
-            interior=self._interior,
-            background_H=background_H,
-        )
-        # Dorfman twin uses the SAME Cartan operators. The bridge
-        # identity is only exact when both brackets share operators;
-        # mixing would re-introduce the very residuals the bridge
-        # claims to cancel.
-        self._dorfman = DorfmanBracket(
-            vector_bracket=self._vector_bracket,
-            d=self._d,
-            lie_derivative=self._lie_derivative,
-            interior=self._interior,
-        )
+        if bialgebroid is not None:
+            # LWX Courant bracket — Liu-Weinstein-Xu form on (TM, T*M).
+            self._courant = LWXCourantBracket(
+                bialgebroid, background_H=background_H
+            )
+            # Dorfman twin: not constructed in LWX mode. Bridge identity
+            # has a different shape on a triangular bialgebroid (involves
+            # Koszul + tilde-d corrections); accessing :attr:`dorfman` /
+            # :meth:`expand_dorfman` raises AttributeError until the LWX
+            # Dorfman is implemented in a follow-up.
+            self._dorfman = None
+        else:
+            self._courant = CourantBracket(
+                vector_bracket=self._vector_bracket,
+                d=self._d,
+                lie_derivative=self._lie_derivative,
+                interior=self._interior,
+                background_H=background_H,
+            )
+            # Dorfman twin uses the SAME Cartan operators. The bridge
+            # identity is only exact when both brackets share operators;
+            # mixing would re-introduce the very residuals the bridge
+            # claims to cancel.
+            self._dorfman = DorfmanBracket(
+                vector_bracket=self._vector_bracket,
+                d=self._d,
+                lie_derivative=self._lie_derivative,
+                interior=self._interior,
+            )
         if name is not None:
             self._name = name
+        elif bialgebroid is not None:
+            twist = (
+                f", H={background_H._repr_inner()}"
+                if background_H is not None
+                else ""
+            )
+            self._name = (
+                f"LWXCourant(TM⊕T*M; π={bialgebroid.pi._repr_inner()}{twist})"
+            )
         elif background_H is None:
             self._name = "Courant(TM⊕T*M)"
         else:
@@ -175,12 +227,37 @@ class CourantAlgebroid:
     # ---- accessors -------------------------------------------------- #
 
     @property
-    def courant(self) -> CourantBracket:
+    def courant(self) -> Any:
+        """The Courant bracket — :class:`CourantBracket` in standard mode,
+        :class:`~jacopy.brackets.courant_lwx.LWXCourantBracket` in LWX mode.
+        """
         return self._courant
 
     @property
     def dorfman(self) -> DorfmanBracket:
+        """Dorfman twin (standard mode only).
+
+        Raises :class:`AttributeError` in LWX mode: the bridge identity
+        on a triangular bialgebroid involves Koszul + tilde-d
+        corrections and is not yet implemented at this layer.
+        """
+        if self._dorfman is None:
+            raise AttributeError(
+                "CourantAlgebroid in LWX mode (bialgebroid set) does not "
+                "carry a Dorfman twin yet; the triangular-bialgebroid "
+                "bridge identity is a Stage F follow-up."
+            )
         return self._dorfman
+
+    @property
+    def bialgebroid(self) -> Any:
+        """The triangular Lie bialgebroid (LWX mode), or ``None``."""
+        return self._bialgebroid
+
+    @property
+    def is_lwx(self) -> bool:
+        """``True`` iff this algebroid was constructed with a bialgebroid."""
+        return self._bialgebroid is not None
 
     @property
     def vector_bracket(self) -> GradedBracket:
@@ -227,7 +304,15 @@ class CourantAlgebroid:
         b: SectionPair,
         registry: Optional[PropertyRegistry] = None,
     ) -> SectionPair:
-        """``[a, b]_D``, the Dorfman twin, same Cartan operators."""
+        """``[a, b]_D``, the Dorfman twin, same Cartan operators.
+
+        Standard mode only. Raises :class:`AttributeError` in LWX mode.
+        """
+        if self._dorfman is None:
+            raise AttributeError(
+                "expand_dorfman is unavailable in LWX mode "
+                "(triangular bialgebroid bridge is a Stage F follow-up)."
+            )
         return self._dorfman.expand(a, b, registry)
 
     # ---- structural operators (Stage E) ---------------------------- #

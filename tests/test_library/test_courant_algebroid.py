@@ -935,3 +935,107 @@ class TestStageEProveJacobiByDefinitions:
         assert isinstance(chain, ProofChain)
         # The two methods coexist; prove_jacobi_by_definitions is the
         # definitional alternative.
+
+
+# --------------------------------------------------------------------- #
+# Stage F.2: CourantAlgebroid LWX mode                                   #
+# --------------------------------------------------------------------- #
+
+
+class TestStageFLWXMode:
+    """``CourantAlgebroid(bialgebroid=...)`` switches to LWX mode."""
+
+    @pytest.fixture
+    def tlb(self):
+        from jacopy.library.triangular_lie_bialgebroid import (
+            TriangularLieBialgebroid,
+        )
+        return TriangularLieBialgebroid(Symbol("π"))
+
+    @pytest.fixture
+    def C_lwx(self, tlb):
+        return CourantAlgebroid(bialgebroid=tlb)
+
+    def test_is_lwx_true(self, C_lwx):
+        assert C_lwx.is_lwx is True
+
+    def test_default_is_not_lwx(self, algebroid):
+        assert algebroid.is_lwx is False
+
+    def test_bialgebroid_attribute(self, C_lwx, tlb):
+        assert C_lwx.bialgebroid is tlb
+
+    def test_default_bialgebroid_none(self, algebroid):
+        assert algebroid.bialgebroid is None
+
+    def test_lwx_courant_is_lwx_bracket(self, C_lwx):
+        from jacopy.brackets.courant_lwx import LWXCourantBracket
+        assert isinstance(C_lwx.courant, LWXCourantBracket)
+
+    def test_standard_courant_is_courant_bracket(self, algebroid):
+        assert isinstance(algebroid.courant, CourantBracket)
+
+    def test_lwx_dorfman_raises(self, C_lwx):
+        with pytest.raises(AttributeError, match="LWX mode"):
+            _ = C_lwx.dorfman
+
+    def test_lwx_expand_dorfman_raises(self, C_lwx):
+        a = SectionPair(Symbol("U"), Symbol("ω"))
+        b = SectionPair(Symbol("V"), Symbol("η"))
+        with pytest.raises(AttributeError, match="LWX mode"):
+            C_lwx.expand_dorfman(a, b)
+
+    def test_lwx_name_carries_pi(self, C_lwx):
+        assert "π" in C_lwx.name
+        assert "LWX" in C_lwx.name
+
+    def test_lwx_expand_returns_section_pair(self, C_lwx):
+        a = SectionPair(Symbol("U"), Symbol("ω"))
+        b = SectionPair(Symbol("V"), Symbol("η"))
+        result = C_lwx.expand(a, b)
+        assert isinstance(result, SectionPair)
+
+    def test_lwx_uses_tilde_d(self, C_lwx, tlb):
+        assert C_lwx.courant.bialgebroid.tilde_d is tlb.tilde_d
+
+    def test_lwx_with_h_twist(self, tlb):
+        H = Symbol("H")
+        C = CourantAlgebroid(bialgebroid=tlb, background_H=H)
+        assert C.is_twisted
+        assert C.is_lwx
+        assert "H" in C.name
+
+    def test_mixing_bialgebroid_with_d_raises(self, tlb):
+        with pytest.raises(ValueError, match="bialgebroid"):
+            CourantAlgebroid(bialgebroid=tlb, d=default_d)
+
+    def test_mixing_bialgebroid_with_lie_raises(self, tlb):
+        with pytest.raises(ValueError, match="bialgebroid"):
+            from jacopy.calculus.lie_derivative import lie_derivative
+            CourantAlgebroid(bialgebroid=tlb, lie_derivative=lie_derivative)
+
+    def test_mixing_bialgebroid_with_interior_raises(self, tlb):
+        from jacopy.calculus.interior import interior
+        with pytest.raises(ValueError, match="bialgebroid"):
+            CourantAlgebroid(bialgebroid=tlb, interior=interior)
+
+    def test_mixing_bialgebroid_with_vector_bracket_raises(self, tlb):
+        with pytest.raises(ValueError, match="bialgebroid"):
+            CourantAlgebroid(bialgebroid=tlb, vector_bracket=LieBracket())
+
+    def test_invalid_bialgebroid_raises(self):
+        with pytest.raises(TypeError, match="missing attribute"):
+            CourantAlgebroid(bialgebroid=Symbol("not_tlb"))
+
+    def test_lwx_inherits_tm_bracket(self, C_lwx, tlb):
+        assert C_lwx.vector_bracket is tlb.tm_bracket
+        assert C_lwx.d is tlb.tm_d
+        assert C_lwx.lie_derivative is tlb.tm_lie_derivative
+        assert C_lwx.interior is tlb.tm_interior
+
+    def test_jacobi_condition_works_in_lwx_mode(self, C_lwx):
+        """``jacobi_condition`` returns the bracket's own VanishingCondition."""
+        cond = C_lwx.jacobi_condition()
+        # In untwisted LWX mode, Jacobi condition is whatever the LWX
+        # bracket reports — we just check it doesn't crash.
+        assert cond is not None
