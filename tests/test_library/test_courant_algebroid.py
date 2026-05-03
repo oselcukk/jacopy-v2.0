@@ -1039,3 +1039,177 @@ class TestStageFLWXMode:
         # In untwisted LWX mode, Jacobi condition is whatever the LWX
         # bracket reports — we just check it doesn't crash.
         assert cond is not None
+
+
+# --------------------------------------------------------------------- #
+# Stage F.3: LWX-mode prove methods                                      #
+# --------------------------------------------------------------------- #
+
+
+class TestStageFLWXProveMethods:
+    """LWX-mode dispatch in CourantAlgebroid prove methods."""
+
+    @pytest.fixture
+    def tlb(self):
+        from jacopy.library.triangular_lie_bialgebroid import (
+            TriangularLieBialgebroid,
+        )
+        return TriangularLieBialgebroid(Symbol("π"))
+
+    @pytest.fixture
+    def C_lwx(self, tlb):
+        return CourantAlgebroid(bialgebroid=tlb)
+
+    @pytest.fixture
+    def C_lwx_twisted(self, tlb):
+        return CourantAlgebroid(bialgebroid=tlb, background_H=Symbol("H"))
+
+    @pytest.fixture
+    def operands(self):
+        e1 = SectionPair(Symbol("U"), Symbol("ω"))
+        e2 = SectionPair(Symbol("V"), Symbol("η"))
+        e3 = SectionPair(Symbol("W"), Symbol("γ"))
+        return e1, e2, e3
+
+    # ---- prove_D_compat (deferred in LWX mode) -------------------- #
+
+    def test_prove_D_compat_lwx_raises_not_implemented(self, C_lwx):
+        with pytest.raises(NotImplementedError, match="LWX mode"):
+            C_lwx.prove_D_compat(Symbol("f"))
+
+    def test_prove_D_compat_lwx_message_mentions_convention(self, C_lwx):
+        try:
+            C_lwx.prove_D_compat(Symbol("f"))
+            pytest.fail("expected NotImplementedError")
+        except NotImplementedError as e:
+            assert "convention" in str(e).lower()
+
+    # ---- prove_anchor_compat (full LWX impl) ---------------------- #
+
+    def test_prove_anchor_compat_lwx_three_steps(self, C_lwx, operands):
+        e1, e2, _ = operands
+        chain = C_lwx.prove_anchor_compat(e1, e2)
+        assert len(chain) == 3
+
+    def test_prove_anchor_compat_lwx_all_axiom(self, C_lwx, operands):
+        e1, e2, _ = operands
+        chain = C_lwx.prove_anchor_compat(e1, e2)
+        for step in chain.steps:
+            assert step.provenance_tag == "axiom"
+
+    def test_prove_anchor_compat_lwx_step_rules(self, C_lwx, operands):
+        e1, e2, _ = operands
+        chain = C_lwx.prove_anchor_compat(e1, e2)
+        rules = [s.rule for s in chain.steps]
+        assert rules == [
+            "LWXBracketDefinition",
+            "MixedAnchorProjection",
+            "TildeAnchorCompatibility",
+        ]
+
+    def test_prove_anchor_compat_lwx_chain_consistent(self, C_lwx, operands):
+        e1, e2, _ = operands
+        chain = C_lwx.prove_anchor_compat(e1, e2)
+        for i in range(1, len(chain)):
+            assert chain.steps[i].before == chain.steps[i - 1].after
+
+    def test_prove_anchor_compat_lwx_final_has_sharp(self, C_lwx, operands):
+        """Final form is [U + π^♯(ω), V + π^♯(η)]_TM."""
+        e1, e2, _ = operands
+        chain = C_lwx.prove_anchor_compat(e1, e2)
+        assert "π♯" in repr(chain.final)
+        assert "ω" in repr(chain.final) and "η" in repr(chain.final)
+
+    def test_prove_anchor_compat_lwx_final_is_lie_bracket(
+        self, C_lwx, operands, tlb
+    ):
+        from jacopy.brackets.base import BracketApply
+        e1, e2, _ = operands
+        chain = C_lwx.prove_anchor_compat(e1, e2)
+        assert isinstance(chain.final, BracketApply)
+        assert chain.final.bracket is tlb.tm_bracket
+
+    # ---- prove_leibniz (deferred in LWX mode) --------------------- #
+
+    def test_prove_leibniz_lwx_raises_not_implemented(self, C_lwx, operands):
+        e1, e2, _ = operands
+        with pytest.raises(NotImplementedError, match="LWX mode"):
+            C_lwx.prove_leibniz(e1, e2, Symbol("f"))
+
+    def test_prove_leibniz_lwx_message_mentions_convention(
+        self, C_lwx, operands
+    ):
+        e1, e2, _ = operands
+        try:
+            C_lwx.prove_leibniz(e1, e2, Symbol("f"))
+            pytest.fail("expected NotImplementedError")
+        except NotImplementedError as e:
+            assert "convention" in str(e).lower()
+
+    # ---- prove_inner_compat (deferred in LWX mode) ---------------- #
+
+    def test_prove_inner_compat_lwx_raises_not_implemented(
+        self, C_lwx, operands
+    ):
+        e1, e2, e3 = operands
+        with pytest.raises(NotImplementedError, match="LWX mode"):
+            C_lwx.prove_inner_compat(e1, e2, e3)
+
+    def test_prove_inner_compat_lwx_message_mentions_inner_product(
+        self, C_lwx, operands
+    ):
+        e1, e2, e3 = operands
+        try:
+            C_lwx.prove_inner_compat(e1, e2, e3)
+            pytest.fail("expected NotImplementedError")
+        except NotImplementedError as e:
+            assert "inner product" in str(e).lower()
+
+    # ---- prove_jacobi_by_definitions (full LWX impl) -------------- #
+
+    def test_prove_jacobi_by_definitions_lwx_four_steps(self, C_lwx, operands):
+        e1, e2, e3 = operands
+        chain = C_lwx.prove_jacobi_by_definitions(e1, e2, e3)
+        assert len(chain) == 4
+
+    def test_prove_jacobi_by_definitions_lwx_all_axiom(self, C_lwx, operands):
+        e1, e2, e3 = operands
+        chain = C_lwx.prove_jacobi_by_definitions(e1, e2, e3)
+        for step in chain.steps:
+            assert step.provenance_tag == "axiom"
+
+    def test_prove_jacobi_by_definitions_lwx_step_rules(
+        self, C_lwx, operands
+    ):
+        e1, e2, e3 = operands
+        chain = C_lwx.prove_jacobi_by_definitions(e1, e2, e3)
+        rules = [s.rule for s in chain.steps]
+        assert rules == [
+            "CyclicCourantJacobiatorDefinition",
+            "LWXSplitTMTildeSides",
+            "CyclicCrossIdentityCancellation",
+            "TwoSideJacobiClosure",
+        ]
+
+    def test_prove_jacobi_by_definitions_lwx_untwisted_final_zero(
+        self, C_lwx, operands
+    ):
+        e1, e2, e3 = operands
+        chain = C_lwx.prove_jacobi_by_definitions(e1, e2, e3)
+        assert chain.final == Integer(0)
+
+    def test_prove_jacobi_by_definitions_lwx_twisted_final_dH(
+        self, C_lwx_twisted, operands
+    ):
+        e1, e2, e3 = operands
+        chain = C_lwx_twisted.prove_jacobi_by_definitions(e1, e2, e3)
+        assert "H" in repr(chain.final)
+        assert "d" in repr(chain.final)
+
+    def test_prove_jacobi_by_definitions_lwx_chain_consistent(
+        self, C_lwx, operands
+    ):
+        e1, e2, e3 = operands
+        chain = C_lwx.prove_jacobi_by_definitions(e1, e2, e3)
+        for i in range(1, len(chain)):
+            assert chain.steps[i].before == chain.steps[i - 1].after

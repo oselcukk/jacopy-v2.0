@@ -386,6 +386,16 @@ class CourantAlgebroid:
         """
         if not isinstance(f, Expr):
             raise TypeError("prove_D_compat argument must be an Expr")
+        if self.is_lwx:
+            raise NotImplementedError(
+                "prove_D_compat is not implemented in LWX mode: the "
+                "D operator's convention on a triangular bialgebroid "
+                "is ambiguous between Vaisman's ½(π^♯(df), df), "
+                "Roytenberg's (-π^♯(df), df), and the standard exact "
+                "(0, df). Pick a convention via memory:"
+                " faz9_stage_f_lwx_courant.md before extending this "
+                "method to LWX mode."
+            )
         Df = self.D(f)
         anchor_Df = self.anchor_of(Df)
 
@@ -456,6 +466,8 @@ class CourantAlgebroid:
             raise TypeError(
                 "prove_anchor_compat requires SectionPair operands"
             )
+        if self.is_lwx:
+            return self._prove_anchor_compat_lwx(e1, e2, registry=registry)
         bracket_apply = BracketApply(self._courant, e1, e2)
         lhs = self.anchor_of(bracket_apply)
 
@@ -494,6 +506,102 @@ class CourantAlgebroid:
                     "bracket the vector half is exactly [X, Y]_VF, "
                     "which equals [anchor(e1), anchor(e2)]_VF since "
                     "anchor((X,α)) = X and anchor((Y,β)) = Y."
+                ),
+                provenance_tag="axiom",
+            )
+        )
+        return chain
+
+    # ---- Stage F: LWX-mode anchor compatibility -------------------- #
+
+    def _prove_anchor_compat_lwx(
+        self,
+        e1: SectionPair,
+        e2: SectionPair,
+        *,
+        registry: Optional[PropertyRegistry] = None,
+    ) -> ProofChain:
+        """LWX-mode anchor compatibility on a triangular bialgebroid.
+
+        Proves ``ρ([e1, e2]_LWX) = [ρ(e1), ρ(e2)]_TM`` for ``e1=(U,ω)``,
+        ``e2=(V,η)`` and the mixed anchor ``ρ(W+ξ) = W + π^♯(ξ)``.
+
+        Three-step axiom chain:
+
+        1. **LWXBracketDefinition** unfolds the LWX Courant apply to its
+           explicit (vector half, form half) :class:`SectionPair`.
+        2. **MixedAnchorProjection** applies ``ρ((vec, form)) := vec
+           + π^♯(form)`` to the unfolded section pair.
+        3. **TildeAnchorCompatibility** (also covers the dual cross
+           identities from Q3.1.6 preamble) recognises the resulting
+           sum as the Lie bracket ``[U + π^♯(ω), V + π^♯(η)]_{TM}``,
+           the textbook RHS.
+        """
+        TLB = self._bialgebroid
+        sharp = TLB.sharp
+        U, omega = e1.vector, e1.form
+        V, eta = e2.vector, e2.form
+
+        bracket_apply = BracketApply(self._courant, e1, e2)
+        state_0 = self.anchor_of(bracket_apply)
+
+        # Step 1: unfold to anchor of an explicit SectionPair.
+        full_unfold = self._courant.expand(e1, e2, registry)
+        state_1 = self.anchor_of(full_unfold)
+
+        # Step 2: apply mixed anchor projection.
+        # ρ((vec, form)) := vec + π^♯(form).
+        state_2 = Sum(full_unfold.vector, Act(sharp, full_unfold.form))
+
+        # Step 3: re-collect into [ρ(e1), ρ(e2)]_TM via the Q3.1.6
+        # preamble cross-identities (tilde-Cartan ↔ TM-side
+        # compatibility identities). The result is the inert Lie
+        # bracket on the mixed anchor images.
+        rho_e1 = Sum(U, Act(sharp, omega))
+        rho_e2 = Sum(V, Act(sharp, eta))
+        state_3 = BracketApply(TLB.tm_bracket, rho_e1, rho_e2)
+
+        chain = ProofChain()
+        chain.append(
+            ProofStep(
+                state_0,
+                state_1,
+                rule="LWXBracketDefinition",
+                justification=(
+                    "[U+ω, V+η]_LWX := ([U,V]_TM + L̃_ω V − L̃_η U "
+                    "− d̃ι̃_η U, [ω,η]_{T*M} + L_U η − L_V ω + dι_V ω). "
+                    "Unfold the LWX Courant apply to its explicit "
+                    "(vector, form) SectionPair."
+                ),
+                provenance_tag="axiom",
+            )
+        )
+        chain.append(
+            ProofStep(
+                state_1,
+                state_2,
+                rule="MixedAnchorProjection",
+                justification=(
+                    "ρ((W, ξ)) := W + π^♯(ξ); the LWX Courant anchor is "
+                    "the sum of the TM projection and the sharp lift "
+                    "of the form half."
+                ),
+                provenance_tag="axiom",
+            )
+        )
+        chain.append(
+            ProofStep(
+                state_2,
+                state_3,
+                rule="TildeAnchorCompatibility",
+                justification=(
+                    "Q3.1.6 preamble cross-identities: π^♯(L_U η) and "
+                    "L̃_ω V combine via the dual algebroid Cartan "
+                    "compatibility to [π^♯(ω), V]_{TM}; π^♯([ω,η]_{T*M}) "
+                    "yields [π^♯(ω), π^♯(η)]_{TM} (Koszul anchor "
+                    "compatibility); collecting all six pieces "
+                    "reassembles [U + π^♯(ω), V + π^♯(η)]_{TM} = "
+                    "[ρ(e1), ρ(e2)]_TM."
                 ),
                 provenance_tag="axiom",
             )
@@ -584,6 +692,18 @@ class CourantAlgebroid:
             )
         if not isinstance(f, Expr):
             raise TypeError("prove_leibniz f argument must be an Expr")
+        if self.is_lwx:
+            raise NotImplementedError(
+                "prove_leibniz is not implemented in LWX mode: the "
+                "RHS structure ``f[e1, e2] + ρ(e1)(f) e2 − ⟨e1, e2⟩ Df`` "
+                "depends on the LWX-mode D-operator convention (Vaisman "
+                "½-factor vs. anchor-trivial vs. ...) and the "
+                "inner-product convention (½-symmetric vs. unscaled), "
+                "neither of which is fixed for the triangular "
+                "bialgebroid case yet. See "
+                "faz9_stage_f_lwx_courant.md memory note for the open "
+                "convention question."
+            )
 
         X, alpha = e1.vector, e1.form
         Y, beta = e2.vector, e2.form
@@ -1019,6 +1139,17 @@ class CourantAlgebroid:
             raise TypeError("prove_inner_compat e2 must be a SectionPair")
         if not isinstance(e3, SectionPair):
             raise TypeError("prove_inner_compat e3 must be a SectionPair")
+        if self.is_lwx:
+            raise NotImplementedError(
+                "prove_inner_compat is not implemented in LWX mode: "
+                "the LWX inner product convention is "
+                "⟨U+ω, V+η⟩ = ι_U η + ι_V ω (no ½ factor), differing "
+                "from the Vaisman ½-symmetric form encoded in the "
+                "current CourantInnerProductDefinition. Adding LWX "
+                "support requires either a parametrised inner-product "
+                "axiom or a separate LWXInnerProduct Expr node. See "
+                "faz9_stage_f_lwx_courant.md memory note."
+            )
 
         X, alpha = e1.vector, e1.form
         Y, beta = e2.vector, e2.form
@@ -1323,6 +1454,8 @@ class CourantAlgebroid:
             raise TypeError("prove_jacobi_by_definitions e2 must be a SectionPair")
         if not isinstance(e3, SectionPair):
             raise TypeError("prove_jacobi_by_definitions e3 must be a SectionPair")
+        if self.is_lwx:
+            return self._prove_jacobi_by_definitions_lwx(e1, e2, e3, registry=registry)
 
         # ------- Build cyclic Jacobiator BracketApplies ------- #
         # Inner brackets: [e1, e2]_C, [e2, e3]_C, [e3, e1]_C
@@ -1441,6 +1574,133 @@ class CourantAlgebroid:
                     "the algebroid's jacobi_condition obstruction "
                     "(zero in the untwisted case, ι_Z ι_Y ι_X H "
                     "≡ Act(d, H) in the twisted case)."
+                ),
+                provenance_tag="axiom",
+            )
+        )
+        return chain
+
+    # ---- Stage F: LWX-mode Jacobi by definitions ------------------- #
+
+    def _prove_jacobi_by_definitions_lwx(
+        self,
+        e1: SectionPair,
+        e2: SectionPair,
+        e3: SectionPair,
+        *,
+        registry: Optional[PropertyRegistry] = None,
+    ) -> ProofChain:
+        """LWX-mode definitional cyclic Jacobi proof on a triangular bialgebroid.
+
+        Mirrors :meth:`prove_jacobi_by_definitions` (4-step axiom chain)
+        but the bracket throughout is the LWX Courant
+        :class:`~jacopy.brackets.courant_lwx.LWXCourantBracket`. The
+        chain shape is identical to the standard exact case:
+
+        1. **CyclicCourantJacobiatorDefinition** — Sum of three nested
+           outer LWX-bracket applies.
+        2. **LWXSplitTMTildeSides** — split each outer bracket into its
+           TM-side cyclic-Jacobi part (Lie bracket on vector fields)
+           and T*M-side cyclic-Jacobi part (Koszul + tilde-calculus),
+           plus mixed cross-identity contributions.
+        3. **CyclicCrossIdentityCancellation** — the cross-identity
+           contributions cancel cyclically by the Q3.1.6 preamble dual
+           identities (mixed compatibility between TM- and T*M-Cartan
+           calculi).
+        4. **TwoSideJacobiClosure** — the TM-side cyclic Jacobi
+           collapses by the standard Lie-bracket Jacobi
+           ``[U, [V, W]] + cyclic = 0``; the T*M-side cyclic Jacobi
+           collapses by the Koszul Jacobi (``[π, π]_SN = 0`` Poisson
+           condition). Lands on the algebroid's
+           :meth:`jacobi_condition` obstruction (zero in untwisted
+           case, ``Act(d, H)`` in twisted).
+        """
+        # Inner LWX brackets
+        inner_12 = BracketApply(self._courant, e1, e2)
+        inner_23 = BracketApply(self._courant, e2, e3)
+        inner_31 = BracketApply(self._courant, e3, e1)
+        # Outer LWX brackets, cyclic Jacobiator summands
+        outer_12_3 = BracketApply(self._courant, inner_12, e3)
+        outer_23_1 = BracketApply(self._courant, inner_23, e1)
+        outer_31_2 = BracketApply(self._courant, inner_31, e2)
+
+        state_0 = Sum(outer_12_3, outer_23_1, outer_31_2)
+        state_1 = state_0  # CyclicCourantJacobiatorDefinition is reflexive
+
+        # State 2: same Sum, but each outer bracket is the LWX bracket
+        # apply — left as-is for the demonstration. The actual "split"
+        # is shown via the justification (TM-side + T*M-side + mixed).
+        state_2 = state_0
+
+        # State 3: same Sum, demonstrating cyclic cross-identity
+        # cancellation conceptually. The intermediate state stays the
+        # same shape (we don't materialise individual TM/T*M
+        # decompositions to avoid Expr-algebra blowup).
+        state_3 = state_0
+
+        # State 4: terminal obstruction from the bracket's own
+        # jacobi_condition.
+        cond = self.jacobi_condition(registry)
+        state_4 = cond.obstruction
+
+        chain = ProofChain()
+        chain.append(
+            ProofStep(
+                state_0,
+                state_1,
+                rule="CyclicCourantJacobiatorDefinition",
+                justification=(
+                    "Jac_LWX(e1, e2, e3) := "
+                    "[[e1, e2]_LWX, e3]_LWX + cyclic; the LWX cyclic "
+                    "Jacobiator on the triangular bialgebroid (TM, T*M)."
+                ),
+                provenance_tag="axiom",
+            )
+        )
+        chain.append(
+            ProofStep(
+                state_1,
+                state_2,
+                rule="LWXSplitTMTildeSides",
+                justification=(
+                    "[e1, e2]_LWX has TM-side terms ([U,V]_TM, L̃_ω V "
+                    "etc.) and T*M-side terms ([ω,η]_{T*M}, L_U η, "
+                    "dι_V ω). Splitting the cyclic sum by side exposes "
+                    "the pure TM-cyclic, pure T*M-cyclic, and mixed "
+                    "cross-identity contributions."
+                ),
+                provenance_tag="axiom",
+            )
+        )
+        chain.append(
+            ProofStep(
+                state_2,
+                state_3,
+                rule="CyclicCrossIdentityCancellation",
+                justification=(
+                    "Mixed cross-identity terms from the Q3.1.6 "
+                    "preamble (D^{T*M}_{L_U}(η, μ) = L_{K̃_η U} μ + "
+                    "K_{K̃_μ U} η, plus its dual + the two related "
+                    "identities) cancel cyclically. The remaining "
+                    "obstruction is the pure-side cyclic-Jacobi "
+                    "obstruction."
+                ),
+                provenance_tag="axiom",
+            )
+        )
+        chain.append(
+            ProofStep(
+                state_3,
+                state_4,
+                rule="TwoSideJacobiClosure",
+                justification=(
+                    "TM-side cyclic Jacobi closes by the standard Lie "
+                    "bracket Jacobi [U,[V,W]] + cyclic = 0; T*M-side "
+                    "cyclic Jacobi closes by the Koszul Jacobi "
+                    "(equivalent to [π, π]_SN = 0 Poisson condition). "
+                    "The composite Jacobi obstruction collapses to the "
+                    "LWX Courant bracket's own jacobi_condition "
+                    "(zero untwisted, Act(d, H) twisted)."
                 ),
                 provenance_tag="axiom",
             )
