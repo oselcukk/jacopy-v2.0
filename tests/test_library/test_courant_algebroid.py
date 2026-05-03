@@ -688,3 +688,250 @@ class TestStageEProveLeibniz:
         a, b = ab
         with pytest.raises(TypeError):
             algebroid.prove_leibniz(a, b, "not_an_expr", registry=registry)
+
+
+# --------------------------------------------------------------------- #
+# Stage E.4: prove_inner_compat                                          #
+# --------------------------------------------------------------------- #
+
+
+class TestStageEProveInnerCompat:
+    """Vaisman inner-product compatibility on Courant bracket."""
+
+    @pytest.fixture
+    def e3(self):
+        return SectionPair(Symbol("Z"), Symbol("γ"))
+
+    @pytest.fixture
+    def registry3(self, registry):
+        Z, gamma = Symbol("Z"), Symbol("γ")
+        registry.declare(Z, Graded(degree=0))
+        registry.declare(gamma, Graded(degree=1))
+        return registry
+
+    def test_returns_proof_chain(self, algebroid, ab, e3, registry3):
+        a, b = ab
+        chain = algebroid.prove_inner_compat(a, b, e3, registry=registry3)
+        assert isinstance(chain, ProofChain)
+
+    def test_seven_axiom_steps(self, algebroid, ab, e3, registry3):
+        a, b = ab
+        chain = algebroid.prove_inner_compat(a, b, e3, registry=registry3)
+        assert len(chain) == 7
+
+    def test_all_steps_axiom_tagged(self, algebroid, ab, e3, registry3):
+        """No theorem-citation shortcut; all seven steps are axioms."""
+        a, b = ab
+        chain = algebroid.prove_inner_compat(a, b, e3, registry=registry3)
+        for step in chain.steps:
+            assert step.provenance_tag == "axiom"
+
+    def test_step_rules_in_expected_order(self, algebroid, ab, e3, registry3):
+        a, b = ab
+        chain = algebroid.prove_inner_compat(a, b, e3, registry=registry3)
+        rules = [s.rule for s in chain.steps]
+        assert rules == [
+            "CourantInnerProductDefinition",
+            "PairingLieLeibniz",
+            "VectorLieDerivativeIsBracket",
+            "DAlphaAntisymmetry",
+            "CourantInnerProductDefinition",
+            "DorfmanBracketDefinition",
+            "CourantDorfmanBridge",
+        ]
+
+    def test_chain_consistency(self, algebroid, ab, e3, registry3):
+        """Each step's before equals the previous step's after."""
+        a, b = ab
+        chain = algebroid.prove_inner_compat(a, b, e3, registry=registry3)
+        for i in range(1, len(chain)):
+            assert chain.steps[i].before == chain.steps[i - 1].after
+
+    def test_initial_is_lie_derivative_on_inner_product(
+        self, algebroid, ab, e3, registry3
+    ):
+        from jacopy.algebra.derivation import Act
+        from jacopy.brackets.courant_inner_product import CourantInnerProduct
+        a, b = ab
+        chain = algebroid.prove_inner_compat(a, b, e3, registry=registry3)
+        initial = chain.initial
+        assert isinstance(initial, Act)
+        assert isinstance(initial.arg, CourantInnerProduct)
+
+    def test_final_is_sum_of_two_inner_products(
+        self, algebroid, ab, e3, registry3
+    ):
+        """RHS = ⟨[e1,e2]_C + D⟨e1,e2⟩, e3⟩ + ⟨e2, [e1,e3]_C + D⟨e1,e3⟩⟩."""
+        from jacopy.brackets.courant_inner_product import CourantInnerProduct
+        from jacopy.core.expr import Sum
+        a, b = ab
+        chain = algebroid.prove_inner_compat(a, b, e3, registry=registry3)
+        final = chain.final
+        assert isinstance(final, Sum)
+        assert len(final.children) == 2
+        for child in final.children:
+            assert isinstance(child, CourantInnerProduct)
+
+    def test_dα_antisymmetry_step_uses_pairings(
+        self, algebroid, ab, e3, registry3
+    ):
+        """Step 3 (DAlphaAntisymmetry) introduces ι dα pairings."""
+        a, b = ab
+        chain = algebroid.prove_inner_compat(a, b, e3, registry=registry3)
+        step3_repr = repr(chain.steps[3].after)
+        # The state should now contain ι_? dα-related Pairings.
+        assert "d" in step3_repr  # d operator present
+
+    def test_courant_dorfman_bridge_step_carries_d(
+        self, algebroid, ab, e3, registry3
+    ):
+        """Step 6 (CourantDorfmanBridge reverse) introduces D operator."""
+        from jacopy.brackets.courant_anchor_d import DOperator
+        a, b = ab
+        chain = algebroid.prove_inner_compat(a, b, e3, registry=registry3)
+        # The final state's Sum operands should each carry a Sum of
+        # BracketApply + DOperator on the inner-product e_j operands.
+        assert "D(" in repr(chain.final)
+
+    def test_twisted_same_chain_length(self, twisted, ab, e3, registry3):
+        a, b = ab
+        chain = twisted.prove_inner_compat(a, b, e3, registry=registry3)
+        assert len(chain) == 7
+
+    def test_rejects_non_section_pair_e1(self, algebroid, ab, e3, registry3):
+        a, b = ab
+        with pytest.raises(TypeError):
+            algebroid.prove_inner_compat(
+                Symbol("not_pair"), b, e3, registry=registry3
+            )
+
+    def test_rejects_non_section_pair_e2(self, algebroid, ab, e3, registry3):
+        a, b = ab
+        with pytest.raises(TypeError):
+            algebroid.prove_inner_compat(
+                a, Symbol("not_pair"), e3, registry=registry3
+            )
+
+    def test_rejects_non_section_pair_e3(self, algebroid, ab, registry3):
+        a, b = ab
+        with pytest.raises(TypeError):
+            algebroid.prove_inner_compat(
+                a, b, Symbol("not_pair"), registry=registry3
+            )
+
+
+# --------------------------------------------------------------------- #
+# Stage E.5: prove_jacobi_by_definitions                                 #
+# --------------------------------------------------------------------- #
+
+
+class TestStageEProveJacobiByDefinitions:
+    """Definitional alternative to prove_jacobi_reduction (cyclic Jacobi)."""
+
+    @pytest.fixture
+    def e3(self):
+        return SectionPair(Symbol("Z"), Symbol("γ"))
+
+    def test_returns_proof_chain(self, algebroid, ab, e3):
+        a, b = ab
+        chain = algebroid.prove_jacobi_by_definitions(a, b, e3)
+        assert isinstance(chain, ProofChain)
+
+    def test_four_axiom_steps(self, algebroid, ab, e3):
+        a, b = ab
+        chain = algebroid.prove_jacobi_by_definitions(a, b, e3)
+        assert len(chain) == 4
+
+    def test_all_steps_axiom_tagged(self, algebroid, ab, e3):
+        """No theorem-citation shortcut; all four steps are axioms."""
+        a, b = ab
+        chain = algebroid.prove_jacobi_by_definitions(a, b, e3)
+        for step in chain.steps:
+            assert step.provenance_tag == "axiom"
+
+    def test_step_rules_in_expected_order(self, algebroid, ab, e3):
+        a, b = ab
+        chain = algebroid.prove_jacobi_by_definitions(a, b, e3)
+        rules = [s.rule for s in chain.steps]
+        assert rules == [
+            "CyclicCourantJacobiatorDefinition",
+            "CourantDorfmanBridge",
+            "CyclicDInnerProductCancellation",
+            "DorfmanLodayClosure",
+        ]
+
+    def test_chain_consistency(self, algebroid, ab, e3):
+        a, b = ab
+        chain = algebroid.prove_jacobi_by_definitions(a, b, e3)
+        for i in range(1, len(chain)):
+            assert chain.steps[i].before == chain.steps[i - 1].after
+
+    def test_initial_is_sum_of_three_outer_brackets(self, algebroid, ab, e3):
+        from jacopy.brackets.base import BracketApply
+        from jacopy.core.expr import Sum
+        a, b = ab
+        chain = algebroid.prove_jacobi_by_definitions(a, b, e3)
+        initial = chain.initial
+        assert isinstance(initial, Sum)
+        # Three cyclic summands.
+        assert len(initial.children) == 3
+        for child in initial.children:
+            assert isinstance(child, BracketApply)
+            assert child.bracket is algebroid.courant
+
+    def test_untwisted_final_is_zero(self, algebroid, ab, e3):
+        a, b = ab
+        chain = algebroid.prove_jacobi_by_definitions(a, b, e3)
+        assert chain.final == Integer(0)
+
+    def test_twisted_final_carries_dH(self, twisted, ab, e3):
+        a, b = ab
+        chain = twisted.prove_jacobi_by_definitions(a, b, e3)
+        assert "H" in repr(chain.final)
+        assert "d" in repr(chain.final)
+
+    def test_twisted_chain_same_length(self, twisted, ab, e3):
+        """Both untwisted and twisted produce 4-step chains."""
+        a, b = ab
+        chain = twisted.prove_jacobi_by_definitions(a, b, e3)
+        assert len(chain) == 4
+
+    def test_step_one_brings_in_dorfman(self, algebroid, ab, e3):
+        """Step 1 (bridge) introduces Dorfman bracket and D operator."""
+        a, b = ab
+        chain = algebroid.prove_jacobi_by_definitions(a, b, e3)
+        step1_repr = repr(chain.steps[1].after)
+        assert "_D" in step1_repr  # Dorfman bracket
+        assert "D(" in step1_repr  # D operator
+
+    def test_step_three_uses_jacobi_condition_obstruction(
+        self, algebroid, twisted, ab, e3
+    ):
+        """Step 3's after equals jacobi_condition().obstruction."""
+        a, b = ab
+        chain_u = algebroid.prove_jacobi_by_definitions(a, b, e3)
+        assert chain_u.final == algebroid.jacobi_condition().obstruction
+        chain_t = twisted.prove_jacobi_by_definitions(a, b, e3)
+        assert chain_t.final == twisted.jacobi_condition().obstruction
+
+    def test_rejects_non_section_pair_e1(self, algebroid, ab, e3):
+        a, b = ab
+        with pytest.raises(TypeError):
+            algebroid.prove_jacobi_by_definitions(Symbol("nope"), b, e3)
+
+    def test_rejects_non_section_pair_e2(self, algebroid, ab, e3):
+        a, b = ab
+        with pytest.raises(TypeError):
+            algebroid.prove_jacobi_by_definitions(a, Symbol("nope"), e3)
+
+    def test_rejects_non_section_pair_e3(self, algebroid, ab):
+        a, b = ab
+        with pytest.raises(TypeError):
+            algebroid.prove_jacobi_by_definitions(a, b, Symbol("nope"))
+
+    def test_does_not_replace_prove_jacobi_reduction(self, algebroid):
+        """prove_jacobi_reduction (existing seeded version) still works."""
+        chain = algebroid.prove_jacobi_reduction()
+        assert isinstance(chain, ProofChain)
+        # The two methods coexist; prove_jacobi_by_definitions is the
+        # definitional alternative.
