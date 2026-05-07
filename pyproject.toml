@@ -41,6 +41,7 @@ docs = [
     "ipykernel>=6.0",
 ]
 components = ["sympy>=1.12"]
+parallel = ["joblib>=1.3"]
 dev = [
     "pytest>=7.0",
     "rich>=13.0",
@@ -48,6 +49,7 @@ dev = [
     "nbclient>=0.7",
     "ipykernel>=6.0",
     "sympy>=1.12",
+    "joblib>=1.3",
 ]
 
 [tool.setuptools.packages.find]

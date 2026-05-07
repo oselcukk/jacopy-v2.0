@@ -79,14 +79,31 @@ pip install "jacopy[components] @ git+https://github.com/oselcukk/jacopy-v2.0.gi
 
 ### For development
 
+**Recommended — virtual environment:**
+
 ```bash
 git clone https://github.com/oselcukk/jacopy-v2.0.git
 cd jacopy-v2.0
-pip install -e ".[dev]"        # editable + dev tools (pytest, rich, nbformat, sympy, ...)
+make setup                     # creates .venv, installs deps, registers Jupyter kernel
 ```
 
-> **zsh note:** the brackets in `".[dev]"` need quoting; copy-paste
+Or manually:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev,parallel]"   # editable + dev tools + joblib for parallel Riemann
+python -m ipykernel install --user --name=jacopy --display-name="Python (jacopy .venv)"
+```
+
+> **zsh note:** the brackets in `".[dev,parallel]"` need quoting; copy-paste
 > the line as-is.
+
+**Alternative — single-file requirements:**
+
+```bash
+pip install -r requirements.txt    # no editable install, runtime deps only
+```
 
 ### Optional dependency groups
 
@@ -96,6 +113,7 @@ pip install -e ".[dev]"        # editable + dev tools (pytest, rich, nbformat, s
 | `[test]` | `pytest` |
 | `[docs]` | `nbformat`, `nbclient`, `ipykernel`, needed for tutorial notebooks |
 | `[components]` | `sympy`, required for `jacopy.frame_calc` (component-level differential geometry) |
+| `[parallel]` | `joblib`, multi-core Riemann/Ricci/Einstein for heavy metrics (Kerr, Bianchi-IX) |
 | `[dev]` | All of the above (single one-liner for contributors) |
 
 **Requirements:** Python ≥ 3.10. **Zero required runtime dependencies**

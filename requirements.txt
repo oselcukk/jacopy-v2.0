@@ -1,0 +1,27 @@
+# jacopy runtime + recommended optional dependencies.
+#
+# For development (tests, notebook execution), install via the project's
+# pyproject.toml extras instead:
+#
+#   pip install -e ".[dev]"
+#
+# This file is provided for users who prefer a single-file install.
+# It pins major versions only; bump as the project evolves.
+
+# Core symbolic engine (used by jacopy.frame_calc + symbolic_atoms)
+sympy>=1.12
+
+# Coloured / paper-grade display (display.terminal, display.jupyter)
+rich>=13.0
+
+# Notebook execution + Jupyter kernel (used by tests/test_docs and tutorials)
+ipykernel>=6.0
+nbformat>=5.0
+nbclient>=0.7
+
+# Multi-core symbolic computation (Riemann/Ricci/Einstein parallelisation
+# in heavy metrics like Kerr / Bianchi-IX). loky backend works in Jupyter.
+joblib>=1.3
+
+# Test runner
+pytest>=7.0
