@@ -1,18 +1,24 @@
 """
-Kerr-Newman-de Sitter (KNdS) — optimized pipeline.
+Kerr-Newman-de Sitter (KNdS) — full pipeline.
+
+Christoffel (Γ) → Riemann → Ricci → R-scalar → Einstein, all entries
+printed with index numbering.
 
 Optimizations:
-  1. Tensor symmetries:
-       • Christoffel Γ^a_{bc} = Γ^a_{cb}    → only b ≤ c (40 unique vs 64)
-       • Riemann R^a_{bcd} = -R^a_{cbd}     → only b < c, b≠c (96 vs 256)
-       • Ricci/Einstein symmetric             → only a ≤ b (10 vs 16)
-  2. CSE (Common Subexpression Elimination): cross-tensor shared
-     subexpressions extracted, simplified once, substituted back.
-  3. Smart simplify chain: together → cancel → trigsimp → factor
-     (replaces brute-force sp.simplify).
-  4. Multiprocess (joblib loky): paralel simplify.
-  5. Auxiliary symbols: Σ, Δ_r, Δ_θ, Ξ as SymPy Functions, kept atomic
+  1. Auxiliary symbols Σ, Δ_r, Δ_θ, Ξ as SymPy Function — kept atomic
      during computation, expanded only at the end.
+  2. Tensor symmetries:
+       • Christoffel Γ^a_{bc} = Γ^a_{cb}    → only b ≤ c (40 vs 64)
+       • Riemann R^a_{bcd} = -R^a_{cbd}     → only j < k (96 vs 256)
+       • Ricci/Einstein symmetric             → only a ≤ b (10 vs 16)
+  3. CSE (Common Subexpression Elimination) — shared subexpressions
+     across LC + Ric + G + R simplified once.
+  4. Smart simplify chain: together → cancel → trigsimp → factor
+     (replaces brute-force sp.simplify).
+  5. Multiprocess (joblib loky) — parallel simplify.
+
+Tested on Colab Pro (25GB RAM, 4-8 cores) — bottleneck is `sp.cancel`
+on the heaviest Ric/G entries, but RAM stays under control.
 """
 
 import os
@@ -91,12 +97,11 @@ coord_syms  = (t, r, theta, varphi)
 n = 4
 
 # ============================================================== #
-# 4) Smart simplify (Optimization 3)                              #
+# 4) Smart simplify                                                #
 # ============================================================== #
 
 def smart_simplify(expr):
-    """together → cancel → trigsimp → factor.
-    sp.simplify yerine targeted chain — 2-3x daha hızlı."""
+    """together → cancel → trigsimp → factor."""
     e = sp.together(expr)
     e = sp.cancel(e)
     e = sp.trigsimp(e)
@@ -120,23 +125,20 @@ LC = levi_civita(g, optimized=True)
 print(f"[{time.strftime('%H:%M:%S')}] LC done ({time.time()-t0:.1f}s)", flush=True)
 
 # ============================================================== #
-# 6) Riemann (Optimization 1: only j < k, antisymmetry mirror)    #
+# 6) Riemann (j < k antisymmetry exploitation)                     #
 # ============================================================== #
 
-print(f"[{time.strftime('%H:%M:%S')}] Computing Riemann (96 unique entries instead of 256)...", flush=True)
+print(f"[{time.strftime('%H:%M:%S')}] Computing Riemann (96 unique entries)...", flush=True)
 t0 = time.time()
 LC_comp = [[[LC[i, j, k] for k in range(n)] for j in range(n)] for i in range(n)]
 
 R = sp.MutableDenseNDimArray.zeros(n, n, n, n)
-# R^i_{jkl} antisymmetric in (j, k): R[i, j, k, l] = -R[i, k, j, l]
-# Diagonal (j = k): R = 0 automatic
 for i, j, k, l in product(range(n), repeat=4):
     if j == k:
-        continue                    # 0 by antisymmetry
-    if j > k:
-        R[i, j, k, l] = -R[i, k, j, l]   # mirror from already-computed
         continue
-    # j < k: compute
+    if j > k:
+        R[i, j, k, l] = -R[i, k, j, l]
+        continue
     term1 = sp.diff(LC_comp[i][k][l], coord_syms[j])
     term2 = sp.diff(LC_comp[i][j][l], coord_syms[k])
     prod1 = sum(LC_comp[i][j][e] * LC_comp[e][k][l] for e in range(4))
@@ -145,10 +147,10 @@ for i, j, k, l in product(range(n), repeat=4):
 print(f"[{time.strftime('%H:%M:%S')}] Riemann done ({time.time()-t0:.1f}s)", flush=True)
 
 # ============================================================== #
-# 7) Ricci, R-scalar, Einstein (Opt 1: only a ≤ b, mirror)        #
+# 7) Ricci, R-scalar, Einstein                                    #
 # ============================================================== #
 
-print(f"[{time.strftime('%H:%M:%S')}] Computing Ric, R-scalar, G (10 unique each instead of 16)...", flush=True)
+print(f"[{time.strftime('%H:%M:%S')}] Computing Ric, R-scalar, G...", flush=True)
 t0 = time.time()
 
 Ric_unique = [(j, l) for j in range(n) for l in range(j, n)]
@@ -157,7 +159,7 @@ for j, l in Ric_unique:
     val = sum(R[i, j, i, l] for i in range(n))
     Ric[j, l] = val
     if j != l:
-        Ric[l, j] = val   # mirror
+        Ric[l, j] = val
 
 g_inv_mat = sp.Matrix(g_mat).inv()
 R_scalar  = sum(g_inv_mat[i, j] * Ric[i, j] for i in range(n) for j in range(n))
@@ -172,16 +174,14 @@ for i, j in Ric_unique:
 print(f"[{time.strftime('%H:%M:%S')}] Assembled ({time.time()-t0:.1f}s)", flush=True)
 
 # ============================================================== #
-# 8) CSE + parallel simplify (Optimizations 2 + 3 + 4)            #
+# 8) CSE                                                           #
 # ============================================================== #
 
-# Index sets — sadece unique entry'ler
 LC_unique = [(i, j, k) for i in range(n) for j in range(n) for k in range(j, n)]
 
 print(f"[{time.strftime('%H:%M:%S')}] CSE: collecting unique expressions...", flush=True)
 t0 = time.time()
 
-# Tüm unique entry'leri tek liste yap — CSE tüm bunlara birden bakar
 all_raw = (
     [LC[i, j, k] for i, j, k in LC_unique] +
     [Ric[i, j] for i, j in Ric_unique] +
@@ -193,15 +193,18 @@ print(f"  Total unique entries: {len(all_raw)} "
       f"(LC={n_lc}, Ric={n_ric}, G={n_ric}, R=1)", flush=True)
 
 substitutions, simplified_exprs = sp.cse(all_raw)
-print(f"  CSE found {len(substitutions)} shared subexpressions.", flush=True)
-print(f"  CSE took {time.time()-t0:.1f}s", flush=True)
+print(f"  CSE found {len(substitutions)} shared subexpressions ({time.time()-t0:.1f}s)", flush=True)
 
-# Shared subs — auxiliary expand + smart_simplify (paralel)
-print(f"[{time.strftime('%H:%M:%S')}] Simplifying {len(substitutions)} shared subexpressions ({n_jobs} workers)...", flush=True)
+# ============================================================== #
+# 9) Parallel simplify of shared subexpressions                    #
+# ============================================================== #
+
+print(f"[{time.strftime('%H:%M:%S')}] Simplifying {len(substitutions)} "
+      f"shared subexpressions ({n_jobs} workers)...", flush=True)
 t0 = time.time()
 
 if substitutions:
-    shared_simp_vals = Parallel(n_jobs=n_jobs, backend="loky")(
+    shared_simp_vals = Parallel(n_jobs=n_jobs, backend="loky", verbose=5)(
         delayed(expand_and_simplify)(val) for sym, val in substitutions
     )
     shared_simp = dict(zip([sym for sym, _ in substitutions], shared_simp_vals))
@@ -210,80 +213,41 @@ else:
 
 print(f"  Shared simplify: {time.time()-t0:.1f}s", flush=True)
 
-# Substitute shared back — STREAMING DISK-CACHED VERSION
-#
-# Memory-safety: instead of holding all 61 large expressions in RAM
-# simultaneously (8 workers × ~big expr ≈ swap pressure → freeze),
-# process ONE entry at a time, write result to disk, free memory,
-# move on. Final read-back happens just before print.
-#
-# Also: `xreplace` instead of `subs` — atomic replace, faster + less RAM.
+# ============================================================== #
+# 10) Back-substitute (reverse CSE order) + cancel                 #
+# ============================================================== #
 
-import pickle
-import gc
-from pathlib import Path
-
-CACHE_DIR = Path("kerr_cache")
-CACHE_DIR.mkdir(exist_ok=True)
-print(f"[{time.strftime('%H:%M:%S')}] Cache dir: {CACHE_DIR.absolute()}", flush=True)
-
-# CSE state — save immediately as crash-recovery checkpoint
 sub_pairs = list(substitutions)
-with open(CACHE_DIR / "cse_state.pkl", "wb") as f:
-    pickle.dump({"sub_pairs": sub_pairs, "shared_simp": shared_simp}, f)
-print(f"  CSE checkpoint saved ({len(sub_pairs)} sub_pairs, "
-      f"{len(shared_simp)} shared values).", flush=True)
+reverse_chain = list(reversed(sub_pairs))
 
-# Build a pure xreplace-friendly dict in REVERSE topo order
-# Single dict for atomic replacement — values still chain, but xreplace
-# in reverse order resolves cleanly.
-reverse_chain = list(reversed(sub_pairs))   # xN, xN-1, ..., x0
-
-def _stream_resolve_save(idx, expr, reverse_chain, shared_dict, aux, cache_dir):
-    """Process ONE entry: resolve CSE chain (reverse order, xreplace),
-    expand auxiliaries, cancel, write to disk, return only index."""
+def back_substitute_resolve(expr, reverse_chain, shared_dict, aux):
+    """Apply CSE subs in REVERSE order (chained refs fully resolved) +
+    expand auxiliaries + cancel."""
     out = expr
-    # xreplace ile tek atomic replace, sequential reverse order
     for sym, _ in reverse_chain:
         if sym in shared_dict:
             out = out.xreplace({sym: shared_dict[sym]})
     out = out.subs(aux).doit()
-    out = sp.cancel(out)
-    # Hemen diske yaz, RAM'den çıkar
-    with open(Path(cache_dir) / f"entry_{idx:03d}.pkl", "wb") as f:
-        pickle.dump(out, f)
-    del out
-    gc.collect()
-    return idx
+    return sp.cancel(out)
 
-# Streaming back-substitute — DÜŞÜK paralelizm (memory için)
-streaming_jobs = max(2, n_jobs // 4)   # 8 yerine 2 — 4x az RAM
-print(f"[{time.strftime('%H:%M:%S')}] Streaming back-substitute "
-      f"({streaming_jobs} workers, disk cache, low-mem mode)...", flush=True)
+print(f"[{time.strftime('%H:%M:%S')}] Back-substituting + cancel ({n_jobs} workers)...", flush=True)
 t0 = time.time()
-done_indices = Parallel(n_jobs=streaming_jobs, backend="loky", verbose=5)(
-    delayed(_stream_resolve_save)(idx, e, reverse_chain, shared_simp,
-                                  expand_aux, str(CACHE_DIR))
-    for idx, e in enumerate(simplified_exprs)
+final_results = Parallel(n_jobs=n_jobs, backend="loky", verbose=5)(
+    delayed(back_substitute_resolve)(e, reverse_chain, shared_simp, expand_aux)
+    for e in simplified_exprs
 )
-print(f"  Streaming back-substitute: {time.time()-t0:.1f}s", flush=True)
+print(f"  Back-substitute: {time.time()-t0:.1f}s", flush=True)
 
-# Sonuçları diskten oku — print öncesi
-print(f"[{time.strftime('%H:%M:%S')}] Loading {len(done_indices)} results from cache...", flush=True)
-t0 = time.time()
-final_results = []
-for idx in range(len(simplified_exprs)):
-    with open(CACHE_DIR / f"entry_{idx:03d}.pkl", "rb") as f:
-        final_results.append(pickle.load(f))
-print(f"  Cache load: {time.time()-t0:.1f}s", flush=True)
+# ============================================================== #
+# 11) Distribute + symmetry mirror                                 #
+# ============================================================== #
 
-# Sonuçları LC_simp, Ric_simp, G_simp, R_scalar_s'e dağıt + simetri yansıt
 LC_simp = {}
 for idx, (i, j, k) in enumerate(LC_unique):
     val = final_results[idx]
     LC_simp[(i, j, k)] = val
     if j != k:
-        LC_simp[(i, k, j)] = val   # Christoffel symmetry mirror
+        LC_simp[(i, k, j)] = val
 
 Ric_simp = {}
 for idx, (i, j) in enumerate(Ric_unique):
@@ -304,7 +268,7 @@ R_scalar_s = final_results[-1]
 print(f"[{time.strftime('%H:%M:%S')}] All done.\n", flush=True)
 
 # ============================================================== #
-# 9) PRINT — full output (every entry, with index)                #
+# 12) PRINT — full output                                          #
 # ============================================================== #
 
 print("=" * 70)
